@@ -10,6 +10,42 @@ import duckdb
 from sieve.models import CurationDecision, CurationRecord
 
 
+def calculate_evidence_score(evidence: list[dict]) -> float:
+    """Calculate Net Evidence Ratio from evidence items.
+
+    Formula: NER = (S+ - S-) / (S+ + S- + S?)
+    Where:
+    - S+ = sum of evidence_strength for SUPPORTS items
+    - S- = sum of evidence_strength for CONTRADICTS items
+    - S? = sum of evidence_strength for UNCERTAIN items
+
+    Returns score from -1 (all contradicting) to +1 (all supporting)
+    """
+    if not evidence:
+        return 0.0
+
+    s_plus = 0.0
+    s_minus = 0.0
+    s_uncertain = 0.0
+
+    for ev in evidence:
+        strength = ev.get("evidence_strength", 1.0)
+        direction = ev.get("direction", "SUPPORTS")
+
+        if direction == "SUPPORTS":
+            s_plus += strength
+        elif direction == "CONTRADICTS":
+            s_minus += strength
+        else:
+            s_uncertain += strength
+
+    total = s_plus + s_minus + s_uncertain
+    if total == 0:
+        return 0.0
+
+    return (s_plus - s_minus) / total
+
+
 class CurationDatabase:
     """DuckDB-backed storage for curation data."""
 
@@ -24,25 +60,30 @@ class CurationDatabase:
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS curation_records (
                 id VARCHAR PRIMARY KEY,
+                last_updated DATE,
                 assertion_subject_id VARCHAR NOT NULL,
                 assertion_subject_label VARCHAR,
                 assertion_predicate VARCHAR NOT NULL,
                 assertion_predicate_label VARCHAR,
                 assertion_object_id VARCHAR NOT NULL,
                 assertion_object_label VARCHAR,
-                provenance_attributed_to VARCHAR,
-                provenance_attributed_to_label VARCHAR,
-                provenance_generated_at DATE,
-                provenance_source_version VARCHAR,
-                provenance_source_uri VARCHAR,
-                evidence_items JSON,
-                source_artifact_uri VARCHAR,
-                source_artifact_type VARCHAR,
+                assertion_display_text VARCHAR,
+                provenance JSON,
+                evidence JSON,
+                evidence_score DOUBLE,
                 status VARCHAR NOT NULL DEFAULT 'PENDING',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        # Add evidence_score column if it doesn't exist (migration)
+        try:
+            self.conn.execute(
+                "ALTER TABLE curation_records ADD COLUMN evidence_score DOUBLE"
+            )
+        except duckdb.CatalogException:
+            pass  # Column already exists
 
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS curation_decisions (
@@ -59,41 +100,43 @@ class CurationDatabase:
 
     def insert_record(self, record: CurationRecord) -> str:
         """Insert a new curation record."""
-        evidence_json = json.dumps(
-            [
-                e.model_dump(mode="json", exclude_none=True)
-                for e in (record.evidence_items or [])
-            ]
+        evidence_list = [
+            e.model_dump(mode="json", exclude_none=True)
+            for e in (record.evidence or [])
+        ]
+        evidence_json = json.dumps(evidence_list)
+
+        # Calculate and cache evidence score
+        evidence_score = calculate_evidence_score(evidence_list)
+
+        provenance_json = (
+            json.dumps(record.provenance.model_dump(mode="json", exclude_none=True))
+            if record.provenance
+            else None
         )
 
         self.conn.execute(
             """
             INSERT INTO curation_records (
-                id, assertion_subject_id, assertion_subject_label,
+                id, last_updated, assertion_subject_id, assertion_subject_label,
                 assertion_predicate, assertion_predicate_label,
-                assertion_object_id, assertion_object_label,
-                provenance_attributed_to, provenance_attributed_to_label,
-                provenance_generated_at, provenance_source_version, provenance_source_uri,
-                evidence_items, source_artifact_uri, source_artifact_type,
-                status, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                assertion_object_id, assertion_object_label, assertion_display_text,
+                provenance, evidence, evidence_score, status, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             [
                 record.id,
+                record.last_updated,
                 record.assertion.subject_id,
                 record.assertion.subject_label,
                 record.assertion.predicate,
                 record.assertion.predicate_label,
                 record.assertion.object_id,
                 record.assertion.object_label,
-                record.provenance.attributed_to if record.provenance else None,
-                record.provenance.attributed_to_label if record.provenance else None,
-                record.provenance.generated_at if record.provenance else None,
-                record.provenance.source_version if record.provenance else None,
-                record.provenance.source_uri if record.provenance else None,
+                record.assertion.display_text,
+                provenance_json,
                 evidence_json,
-                record.source_artifact_uri,
-                record.source_artifact_type,
+                evidence_score,
                 record.status.value if record.status else "PENDING",
                 record.created_at or datetime.now(),
                 record.updated_at or datetime.now(),
@@ -117,6 +160,81 @@ class CurationDatabase:
             [status],
         ).fetchall()
         return [self._row_to_dict(r) for r in results]
+
+    def get_records_paginated(
+        self,
+        status: Optional[str] = None,
+        offset: int = 0,
+        limit: int = 50,
+        sort_by: str = "created_at",
+        sort_order: str = "DESC",
+    ) -> tuple[list[dict], int]:
+        """Get paginated records with sorting.
+
+        Returns tuple of (records, total_count).
+        Only fetches columns needed for table display (not full evidence JSON).
+        """
+        # Validate sort column to prevent SQL injection
+        valid_sort_columns = {
+            "created_at",
+            "evidence_score",
+            "assertion_display_text",
+            "assertion_predicate",
+        }
+        if sort_by not in valid_sort_columns:
+            sort_by = "created_at"
+        if sort_order.upper() not in ("ASC", "DESC"):
+            sort_order = "DESC"
+
+        # Build WHERE clause
+        where_clause = ""
+        params = []
+        if status:
+            where_clause = "WHERE status = ?"
+            params.append(status)
+
+        # Get total count
+        count_query = f"SELECT COUNT(*) FROM curation_records {where_clause}"
+        total_count = self.conn.execute(count_query, params).fetchone()[0]
+
+        # Get paginated results (lightweight columns only for table)
+        query = f"""
+            SELECT
+                id,
+                assertion_display_text,
+                assertion_subject_label,
+                assertion_subject_id,
+                assertion_predicate_label,
+                assertion_predicate,
+                assertion_object_label,
+                assertion_object_id,
+                evidence_score,
+                status,
+                created_at
+            FROM curation_records
+            {where_clause}
+            ORDER BY {sort_by} {sort_order}
+            LIMIT ? OFFSET ?
+        """
+        params.extend([limit, offset])
+        results = self.conn.execute(query, params).fetchall()
+
+        columns = [
+            "id",
+            "assertion_display_text",
+            "assertion_subject_label",
+            "assertion_subject_id",
+            "assertion_predicate_label",
+            "assertion_predicate",
+            "assertion_object_label",
+            "assertion_object_id",
+            "evidence_score",
+            "status",
+            "created_at",
+        ]
+        records = [dict(zip(columns, r)) for r in results]
+
+        return records, total_count
 
     def get_all_records(self) -> list[dict]:
         """Get all records."""
@@ -205,29 +323,29 @@ class CurationDatabase:
         """Convert database row to dictionary."""
         columns = [
             "id",
+            "last_updated",
             "assertion_subject_id",
             "assertion_subject_label",
             "assertion_predicate",
             "assertion_predicate_label",
             "assertion_object_id",
             "assertion_object_label",
-            "provenance_attributed_to",
-            "provenance_attributed_to_label",
-            "provenance_generated_at",
-            "provenance_source_version",
-            "provenance_source_uri",
-            "evidence_items",
-            "source_artifact_uri",
-            "source_artifact_type",
+            "assertion_display_text",
+            "provenance",
+            "evidence",
+            "evidence_score",
             "status",
             "created_at",
             "updated_at",
         ]
         d = dict(zip(columns, row))
-        # Parse JSON evidence
-        if d["evidence_items"]:
-            if isinstance(d["evidence_items"], str):
-                d["evidence_items"] = json.loads(d["evidence_items"])
+        # Parse JSON fields
+        if d["evidence"]:
+            if isinstance(d["evidence"], str):
+                d["evidence"] = json.loads(d["evidence"])
+        if d["provenance"]:
+            if isinstance(d["provenance"], str):
+                d["provenance"] = json.loads(d["provenance"])
         return d
 
     def record_exists(self, record_id: str) -> bool:

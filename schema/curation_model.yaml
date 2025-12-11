@@ -1,6 +1,6 @@
 id: https://w3id.org/curation-app
 name: curation_app
-title: Curation App Data Model
+title: Sieve Data Model
 description: Data model for ontology assertion curation
 
 prefixes:
@@ -24,8 +24,12 @@ classes:
     attributes:
       id:
         identifier: true
-        range: string
-        description: Unique identifier for this record
+        range: uriorcurie
+        description: Unique identifier for this record (e.g., nanopub URI)
+
+      last_updated:
+        range: date
+        description: Date when this record was last updated
 
       assertion:
         range: Assertion
@@ -36,17 +40,10 @@ classes:
         range: AssertionProvenance
         inlined: true
 
-      evidence_items:
-        range: EvidenceItem
+      evidence:
+        range: Evidence
         multivalued: true
         inlined_as_list: true
-
-      source_artifact_uri:
-        range: uri
-        description: URI/path to original source (e.g., nanopub IRI)
-
-      source_artifact_type:
-        range: ArtifactType
 
       status:
         range: CurationStatus
@@ -84,16 +81,18 @@ classes:
       object_label:
         range: string
 
+      display_text:
+        range: string
+        description: Human-readable rendering of the assertion (e.g., "asthma subClassOf respiratory system disorder")
+
 
   AssertionProvenance:
     description: Origin and attribution of the assertion
     attributes:
       attributed_to:
         range: uriorcurie
-        description: ORCID or identifier of original creator
-
-      attributed_to_label:
-        range: string
+        multivalued: true
+        description: ORCIDs or identifiers of original creators
 
       generated_at:
         range: date
@@ -105,9 +104,50 @@ classes:
       source_uri:
         range: uri
 
+      generated_by:
+        range: CurationActivity
+        inlined: true
+        description: The activity that generated this assertion
 
-  EvidenceItem:
-    description: A piece of evidence supporting the assertion
+
+  CurationActivity:
+    description: A curation activity that generated or modified an assertion
+    attributes:
+      id:
+        identifier: true
+        range: string
+
+      description:
+        range: string
+        description: Human-readable description of the curation activity
+
+      associated_with:
+        range: uriorcurie
+        multivalued: true
+        description: ORCIDs or URIs of people/organizations involved
+
+      associated_with_labels:
+        range: string
+        multivalued: true
+
+      started_at:
+        range: date
+
+      ended_at:
+        range: date
+
+      created_with:
+        range: uriorcurie
+        description: Tool or software used (e.g., Protege URI)
+
+      pull_request:
+        range: uriorcurie
+        description: GitHub pull request URL associated with this activity
+
+
+  Evidence:
+    description: A piece of evidence supporting or contradicting the assertion
+    abstract: true
     attributes:
       id:
         identifier: true
@@ -116,6 +156,19 @@ classes:
       evidence_type:
         range: EvidenceType
         required: true
+        designates_type: true
+
+      direction:
+        range: EvidenceDirection
+        description: Whether this evidence supports or contradicts the assertion
+        ifabsent: string(SUPPORTS)
+
+      evidence_strength:
+        range: float
+        description: Strength of the evidence, from 0 (weak) to 1 (strong)
+        ifabsent: float(1.0)
+        minimum_value: 0
+        maximum_value: 1
 
       eco_code:
         range: uriorcurie
@@ -128,10 +181,30 @@ classes:
         range: string
         description: Human-readable description of this evidence
 
-      # Concordance-specific fields
-      source_ontology:
+
+  ConcordanceEvidence:
+    description: Cross-ontology concordance evidence
+    is_a: Evidence
+    class_uri: cura:ConcordanceEvidence
+    attributes:
+      source:
+        range: uriorcurie
+        description: PURL of the concordant source (e.g., http://purl.obolibrary.org/obo/doid.owl)
+
+      source_name:
         range: string
-        description: Name of concordant ontology (e.g., "ICD-10")
+        description: Human-readable name of the source (e.g., "Disease Ontology")
+
+      source_type:
+        range: SourceType
+        description: Type of the concordant source
+
+      predicate_id:
+        range: uriorcurie
+        description: The predicate used in the source assertion
+
+      predicate_label:
+        range: string
 
       source_subject_id:
         range: uriorcurie
@@ -145,11 +218,16 @@ classes:
       source_object_label:
         range: string
 
-      mapping_set_uri:
+      mapping_set:
         range: uri
-        description: SSSOM mapping set reference
+        description: SSSOM mapping set URI reference
 
-      # Literature-specific fields
+
+  LiteratureEvidence:
+    description: Published literature evidence
+    is_a: Evidence
+    class_uri: cura:LiteratureEvidence
+    attributes:
       publication_id:
         range: uriorcurie
         description: e.g., PMID:123456
@@ -165,7 +243,16 @@ classes:
         range: string
         description: Section/page reference
 
-      # Expert review-specific fields
+      explanation:
+        range: string
+        description: Explanation of how the quoted text supports the assertion
+
+
+  ExpertReviewEvidence:
+    description: Domain expert review evidence
+    is_a: Evidence
+    class_uri: cura:ExpertReviewEvidence
+    attributes:
       reviewer_orcid:
         range: uriorcurie
 
@@ -177,6 +264,32 @@ classes:
 
       reviewed_at:
         range: date
+
+      issue:
+        range: uriorcurie
+        description: GitHub issue URL associated with this review
+
+
+  ComputationalEvidence:
+    description: Algorithmically computed evidence
+    is_a: Evidence
+    class_uri: cura:ComputationalEvidence
+    attributes:
+      method:
+        range: string
+        description: Name or description of the computational method
+
+      method_uri:
+        range: uriorcurie
+        description: URI identifying the method
+
+      confidence_score:
+        range: float
+        description: Confidence score from the method
+
+      parameters:
+        range: string
+        description: Parameters used in the computation
 
 
   CurationDecision:
@@ -234,16 +347,36 @@ enums:
     permissible_values:
       CONCORDANCE:
         description: Cross-ontology agreement
+        meaning: cura:ConcordanceEvidence
       LITERATURE:
         description: Published literature support
+        meaning: cura:LiteratureEvidence
       EXPERT_REVIEW:
         description: Domain expert validation
+        meaning: cura:ExpertReviewEvidence
       COMPUTATIONAL:
         description: Algorithmic/computed evidence
+        meaning: cura:ComputationalEvidence
       OTHER:
+        description: Other evidence type
 
-  ArtifactType:
+  SourceType:
     permissible_values:
-      NANOPUB:
-      YAML_FILE:
-      JSON_FILE:
+      ONTOLOGY:
+        description: An ontology source
+      TERMINOLOGY:
+        description: A terminology or classification system
+      DATABASE:
+        description: A database or knowledge base
+      OTHER:
+        description: Other source type
+
+  EvidenceDirection:
+    description: Whether the evidence supports or contradicts the assertion
+    permissible_values:
+      SUPPORTS:
+        description: Evidence supports the assertion
+      CONTRADICTS:
+        description: Evidence contradicts the assertion
+      UNCERTAIN:
+        description: Direction is uncertain or neutral

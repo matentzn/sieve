@@ -1,14 +1,138 @@
-id: mondo-asthma-001
+id: http://purl.org/np/RA9876543210
+last_updated: "2024-01-20"
 assertion:
   subject_id: MONDO:0004979
   subject_label: asthma
   predicate: rdfs:subClassOf
+  predicate_label: subClassOf
   object_id: MONDO:0005275
   object_label: respiratory system disorder
+  display_text: "asthma subClassOf respiratory system disorder"
 
-evidence_items:
-  - id: ev-lit-1
+provenance:
+  attributed_to:
+    - orcid:0000-0002-6601-2165
+  generated_at: "2020-06-15"
+  source_version: "2025-10-08"
+  source_uri: http://purl.obolibrary.org/obo/mondo/releases/2025-10-08/mondo.owl
+  generated_by:
+    id: activity:mondo-asthma-curation-2020
+    description: Mondo disease ontology curation - classification of asthma as respiratory system disorder
+    associated_with:
+      - orcid:0000-0002-6601-2165
+      - https://monarchinitiative.org/
+    started_at: "2020-06-10"
+    ended_at: "2020-06-15"
+    created_with: https://protege.stanford.edu/
+    pull_request: https://github.com/monarch-initiative/mondo/pull/2345
+
+evidence:
+  - id: ev-concordance-icd10
+    evidence_type: CONCORDANCE
+    direction: SUPPORTS
+    evidence_strength: 0.9
+    eco_code: ECO:0000204
+    eco_label: similarity evidence
+    description: Cross-ontology concordance with ICD-10 - The Mondo subClassOf axiom is mirrored by equivalent hierarchical structure in ICD-10
+    source: https://bioportal.bioontology.org/ontologies/ICD10CM
+    source_name: ICD-10-CM
+    source_type: TERMINOLOGY
+    predicate_id: rdfs:subClassOf
+    predicate_label: subClassOf
+    source_subject_id: ICD10CM:J45
+    source_subject_label: Asthma
+    source_object_id: ICD10CM:J00-J99
+    source_object_label: Diseases of the respiratory system
+    mapping_set: https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv
+
+  - id: ev-concordance-doid
+    evidence_type: CONCORDANCE
+    direction: CONTRADICTS
+    evidence_strength: 0.7
+    eco_code: ECO:0000204
+    eco_label: similarity evidence
+    description: Cross-ontology concordance with Disease Ontology - DOID classifies asthma under sensory system disease, not respiratory
+    source: http://purl.obolibrary.org/obo/doid.owl
+    source_name: Disease Ontology
+    source_type: ONTOLOGY
+    predicate_id: rdfs:subClassOf
+    predicate_label: subClassOf
+    source_subject_id: DOID:2841
+    source_subject_label: asthma
+    source_object_id: DOID:0050155
+    source_object_label: sensory system disease
+    mapping_set: https://w3id.org/sssom/mappings/mondo-doid.sssom.tsv
+
+  - id: ev-literature-1
     evidence_type: LITERATURE
-    description: Textbook definition
-    publication_id: PMID:99999999
-    quoted_text: Asthma is a chronic respiratory condition characterized by inflammation of the airways.
+    direction: SUPPORTS
+    evidence_strength: 0.95
+    eco_code: ECO:0000006
+    eco_label: experimental evidence
+    description: Published literature evidence supporting classification
+    publication_id: PMID:28884740
+    publication_title: Global Strategy for Asthma Management and Prevention (GINA 2017)
+    quoted_text: >-
+      Asthma is a heterogeneous disease, usually characterized by chronic airway
+      inflammation. It is defined by the history of respiratory symptoms such as
+      wheeze, shortness of breath, chest tightness and cough that vary over time
+      and in intensity, together with variable expiratory airflow limitation.
+    quote_location: Chapter 1, Definition, page 14
+    explanation: >-
+      This text explicitly defines asthma as a disease characterized by respiratory
+      symptoms (wheeze, shortness of breath, chest tightness, cough) and airflow
+      limitation, directly supporting its classification as a respiratory system disorder.
+
+  - id: ev-literature-2
+    evidence_type: LITERATURE
+    direction: SUPPORTS
+    evidence_strength: 0.85
+    eco_code: ECO:0000006
+    eco_label: experimental evidence
+    description: Published literature evidence supporting respiratory classification
+    publication_id: PMID:31542051
+    publication_title: Pathophysiology of Asthma
+    quoted_text: >-
+      Asthma is a chronic inflammatory disorder of the airways involving multiple
+      cell types and cellular elements. The chronic inflammation is associated
+      with airway hyperresponsiveness that leads to recurrent episodes of wheezing,
+      breathlessness, chest tightness, and coughing.
+    quote_location: Abstract
+    explanation: >-
+      The text describes asthma as a disorder of the airways with respiratory
+      manifestations, confirming its classification under respiratory system disorders.
+
+  - id: ev-expert-review
+    evidence_type: EXPERT_REVIEW
+    direction: SUPPORTS
+    evidence_strength: 0.8
+    eco_code: ECO:0000218
+    eco_label: manual assertion
+    description: Clinical pulmonologist review confirming classification of asthma as a respiratory system disorder
+    reviewer_orcid: orcid:0000-0003-4567-8901
+    reviewer_name: Dr. Sarah Chen
+    reviewer_affiliation: Johns Hopkins Medicine, Division of Pulmonary and Critical Care
+    reviewed_at: "2024-01-20"
+    issue: https://github.com/monarch-initiative/mondo/issues/7890
+
+  - id: ev-ai-research
+    evidence_type: COMPUTATIONAL
+    direction: SUPPORTS
+    evidence_strength: 0.75
+    eco_code: ECO:0008006
+    eco_label: computational evidence
+    description: ChatGPT Deep Research analysis of asthma classification in medical literature
+    method: ChatGPT Deep Research
+    method_uri: https://openai.com/chatgpt
+    confidence_score: 0.92
+    parameters: >-
+      Prompt: "Analyze the medical literature to determine whether asthma should be
+      classified as a respiratory system disorder. Consider pathophysiology, clinical
+      presentation, and standard medical classifications."
+
+      Summary: Deep research analysis of 47 sources including medical textbooks,
+      peer-reviewed articles, and clinical guidelines. Found unanimous consensus that
+      asthma is primarily a respiratory condition characterized by airway inflammation,
+      bronchospasm, and respiratory symptoms. All major classification systems (ICD-10,
+      SNOMED CT, MeSH) place asthma under respiratory disorders. The analysis found no
+      credible sources suggesting alternative classifications.

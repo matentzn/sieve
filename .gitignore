@@ -141,3 +141,6 @@ dmypy.json
 .vscode
 data/curation.duckdb.wal
 data/curation.duckdb
+
+# Curators list (contains authorized user ORCIDs)
+curators.yaml

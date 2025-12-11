@@ -37,7 +37,7 @@ def test_parse_record_with_evidence():
             "object_id": "MONDO:0002",
             "object_label": "disease B",
         },
-        "evidence_items": [
+        "evidence": [
             {
                 "id": "ev-001",
                 "evidence_type": "LITERATURE",
@@ -48,9 +48,9 @@ def test_parse_record_with_evidence():
     }
     record = parse_curation_record(data)
     assert record.id == "test-002"
-    assert len(record.evidence_items) == 1
-    assert record.evidence_items[0].evidence_type.value == "LITERATURE"
-    assert record.evidence_items[0].publication_id == "PMID:12345"
+    assert len(record.evidence) == 1
+    assert record.evidence[0].evidence_type.value == "LITERATURE"
+    assert record.evidence[0].publication_id == "PMID:12345"
 
 
 def test_insert_and_retrieve(db):

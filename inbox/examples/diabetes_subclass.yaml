@@ -1,4 +1,5 @@
-id: mondo-diabetes-001
+id: http://purl.org/np/RA1234567890
+last_updated: "2024-03-15"
 assertion:
   subject_id: MONDO:0005015
   subject_label: diabetes mellitus
@@ -6,32 +7,41 @@ assertion:
   predicate_label: subClassOf
   object_id: MONDO:0005151
   object_label: endocrine system disorder
+  display_text: "diabetes mellitus subClassOf endocrine system disorder"
 
 provenance:
-  attributed_to: orcid:0000-0002-9553-7227
-  attributed_to_label: Dr. Alice Chen
+  attributed_to:
+    - orcid:0000-0002-9553-7227
   generated_at: "2019-03-22"
   source_version: Mondo 2019-03-22
   source_uri: http://purl.obolibrary.org/obo/mondo/releases/2019-03-22/mondo.owl
 
-evidence_items:
+evidence:
   - id: ev-concordance-icd10
     evidence_type: CONCORDANCE
+    direction: SUPPORTS
+    evidence_strength: 0.95
     eco_code: ECO:0000204
     eco_label: similarity evidence
-    description: Cross-ontology concordance with ICD-10
-    source_ontology: ICD-10
-    source_subject_id: ICD10:E11
+    description: Cross-ontology concordance with ICD-10 - diabetes classified under endocrine diseases
+    source: https://bioportal.bioontology.org/ontologies/ICD10CM
+    source_name: ICD-10-CM
+    source_type: TERMINOLOGY
+    predicate_id: rdfs:subClassOf
+    predicate_label: subClassOf
+    source_subject_id: ICD10CM:E11
     source_subject_label: Type 2 diabetes mellitus
-    source_object_id: ICD10:E00-E89
+    source_object_id: ICD10CM:E00-E89
     source_object_label: Endocrine, nutritional and metabolic diseases
-    mapping_set_uri: https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv
+    mapping_set: https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv
 
   - id: ev-literature-1
     evidence_type: LITERATURE
+    direction: SUPPORTS
+    evidence_strength: 0.9
     eco_code: ECO:0000006
     eco_label: experimental evidence
-    description: Published literature evidence
+    description: Published literature evidence supporting endocrine classification
     publication_id: PMID:12345678
     publication_title: Classification of Diabetes as an Endocrine Disorder
     quoted_text: >-
@@ -39,16 +49,38 @@ evidence_items:
       disorders fundamentally rooted in endocrine dysfunction, specifically
       involving the pancreatic islet cells and their insulin-producing capacity.
     quote_location: Results, Section 3.2, paragraph 1
+    explanation: >-
+      The text explicitly states that diabetes is rooted in endocrine dysfunction
+      involving pancreatic islet cells, directly supporting its classification
+      as an endocrine system disorder.
+
+  - id: ev-literature-2
+    evidence_type: LITERATURE
+    direction: CONTRADICTS
+    evidence_strength: 0.6
+    eco_code: ECO:0000006
+    eco_label: experimental evidence
+    description: Some argue diabetes is primarily a metabolic disorder
+    publication_id: PMID:29876543
+    publication_title: Rethinking Diabetes Classification - A Metabolic Perspective
+    quoted_text: >-
+      While traditionally classified under endocrine disorders, diabetes mellitus
+      is fundamentally a disorder of glucose metabolism. The focus on insulin
+      secretion overlooks the broader metabolic dysregulation that defines the disease.
+    quote_location: Discussion, page 412
+    explanation: >-
+      This text argues that diabetes should be classified as a metabolic disorder
+      rather than an endocrine disorder, challenging the traditional classification.
 
   - id: ev-expert-review
     evidence_type: EXPERT_REVIEW
+    direction: SUPPORTS
+    evidence_strength: 0.85
     eco_code: ECO:0000218
     eco_label: manual assertion
-    description: Clinical specialist review
+    description: Clinical endocrinologist review supporting classification
     reviewer_orcid: orcid:0000-0002-1234-5678
     reviewer_name: Dr. Jane Smith
     reviewer_affiliation: Massachusetts General Hospital, Endocrinology
     reviewed_at: "2024-03-15"
-
-source_artifact_uri: http://purl.org/np/RA1234567890
-source_artifact_type: NANOPUB
+    issue: https://github.com/monarch-initiative/mondo/issues/5432

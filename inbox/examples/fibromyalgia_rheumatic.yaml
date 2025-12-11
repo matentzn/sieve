@@ -1,0 +1,85 @@
+id: http://purl.org/np/RA3456789012
+last_updated: "2024-04-22"
+assertion:
+  subject_id: MONDO:0005546
+  subject_label: fibromyalgia
+  predicate: rdfs:subClassOf
+  predicate_label: subClassOf
+  object_id: MONDO:0005554
+  object_label: rheumatic disease
+  display_text: "fibromyalgia subClassOf rheumatic disease"
+
+provenance:
+  attributed_to:
+    - orcid:0000-0002-3456-7890
+  generated_at: "2022-08-10"
+  source_version: Mondo 2022-08-10
+  source_uri: http://purl.obolibrary.org/obo/mondo/releases/2022-08-10/mondo.owl
+
+evidence:
+  - id: ev-literature-acr
+    evidence_type: LITERATURE
+    direction: SUPPORTS
+    evidence_strength: 0.4
+    eco_code: ECO:0000006
+    eco_label: experimental evidence
+    description: ACR historically classified fibromyalgia with rheumatic conditions
+    publication_id: PMID:2306288
+    publication_title: The American College of Rheumatology 1990 Criteria for Fibromyalgia
+    quoted_text: >-
+      Fibromyalgia is classified as a rheumatic condition based on its presentation
+      with widespread musculoskeletal pain and tenderness at specific anatomical sites.
+    quote_location: Methods, page 160
+    explanation: >-
+      Historical classification by ACR placed fibromyalgia among rheumatic conditions,
+      though this was based on symptom presentation rather than pathophysiology.
+
+  - id: ev-literature-neuro
+    evidence_type: LITERATURE
+    direction: UNCERTAIN
+    evidence_strength: 0.6
+    eco_code: ECO:0000006
+    eco_label: experimental evidence
+    description: Growing evidence for central sensitization mechanism
+    publication_id: PMID:28389214
+    publication_title: Central Sensitization in Fibromyalgia - A Neurological Perspective
+    quoted_text: >-
+      Evidence increasingly suggests that fibromyalgia is characterized by
+      central sensitization and altered pain processing in the central nervous
+      system. However, the exact classification remains debated, with some
+      advocating for neurological and others for rheumatic categorization.
+    quote_location: Discussion, page 892
+    explanation: >-
+      This text indicates uncertainty about the classification, noting evidence
+      for neurological mechanisms while acknowledging the ongoing debate.
+
+  - id: ev-concordance-snomed
+    evidence_type: CONCORDANCE
+    direction: SUPPORTS
+    evidence_strength: 0.5
+    eco_code: ECO:0000204
+    eco_label: similarity evidence
+    description: SNOMED CT places fibromyalgia under soft tissue disorders
+    source: https://browser.ihtsdotools.org/
+    source_name: SNOMED CT
+    source_type: TERMINOLOGY
+    predicate_id: rdfs:subClassOf
+    predicate_label: subClassOf
+    source_subject_id: SCTID:24693007
+    source_subject_label: Fibromyalgia
+    source_object_id: SCTID:19660004
+    source_object_label: Disorder of soft tissue
+    mapping_set: https://w3id.org/sssom/mappings/mondo-snomed.sssom.tsv
+
+  - id: ev-expert-uncertain
+    evidence_type: EXPERT_REVIEW
+    direction: UNCERTAIN
+    evidence_strength: 0.5
+    eco_code: ECO:0000218
+    eco_label: manual assertion
+    description: Rheumatologist notes classification is controversial
+    reviewer_orcid: orcid:0000-0001-2345-6789
+    reviewer_name: Dr. Elena Rodriguez
+    reviewer_affiliation: Johns Hopkins Arthritis Center
+    reviewed_at: "2024-04-20"
+    issue: https://github.com/monarch-initiative/mondo/issues/6789

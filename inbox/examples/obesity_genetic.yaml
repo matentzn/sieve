@@ -1,0 +1,132 @@
+id: http://purl.org/np/RA4567890123
+last_updated: "2024-05-18"
+assertion:
+  subject_id: MONDO:0011122
+  subject_label: obesity
+  predicate: rdfs:subClassOf
+  predicate_label: subClassOf
+  object_id: MONDO:0003847
+  object_label: genetic disease
+  display_text: "obesity subClassOf genetic disease"
+
+provenance:
+  attributed_to:
+    - orcid:0000-0003-4567-8901
+  generated_at: "2023-11-20"
+  source_version: Mondo 2023-11-20
+  source_uri: http://purl.obolibrary.org/obo/mondo/releases/2023-11-20/mondo.owl
+  generated_by:
+    id: activity:obesity-genetics-review
+    description: Proposed reclassification of obesity as primarily genetic
+    associated_with:
+      - orcid:0000-0003-4567-8901
+    started_at: "2023-11-15"
+    ended_at: "2023-11-20"
+    pull_request: https://github.com/monarch-initiative/mondo/pull/8901
+
+evidence:
+  - id: ev-literature-gwas
+    evidence_type: LITERATURE
+    direction: SUPPORTS
+    evidence_strength: 0.55
+    eco_code: ECO:0000006
+    eco_label: experimental evidence
+    description: GWAS studies identify genetic variants associated with obesity
+    publication_id: PMID:30677029
+    publication_title: Genome-wide Association Studies of Obesity
+    quoted_text: >-
+      GWAS have identified over 900 genetic loci associated with body mass index
+      and obesity-related traits, explaining approximately 6% of BMI variance.
+    quote_location: Results, page 245
+    explanation: >-
+      While genetic factors contribute to obesity risk, the 6% variance explained
+      suggests genetics is only one factor among many, providing weak support
+      for classifying obesity as a genetic disease.
+
+  - id: ev-literature-environmental
+    evidence_type: LITERATURE
+    direction: CONTRADICTS
+    evidence_strength: 0.9
+    eco_code: ECO:0000006
+    eco_label: experimental evidence
+    description: Environmental and behavioral factors are primary drivers
+    publication_id: PMID:28402261
+    publication_title: The Global Obesity Pandemic - Shaped by Global Drivers and Local Environments
+    quoted_text: >-
+      The rapid rise in obesity prevalence over the past 50 years cannot be
+      explained by genetic changes, which occur over much longer timescales.
+      Environmental factors including food availability, physical activity
+      patterns, and socioeconomic conditions are the primary drivers of the
+      obesity epidemic.
+    quote_location: Discussion, page 1342
+    explanation: >-
+      This strongly contradicts the genetic classification, noting that the
+      rapid increase in obesity rates rules out genetics as the primary cause.
+
+  - id: ev-concordance-icd10
+    evidence_type: CONCORDANCE
+    direction: CONTRADICTS
+    evidence_strength: 0.85
+    eco_code: ECO:0000204
+    eco_label: similarity evidence
+    description: ICD-10 classifies obesity under metabolic disorders, not genetic
+    source: https://bioportal.bioontology.org/ontologies/ICD10CM
+    source_name: ICD-10-CM
+    source_type: TERMINOLOGY
+    predicate_id: rdfs:subClassOf
+    predicate_label: subClassOf
+    source_subject_id: ICD10CM:E66
+    source_subject_label: Overweight and obesity
+    source_object_id: ICD10CM:E00-E89
+    source_object_label: Endocrine, nutritional and metabolic diseases
+    mapping_set: https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv
+
+  - id: ev-expert-epidemiology
+    evidence_type: EXPERT_REVIEW
+    direction: CONTRADICTS
+    evidence_strength: 0.8
+    eco_code: ECO:0000218
+    eco_label: manual assertion
+    description: Epidemiologist rejects genetic disease classification
+    reviewer_orcid: orcid:0000-0002-8765-4321
+    reviewer_name: Dr. Sarah Williams
+    reviewer_affiliation: Harvard T.H. Chan School of Public Health
+    reviewed_at: "2024-05-15"
+    issue: https://github.com/monarch-initiative/mondo/issues/10234
+
+  - id: ev-expert-genetics
+    evidence_type: EXPERT_REVIEW
+    direction: SUPPORTS
+    evidence_strength: 0.4
+    eco_code: ECO:0000218
+    eco_label: manual assertion
+    description: Geneticist notes monogenic obesity forms exist
+    reviewer_orcid: orcid:0000-0001-9876-5432
+    reviewer_name: Dr. James Chen
+    reviewer_affiliation: Broad Institute of MIT and Harvard
+    reviewed_at: "2024-05-16"
+    issue: https://github.com/monarch-initiative/mondo/issues/10234
+
+  - id: ev-ai-analysis
+    evidence_type: COMPUTATIONAL
+    direction: CONTRADICTS
+    evidence_strength: 0.75
+    eco_code: ECO:0008006
+    eco_label: computational evidence
+    description: AI systematic review of obesity classification
+    method: GPT-4 Deep Research
+    method_uri: https://openai.com/gpt-4
+    confidence_score: 0.85
+    parameters: >-
+      Prompt: "Analyze whether obesity should be classified as a genetic disease
+      based on current scientific evidence."
+
+      Summary: Review of 156 sources indicates that while genetic factors
+      contribute to obesity susceptibility, classifying obesity as a genetic
+      disease is not supported by current evidence. Key findings:
+      - Heritability estimates (40-70%) indicate significant non-genetic factors
+      - Monogenic obesity forms exist but represent <5% of cases
+      - Rapid prevalence increase incompatible with genetic causation
+      - WHO, ICD, and major health organizations classify obesity as
+        nutritional/metabolic, not genetic
+      Recommendation: Reject genetic disease classification for general obesity.

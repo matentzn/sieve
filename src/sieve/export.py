@@ -111,13 +111,13 @@ def export_accepted_records(
                         )
                     )
 
-                # Link to source artifact
-                if record.get("source_artifact_uri"):
+                # Link to source record
+                if record.get("id"):
                     g.add(
                         (
                             decision_uri,
                             PROV.wasDerivedFrom,
-                            URIRef(record["source_artifact_uri"]),
+                            URIRef(expand_curie(record["id"])),
                         )
                     )
 

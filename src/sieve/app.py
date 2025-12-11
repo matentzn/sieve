@@ -4,9 +4,104 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
+
+import curies
 import streamlit as st
+import streamlit.components.v1 as components
 import yaml
 
+@st.cache_resource
+def _get_obo_converter() -> curies.Converter:
+    """Get the OBO converter, cached across Streamlit reruns."""
+    return curies.get_obo_converter()
+
+
+def expand_curie_to_link(curie: str) -> str:
+    """Expand a CURIE to a clickable markdown link using OBO converter."""
+    if not curie:
+        return "?"
+
+    converter = _get_obo_converter()
+    expanded = converter.expand(curie)
+
+    if expanded:
+        return f"[`{curie}`]({expanded})"
+    return f"`{curie}`"
+
+
+def calculate_evidence_score(evidence: list[dict]) -> tuple[float, str]:
+    """Calculate Net Evidence Ratio from evidence items.
+
+    Formula: NER = (S+ - S-) / (S+ + S- + S?)
+    Where:
+    - S+ = sum of evidence_strength for SUPPORTS items
+    - S- = sum of evidence_strength for CONTRADICTS items
+    - S? = sum of evidence_strength for UNCERTAIN items
+
+    Returns:
+        Tuple of (score, formula_explanation)
+        Score ranges from -1 (all contradicting) to +1 (all supporting)
+    """
+    if not evidence:
+        return 0.0, "No evidence available"
+
+    s_plus = 0.0  # Sum of supporting strengths
+    s_minus = 0.0  # Sum of contradicting strengths
+    s_uncertain = 0.0  # Sum of uncertain strengths
+
+    for ev in evidence:
+        strength = ev.get("evidence_strength", 1.0)
+        direction = ev.get("direction", "SUPPORTS")
+
+        if direction == "SUPPORTS":
+            s_plus += strength
+        elif direction == "CONTRADICTS":
+            s_minus += strength
+        else:  # UNCERTAIN
+            s_uncertain += strength
+
+    total = s_plus + s_minus + s_uncertain
+    if total == 0:
+        return 0.0, "No weighted evidence"
+
+    score = (s_plus - s_minus) / total
+
+    # Build formula explanation
+    explanation = (
+        f"**Net Evidence Ratio (NER)**\n\n"
+        f"Formula: `(S+ - S-) / (S+ + S- + S?)`\n\n"
+        f"Where:\n"
+        f"- S+ (supporting) = {s_plus:.2f}\n"
+        f"- S- (contradicting) = {s_minus:.2f}\n"
+        f"- S? (uncertain) = {s_uncertain:.2f}\n\n"
+        f"Calculation: `({s_plus:.2f} - {s_minus:.2f}) / ({s_plus:.2f} + {s_minus:.2f} + {s_uncertain:.2f})`\n\n"
+        f"Result: **{score:.2f}**\n\n"
+        f"Score ranges from -1 (all contradicting) to +1 (all supporting)"
+    )
+
+    return score, explanation
+
+
+def render_mermaid(mermaid_code: str, height: int = 300):
+    """Render a mermaid diagram using HTML component."""
+    html = f"""
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({{startOnLoad:true}});</script>
+    <div class="mermaid">
+    {mermaid_code}
+    </div>
+    """
+    components.html(html, height=height)
+
+
+def sanitize_mermaid_label(label: str) -> str:
+    """Sanitize a label for use in mermaid diagrams."""
+    return label.replace('"', "'").replace("(", "[").replace(")", "]").replace("<", "&lt;").replace(">", "&gt;")
+
+from sieve.auth import get_curator_info, handle_oauth_callback, is_authorized_curator, render_login_ui
 from sieve.db import CurationDatabase
 from sieve.export import export_accepted_records
 from sieve.ingest import ingest_directory, parse_curation_record
@@ -14,7 +109,7 @@ from sieve.models import CurationDecision, DecisionType
 
 # Page config
 st.set_page_config(
-    page_title="Curation App",
+    page_title="Sieve",
     page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -33,8 +128,11 @@ db = get_db()
 def main():
     """Main application entry point."""
 
+    # Handle OAuth callback if present
+    handle_oauth_callback()
+
     # Sidebar navigation
-    st.sidebar.title("🔬 Curation App")
+    st.sidebar.title("🔬 Sieve")
 
     page = st.sidebar.radio(
         "Navigation",
@@ -58,20 +156,8 @@ def main():
     col1.metric("Accepted", stats["accepted"])
     col2.metric("Rejected", stats["rejected"])
 
-    # Curator info
-    st.sidebar.markdown("---")
-    curator_orcid = st.sidebar.text_input(
-        "Your ORCID",
-        value=st.session_state.get("curator_orcid", ""),
-        placeholder="0000-0000-0000-0000",
-    )
-    curator_name = st.sidebar.text_input(
-        "Your Name",
-        value=st.session_state.get("curator_name", ""),
-        placeholder="Dr. Jane Smith",
-    )
-    st.session_state["curator_orcid"] = curator_orcid
-    st.session_state["curator_name"] = curator_name
+    # ORCID login/logout UI
+    render_login_ui()
 
     # Route to page
     if page == "📋 Review Queue":
@@ -89,33 +175,147 @@ def main():
 
 
 def render_review_queue():
-    """Render the review queue page."""
+    """Render the review queue page with paginated table."""
     st.title("📋 Review Queue")
 
-    pending_records = db.get_records_by_status("PENDING")
+    # Initialize session state for pagination and selection
+    if "page_number" not in st.session_state:
+        st.session_state.page_number = 0
+    if "selected_record_id" not in st.session_state:
+        st.session_state.selected_record_id = None
+    if "sort_by" not in st.session_state:
+        st.session_state.sort_by = "evidence_score"
+    if "sort_order" not in st.session_state:
+        st.session_state.sort_order = "ASC"
 
-    if not pending_records:
+    # Page size
+    page_size = 25
+
+    # Sorting controls
+    sort_col1, sort_col2 = st.columns([2, 1])
+    with sort_col1:
+        sort_options = {
+            "Evidence Score": "evidence_score",
+            "Date Added": "created_at",
+            "Assertion": "assertion_display_text",
+        }
+        sort_label = st.selectbox(
+            "Sort by",
+            options=list(sort_options.keys()),
+            index=0 if st.session_state.sort_by == "evidence_score" else 1,
+        )
+        st.session_state.sort_by = sort_options[sort_label]
+    with sort_col2:
+        order_options = {"Ascending": "ASC", "Descending": "DESC"}
+        order_label = st.selectbox(
+            "Order",
+            options=list(order_options.keys()),
+            index=0 if st.session_state.sort_order == "ASC" else 1,
+        )
+        st.session_state.sort_order = order_options[order_label]
+
+    # Get paginated records
+    offset = st.session_state.page_number * page_size
+    records, total_count = db.get_records_paginated(
+        status="PENDING",
+        offset=offset,
+        limit=page_size,
+        sort_by=st.session_state.sort_by,
+        sort_order=st.session_state.sort_order,
+    )
+
+    if total_count == 0:
         st.info("🎉 No pending records to review! Ingest some files to get started.")
         return
 
-    st.write(f"**{len(pending_records)} records pending review**")
+    # Show count and pagination info
+    total_pages = (total_count + page_size - 1) // page_size
+    st.write(f"**{total_count} records pending review** (Page {st.session_state.page_number + 1} of {total_pages})")
 
-    # Record selection
-    record_options = {
-        f"{r['assertion_subject_label'] or r['assertion_subject_id']} → {r['assertion_object_label'] or r['assertion_object_id']}": r[
-            "id"
-        ]
-        for r in pending_records
-    }
+    # Build table data
+    table_data = []
+    for r in records:
+        display_text = r.get("assertion_display_text") or (
+            f"{r.get('assertion_subject_label') or r.get('assertion_subject_id')} → "
+            f"{r.get('assertion_object_label') or r.get('assertion_object_id')}"
+        )
+        predicate = r.get("assertion_predicate_label") or r.get("assertion_predicate", "")
+        score = r.get("evidence_score")
+        score_display = f"{score:+.2f}" if score is not None else "N/A"
 
-    selected_label = st.selectbox(
-        "Select a record to review", options=list(record_options.keys())
+        # Color indicator for score
+        if score is not None:
+            if score > 0.3:
+                score_indicator = "🟢"
+            elif score < -0.3:
+                score_indicator = "🔴"
+            else:
+                score_indicator = "🟡"
+        else:
+            score_indicator = "⚪"
+
+        table_data.append({
+            "id": r["id"],
+            "Score": f"{score_indicator} {score_display}",
+            "Assertion": display_text[:80] + ("..." if len(display_text) > 80 else ""),
+            "Predicate": predicate,
+        })
+
+    # Display as interactive dataframe
+    import pandas as pd
+
+    df = pd.DataFrame(table_data)
+
+    # Use st.dataframe with selection
+    selection = st.dataframe(
+        df[["Score", "Assertion", "Predicate"]],
+        width="stretch",
+        hide_index=True,
+        on_select="rerun",
+        selection_mode="single-row",
     )
 
-    if selected_label:
-        record_id = record_options[selected_label]
-        record = db.get_record(record_id)
-        render_review_panel(record)
+    # Handle selection
+    if selection and selection.selection and selection.selection.rows:
+        selected_idx = selection.selection.rows[0]
+        st.session_state.selected_record_id = table_data[selected_idx]["id"]
+
+    # Pagination controls
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
+    with col1:
+        if st.button("⏮️ First", disabled=st.session_state.page_number == 0):
+            st.session_state.page_number = 0
+            st.rerun()
+    with col2:
+        if st.button("◀️ Prev", disabled=st.session_state.page_number == 0):
+            st.session_state.page_number -= 1
+            st.rerun()
+    with col3:
+        # Page jump
+        new_page = st.number_input(
+            "Page",
+            min_value=1,
+            max_value=total_pages,
+            value=st.session_state.page_number + 1,
+            label_visibility="collapsed",
+        )
+        if new_page != st.session_state.page_number + 1:
+            st.session_state.page_number = new_page - 1
+            st.rerun()
+    with col4:
+        if st.button("Next ▶️", disabled=st.session_state.page_number >= total_pages - 1):
+            st.session_state.page_number += 1
+            st.rerun()
+    with col5:
+        if st.button("Last ⏭️", disabled=st.session_state.page_number >= total_pages - 1):
+            st.session_state.page_number = total_pages - 1
+            st.rerun()
+
+    # Show review panel if record selected
+    if st.session_state.selected_record_id:
+        record = db.get_record(st.session_state.selected_record_id)
+        if record:
+            render_review_panel(record)
 
 
 def render_review_panel(record: dict):
@@ -126,57 +326,115 @@ def render_review_panel(record: dict):
     # Assertion display
     st.subheader("📝 Assertion")
 
-    col1, col2, col3 = st.columns([2, 1, 2])
+    # Display text if available
+    if record.get("assertion_display_text"):
+        st.markdown(f"**{record['assertion_display_text']}**")
 
+    # Render assertion as mermaid diagram
+    subject_label = record.get("assertion_subject_label") or record["assertion_subject_id"]
+    object_label = record.get("assertion_object_label") or record["assertion_object_id"]
+    predicate_label = record.get("assertion_predicate_label") or record["assertion_predicate"]
+
+    # Sanitize labels for mermaid (remove special characters)
+    subject_label_safe = sanitize_mermaid_label(subject_label)
+    object_label_safe = sanitize_mermaid_label(object_label)
+    predicate_label_safe = sanitize_mermaid_label(predicate_label)
+
+    mermaid_code = f"""graph LR
+    S["{subject_label_safe}"] -->|{predicate_label_safe}| O["{object_label_safe}"]"""
+    render_mermaid(mermaid_code, height=150)
+
+    # Show IDs as clickable links
+    col1, col2 = st.columns(2)
     with col1:
-        st.markdown(f"### {record['assertion_subject_label'] or 'No label'}")
-        st.code(record["assertion_subject_id"], language=None)
-
+        st.markdown(f"Subject: {expand_curie_to_link(record['assertion_subject_id'])}")
     with col2:
-        st.markdown("### →")
-        predicate_label = (
-            record.get("assertion_predicate_label") or record["assertion_predicate"]
-        )
-        st.markdown(f"**{predicate_label}**")
+        st.markdown(f"Object: {expand_curie_to_link(record['assertion_object_id'])}")
 
-    with col3:
-        st.markdown(f"### {record['assertion_object_label'] or 'No label'}")
-        st.code(record["assertion_object_id"], language=None)
+    # Show last_updated if available
+    if record.get("last_updated"):
+        st.caption(f"Last updated: {record['last_updated']}")
 
     # Provenance
-    if record.get("provenance_attributed_to"):
+    provenance = record.get("provenance")
+    if provenance:
         st.markdown("---")
         st.subheader("📜 Provenance")
         prov_cols = st.columns(3)
         with prov_cols[0]:
-            st.markdown(
-                f"**Attributed to:** {record.get('provenance_attributed_to_label', record['provenance_attributed_to'])}"
-            )
+            attributed = provenance.get("attributed_to", [])
+            if isinstance(attributed, list):
+                attributed_str = ", ".join(attributed)
+            else:
+                attributed_str = attributed
+            if attributed_str:
+                st.markdown(f"**Attributed to:** {attributed_str}")
         with prov_cols[1]:
-            if record.get("provenance_generated_at"):
-                st.markdown(f"**Created:** {record['provenance_generated_at']}")
+            if provenance.get("generated_at"):
+                st.markdown(f"**Created:** {provenance['generated_at']}")
         with prov_cols[2]:
-            if record.get("provenance_source_version"):
-                st.markdown(f"**Source:** {record['provenance_source_version']}")
+            if provenance.get("source_version"):
+                st.markdown(f"**Source:** {provenance['source_version']}")
+
+        # Display generated_by activity if present
+        activity = provenance.get("generated_by")
+        if activity:
+            render_curation_activity(activity)
 
     # Evidence
     st.markdown("---")
-    st.subheader("🔍 Supporting Evidence")
+    st.subheader("🔍 Evidence")
 
-    evidence_items = record.get("evidence_items", [])
+    evidence = record.get("evidence", [])
 
-    if not evidence_items:
+    if not evidence:
         st.warning("No evidence items provided for this assertion.")
     else:
-        for i, ev in enumerate(evidence_items):
-            render_evidence_item(ev, i)
+        # Calculate and display evidence score
+        score, formula_explanation = calculate_evidence_score(evidence)
+
+        # Determine color based on score
+        if score > 0.3:
+            score_color = "green"
+            score_label = "Supports"
+        elif score < -0.3:
+            score_color = "red"
+            score_label = "Contradicts"
+        else:
+            score_color = "orange"
+            score_label = "Mixed"
+
+        # Display score with info popover
+        score_col, info_col = st.columns([4, 1])
+        with score_col:
+            st.markdown(
+                f"**Evidence Score:** :{score_color}[{score:+.2f}] ({score_label})"
+            )
+            # Visual indicator: progress bar centered at 0.5 (score of 0)
+            # Map score from [-1, 1] to [0, 1] for display
+            normalized_score = (score + 1) / 2
+            st.progress(normalized_score)
+        with info_col:
+            with st.popover("❓"):
+                st.markdown(formula_explanation)
+
+        st.markdown(f"*{len(evidence)} evidence items*")
+
+        # Render all evidence items
+        for i, ev in enumerate(evidence):
+            render_evidence_item(ev, i, record)
 
     # Decision section
     st.markdown("---")
-    st.subheader("⚖️ Your Decision")
+    st.subheader("Your Decision")
 
-    if not st.session_state.get("curator_orcid"):
-        st.warning("Please enter your ORCID in the sidebar before making decisions.")
+    curator_orcid, _ = get_curator_info()
+    if not curator_orcid:
+        st.warning("Please log in with ORCID to make decisions.")
+        return
+
+    if not is_authorized_curator(curator_orcid):
+        st.error("You are not authorized to make curation decisions. Contact an admin to be added to the curators list.")
         return
 
     rationale = st.text_area(
@@ -186,12 +444,12 @@ def render_review_panel(record: dict):
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        if st.button("✅ Accept", type="primary", use_container_width=True):
+        if st.button("Accept", type="primary", use_container_width=True):
             make_decision(record["id"], "ACCEPT", rationale)
             st.rerun()
 
     with col2:
-        if st.button("❌ Reject", type="secondary", use_container_width=True):
+        if st.button("Reject", type="secondary", use_container_width=True):
             if not rationale:
                 st.error("Rationale is required for rejection.")
             else:
@@ -199,34 +457,54 @@ def render_review_panel(record: dict):
                 st.rerun()
 
     with col3:
-        if st.button("⏸️ Defer", use_container_width=True):
+        if st.button("Defer", use_container_width=True):
             make_decision(record["id"], "DEFER", rationale)
             st.rerun()
 
     with col4:
-        if st.button("⏭️ Skip", use_container_width=True):
+        if st.button("Skip", use_container_width=True):
             st.rerun()
 
 
-def render_evidence_item(evidence: dict, index: int):
+def render_evidence_item(evidence: dict, index: int, record: dict = None):
     """Render a single evidence item."""
 
     ev_type = evidence.get("evidence_type", "OTHER")
+    direction = evidence.get("direction", "SUPPORTS")
 
-    # Icon mapping
-    icons = {
+    # Icon mapping for evidence type
+    type_icons = {
         "CONCORDANCE": "🔗",
         "LITERATURE": "📚",
         "EXPERT_REVIEW": "👨‍🔬",
         "COMPUTATIONAL": "🤖",
         "OTHER": "📌",
     }
-    icon = icons.get(ev_type, "📌")
+    type_icon = type_icons.get(ev_type, "📌")
+
+    # Icon and color for direction
+    direction_indicators = {
+        "SUPPORTS": ("✅", "green"),
+        "CONTRADICTS": ("❌", "red"),
+        "UNCERTAIN": ("❓", "orange"),
+    }
+    dir_icon, dir_color = direction_indicators.get(direction, ("❓", "gray"))
+
+    # Evidence strength (default 1.0)
+    strength = evidence.get("evidence_strength", 1.0)
 
     with st.expander(
-        f"{icon} **{ev_type}** — {evidence.get('description', 'No description')}",
+        f"{type_icon} {dir_icon} **{ev_type}** — {evidence.get('description', 'No description')}",
         expanded=(index == 0),
     ):
+        # Direction and strength indicators
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown(f"**Direction:** :{dir_color}[{direction}]")
+        with col2:
+            st.markdown(f"**Strength:** {strength:.0%}")
+            st.progress(strength)
+
         # ECO code
         if evidence.get("eco_code"):
             st.markdown(
@@ -235,48 +513,99 @@ def render_evidence_item(evidence: dict, index: int):
 
         # Type-specific rendering
         if ev_type == "CONCORDANCE":
-            render_concordance_evidence(evidence)
+            render_concordance_evidence(evidence, record)
         elif ev_type == "LITERATURE":
             render_literature_evidence(evidence)
         elif ev_type == "EXPERT_REVIEW":
             render_expert_review_evidence(evidence)
+        elif ev_type == "COMPUTATIONAL":
+            render_computational_evidence(evidence)
         else:
             st.json(evidence)
 
 
-def render_concordance_evidence(evidence: dict):
+def render_concordance_evidence(evidence: dict, record: dict = None):
     """Render concordance evidence with mapping visualization."""
 
-    st.markdown(f"**Source ontology:** {evidence.get('source_ontology', 'Unknown')}")
+    # Source info
+    source_name = evidence.get("source_name", "Unknown")
+    source_type = evidence.get("source_type", "")
+    source_uri = evidence.get("source")
 
-    if evidence.get("mapping_set_uri"):
+    if source_uri:
+        st.markdown(f"**Source:** [{source_name}]({source_uri}) ({source_type})")
+    else:
+        st.markdown(f"**Source:** {source_name} ({source_type})")
+
+    if evidence.get("mapping_set"):
         st.markdown(
-            f"**Mapping set:** [{evidence['mapping_set_uri']}]({evidence['mapping_set_uri']})"
+            f"**Mapping set:** [{evidence['mapping_set']}]({evidence['mapping_set']})"
         )
 
-    # Visual mapping display
-    st.markdown("#### Mapping Chain")
+    # Get Mondo assertion info from record
+    mondo_subject_label = "?"
+    mondo_object_label = "?"
+    mondo_subject_id = "?"
+    mondo_object_id = "?"
+    mondo_predicate = "subClassOf"
+    if record:
+        mondo_subject_label = record.get("assertion_subject_label") or "?"
+        mondo_object_label = record.get("assertion_object_label") or "?"
+        mondo_subject_id = record.get("assertion_subject_id") or "?"
+        mondo_object_id = record.get("assertion_object_id") or "?"
+        mondo_predicate = record.get("assertion_predicate_label") or record.get("assertion_predicate") or "subClassOf"
 
-    col1, col2, col3 = st.columns([2, 1, 2])
+    # Get source assertion info
+    source_subject_label = evidence.get("source_subject_label") or "?"
+    source_object_label = evidence.get("source_object_label") or "?"
+    source_subject_id = evidence.get("source_subject_id") or "?"
+    source_object_id = evidence.get("source_object_id") or "?"
+    source_predicate = evidence.get("predicate_label") or evidence.get("predicate_id") or "subClassOf"
 
+    # Build display strings with label and ID
+    mondo_subject_display = f"{mondo_subject_label} [{mondo_subject_id}]" if mondo_subject_label != "?" else mondo_subject_id
+    mondo_object_display = f"{mondo_object_label} [{mondo_object_id}]" if mondo_object_label != "?" else mondo_object_id
+    source_subject_display = f"{source_subject_label} [{source_subject_id}]" if source_subject_label != "?" else source_subject_id
+    source_object_display = f"{source_object_label} [{source_object_id}]" if source_object_label != "?" else source_object_id
+
+    # Sanitize labels for mermaid
+    mondo_subject_safe = sanitize_mermaid_label(mondo_subject_display)
+    mondo_object_safe = sanitize_mermaid_label(mondo_object_display)
+    mondo_predicate_safe = sanitize_mermaid_label(mondo_predicate)
+    source_subject_safe = sanitize_mermaid_label(source_subject_display)
+    source_object_safe = sanitize_mermaid_label(source_object_display)
+    source_predicate_safe = sanitize_mermaid_label(source_predicate)
+    source_name_safe = source_name.replace(" ", "_").replace("-", "_")
+
+    # Render mermaid diagram showing both assertions and mappings
+    # 4 nodes: Mondo subject, Mondo object, Source subject, Source object
+    # 4 edges: Mondo assertion, Source assertion, subject mapping, object mapping
+    # Subgraphs clearly label which hierarchy is which
+    mermaid_code = f"""graph LR
+    subgraph Mondo["Mondo Assertion"]
+        direction BT
+        MS["{mondo_subject_safe}"] -->|{mondo_predicate_safe}| MO["{mondo_object_safe}"]
+    end
+    subgraph Source["{source_name_safe}"]
+        direction BT
+        SS["{source_subject_safe}"] -->|{source_predicate_safe}| SO["{source_object_safe}"]
+    end
+    MS <-.->|mapping| SS
+    MO <-.->|mapping| SO"""
+    render_mermaid(mermaid_code, height=450)
+
+    # Show IDs as clickable links
+    st.markdown("**Identifiers:**")
+    col1, col2 = st.columns(2)
     with col1:
-        st.markdown("**Subject mapping:**")
-        if evidence.get("source_subject_id"):
-            st.code(
-                f"→ {evidence['source_subject_label'] or evidence['source_subject_id']}",
-                language=None,
-            )
-
+        st.markdown("**Mondo:**")
+        if record:
+            st.markdown(f"Subject: {expand_curie_to_link(record.get('assertion_subject_id'))}")
+            st.markdown(f"Object: {expand_curie_to_link(record.get('assertion_object_id'))}")
     with col2:
-        st.markdown("**↓**")
-
-    with col3:
-        st.markdown("**Object mapping:**")
-        if evidence.get("source_object_id"):
-            st.code(
-                f"→ {evidence['source_object_label'] or evidence['source_object_id']}",
-                language=None,
-            )
+        st.markdown(f"**{source_name}:**")
+        st.markdown(f"Subject: {expand_curie_to_link(evidence.get('source_subject_id'))}")
+        st.markdown(f"Object: {expand_curie_to_link(evidence.get('source_object_id'))}")
 
 
 def render_literature_evidence(evidence: dict):
@@ -301,6 +630,10 @@ def render_literature_evidence(evidence: dict):
         if evidence.get("quote_location"):
             st.caption(f"📍 {evidence['quote_location']}")
 
+    if evidence.get("explanation"):
+        st.markdown("**Explanation:**")
+        st.markdown(f"_{evidence['explanation']}_")
+
 
 def render_expert_review_evidence(evidence: dict):
     """Render expert review evidence."""
@@ -321,15 +654,84 @@ def render_expert_review_evidence(evidence: dict):
     if evidence.get("reviewed_at"):
         st.markdown(f"**Reviewed:** {evidence['reviewed_at']}")
 
+    if evidence.get("issue"):
+        issue_url = evidence["issue"]
+        st.markdown(f"**Issue:** [{issue_url}]({issue_url})")
+
+
+def render_computational_evidence(evidence: dict):
+    """Render computational evidence."""
+
+    if evidence.get("method"):
+        st.markdown(f"**Method:** {evidence['method']}")
+
+    if evidence.get("method_uri"):
+        st.markdown(f"**Method URI:** [{evidence['method_uri']}]({evidence['method_uri']})")
+
+    if evidence.get("confidence_score") is not None:
+        score = evidence["confidence_score"]
+        st.markdown(f"**Confidence score:** {score:.2f}")
+        st.progress(min(1.0, max(0.0, score)))
+
+    if evidence.get("parameters"):
+        st.markdown("**Parameters:**")
+        st.code(evidence["parameters"], language=None)
+
+
+def render_curation_activity(activity: dict):
+    """Render a curation activity."""
+
+    with st.expander("📋 **Curation Activity**", expanded=False):
+        if activity.get("description"):
+            st.markdown(f"**Description:** {activity['description']}")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if activity.get("started_at"):
+                st.markdown(f"**Started:** {activity['started_at']}")
+            if activity.get("ended_at"):
+                st.markdown(f"**Ended:** {activity['ended_at']}")
+
+        with col2:
+            if activity.get("created_with"):
+                st.markdown(f"**Tool:** [{activity['created_with']}]({activity['created_with']})")
+
+        if activity.get("associated_with"):
+            associated = activity["associated_with"]
+            if isinstance(associated, list):
+                links = []
+                for a in associated:
+                    if "orcid.org" in a or a.startswith("orcid:"):
+                        orcid = a.replace("orcid:", "")
+                        links.append(f"[{orcid}](https://orcid.org/{orcid})")
+                    else:
+                        links.append(f"[{a}]({a})")
+                st.markdown(f"**Associated with:** {', '.join(links)}")
+            else:
+                st.markdown(f"**Associated with:** {associated}")
+
+        if activity.get("pull_request"):
+            pr_url = activity["pull_request"]
+            st.markdown(f"**Pull request:** [{pr_url}]({pr_url})")
+
 
 def make_decision(record_id: str, decision: str, rationale: str):
     """Record a curation decision."""
+    curator_orcid, curator_name = get_curator_info()
+
+    if not curator_orcid:
+        st.error("Please log in with ORCID to make decisions.")
+        return
+
+    if not is_authorized_curator(curator_orcid):
+        st.error("You are not authorized to make curation decisions.")
+        return
 
     decision_obj = CurationDecision(
         id=f"decision:{uuid4().hex[:12]}",
         record_id=record_id,
-        curator_orcid=f"orcid:{st.session_state['curator_orcid']}",
-        curator_name=st.session_state.get("curator_name"),
+        curator_orcid=curator_orcid,
+        curator_name=curator_name,
         decision=DecisionType(decision),
         rationale=rationale if rationale else None,
         decided_at=datetime.now(),
@@ -415,7 +817,7 @@ assertion:
   predicate: rdfs:subClassOf
   object_id: MONDO:0005151
   object_label: endocrine system disorder
-evidence_items:
+evidence:
   - evidence_type: LITERATURE
     publication_id: PMID:12345
     quoted_text: "Example supporting text..."

@@ -1,0 +1,114 @@
+id: http://purl.org/np/RA2345678901
+last_updated: "2024-06-10"
+assertion:
+  subject_id: MONDO:0005277
+  subject_label: migraine
+  predicate: rdfs:subClassOf
+  predicate_label: subClassOf
+  object_id: MONDO:0004995
+  object_label: cardiovascular system disease
+  display_text: "migraine subClassOf cardiovascular system disease"
+
+provenance:
+  attributed_to:
+    - orcid:0000-0001-5678-9012
+  generated_at: "2024-01-15"
+  source_version: Mondo 2024-01-15
+  source_uri: http://purl.obolibrary.org/obo/mondo/releases/2024-01-15/mondo.owl
+  generated_by:
+    id: activity:mondo-migraine-review-2024
+    description: Review of migraine classification based on vascular theory
+    associated_with:
+      - orcid:0000-0001-5678-9012
+    started_at: "2024-01-10"
+    ended_at: "2024-01-15"
+
+evidence:
+  - id: ev-literature-vascular
+    evidence_type: LITERATURE
+    direction: SUPPORTS
+    evidence_strength: 0.5
+    eco_code: ECO:0000006
+    eco_label: experimental evidence
+    description: Historical vascular theory of migraine
+    publication_id: PMID:8456789
+    publication_title: The Vascular Theory of Migraine - A Historical Perspective
+    quoted_text: >-
+      The vascular theory of migraine, which dominated for decades, proposed that
+      migraine attacks were primarily caused by vasodilation of cranial blood vessels,
+      suggesting a cardiovascular component to the disorder.
+    quote_location: Introduction, page 2
+    explanation: >-
+      This older text supports the vascular/cardiovascular classification of migraine
+      based on the historical vascular theory, though this theory has been largely superseded.
+
+  - id: ev-literature-neuro
+    evidence_type: LITERATURE
+    direction: CONTRADICTS
+    evidence_strength: 0.95
+    eco_code: ECO:0000006
+    eco_label: experimental evidence
+    description: Modern understanding - migraine is a neurological disorder
+    publication_id: PMID:31578890
+    publication_title: Migraine as a Primary Brain Disorder
+    quoted_text: >-
+      Current evidence overwhelmingly supports migraine as a complex neurological
+      disorder originating in the central nervous system. The trigeminal-vascular
+      system activation is secondary to cortical and brainstem dysfunction, not
+      a primary cardiovascular event.
+    quote_location: Abstract
+    explanation: >-
+      Modern research strongly contradicts the cardiovascular classification,
+      establishing migraine as a primary neurological disorder.
+
+  - id: ev-concordance-icd11
+    evidence_type: CONCORDANCE
+    direction: CONTRADICTS
+    evidence_strength: 0.9
+    eco_code: ECO:0000204
+    eco_label: similarity evidence
+    description: ICD-11 classifies migraine under nervous system disorders
+    source: https://icd.who.int/browse11
+    source_name: ICD-11
+    source_type: TERMINOLOGY
+    predicate_id: rdfs:subClassOf
+    predicate_label: subClassOf
+    source_subject_id: ICD11:8A80
+    source_subject_label: Migraine
+    source_object_id: ICD11:8A00-8E7Z
+    source_object_label: Diseases of the nervous system
+    mapping_set: https://w3id.org/sssom/mappings/mondo-icd11.sssom.tsv
+
+  - id: ev-expert-neurology
+    evidence_type: EXPERT_REVIEW
+    direction: CONTRADICTS
+    evidence_strength: 0.85
+    eco_code: ECO:0000218
+    eco_label: manual assertion
+    description: Neurologist strongly disagrees with cardiovascular classification
+    reviewer_orcid: orcid:0000-0003-9876-5432
+    reviewer_name: Dr. Michael Torres
+    reviewer_affiliation: Cleveland Clinic, Headache Center
+    reviewed_at: "2024-06-08"
+    issue: https://github.com/monarch-initiative/mondo/issues/9012
+
+  - id: ev-ai-research
+    evidence_type: COMPUTATIONAL
+    direction: CONTRADICTS
+    evidence_strength: 0.7
+    eco_code: ECO:0008006
+    eco_label: computational evidence
+    description: AI literature review on migraine classification
+    method: Claude Deep Analysis
+    method_uri: https://anthropic.com/claude
+    confidence_score: 0.88
+    parameters: >-
+      Prompt: "Review the scientific literature on migraine pathophysiology and
+      determine whether migraine should be classified as a cardiovascular or
+      neurological disorder."
+
+      Summary: Analysis of 82 peer-reviewed sources from 2010-2024 reveals strong
+      consensus that migraine is a primary neurological disorder. The vascular
+      theory has been largely abandoned in favor of the neurovascular hypothesis,
+      which places the primary dysfunction in the central nervous system. Only 3
+      of 82 sources supported any cardiovascular classification.
