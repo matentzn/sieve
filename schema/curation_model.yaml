@@ -1,0 +1,249 @@
+id: https://w3id.org/curation-app
+name: curation_app
+title: Curation App Data Model
+description: Data model for ontology assertion curation
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  cura: https://w3id.org/curation-app/
+  orcid: https://orcid.org/
+  eco: http://purl.obolibrary.org/obo/ECO_
+  schema: http://schema.org/
+
+imports:
+  - linkml:types
+
+default_range: string
+default_prefix: cura
+
+
+classes:
+
+  CurationRecord:
+    description: A candidate assertion with supporting evidence for curation review
+    attributes:
+      id:
+        identifier: true
+        range: string
+        description: Unique identifier for this record
+
+      assertion:
+        range: Assertion
+        required: true
+        inlined: true
+
+      provenance:
+        range: AssertionProvenance
+        inlined: true
+
+      evidence_items:
+        range: EvidenceItem
+        multivalued: true
+        inlined_as_list: true
+
+      source_artifact_uri:
+        range: uri
+        description: URI/path to original source (e.g., nanopub IRI)
+
+      source_artifact_type:
+        range: ArtifactType
+
+      status:
+        range: CurationStatus
+        required: true
+        ifabsent: string(PENDING)
+
+      created_at:
+        range: datetime
+
+      updated_at:
+        range: datetime
+
+
+  Assertion:
+    description: The statement being curated (typically an ontology axiom)
+    attributes:
+      subject_id:
+        range: uriorcurie
+        required: true
+
+      subject_label:
+        range: string
+
+      predicate:
+        range: uriorcurie
+        required: true
+
+      predicate_label:
+        range: string
+
+      object_id:
+        range: uriorcurie
+        required: true
+
+      object_label:
+        range: string
+
+
+  AssertionProvenance:
+    description: Origin and attribution of the assertion
+    attributes:
+      attributed_to:
+        range: uriorcurie
+        description: ORCID or identifier of original creator
+
+      attributed_to_label:
+        range: string
+
+      generated_at:
+        range: date
+
+      source_version:
+        range: string
+        description: Version identifier of source (e.g., "Mondo 2024-05-01")
+
+      source_uri:
+        range: uri
+
+
+  EvidenceItem:
+    description: A piece of evidence supporting the assertion
+    attributes:
+      id:
+        identifier: true
+        range: string
+
+      evidence_type:
+        range: EvidenceType
+        required: true
+
+      eco_code:
+        range: uriorcurie
+        description: Evidence ontology code
+
+      eco_label:
+        range: string
+
+      description:
+        range: string
+        description: Human-readable description of this evidence
+
+      # Concordance-specific fields
+      source_ontology:
+        range: string
+        description: Name of concordant ontology (e.g., "ICD-10")
+
+      source_subject_id:
+        range: uriorcurie
+
+      source_subject_label:
+        range: string
+
+      source_object_id:
+        range: uriorcurie
+
+      source_object_label:
+        range: string
+
+      mapping_set_uri:
+        range: uri
+        description: SSSOM mapping set reference
+
+      # Literature-specific fields
+      publication_id:
+        range: uriorcurie
+        description: e.g., PMID:123456
+
+      publication_title:
+        range: string
+
+      quoted_text:
+        range: string
+        description: Verbatim excerpt from publication
+
+      quote_location:
+        range: string
+        description: Section/page reference
+
+      # Expert review-specific fields
+      reviewer_orcid:
+        range: uriorcurie
+
+      reviewer_name:
+        range: string
+
+      reviewer_affiliation:
+        range: string
+
+      reviewed_at:
+        range: date
+
+
+  CurationDecision:
+    description: A curator's decision on a CurationRecord
+    attributes:
+      id:
+        identifier: true
+        range: string
+
+      record_id:
+        range: string
+        required: true
+        description: Reference to CurationRecord.id
+
+      curator_orcid:
+        range: uriorcurie
+        required: true
+
+      curator_name:
+        range: string
+
+      decision:
+        range: DecisionType
+        required: true
+
+      rationale:
+        range: string
+        description: Explanation for decision (required for rejections)
+
+      decided_at:
+        range: datetime
+        required: true
+
+
+enums:
+
+  CurationStatus:
+    permissible_values:
+      PENDING:
+        description: Awaiting review
+      ACCEPTED:
+        description: Approved by curator
+      REJECTED:
+        description: Rejected by curator
+      DEFERRED:
+        description: Postponed for later review
+
+  DecisionType:
+    permissible_values:
+      ACCEPT:
+      REJECT:
+      DEFER:
+
+  EvidenceType:
+    permissible_values:
+      CONCORDANCE:
+        description: Cross-ontology agreement
+      LITERATURE:
+        description: Published literature support
+      EXPERT_REVIEW:
+        description: Domain expert validation
+      COMPUTATIONAL:
+        description: Algorithmic/computed evidence
+      OTHER:
+
+  ArtifactType:
+    permissible_values:
+      NANOPUB:
+      YAML_FILE:
+      JSON_FILE:

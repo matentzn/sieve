@@ -1,0 +1,14 @@
+id: mondo-asthma-001
+assertion:
+  subject_id: MONDO:0004979
+  subject_label: asthma
+  predicate: rdfs:subClassOf
+  object_id: MONDO:0005275
+  object_label: respiratory system disorder
+
+evidence_items:
+  - id: ev-lit-1
+    evidence_type: LITERATURE
+    description: Textbook definition
+    publication_id: PMID:99999999
+    quoted_text: Asthma is a chronic respiratory condition characterized by inflammation of the airways.
