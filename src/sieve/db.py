@@ -7,7 +7,7 @@ from typing import Optional
 
 import duckdb
 
-from curation_app.models import CurationDecision, CurationRecord
+from sieve.models import CurationDecision, CurationRecord
 
 
 class CurationDatabase:

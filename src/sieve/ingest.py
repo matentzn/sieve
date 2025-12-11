@@ -6,8 +6,8 @@ from uuid import uuid4
 
 import yaml
 
-from curation_app.db import CurationDatabase
-from curation_app.models import (
+from sieve.db import CurationDatabase
+from sieve.models import (
     Assertion,
     AssertionProvenance,
     CurationRecord,

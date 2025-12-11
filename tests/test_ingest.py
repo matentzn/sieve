@@ -2,8 +2,8 @@
 
 import pytest
 
-from curation_app.db import CurationDatabase
-from curation_app.ingest import parse_curation_record
+from sieve.db import CurationDatabase
+from sieve.ingest import parse_curation_record
 
 
 @pytest.fixture

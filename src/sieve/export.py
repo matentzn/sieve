@@ -6,7 +6,7 @@ from pathlib import Path
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import PROV, RDF, XSD
 
-from curation_app.db import CurationDatabase
+from sieve.db import CurationDatabase
 
 # Namespaces
 CURA = Namespace("https://w3id.org/curation-app/")

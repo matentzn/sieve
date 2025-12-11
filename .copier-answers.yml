@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier
+_commit: 34d23a0
+_src_path: https://github.com/monarch-initiative/monarch-project-copier
+copyright_year: '2025'
+email: nico@semanticly.ai
+full_name: Nicolas Matentzoglu
+gh_action_docs_preview: true
+github_handle: matentzn
+github_org: matentzn
+license: Apache-2.0
+project_description: An app to review simple knowledge assertions.
+project_name: sieve
+project_slug: sieve
+

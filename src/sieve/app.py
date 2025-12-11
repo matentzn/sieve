@@ -7,10 +7,10 @@ from uuid import uuid4
 import streamlit as st
 import yaml
 
-from curation_app.db import CurationDatabase
-from curation_app.export import export_accepted_records
-from curation_app.ingest import ingest_directory, parse_curation_record
-from curation_app.models import CurationDecision, DecisionType
+from sieve.db import CurationDatabase
+from sieve.export import export_accepted_records
+from sieve.ingest import ingest_directory, parse_curation_record
+from sieve.models import CurationDecision, DecisionType
 
 # Page config
 st.set_page_config(

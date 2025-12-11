@@ -1,1 +1,1 @@
-"""Tests for the curation application."""
+"""Tests for sieve."""
