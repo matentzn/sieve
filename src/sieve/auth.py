@@ -124,9 +124,25 @@ def is_admin(orcid: Optional[str]) -> bool:
     return get_curator_role(orcid) == "admin"
 
 
+def _get_secret(key: str, default: str = "") -> str:
+    """Get a secret from Streamlit secrets (Cloud) or environment variables (local).
+
+    Streamlit Cloud uses .streamlit/secrets.toml, local dev uses .env files.
+    """
+    # First try Streamlit secrets (for Streamlit Cloud)
+    try:
+        if key in st.secrets:
+            return str(st.secrets[key])
+    except Exception:
+        pass  # st.secrets not available or key not found
+
+    # Fall back to environment variables (for local development)
+    return os.getenv(key, default)
+
+
 def get_orcid_config() -> dict:
-    """Get ORCID OAuth configuration from environment variables."""
-    use_sandbox = os.getenv("ORCID_SANDBOX", "true").lower() == "true"
+    """Get ORCID OAuth configuration from secrets or environment variables."""
+    use_sandbox = _get_secret("ORCID_SANDBOX", "true").lower() == "true"
 
     if use_sandbox:
         auth_url = ORCID_SANDBOX_AUTH_URL
@@ -138,9 +154,9 @@ def get_orcid_config() -> dict:
         api_url = ORCID_PROD_API_URL
 
     return {
-        "client_id": os.getenv("ORCID_CLIENT_ID", ""),
-        "client_secret": os.getenv("ORCID_CLIENT_SECRET", ""),
-        "redirect_uri": os.getenv("ORCID_REDIRECT_URI", "http://localhost:8501/"),
+        "client_id": _get_secret("ORCID_CLIENT_ID"),
+        "client_secret": _get_secret("ORCID_CLIENT_SECRET"),
+        "redirect_uri": _get_secret("ORCID_REDIRECT_URI", "http://localhost:8501/"),
         "auth_url": auth_url,
         "token_url": token_url,
         "api_url": api_url,

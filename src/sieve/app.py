@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from .env file
+load_dotenv(override=True)  # Load environment variables from .env file
 
 import curies
 import streamlit as st
