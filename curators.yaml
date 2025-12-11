@@ -1,0 +1,15 @@
+# Authorized curators for Sieve
+# Copy this file to curators.yaml and add your authorized curators
+#
+# Each curator needs:
+#   - orcid: The ORCID iD (without the "orcid:" prefix)
+#   - name: Display name (optional but recommended)
+#   - role: Either "admin" or "curator" (optional, defaults to "curator")
+#
+# Admins can approve/reject assertions and manage other curators (future)
+# Curators can approve/reject assertions
+
+curators:
+  - orcid: "0000-0002-7356-1779"
+    name: "Nico Matentzoglu"
+    role: admin

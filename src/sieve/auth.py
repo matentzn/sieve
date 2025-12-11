@@ -44,69 +44,34 @@ CURATORS_FILE_PATH = os.getenv("CURATORS_FILE", "curators.yaml")
 
 @st.cache_data(ttl=60)
 def load_authorized_curators() -> dict[str, AuthorizedCurator]:
-    """Load authorized curators from curators.yaml file or Streamlit secrets.
+    """Load authorized curators from curators.yaml file.
 
     Returns a dict mapping ORCID to AuthorizedCurator.
     Cached for 60 seconds to allow hot-reloading of the file.
-
-    Supports two sources:
-    1. curators.yaml file (for local dev or if committed to repo)
-    2. Streamlit secrets with AUTHORIZED_CURATORS key (for Streamlit Cloud)
-
-    In secrets.toml, use:
-        AUTHORIZED_CURATORS = "0000-0001-1234-5678,0000-0002-9876-5432"
-    Or for more control:
-        [[curators]]
-        orcid = "0000-0001-1234-5678"
-        name = "Dr. Jane Smith"
-        role = "admin"
     """
-    result = {}
-
-    # First try Streamlit secrets
-    try:
-        # Check for simple comma-separated list
-        if "AUTHORIZED_CURATORS" in st.secrets:
-            orcids = str(st.secrets["AUTHORIZED_CURATORS"]).split(",")
-            for orcid in orcids:
-                orcid = orcid.strip()
-                if orcid:
-                    if orcid.startswith("orcid:"):
-                        orcid = orcid[6:]
-                    result[orcid] = AuthorizedCurator(orcid=orcid, role="curator")
-
-        # Check for structured curators list in secrets
-        if "curators" in st.secrets:
-            for curator_data in st.secrets["curators"]:
-                orcid = str(curator_data.get("orcid", "")).strip()
-                if orcid:
-                    if orcid.startswith("orcid:"):
-                        orcid = orcid[6:]
-                    result[orcid] = AuthorizedCurator(
-                        orcid=orcid,
-                        name=curator_data.get("name"),
-                        role=curator_data.get("role", "curator"),
-                    )
-    except Exception:
-        pass  # st.secrets not available
-
-    # Then load from file (can add to or override secrets)
     curators_path = Path(CURATORS_FILE_PATH)
-    if curators_path.exists():
-        with open(curators_path) as f:
-            data = yaml.safe_load(f)
 
-        if data and "curators" in data:
-            for curator_data in data["curators"]:
-                orcid = curator_data.get("orcid", "").strip()
-                if orcid:
-                    if orcid.startswith("orcid:"):
-                        orcid = orcid[6:]
-                    result[orcid] = AuthorizedCurator(
-                        orcid=orcid,
-                        name=curator_data.get("name"),
-                        role=curator_data.get("role", "curator"),
-                    )
+    if not curators_path.exists():
+        return {}
+
+    with open(curators_path) as f:
+        data = yaml.safe_load(f)
+
+    if not data or "curators" not in data:
+        return {}
+
+    result = {}
+    for curator_data in data["curators"]:
+        orcid = curator_data.get("orcid", "").strip()
+        if orcid:
+            # Normalize ORCID (remove prefix if present)
+            if orcid.startswith("orcid:"):
+                orcid = orcid[6:]
+            result[orcid] = AuthorizedCurator(
+                orcid=orcid,
+                name=curator_data.get("name"),
+                role=curator_data.get("role", "curator"),
+            )
 
     return result
 
