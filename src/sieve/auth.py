@@ -83,8 +83,12 @@ def is_authorized_curator(orcid: Optional[str]) -> bool:
         orcid: ORCID iD (with or without "orcid:" prefix)
 
     Returns:
-        True if authorized, False otherwise
+        True if authorized, False otherwise.
+        Always returns True in dev mode.
     """
+    if is_dev_mode():
+        return True
+
     if not orcid:
         return False
 
@@ -120,7 +124,12 @@ def get_curator_role(orcid: Optional[str]) -> Optional[str]:
 
 
 def is_admin(orcid: Optional[str]) -> bool:
-    """Check if the given ORCID has admin role."""
+    """Check if the given ORCID has admin role.
+
+    Always returns True in dev mode.
+    """
+    if is_dev_mode():
+        return True
     return get_curator_role(orcid) == "admin"
 
 
@@ -138,6 +147,15 @@ def _get_secret(key: str, default: str = "") -> str:
 
     # Fall back to environment variables (for local development)
     return os.getenv(key, default)
+
+
+def is_dev_mode() -> bool:
+    """Check if running in development mode.
+
+    Set SIEVE_DEV_MODE=true in .env to enable.
+    In dev mode, authentication is bypassed and users can review without logging in.
+    """
+    return _get_secret("SIEVE_DEV_MODE", "false").lower() == "true"
 
 
 def get_orcid_config() -> dict:
@@ -294,7 +312,11 @@ def render_login_ui():
         # User is not logged in
         st.sidebar.markdown("---")
 
-        if is_orcid_configured():
+        if is_dev_mode():
+            # Dev mode - no login required
+            st.sidebar.warning("DEV MODE")
+            st.sidebar.caption("Authentication bypassed. Decisions recorded as 'Dev Mode User'.")
+        elif is_orcid_configured():
             auth_url = get_authorization_url()
             # Official ORCID sign-in button
             st.sidebar.markdown(
@@ -340,7 +362,8 @@ def get_curator_info() -> tuple[Optional[str], Optional[str]]:
     """Get curator ORCID and name (from OAuth or manual entry).
 
     Returns:
-        Tuple of (orcid, name)
+        Tuple of (orcid, name).
+        In dev mode, returns a placeholder if not logged in.
     """
     user = get_current_user()
 
@@ -356,5 +379,9 @@ def get_curator_info() -> tuple[Optional[str], Optional[str]]:
         if not orcid.startswith("orcid:"):
             orcid = f"orcid:{orcid}"
         return orcid, name if name else None
+
+    # In dev mode, return a placeholder so decisions can be made
+    if is_dev_mode():
+        return "orcid:0000-0000-0000-0000", "Dev Mode User"
 
     return None, None

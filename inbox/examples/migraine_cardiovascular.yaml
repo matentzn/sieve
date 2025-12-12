@@ -67,7 +67,7 @@ evidence:
     evidence_strength: 0.9
     eco_code: ECO:0000204
     eco_label: similarity evidence
-    description: ICD-11 classifies migraine under nervous system disorders
+    description: ICD-11 has both migraine and cardiovascular disease but no subclass relationship between them
     source: https://icd.who.int/browse11
     source_name: ICD-11
     source_type: TERMINOLOGY
@@ -75,8 +75,8 @@ evidence:
     predicate_label: subClassOf
     source_subject_id: ICD11:8A80
     source_subject_label: Migraine
-    source_object_id: ICD11:8A00-8E7Z
-    source_object_label: Diseases of the nervous system
+    source_object_id: ICD11:BA00-BE2Z
+    source_object_label: Diseases of the circulatory system
     mapping_set: https://w3id.org/sssom/mappings/mondo-icd11.sssom.tsv
 
   - id: ev-expert-neurology

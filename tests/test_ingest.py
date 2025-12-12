@@ -24,7 +24,7 @@ def test_parse_minimal_record():
     record = parse_curation_record(data)
     assert record.id == "test-001"
     assert record.assertion.subject_id == "MONDO:0001"
-    assert record.status.value == "PENDING"
+    assert record.status.value == "UNREVIEWED"
 
 
 def test_parse_record_with_evidence():
@@ -89,7 +89,7 @@ def test_record_exists(db):
 def test_get_records_by_status(db):
     for i in range(3):
         data = {
-            "id": f"test-pending-{i}",
+            "id": f"test-unreviewed-{i}",
             "assertion": {
                 "subject_id": f"MONDO:000{i}",
                 "predicate": "rdfs:subClassOf",
@@ -99,8 +99,8 @@ def test_get_records_by_status(db):
         record = parse_curation_record(data)
         db.insert_record(record)
 
-    pending = db.get_records_by_status("PENDING")
-    assert len(pending) == 3
+    unreviewed = db.get_records_by_status("UNREVIEWED")
+    assert len(unreviewed) == 3
 
 
 def test_stats(db):
@@ -117,5 +117,240 @@ def test_stats(db):
 
     stats = db.get_stats()
     assert stats["total"] == 1
-    assert stats["pending"] == 1
+    assert stats["unreviewed"] == 1
     assert stats["accepted"] == 0
+
+
+def test_record_decision_with_certainty(db):
+    """Test that decisions can include certainty values."""
+    from datetime import datetime
+
+    from sieve.models import CurationDecision, DecisionType
+
+    # Create a record
+    data = {
+        "id": "test-certainty-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+    }
+    record = parse_curation_record(data)
+    db.insert_record(record)
+
+    # Make a decision with certainty
+    decision = CurationDecision(
+        id="decision-001",
+        record_id="test-certainty-001",
+        curator_orcid="orcid:0000-0001-2345-6789",
+        curator_name="Test Curator",
+        decision=DecisionType.ACCEPT,
+        certainty=0.75,
+        rationale="Test rationale",
+        decided_at=datetime.now(),
+    )
+    db.record_decision(decision)
+
+    # Retrieve and verify
+    decisions = db.get_decisions_for_record("test-certainty-001")
+    assert len(decisions) == 1
+    assert decisions[0]["certainty"] == 0.75
+    assert decisions[0]["decision"] == "ACCEPT"
+
+
+def test_record_decision_default_certainty(db):
+    """Test that decisions default to certainty of 1.0."""
+    from datetime import datetime
+
+    from sieve.models import CurationDecision, DecisionType
+
+    # Create a record
+    data = {
+        "id": "test-default-certainty-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+    }
+    record = parse_curation_record(data)
+    db.insert_record(record)
+
+    # Make a decision without specifying certainty
+    decision = CurationDecision(
+        id="decision-002",
+        record_id="test-default-certainty-001",
+        curator_orcid="orcid:0000-0001-2345-6789",
+        curator_name="Test Curator",
+        decision=DecisionType.REJECT,
+        rationale="Test rejection",
+        decided_at=datetime.now(),
+    )
+    db.record_decision(decision)
+
+    # Retrieve and verify default certainty
+    decisions = db.get_decisions_for_record("test-default-certainty-001")
+    assert len(decisions) == 1
+    assert decisions[0]["certainty"] == 1.0
+
+
+def test_get_records_with_decisions_paginated_includes_certainty(db):
+    """Test that paginated records include certainty from decisions."""
+    from datetime import datetime
+
+    from sieve.models import CurationDecision, DecisionType
+
+    # Create a record
+    data = {
+        "id": "test-paginated-certainty-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+    }
+    record = parse_curation_record(data)
+    db.insert_record(record)
+
+    # Make a decision with specific certainty
+    decision = CurationDecision(
+        id="decision-003",
+        record_id="test-paginated-certainty-001",
+        curator_orcid="orcid:0000-0001-2345-6789",
+        curator_name="Test Curator",
+        decision=DecisionType.ACCEPT,
+        certainty=0.5,
+        rationale=None,
+        decided_at=datetime.now(),
+    )
+    db.record_decision(decision)
+
+    # Retrieve paginated records
+    records, total = db.get_records_with_decisions_paginated(
+        status="ACCEPTED", offset=0, limit=10
+    )
+    assert total == 1
+    assert len(records) == 1
+    assert records[0]["certainty"] == 0.5
+
+
+def test_certainty_validation():
+    """Test that certainty must be between 0 and 1."""
+    from datetime import datetime
+
+    import pytest
+    from pydantic import ValidationError
+
+    from sieve.models import CurationDecision, DecisionType
+
+    # Valid certainty values
+    for valid_certainty in [0.0, 0.5, 1.0]:
+        decision = CurationDecision(
+            id="test-valid",
+            record_id="record-001",
+            curator_orcid="orcid:0000-0001-2345-6789",
+            decision=DecisionType.ACCEPT,
+            certainty=valid_certainty,
+            decided_at=datetime.now(),
+        )
+        assert decision.certainty == valid_certainty
+
+    # Invalid certainty values
+    for invalid_certainty in [-0.1, 1.1, 2.0]:
+        with pytest.raises(ValidationError):
+            CurationDecision(
+                id="test-invalid",
+                record_id="record-001",
+                curator_orcid="orcid:0000-0001-2345-6789",
+                decision=DecisionType.ACCEPT,
+                certainty=invalid_certainty,
+                decided_at=datetime.now(),
+            )
+
+
+def test_record_decision_sets_evidence_steward_and_confidence(db):
+    """Test that making a decision sets evidence_steward and confidence on the record."""
+    from datetime import datetime
+
+    from sieve.models import CurationDecision, DecisionType
+
+    # Create a record
+    data = {
+        "id": "test-steward-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+    }
+    record = parse_curation_record(data)
+    db.insert_record(record)
+
+    # Verify initial state - no steward or confidence
+    initial_record = db.get_record("test-steward-001")
+    assert initial_record["evidence_steward"] is None
+    assert initial_record["confidence"] is None
+
+    # Make a decision
+    decision = CurationDecision(
+        id="decision-steward-001",
+        record_id="test-steward-001",
+        curator_orcid="orcid:0000-0001-2345-6789",
+        curator_name="Test Curator",
+        decision=DecisionType.ACCEPT,
+        certainty=0.85,
+        rationale="Test rationale",
+        decided_at=datetime.now(),
+    )
+    db.record_decision(decision)
+
+    # Verify the record now has evidence_steward and confidence set
+    updated_record = db.get_record("test-steward-001")
+    assert updated_record["status"] == "ACCEPTED"
+    assert updated_record["evidence_steward"] == "orcid:0000-0001-2345-6789"
+    assert updated_record["confidence"] == 0.85
+
+
+def test_return_to_queue_clears_steward_and_confidence(db):
+    """Test that returning a record to queue clears evidence_steward and confidence."""
+    from datetime import datetime
+
+    from sieve.models import CurationDecision, DecisionType
+
+    # Create and decide on a record
+    data = {
+        "id": "test-return-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+    }
+    record = parse_curation_record(data)
+    db.insert_record(record)
+
+    decision = CurationDecision(
+        id="decision-return-001",
+        record_id="test-return-001",
+        curator_orcid="orcid:0000-0001-2345-6789",
+        decision=DecisionType.REJECT,
+        certainty=0.9,
+        decided_at=datetime.now(),
+    )
+    db.record_decision(decision)
+
+    # Verify decision was recorded
+    decided_record = db.get_record("test-return-001")
+    assert decided_record["status"] == "REJECTED"
+    assert decided_record["evidence_steward"] == "orcid:0000-0001-2345-6789"
+    assert decided_record["confidence"] == 0.9
+
+    # Return to queue
+    db.return_to_queue("test-return-001")
+
+    # Verify steward and confidence are cleared
+    returned_record = db.get_record("test-return-001")
+    assert returned_record["status"] == "UNREVIEWED"
+    assert returned_record["evidence_steward"] is None
+    assert returned_record["confidence"] is None

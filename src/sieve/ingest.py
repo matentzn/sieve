@@ -140,11 +140,11 @@ def parse_curation_record(data: dict) -> CurationRecord:
             )
         )
 
-    status_str = data.get("status", "PENDING")
+    status_str = data.get("status", "UNREVIEWED")
     try:
         status = CurationStatus(status_str)
     except ValueError:
-        status = CurationStatus.PENDING
+        status = CurationStatus.UNREVIEWED
 
     return CurationRecord(
         id=data.get("id", generate_id()),

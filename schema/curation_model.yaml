@@ -48,7 +48,17 @@ classes:
       status:
         range: CurationStatus
         required: true
-        ifabsent: string(PENDING)
+        ifabsent: string(UNREVIEWED)
+
+      evidence_steward:
+        range: uriorcurie
+        description: ORCID of the person who assigned the final status
+
+      confidence:
+        range: float
+        description: Confidence level (0-1) of the evidence steward in their final judgment
+        minimum_value: 0
+        maximum_value: 1
 
       created_at:
         range: datetime
@@ -328,20 +338,23 @@ enums:
 
   CurationStatus:
     permissible_values:
-      PENDING:
-        description: Awaiting review
+      UNREVIEWED:
+        description: Not yet reviewed (default)
       ACCEPTED:
         description: Approved by curator
       REJECTED:
         description: Rejected by curator
-      DEFERRED:
-        description: Postponed for later review
+      CONTROVERSIAL:
+        description: Conflicting opinions or requires further discussion
 
   DecisionType:
     permissible_values:
       ACCEPT:
+        description: Accept the assertion
       REJECT:
-      DEFER:
+        description: Reject the assertion
+      CONTROVERSIAL:
+        description: Mark as controversial for further discussion
 
   EvidenceType:
     permissible_values:

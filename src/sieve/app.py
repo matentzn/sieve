@@ -101,7 +101,7 @@ def sanitize_mermaid_label(label: str) -> str:
     """Sanitize a label for use in mermaid diagrams."""
     return label.replace('"', "'").replace("(", "[").replace(")", "]").replace("<", "&lt;").replace(">", "&gt;")
 
-from sieve.auth import get_curator_info, handle_oauth_callback, is_authorized_curator, render_login_ui
+from sieve.auth import get_curator_info, handle_oauth_callback, is_admin, is_authorized_curator, render_login_ui
 from sieve.db import CurationDatabase
 from sieve.export import export_accepted_records
 from sieve.ingest import ingest_directory, parse_curation_record
@@ -140,6 +140,7 @@ def main():
             "📋 Review Queue",
             "✅ Accepted",
             "❌ Rejected",
+            "⚠️ Controversial",
             "📥 Ingest",
             "📤 Export",
             "📊 Dashboard",
@@ -151,10 +152,11 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Statistics")
     col1, col2 = st.sidebar.columns(2)
-    col1.metric("Pending", stats["pending"])
+    col1.metric("Unreviewed", stats["unreviewed"])
     col2.metric("Total", stats["total"])
     col1.metric("Accepted", stats["accepted"])
     col2.metric("Rejected", stats["rejected"])
+    col1.metric("Controversial", stats["controversial"])
 
     # ORCID login/logout UI
     render_login_ui()
@@ -166,6 +168,8 @@ def main():
         render_status_list("ACCEPTED")
     elif page == "❌ Rejected":
         render_status_list("REJECTED")
+    elif page == "⚠️ Controversial":
+        render_status_list("CONTROVERSIAL")
     elif page == "📥 Ingest":
         render_ingest_page()
     elif page == "📤 Export":
@@ -217,7 +221,7 @@ def render_review_queue():
     # Get paginated records
     offset = st.session_state.page_number * page_size
     records, total_count = db.get_records_paginated(
-        status="PENDING",
+        status="UNREVIEWED",
         offset=offset,
         limit=page_size,
         sort_by=st.session_state.sort_by,
@@ -225,7 +229,7 @@ def render_review_queue():
     )
 
     if total_count == 0:
-        st.info("🎉 No pending records to review! Ingest some files to get started.")
+        st.info("🎉 No unreviewed records! Ingest some files to get started.")
         return
 
     # Show count and pagination info
@@ -437,6 +441,16 @@ def render_review_panel(record: dict):
         st.error("You are not authorized to make curation decisions. Contact an admin to be added to the curators list.")
         return
 
+    # Certainty slider
+    certainty = st.slider(
+        "Certainty",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.8,
+        step=0.1,
+        help="How certain are you about this decision? (0 = uncertain, 1 = very certain)",
+    )
+
     rationale = st.text_area(
         "Rationale (required for rejection)", placeholder="Explain your decision..."
     )
@@ -444,25 +458,25 @@ def render_review_panel(record: dict):
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        if st.button("Accept", type="primary", use_container_width=True):
-            make_decision(record["id"], "ACCEPT", rationale)
+        if st.button("Accept", type="primary", width="stretch"):
+            make_decision(record["id"], "ACCEPT", rationale, certainty)
             st.rerun()
 
     with col2:
-        if st.button("Reject", type="secondary", use_container_width=True):
+        if st.button("Reject", type="secondary", width="stretch"):
             if not rationale:
                 st.error("Rationale is required for rejection.")
             else:
-                make_decision(record["id"], "REJECT", rationale)
+                make_decision(record["id"], "REJECT", rationale, certainty)
                 st.rerun()
 
     with col3:
-        if st.button("Defer", use_container_width=True):
-            make_decision(record["id"], "DEFER", rationale)
+        if st.button("Controversial", width="stretch"):
+            make_decision(record["id"], "CONTROVERSIAL", rationale, certainty)
             st.rerun()
 
     with col4:
-        if st.button("Skip", use_container_width=True):
+        if st.button("Skip", width="stretch"):
             st.rerun()
 
 
@@ -531,6 +545,7 @@ def render_concordance_evidence(evidence: dict, record: dict = None):
     source_name = evidence.get("source_name", "Unknown")
     source_type = evidence.get("source_type", "")
     source_uri = evidence.get("source")
+    direction = evidence.get("direction", "SUPPORTS")
 
     if source_uri:
         st.markdown(f"**Source:** [{source_name}]({source_uri}) ({source_type})")
@@ -578,10 +593,25 @@ def render_concordance_evidence(evidence: dict, record: dict = None):
     source_name_safe = source_name.replace(" ", "_").replace("-", "_")
 
     # Render mermaid diagram showing both assertions and mappings
-    # 4 nodes: Mondo subject, Mondo object, Source subject, Source object
-    # 4 edges: Mondo assertion, Source assertion, subject mapping, object mapping
-    # Subgraphs clearly label which hierarchy is which
-    mermaid_code = f"""graph LR
+    # For SUPPORTS: show the relationship exists in source
+    # For CONTRADICTS: show the relationship is ABSENT in source (no edge, just nodes with mappings)
+    if direction == "CONTRADICTS":
+        # Source has mappings but NO relationship between the terms
+        mermaid_code = f"""graph LR
+    subgraph Mondo["Mondo Assertion"]
+        direction BT
+        MS["{mondo_subject_safe}"] -->|{mondo_predicate_safe}| MO["{mondo_object_safe}"]
+    end
+    subgraph Source["{source_name_safe} - no relationship"]
+        direction BT
+        SS["{source_subject_safe}"]
+        SO["{source_object_safe}"]
+    end
+    MS <-.->|mapping| SS
+    MO <-.->|mapping| SO"""
+    else:
+        # SUPPORTS or UNCERTAIN: show the relationship exists in source
+        mermaid_code = f"""graph LR
     subgraph Mondo["Mondo Assertion"]
         direction BT
         MS["{mondo_subject_safe}"] -->|{mondo_predicate_safe}| MO["{mondo_object_safe}"]
@@ -715,7 +745,7 @@ def render_curation_activity(activity: dict):
             st.markdown(f"**Pull request:** [{pr_url}]({pr_url})")
 
 
-def make_decision(record_id: str, decision: str, rationale: str):
+def make_decision(record_id: str, decision: str, rationale: str, certainty: float = 1.0):
     """Record a curation decision."""
     curator_orcid, curator_name = get_curator_info()
 
@@ -733,6 +763,7 @@ def make_decision(record_id: str, decision: str, rationale: str):
         curator_orcid=curator_orcid,
         curator_name=curator_name,
         decision=DecisionType(decision),
+        certainty=certainty,
         rationale=rationale if rationale else None,
         decided_at=datetime.now(),
     )
@@ -742,42 +773,284 @@ def make_decision(record_id: str, decision: str, rationale: str):
 
 
 def render_status_list(status: str):
-    """Render list of records with given status."""
+    """Render paginated list of records with given status."""
     title_map = {
-        "ACCEPTED": "✅ Accepted",
-        "REJECTED": "❌ Rejected",
-        "DEFERRED": "⏸️ Deferred",
+        "ACCEPTED": "Accepted",
+        "REJECTED": "Rejected",
+        "CONTROVERSIAL": "Controversial",
     }
     st.title(title_map.get(status, status))
 
-    records = db.get_records_by_status(status)
+    # Session state keys for this status
+    page_key = f"{status.lower()}_page"
+    selected_key = f"{status.lower()}_selected"
+    sort_by_key = f"{status.lower()}_sort_by"
+    sort_order_key = f"{status.lower()}_sort_order"
 
-    if not records:
+    # Initialize session state
+    if page_key not in st.session_state:
+        st.session_state[page_key] = 0
+    if selected_key not in st.session_state:
+        st.session_state[selected_key] = None
+    if sort_by_key not in st.session_state:
+        st.session_state[sort_by_key] = "decided_at"
+    if sort_order_key not in st.session_state:
+        st.session_state[sort_order_key] = "DESC"
+
+    page_size = 25
+
+    # Sorting controls
+    sort_col1, sort_col2 = st.columns([2, 1])
+    with sort_col1:
+        sort_options = {
+            "Decision Date": "decided_at",
+            "Evidence Score": "evidence_score",
+            "Certainty": "certainty",
+            "Assertion": "assertion_display_text",
+            "Curator": "curator_name",
+        }
+        current_sort = st.session_state[sort_by_key]
+        current_label = next((k for k, v in sort_options.items() if v == current_sort), "Decision Date")
+        sort_label = st.selectbox(
+            "Sort by",
+            options=list(sort_options.keys()),
+            index=list(sort_options.keys()).index(current_label),
+            key=f"{status}_sort_select",
+        )
+        st.session_state[sort_by_key] = sort_options[sort_label]
+    with sort_col2:
+        order_options = {"Newest First": "DESC", "Oldest First": "ASC"}
+        current_order = st.session_state[sort_order_key]
+        current_order_label = "Newest First" if current_order == "DESC" else "Oldest First"
+        order_label = st.selectbox(
+            "Order",
+            options=list(order_options.keys()),
+            index=list(order_options.keys()).index(current_order_label),
+            key=f"{status}_order_select",
+        )
+        st.session_state[sort_order_key] = order_options[order_label]
+
+    # Get paginated records with decision info
+    offset = st.session_state[page_key] * page_size
+    records, total_count = db.get_records_with_decisions_paginated(
+        status=status,
+        offset=offset,
+        limit=page_size,
+        sort_by=st.session_state[sort_by_key],
+        sort_order=st.session_state[sort_order_key],
+    )
+
+    if total_count == 0:
         st.info(f"No {status.lower()} records.")
         return
 
-    st.write(f"**{len(records)} records**")
+    # Show count and pagination info
+    total_pages = (total_count + page_size - 1) // page_size
+    st.write(f"**{total_count} records** (Page {st.session_state[page_key] + 1} of {total_pages})")
 
-    for record in records:
-        with st.expander(
-            f"{record['assertion_subject_label'] or record['assertion_subject_id']} → "
-            f"{record['assertion_object_label'] or record['assertion_object_id']}"
-        ):
-            st.code(
-                f"{record['assertion_subject_id']} {record['assertion_predicate']} {record['assertion_object_id']}",
-                language=None,
-            )
+    # Build table data
+    import pandas as pd
 
-            # Show decision info
-            decisions = db.get_decisions_for_record(record["id"])
-            if decisions:
-                d = decisions[0]
-                st.markdown(
-                    f"**Decided by:** {d.get('curator_name', d['curator_orcid'])}"
-                )
-                st.markdown(f"**Date:** {d['decided_at']}")
-                if d.get("rationale"):
-                    st.markdown(f"**Rationale:** {d['rationale']}")
+    table_data = []
+    for r in records:
+        display_text = r.get("assertion_display_text") or (
+            f"{r.get('assertion_subject_label') or r.get('assertion_subject_id')} -> "
+            f"{r.get('assertion_object_label') or r.get('assertion_object_id')}"
+        )
+        score = r.get("evidence_score")
+        score_display = f"{score:+.2f}" if score is not None else "N/A"
+
+        # Curator info
+        curator = r.get("curator_name") or r.get("curator_orcid") or "Unknown"
+
+        # Decision date
+        decided_at = r.get("decided_at")
+        date_display = str(decided_at)[:10] if decided_at else "N/A"
+
+        # Certainty
+        certainty = r.get("certainty")
+        certainty_display = f"{certainty:.0%}" if certainty is not None else "N/A"
+
+        table_data.append({
+            "id": r["id"],
+            "Assertion": display_text[:60] + ("..." if len(display_text) > 60 else ""),
+            "Score": score_display,
+            "Certainty": certainty_display,
+            "Decided By": curator[:20] + ("..." if len(curator) > 20 else ""),
+            "Date": date_display,
+        })
+
+    df = pd.DataFrame(table_data)
+
+    # Display as interactive dataframe
+    selection = st.dataframe(
+        df[["Assertion", "Score", "Certainty", "Decided By", "Date"]],
+        width="stretch",
+        hide_index=True,
+        on_select="rerun",
+        selection_mode="single-row",
+    )
+
+    # Handle selection
+    if selection and selection.selection and selection.selection.rows:
+        selected_idx = selection.selection.rows[0]
+        st.session_state[selected_key] = table_data[selected_idx]["id"]
+
+    # Pagination controls
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
+    with col1:
+        if st.button("First", disabled=st.session_state[page_key] == 0, key=f"{status}_first"):
+            st.session_state[page_key] = 0
+            st.rerun()
+    with col2:
+        if st.button("Prev", disabled=st.session_state[page_key] == 0, key=f"{status}_prev"):
+            st.session_state[page_key] -= 1
+            st.rerun()
+    with col3:
+        new_page = st.number_input(
+            "Page",
+            min_value=1,
+            max_value=total_pages,
+            value=st.session_state[page_key] + 1,
+            label_visibility="collapsed",
+            key=f"{status}_page_input",
+        )
+        if new_page != st.session_state[page_key] + 1:
+            st.session_state[page_key] = new_page - 1
+            st.rerun()
+    with col4:
+        if st.button("Next", disabled=st.session_state[page_key] >= total_pages - 1, key=f"{status}_next"):
+            st.session_state[page_key] += 1
+            st.rerun()
+    with col5:
+        if st.button("Last", disabled=st.session_state[page_key] >= total_pages - 1, key=f"{status}_last"):
+            st.session_state[page_key] = total_pages - 1
+            st.rerun()
+
+    # Show detail panel if record selected
+    if st.session_state[selected_key]:
+        render_decided_record_panel(st.session_state[selected_key], status)
+
+
+def render_decided_record_panel(record_id: str, status: str):
+    """Render detail panel for a decided record."""
+    record = db.get_record(record_id)
+    if not record:
+        st.error("Record not found")
+        return
+
+    st.markdown("---")
+
+    # Record status info
+    st.subheader("Record Status")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"**Status:** {record.get('status', 'N/A')}")
+    with col2:
+        steward = record.get("evidence_steward")
+        if steward:
+            steward_display = steward.replace("orcid:", "") if steward.startswith("orcid:") else steward
+            st.markdown(f"**Evidence Steward:** [{steward_display}](https://orcid.org/{steward_display})")
+        else:
+            st.markdown("**Evidence Steward:** N/A")
+    with col3:
+        confidence = record.get("confidence")
+        confidence_display = f"{confidence:.0%}" if confidence is not None else "N/A"
+        st.markdown(f"**Confidence:** {confidence_display}")
+
+    # Decision history
+    decisions = db.get_decisions_for_record(record_id)
+    if decisions:
+        d = decisions[0]
+        st.subheader("Latest Decision")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            curator = d.get("curator_name") or d.get("curator_orcid", "Unknown")
+            st.markdown(f"**Decided by:** {curator}")
+        with col2:
+            st.markdown(f"**Date:** {d.get('decided_at', 'N/A')}")
+        with col3:
+            st.markdown(f"**Decision:** {d.get('decision', status)}")
+        with col4:
+            certainty = d.get("certainty")
+            certainty_display = f"{certainty:.0%}" if certainty is not None else "N/A"
+            st.markdown(f"**Certainty:** {certainty_display}")
+
+        if d.get("rationale"):
+            st.markdown(f"**Rationale:** {d['rationale']}")
+
+    # Assertion display
+    st.subheader("Assertion")
+
+    if record.get("assertion_display_text"):
+        st.markdown(f"**{record['assertion_display_text']}**")
+
+    # Render assertion as mermaid diagram
+    subject_label = record.get("assertion_subject_label") or record["assertion_subject_id"]
+    object_label = record.get("assertion_object_label") or record["assertion_object_id"]
+    predicate_label = record.get("assertion_predicate_label") or record["assertion_predicate"]
+
+    subject_label_safe = sanitize_mermaid_label(subject_label)
+    object_label_safe = sanitize_mermaid_label(object_label)
+    predicate_label_safe = sanitize_mermaid_label(predicate_label)
+
+    mermaid_code = f"""graph LR
+    S["{subject_label_safe}"] -->|{predicate_label_safe}| O["{object_label_safe}"]"""
+    render_mermaid(mermaid_code, height=150)
+
+    # Show IDs as clickable links
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"Subject: {expand_curie_to_link(record['assertion_subject_id'])}")
+    with col2:
+        st.markdown(f"Object: {expand_curie_to_link(record['assertion_object_id'])}")
+
+    # Evidence section
+    st.markdown("---")
+    st.subheader("Evidence")
+
+    evidence = record.get("evidence", [])
+    if not evidence:
+        st.warning("No evidence items provided for this assertion.")
+    else:
+        # Calculate and display evidence score
+        score, formula_explanation = calculate_evidence_score(evidence)
+
+        if score > 0.3:
+            score_color = "green"
+            score_label = "Supports"
+        elif score < -0.3:
+            score_color = "red"
+            score_label = "Contradicts"
+        else:
+            score_color = "orange"
+            score_label = "Mixed"
+
+        score_col, info_col = st.columns([4, 1])
+        with score_col:
+            st.markdown(f"**Evidence Score:** :{score_color}[{score:+.2f}] ({score_label})")
+            normalized_score = (score + 1) / 2
+            st.progress(normalized_score)
+        with info_col:
+            with st.popover("?"):
+                st.markdown(formula_explanation)
+
+        st.markdown(f"*{len(evidence)} evidence items*")
+
+        for i, ev in enumerate(evidence):
+            render_evidence_item(ev, i, record)
+
+    # Admin: Return to queue button
+    st.markdown("---")
+    curator_orcid, _ = get_curator_info()
+    if curator_orcid and is_admin(curator_orcid):
+        if st.button("Return to Queue", type="secondary", key=f"return_{record_id}"):
+            db.return_to_queue(record_id)
+            st.session_state[f"{status.lower()}_selected"] = None
+            st.success("Record returned to review queue")
+            st.rerun()
+    elif curator_orcid and is_authorized_curator(curator_orcid):
+        st.caption("Only admins can return records to the queue.")
 
 
 def render_ingest_page():
@@ -896,15 +1169,16 @@ def render_dashboard():
     stats = db.get_stats()
 
     # Metrics row
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
     col1.metric("Total Records", stats["total"])
-    col2.metric("Pending", stats["pending"], delta=None)
+    col2.metric("Unreviewed", stats["unreviewed"], delta=None)
     col3.metric("Accepted", stats["accepted"])
     col4.metric("Rejected", stats["rejected"])
+    col5.metric("Controversial", stats["controversial"])
 
     # Progress
     if stats["total"] > 0:
-        reviewed = stats["accepted"] + stats["rejected"]
+        reviewed = stats["accepted"] + stats["rejected"] + stats["controversial"]
         progress = reviewed / stats["total"]
         st.progress(
             progress, text=f"{reviewed}/{stats['total']} reviewed ({progress*100:.0f}%)"
@@ -918,10 +1192,10 @@ def render_dashboard():
 
     for r in records:
         status_emoji = {
-            "PENDING": "⏳",
+            "UNREVIEWED": "⏳",
             "ACCEPTED": "✅",
             "REJECTED": "❌",
-            "DEFERRED": "⏸️",
+            "CONTROVERSIAL": "⚠️",
         }
         emoji = status_emoji.get(r["status"], "❓")
 

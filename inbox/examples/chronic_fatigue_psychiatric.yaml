@@ -67,7 +67,7 @@ evidence:
     evidence_strength: 0.95
     eco_code: ECO:0000204
     eco_label: similarity evidence
-    description: WHO ICD-11 classifies ME/CFS as neurological, not psychiatric
+    description: ICD-11 has both CFS and psychiatric disorder concepts but no subclass relationship between them
     source: https://icd.who.int/browse11
     source_name: ICD-11
     source_type: TERMINOLOGY
@@ -75,8 +75,8 @@ evidence:
     predicate_label: subClassOf
     source_subject_id: ICD11:8E49
     source_subject_label: Postviral fatigue syndrome
-    source_object_id: ICD11:8A00-8E7Z
-    source_object_label: Diseases of the nervous system
+    source_object_id: ICD11:6A00-6E8Z
+    source_object_label: Mental, behavioural or neurodevelopmental disorders
     mapping_set: https://w3id.org/sssom/mappings/mondo-icd11.sssom.tsv
 
   - id: ev-concordance-nice
@@ -85,7 +85,7 @@ evidence:
     evidence_strength: 0.9
     eco_code: ECO:0000204
     eco_label: similarity evidence
-    description: NICE guidelines reject psychiatric classification
+    description: NICE guidelines have both ME/CFS and psychiatric concepts but explicitly reject psychiatric classification
     source: https://www.nice.org.uk/guidance/ng206
     source_name: NICE Guidelines
     source_type: OTHER
@@ -93,8 +93,8 @@ evidence:
     predicate_label: subClassOf
     source_subject_id: NICE:NG206
     source_subject_label: ME/CFS
-    source_object_id: NICE:chronic-complex
-    source_object_label: Chronic complex condition
+    source_object_id: NICE:mental-health
+    source_object_label: Mental health conditions
 
   - id: ev-expert-immunology
     evidence_type: EXPERT_REVIEW

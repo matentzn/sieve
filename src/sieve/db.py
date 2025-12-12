@@ -71,7 +71,9 @@ class CurationDatabase:
                 provenance JSON,
                 evidence JSON,
                 evidence_score DOUBLE,
-                status VARCHAR NOT NULL DEFAULT 'PENDING',
+                status VARCHAR NOT NULL DEFAULT 'UNREVIEWED',
+                evidence_steward VARCHAR,
+                confidence DOUBLE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -85,6 +87,30 @@ class CurationDatabase:
         except duckdb.CatalogException:
             pass  # Column already exists
 
+        # Add evidence_steward column if it doesn't exist (migration)
+        try:
+            self.conn.execute(
+                "ALTER TABLE curation_records ADD COLUMN evidence_steward VARCHAR"
+            )
+        except duckdb.CatalogException:
+            pass  # Column already exists
+
+        # Add confidence column if it doesn't exist (migration)
+        try:
+            self.conn.execute(
+                "ALTER TABLE curation_records ADD COLUMN confidence DOUBLE"
+            )
+        except duckdb.CatalogException:
+            pass  # Column already exists
+
+        # Migrate old status values to new ones
+        self.conn.execute(
+            "UPDATE curation_records SET status = 'UNREVIEWED' WHERE status = 'PENDING'"
+        )
+        self.conn.execute(
+            "UPDATE curation_records SET status = 'CONTROVERSIAL' WHERE status = 'DEFERRED'"
+        )
+
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS curation_decisions (
                 id VARCHAR PRIMARY KEY,
@@ -92,11 +118,20 @@ class CurationDatabase:
                 curator_orcid VARCHAR NOT NULL,
                 curator_name VARCHAR,
                 decision VARCHAR NOT NULL,
+                certainty DOUBLE DEFAULT 1.0,
                 rationale TEXT,
                 decided_at TIMESTAMP NOT NULL,
                 FOREIGN KEY (record_id) REFERENCES curation_records(id)
             )
         """)
+
+        # Add certainty column if it doesn't exist (migration)
+        try:
+            self.conn.execute(
+                "ALTER TABLE curation_decisions ADD COLUMN certainty DOUBLE DEFAULT 1.0"
+            )
+        except duckdb.CatalogException:
+            pass  # Column already exists
 
     def insert_record(self, record: CurationRecord) -> str:
         """Insert a new curation record."""
@@ -121,8 +156,9 @@ class CurationDatabase:
                 id, last_updated, assertion_subject_id, assertion_subject_label,
                 assertion_predicate, assertion_predicate_label,
                 assertion_object_id, assertion_object_label, assertion_display_text,
-                provenance, evidence, evidence_score, status, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                provenance, evidence, evidence_score, status,
+                evidence_steward, confidence, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             [
                 record.id,
@@ -137,7 +173,9 @@ class CurationDatabase:
                 provenance_json,
                 evidence_json,
                 evidence_score,
-                record.status.value if record.status else "PENDING",
+                record.status.value if record.status else "UNREVIEWED",
+                record.evidence_steward,
+                record.confidence,
                 record.created_at or datetime.now(),
                 record.updated_at or datetime.now(),
             ],
@@ -236,6 +274,99 @@ class CurationDatabase:
 
         return records, total_count
 
+    def get_records_with_decisions_paginated(
+        self,
+        status: str,
+        offset: int = 0,
+        limit: int = 50,
+        sort_by: str = "decided_at",
+        sort_order: str = "DESC",
+    ) -> tuple[list[dict], int]:
+        """Get paginated records with decision info for a given status.
+
+        Returns tuple of (records, total_count).
+        Includes curator info from the most recent decision.
+        """
+        # Validate sort column to prevent SQL injection
+        valid_sort_columns = {
+            "decided_at",
+            "evidence_score",
+            "assertion_display_text",
+            "curator_name",
+            "certainty",
+        }
+        if sort_by not in valid_sort_columns:
+            sort_by = "decided_at"
+        if sort_order.upper() not in ("ASC", "DESC"):
+            sort_order = "DESC"
+
+        # Get total count
+        count_query = "SELECT COUNT(*) FROM curation_records WHERE status = ?"
+        total_count = self.conn.execute(count_query, [status]).fetchone()[0]
+
+        # Get paginated results with latest decision info
+        # Using a subquery to get the most recent decision for each record
+        query = f"""
+            SELECT
+                r.id,
+                r.assertion_display_text,
+                r.assertion_subject_label,
+                r.assertion_subject_id,
+                r.assertion_predicate_label,
+                r.assertion_predicate,
+                r.assertion_object_label,
+                r.assertion_object_id,
+                r.evidence_score,
+                r.status,
+                r.created_at,
+                d.curator_orcid,
+                d.curator_name,
+                d.decided_at,
+                d.certainty,
+                d.rationale
+            FROM curation_records r
+            LEFT JOIN (
+                SELECT record_id, curator_orcid, curator_name, decided_at, certainty, rationale,
+                       ROW_NUMBER() OVER (PARTITION BY record_id ORDER BY decided_at DESC) as rn
+                FROM curation_decisions
+            ) d ON r.id = d.record_id AND d.rn = 1
+            WHERE r.status = ?
+            ORDER BY {sort_by} {sort_order}
+            LIMIT ? OFFSET ?
+        """
+        results = self.conn.execute(query, [status, limit, offset]).fetchall()
+
+        columns = [
+            "id",
+            "assertion_display_text",
+            "assertion_subject_label",
+            "assertion_subject_id",
+            "assertion_predicate_label",
+            "assertion_predicate",
+            "assertion_object_label",
+            "assertion_object_id",
+            "evidence_score",
+            "status",
+            "created_at",
+            "curator_orcid",
+            "curator_name",
+            "decided_at",
+            "certainty",
+            "rationale",
+        ]
+        records = [dict(zip(columns, r)) for r in results]
+
+        return records, total_count
+
+    def return_to_queue(self, record_id: str):
+        """Return a record to UNREVIEWED status (for admin use)."""
+        self.conn.execute(
+            """UPDATE curation_records
+               SET status = 'UNREVIEWED', evidence_steward = NULL, confidence = NULL, updated_at = ?
+               WHERE id = ?""",
+            [datetime.now(), record_id],
+        )
+
     def get_all_records(self) -> list[dict]:
         """Get all records."""
         results = self.conn.execute(
@@ -243,11 +374,19 @@ class CurationDatabase:
         ).fetchall()
         return [self._row_to_dict(r) for r in results]
 
-    def update_status(self, record_id: str, status: str):
-        """Update record status."""
+    def update_status(
+        self,
+        record_id: str,
+        status: str,
+        evidence_steward: str | None = None,
+        confidence: float | None = None,
+    ):
+        """Update record status, evidence_steward, and confidence."""
         self.conn.execute(
-            "UPDATE curation_records SET status = ?, updated_at = ? WHERE id = ?",
-            [status, datetime.now(), record_id],
+            """UPDATE curation_records
+               SET status = ?, evidence_steward = ?, confidence = ?, updated_at = ?
+               WHERE id = ?""",
+            [status, evidence_steward, confidence, datetime.now(), record_id],
         )
 
     def record_decision(self, decision: CurationDecision):
@@ -256,8 +395,8 @@ class CurationDatabase:
             """
             INSERT INTO curation_decisions (
                 id, record_id, curator_orcid, curator_name,
-                decision, rationale, decided_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                decision, certainty, rationale, decided_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
             [
                 decision.id,
@@ -265,15 +404,21 @@ class CurationDatabase:
                 decision.curator_orcid,
                 decision.curator_name,
                 decision.decision.value if hasattr(decision.decision, "value") else decision.decision,
+                decision.certainty,
                 decision.rationale,
                 decision.decided_at,
             ],
         )
 
         # Map decision type to status
-        status_map = {"ACCEPT": "ACCEPTED", "REJECT": "REJECTED", "DEFER": "DEFERRED"}
+        status_map = {"ACCEPT": "ACCEPTED", "REJECT": "REJECTED", "CONTROVERSIAL": "CONTROVERSIAL"}
         decision_value = decision.decision.value if hasattr(decision.decision, "value") else decision.decision
-        self.update_status(decision.record_id, status_map[decision_value])
+        self.update_status(
+            decision.record_id,
+            status_map[decision_value],
+            evidence_steward=decision.curator_orcid,
+            confidence=decision.certainty,
+        )
 
     def get_decisions_for_record(self, record_id: str) -> list[dict]:
         """Get all decisions for a record."""
@@ -287,6 +432,7 @@ class CurationDatabase:
             "curator_orcid",
             "curator_name",
             "decision",
+            "certainty",
             "rationale",
             "decided_at",
         ]
@@ -297,26 +443,26 @@ class CurationDatabase:
         result = self.conn.execute("""
             SELECT
                 COUNT(*) as total,
-                COALESCE(SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END), 0) as pending,
+                COALESCE(SUM(CASE WHEN status = 'UNREVIEWED' THEN 1 ELSE 0 END), 0) as unreviewed,
                 COALESCE(SUM(CASE WHEN status = 'ACCEPTED' THEN 1 ELSE 0 END), 0) as accepted,
                 COALESCE(SUM(CASE WHEN status = 'REJECTED' THEN 1 ELSE 0 END), 0) as rejected,
-                COALESCE(SUM(CASE WHEN status = 'DEFERRED' THEN 1 ELSE 0 END), 0) as deferred
+                COALESCE(SUM(CASE WHEN status = 'CONTROVERSIAL' THEN 1 ELSE 0 END), 0) as controversial
             FROM curation_records
         """).fetchone()
         if result is None:
             return {
                 "total": 0,
-                "pending": 0,
+                "unreviewed": 0,
                 "accepted": 0,
                 "rejected": 0,
-                "deferred": 0,
+                "controversial": 0,
             }
         return {
             "total": result[0] or 0,
-            "pending": result[1] or 0,
+            "unreviewed": result[1] or 0,
             "accepted": result[2] or 0,
             "rejected": result[3] or 0,
-            "deferred": result[4] or 0,
+            "controversial": result[4] or 0,
         }
 
     def _row_to_dict(self, row) -> dict:
@@ -335,6 +481,8 @@ class CurationDatabase:
             "evidence",
             "evidence_score",
             "status",
+            "evidence_steward",
+            "confidence",
             "created_at",
             "updated_at",
         ]

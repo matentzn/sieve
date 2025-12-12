@@ -4,12 +4,13 @@ from datetime import datetime
 from pathlib import Path
 
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
-from rdflib.namespace import PROV, RDF, XSD
+from rdflib.namespace import OWL, RDF, RDFS, XSD
 
 from sieve.db import CurationDatabase
 
 # Namespaces
-CURA = Namespace("https://w3id.org/curation-app/")
+OBOINOWL = Namespace("http://www.geneontology.org/formats/oboInOwl#")
+SEPIO = Namespace("http://purl.obolibrary.org/obo/SEPIO_")
 ORCID = Namespace("https://orcid.org/")
 
 
@@ -40,86 +41,108 @@ def expand_curie(curie: str) -> str:
     return curie
 
 
+def create_owl_axiom_annotation(
+    g: Graph,
+    subject: URIRef,
+    predicate: URIRef,
+    obj: URIRef,
+    curator_orcid: str | None = None,
+    evidence_id: str | None = None,
+) -> BNode:
+    """Create an OWL axiom annotation for a triple.
+
+    This creates standard OWL2 reification using owl:Axiom with
+    owl:annotatedSource, owl:annotatedProperty, owl:annotatedTarget.
+
+    Args:
+        g: RDF graph to add triples to
+        subject: The subject of the annotated triple
+        predicate: The predicate of the annotated triple
+        obj: The object of the annotated triple
+        curator_orcid: Optional ORCID of the curator (used as oboInOwl:source)
+        evidence_id: Optional ID of the evidence packet (used as SEPIO:0000124)
+
+    Returns:
+        The BNode representing the axiom annotation
+    """
+    axiom = BNode()
+    g.add((axiom, RDF.type, OWL.Axiom))
+    g.add((axiom, OWL.annotatedSource, subject))
+    g.add((axiom, OWL.annotatedProperty, predicate))
+    g.add((axiom, OWL.annotatedTarget, obj))
+
+    if curator_orcid:
+        # Normalize ORCID to full URI
+        if curator_orcid.startswith("orcid:"):
+            curator_orcid = curator_orcid[6:]
+        curator_uri = ORCID[curator_orcid]
+        g.add((axiom, OBOINOWL.source, curator_uri))
+
+    if evidence_id:
+        evidence_uri = URIRef(evidence_id)
+        # SEPIO:0000124 = has_evidence
+        g.add((axiom, SEPIO["0000124"], evidence_uri))
+
+    return axiom
+
+
 def export_accepted_records(
     db: CurationDatabase,
     output_path: Path,
     format: str = "turtle",
     include_provenance: bool = True,
 ) -> Path:
-    """
-    Export all accepted records to RDF.
+    """Export all accepted records to RDF with OWL axiom annotations.
 
     Args:
         db: Database connection
         output_path: Directory for output file
         format: RDF serialization format (turtle, xml, json-ld, n3)
-        include_provenance: Whether to include curation provenance
+        include_provenance: Whether to include curation provenance as axiom annotations
 
     Returns:
         Path to generated file
     """
     g = Graph()
 
-    # Bind prefixes
-    g.bind("cura", CURA)
-    g.bind("prov", PROV)
+    # Bind prefixes for cleaner output
+    g.bind("owl", OWL)
+    g.bind("rdfs", RDFS)
+    g.bind("oboInOwl", OBOINOWL)
+    g.bind("SEPIO", SEPIO)
     g.bind("orcid", ORCID)
 
     accepted_records = db.get_records_by_status("ACCEPTED")
 
     for record in accepted_records:
-        # Create the main assertion triple
+        # Create URIs for the assertion
         subject = URIRef(expand_curie(record["assertion_subject_id"]))
         predicate = URIRef(expand_curie(record["assertion_predicate"]))
         obj = URIRef(expand_curie(record["assertion_object_id"]))
 
-        g.add((subject, predicate, obj))
-
         if include_provenance:
-            # Get decision info
+            # Get decision info for curator ORCID
             decisions = db.get_decisions_for_record(record["id"])
+            curator_orcid = None
             if decisions:
                 decision = decisions[0]  # Most recent
+                curator_orcid = decision.get("curator_orcid")
 
-                # Create provenance node
-                decision_uri = CURA[f"decision/{record['id']}"]
-                g.add((decision_uri, RDF.type, CURA.CurationDecision))
+            # Use record ID directly as evidence packet reference
+            evidence_id = record.get("id")
 
-                # Link to assertion via reification
-                assertion_node = BNode()
-                g.add((decision_uri, CURA.approvedAssertion, assertion_node))
-                g.add((assertion_node, RDF.subject, subject))
-                g.add((assertion_node, RDF.predicate, predicate))
-                g.add((assertion_node, RDF.object, obj))
-
-                # Add decision metadata
-                if decision.get("curator_orcid"):
-                    g.add(
-                        (
-                            decision_uri,
-                            PROV.wasAttributedTo,
-                            URIRef(expand_curie(decision["curator_orcid"])),
-                        )
-                    )
-
-                if decision.get("decided_at"):
-                    g.add(
-                        (
-                            decision_uri,
-                            PROV.generatedAtTime,
-                            Literal(decision["decided_at"], datatype=XSD.dateTime),
-                        )
-                    )
-
-                # Link to source record
-                if record.get("id"):
-                    g.add(
-                        (
-                            decision_uri,
-                            PROV.wasDerivedFrom,
-                            URIRef(expand_curie(record["id"])),
-                        )
-                    )
+            # Create OWL axiom annotation (no direct triple needed)
+            create_owl_axiom_annotation(
+                g=g,
+                subject=subject,
+                predicate=predicate,
+                obj=obj,
+                curator_orcid=curator_orcid,
+                evidence_id=evidence_id,
+            )
+        else:
+            # Without provenance, just add the direct triple
+            g.add((subject, predicate, obj))
 
     # Generate output filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -138,8 +161,11 @@ def export_accepted_records(
 def export_record_as_rdf(record: dict, db: CurationDatabase) -> str:
     """Export a single record to Turtle string."""
     g = Graph()
-    g.bind("cura", CURA)
-    g.bind("prov", PROV)
+    g.bind("owl", OWL)
+    g.bind("rdfs", RDFS)
+    g.bind("oboInOwl", OBOINOWL)
+    g.bind("SEPIO", SEPIO)
+    g.bind("orcid", ORCID)
 
     subject = URIRef(expand_curie(record["assertion_subject_id"]))
     predicate = URIRef(expand_curie(record["assertion_predicate"]))

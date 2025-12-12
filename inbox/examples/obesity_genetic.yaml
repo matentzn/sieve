@@ -69,7 +69,7 @@ evidence:
     evidence_strength: 0.85
     eco_code: ECO:0000204
     eco_label: similarity evidence
-    description: ICD-10 classifies obesity under metabolic disorders, not genetic
+    description: ICD-10 has both obesity and genetic disease concepts but no subclass relationship between them
     source: https://bioportal.bioontology.org/ontologies/ICD10CM
     source_name: ICD-10-CM
     source_type: TERMINOLOGY
@@ -77,8 +77,8 @@ evidence:
     predicate_label: subClassOf
     source_subject_id: ICD10CM:E66
     source_subject_label: Overweight and obesity
-    source_object_id: ICD10CM:E00-E89
-    source_object_label: Endocrine, nutritional and metabolic diseases
+    source_object_id: ICD10CM:Q00-Q99
+    source_object_label: Congenital malformations, deformations and chromosomal abnormalities
     mapping_set: https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv
 
   - id: ev-expert-epidemiology

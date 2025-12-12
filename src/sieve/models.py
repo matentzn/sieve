@@ -16,10 +16,10 @@ from pydantic import BaseModel, Field
 class CurationStatus(str, Enum):
     """Status of a curation record."""
 
-    PENDING = "PENDING"
+    UNREVIEWED = "UNREVIEWED"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
-    DEFERRED = "DEFERRED"
+    CONTROVERSIAL = "CONTROVERSIAL"
 
 
 class DecisionType(str, Enum):
@@ -27,7 +27,7 @@ class DecisionType(str, Enum):
 
     ACCEPT = "ACCEPT"
     REJECT = "REJECT"
-    DEFER = "DEFER"
+    CONTROVERSIAL = "CONTROVERSIAL"
 
 
 class EvidenceType(str, Enum):
@@ -152,7 +152,9 @@ class CurationRecord(BaseModel):
     assertion: Assertion
     provenance: Optional[AssertionProvenance] = None
     evidence: Optional[list[Evidence]] = Field(default_factory=list)
-    status: CurationStatus = CurationStatus.PENDING
+    status: CurationStatus = CurationStatus.UNREVIEWED
+    evidence_steward: Optional[str] = None
+    confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -165,5 +167,6 @@ class CurationDecision(BaseModel):
     curator_orcid: str
     curator_name: Optional[str] = None
     decision: DecisionType
+    certainty: float = Field(default=1.0, ge=0.0, le=1.0)
     rationale: Optional[str] = None
     decided_at: datetime
