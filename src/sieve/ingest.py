@@ -15,6 +15,7 @@ from sieve.models import (
     CurationStatus,
     EvidenceDirection,
     EvidenceItem,
+    EvidenceSynthesis,
     EvidenceType,
     SourceType,
 )
@@ -146,12 +147,22 @@ def parse_curation_record(data: dict) -> CurationRecord:
     except ValueError:
         status = CurationStatus.UNREVIEWED
 
+    # Parse evidence synthesis if present
+    evidence_synthesis = None
+    if "evidence_synthesis" in data:
+        synth_data = data["evidence_synthesis"]
+        evidence_synthesis = EvidenceSynthesis(
+            summary=synth_data.get("summary"),
+            confidence=synth_data.get("confidence"),
+        )
+
     return CurationRecord(
         id=data.get("id", generate_id()),
         last_updated=data.get("last_updated"),
         assertion=assertion,
         provenance=provenance,
         evidence=evidence,
+        evidence_synthesis=evidence_synthesis,
         status=status,
         created_at=datetime.now(),
         updated_at=datetime.now(),

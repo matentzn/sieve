@@ -1,9 +1,11 @@
 """Tests for ingestion module."""
 
 import pytest
+from pydantic import ValidationError
 
 from sieve.db import CurationDatabase
 from sieve.ingest import parse_curation_record
+from sieve.models import EvidenceSynthesis
 
 
 @pytest.fixture
@@ -354,3 +356,67 @@ def test_return_to_queue_clears_steward_and_confidence(db):
     assert returned_record["status"] == "UNREVIEWED"
     assert returned_record["evidence_steward"] is None
     assert returned_record["confidence"] is None
+
+
+def test_evidence_synthesis_model():
+    """Test that EvidenceSynthesis model can be created with required fields."""
+    synthesis = EvidenceSynthesis(
+        summary="Based on multiple concordance sources and literature evidence, "
+        "the assertion is well-supported.",
+        confidence=0.85,
+    )
+    assert synthesis.summary == (
+        "Based on multiple concordance sources and literature evidence, "
+        "the assertion is well-supported."
+    )
+    assert synthesis.confidence == 0.85
+
+
+def test_evidence_synthesis_confidence_validation():
+    """Test that confidence must be between 0 and 1."""
+    # Valid values
+    for valid_confidence in [0.0, 0.5, 1.0]:
+        synthesis = EvidenceSynthesis(
+            summary="Test summary",
+            confidence=valid_confidence,
+        )
+        assert synthesis.confidence == valid_confidence
+
+    # Invalid values
+    for invalid_confidence in [-0.1, 1.1, 2.0]:
+        with pytest.raises(ValidationError):
+            EvidenceSynthesis(
+                summary="Test summary",
+                confidence=invalid_confidence,
+            )
+
+
+def test_evidence_synthesis_optional_fields():
+    """Test that EvidenceSynthesis can be created with optional fields."""
+    synthesis = EvidenceSynthesis(
+        summary="The evidence strongly supports this assertion.",
+        confidence=0.95,
+    )
+    assert synthesis.summary == "The evidence strongly supports this assertion."
+    assert synthesis.confidence == 0.95
+
+
+def test_parse_record_with_evidence_synthesis():
+    """Test that curation records can include evidence synthesis."""
+    data = {
+        "id": "test-synthesis-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+        "evidence_synthesis": {
+            "summary": "Strong concordance across multiple ontologies.",
+            "confidence": 0.9,
+        },
+    }
+    record = parse_curation_record(data)
+    assert record.id == "test-synthesis-001"
+    assert record.evidence_synthesis is not None
+    assert record.evidence_synthesis.summary == "Strong concordance across multiple ontologies."
+    assert record.evidence_synthesis.confidence == 0.9
