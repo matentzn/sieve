@@ -391,14 +391,29 @@ def test_evidence_synthesis_confidence_validation():
             )
 
 
-def test_evidence_synthesis_optional_fields():
-    """Test that EvidenceSynthesis can be created with optional fields."""
+def test_evidence_synthesis_creation():
+    """Test that EvidenceSynthesis can be created with required fields."""
     synthesis = EvidenceSynthesis(
         summary="The evidence strongly supports this assertion.",
         confidence=0.95,
     )
     assert synthesis.summary == "The evidence strongly supports this assertion."
     assert synthesis.confidence == 0.95
+
+
+def test_evidence_synthesis_missing_required_fields():
+    """Test that EvidenceSynthesis raises error when required fields are missing."""
+    # Missing summary
+    with pytest.raises(ValidationError):
+        EvidenceSynthesis(confidence=0.5)
+
+    # Missing confidence
+    with pytest.raises(ValidationError):
+        EvidenceSynthesis(summary="Test summary")
+
+    # Both missing
+    with pytest.raises(ValidationError):
+        EvidenceSynthesis()
 
 
 def test_parse_record_with_evidence_synthesis():
@@ -420,3 +435,28 @@ def test_parse_record_with_evidence_synthesis():
     assert record.evidence_synthesis is not None
     assert record.evidence_synthesis.summary == "Strong concordance across multiple ontologies."
     assert record.evidence_synthesis.confidence == 0.9
+
+
+def test_parse_record_with_evidence_synthesis_confidence_clamping():
+    """Test that confidence values are clamped to [0.0, 1.0] range."""
+    # Test value above 1.0 is clamped
+    data = {
+        "id": "test-clamp-high",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+        "evidence_synthesis": {
+            "summary": "Test summary",
+            "confidence": 1.5,
+        },
+    }
+    record = parse_curation_record(data)
+    assert record.evidence_synthesis.confidence == 1.0
+
+    # Test value below 0.0 is clamped
+    data["id"] = "test-clamp-low"
+    data["evidence_synthesis"]["confidence"] = -0.5
+    record = parse_curation_record(data)
+    assert record.evidence_synthesis.confidence == 0.0

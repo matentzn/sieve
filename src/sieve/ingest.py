@@ -151,9 +151,13 @@ def parse_curation_record(data: dict) -> CurationRecord:
     evidence_synthesis = None
     if "evidence_synthesis" in data:
         synth_data = data["evidence_synthesis"]
+        # Clamp confidence to [0.0, 1.0] range for consistency with evidence_strength
+        confidence = synth_data.get("confidence")
+        if confidence is not None:
+            confidence = max(0.0, min(1.0, float(confidence)))
         evidence_synthesis = EvidenceSynthesis(
             summary=synth_data.get("summary"),
-            confidence=synth_data.get("confidence"),
+            confidence=confidence,
         )
 
     return CurationRecord(
