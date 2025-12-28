@@ -45,6 +45,11 @@ classes:
         multivalued: true
         inlined_as_list: true
 
+      evidence_synthesis:
+        range: EvidenceSynthesis
+        inlined: true
+        description: Synthesis of the evidence for this assertion
+
       status:
         range: CurationStatus
         required: true
@@ -300,6 +305,22 @@ classes:
       parameters:
         range: string
         description: Parameters used in the computation
+
+
+  EvidenceSynthesis:
+    description: A synthesis of the evidence for an assertion
+    attributes:
+      summary:
+        range: string
+        required: true
+        description: Textual summary synthesizing the evidence for the assertion
+
+      confidence:
+        range: float
+        required: true
+        description: Confidence score (0-1) reflecting how strongly the agent feels about the correctness of the verdict
+        minimum_value: 0
+        maximum_value: 1
 
 
   CurationDecision:

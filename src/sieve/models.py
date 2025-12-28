@@ -144,6 +144,18 @@ class Evidence(BaseModel):
 EvidenceItem = Evidence
 
 
+class EvidenceSynthesis(BaseModel):
+    """A synthesis of the evidence for an assertion.
+
+    This model captures a textual summary synthesizing the evidence
+    and a confidence score reflecting how strongly the agent feels
+    about the correctness of the verdict.
+    """
+
+    summary: str
+    confidence: float = Field(..., ge=0.0, le=1.0)
+
+
 class CurationRecord(BaseModel):
     """A candidate assertion with supporting evidence for curation review."""
 
@@ -152,6 +164,7 @@ class CurationRecord(BaseModel):
     assertion: Assertion
     provenance: Optional[AssertionProvenance] = None
     evidence: Optional[list[Evidence]] = Field(default_factory=list)
+    evidence_synthesis: Optional[EvidenceSynthesis] = None
     status: CurationStatus = CurationStatus.UNREVIEWED
     evidence_steward: Optional[str] = None
     confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
