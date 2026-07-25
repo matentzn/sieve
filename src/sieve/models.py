@@ -103,6 +103,7 @@ class Evidence(BaseModel):
     evidence_type: EvidenceType
     direction: EvidenceDirection = EvidenceDirection.SUPPORTS
     evidence_strength: float = Field(default=1.0, ge=0.0, le=1.0)
+    rating: Optional[CurationStatus] = None
     eco_code: Optional[str] = None
     eco_label: Optional[str] = None
     description: Optional[str] = None

@@ -103,7 +103,7 @@ def sanitize_mermaid_label(label: str) -> str:
 
 from sieve.auth import get_curator_info, handle_oauth_callback, is_admin, is_authorized_curator, render_login_ui
 from sieve.db import CurationDatabase
-from sieve.export import export_accepted_records
+from sieve.export import create_export_tarball, record_to_yaml
 from sieve.ingest import ingest_directory, parse_curation_record
 from sieve.models import CurationDecision, DecisionType
 
@@ -480,11 +480,18 @@ def render_review_panel(record: dict):
             st.rerun()
 
 
-def render_evidence_item(evidence: dict, index: int, record: dict = None):
-    """Render a single evidence item."""
+def render_evidence_item(evidence: dict, index: int, record: dict = None, allow_rating: bool = True):
+    """Render a single evidence item.
 
+    Args:
+        evidence: The evidence dict
+        index: Index of this evidence item in the record's evidence list
+        record: The parent record dict (needed for concordance visualization and rating updates)
+        allow_rating: Whether to show the rating dropdown (requires curator login)
+    """
     ev_type = evidence.get("evidence_type", "OTHER")
     direction = evidence.get("direction", "SUPPORTS")
+    current_rating = evidence.get("rating")
 
     # Icon mapping for evidence type
     type_icons = {
@@ -504,13 +511,52 @@ def render_evidence_item(evidence: dict, index: int, record: dict = None):
     }
     dir_icon, dir_color = direction_indicators.get(direction, ("❓", "gray"))
 
+    # Rating indicator
+    rating_icons = {
+        "ACCEPTED": "✅",
+        "REJECTED": "❌",
+        "CONTROVERSIAL": "⚠️",
+        "UNREVIEWED": "⏳",
+        None: "",
+    }
+    rating_icon = rating_icons.get(current_rating, "")
+
     # Evidence strength (default 1.0)
     strength = evidence.get("evidence_strength", 1.0)
 
-    with st.expander(
-        f"{type_icon} {dir_icon} **{ev_type}** — {evidence.get('description', 'No description')}",
-        expanded=(index == 0),
-    ):
+    # Build expander title with rating indicator
+    title = f"{type_icon} {dir_icon} **{ev_type}** — {evidence.get('description', 'No description')}"
+    if rating_icon:
+        title = f"{rating_icon} {title}"
+
+    with st.expander(title, expanded=(index == 0)):
+        # Rating dropdown (only if logged in as curator and record is provided)
+        if allow_rating and record:
+            curator_orcid, _ = get_curator_info()
+            if curator_orcid and is_authorized_curator(curator_orcid):
+                rating_options = ["—", "ACCEPTED", "REJECTED", "CONTROVERSIAL", "UNREVIEWED"]
+                current_idx = 0
+                if current_rating and current_rating in rating_options:
+                    current_idx = rating_options.index(current_rating)
+
+                record_id = record.get("id", "")
+                col_rating, _ = st.columns([2, 3])
+                with col_rating:
+                    new_rating = st.selectbox(
+                        "Rate this evidence",
+                        options=rating_options,
+                        index=current_idx,
+                        key=f"rating_{record_id}_{index}",
+                        help="Rate the quality/reliability of this evidence item",
+                    )
+
+                    # Check if rating changed
+                    if new_rating != (current_rating if current_rating else "—"):
+                        rating_value = None if new_rating == "—" else new_rating
+                        if db.update_evidence_rating(record_id, index, rating_value):
+                            st.success("Rating saved!")
+                            st.rerun()
+
         # Direction and strength indicators
         col1, col2 = st.columns(2)
         with col1:
@@ -941,6 +987,22 @@ def render_decided_record_panel(record_id: str, status: str):
 
     st.markdown("---")
 
+    # Get decision for YAML export
+    decisions = db.get_decisions_for_record(record_id)
+    decision = decisions[0] if decisions else None
+
+    # Collapsible YAML preview at the top
+    with st.expander("📄 Evidence Packet (YAML)", expanded=False):
+        yaml_content = record_to_yaml(record, decision)
+        st.code(yaml_content, language="yaml")
+        st.download_button(
+            label="⬇️ Download YAML",
+            data=yaml_content,
+            file_name=f"{record_id.replace(':', '_').replace('/', '_')}.yaml",
+            mime="text/yaml",
+            key=f"download_yaml_{record_id}",
+        )
+
     # Record status info
     st.subheader("Record Status")
     col1, col2, col3 = st.columns(3)
@@ -958,10 +1020,9 @@ def render_decided_record_panel(record_id: str, status: str):
         confidence_display = f"{confidence:.0%}" if confidence is not None else "N/A"
         st.markdown(f"**Confidence:** {confidence_display}")
 
-    # Decision history
-    decisions = db.get_decisions_for_record(record_id)
-    if decisions:
-        d = decisions[0]
+    # Decision history (decision already fetched above)
+    if decision:
+        d = decision
         st.subheader("Latest Decision")
         col1, col2, col3, col4 = st.columns(4)
         with col1:
@@ -1114,51 +1175,60 @@ evidence:
 
 def render_export_page():
     """Render the export page."""
-    st.title("📤 Export Accepted Records")
+    st.title("📤 Export Records")
 
     stats = db.get_stats()
-    st.write(f"**{stats['accepted']} accepted records** ready for export")
 
-    if stats["accepted"] == 0:
-        st.info("No accepted records to export. Review some records first!")
+    # Show counts
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Accepted", stats["accepted"])
+    with col2:
+        st.metric("Rejected", stats["rejected"])
+    with col3:
+        st.metric("Controversial", stats["controversial"])
+
+    total_reviewed = stats["accepted"] + stats["rejected"] + stats["controversial"]
+
+    if total_reviewed == 0:
+        st.info("No reviewed records to export. Review some records first!")
         return
 
-    col1, col2 = st.columns(2)
+    st.markdown("---")
+    st.markdown(
+        """
+        Download all reviewed evidence packets as a tar.gz archive.
 
-    with col1:
-        export_format = st.selectbox(
-            "Output format", options=["turtle", "xml", "json-ld", "n3"], index=0
-        )
+        The archive contains YAML files organized by status:
+        - `accepted/` - Accepted records
+        - `rejected/` - Rejected records
+        - `controversial/` - Controversial records
 
-    with col2:
-        include_provenance = st.checkbox("Include curation provenance", value=True)
+        Each YAML file includes:
+        - The assertion being curated
+        - All original evidence items
+        - The curator's review as an additional EXPERT_REVIEW evidence item
+        - Status, evidence steward, and confidence
+        """
+    )
 
-    if st.button("📤 Generate Export", type="primary"):
-        with st.spinner("Generating RDF export..."):
-            output_path = export_accepted_records(
-                db,
-                Path("data/exports"),
-                format=export_format,
-                include_provenance=include_provenance,
-            )
+    st.markdown("---")
 
-        st.success(f"✅ Export saved to: `{output_path}`")
+    # Generate timestamp for filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        # Show preview
-        with open(output_path, "r") as f:
-            content = f.read()
+    if st.button("📦 Download All Records", type="primary"):
+        with st.spinner(f"Creating archive of {total_reviewed} records..."):
+            tarball_bytes = create_export_tarball(db)
 
-        st.markdown("### Preview")
-        st.code(
-            content[:2000] + ("..." if len(content) > 2000 else ""), language="turtle"
-        )
+        st.success(f"✅ Archive created with {total_reviewed} records")
 
-        # Download button
         st.download_button(
-            label="⬇️ Download",
-            data=content,
-            file_name=output_path.name,
-            mime="text/turtle",
+            label="⬇️ Download tar.gz",
+            data=tarball_bytes,
+            file_name=f"sieve_export_{timestamp}.tar.gz",
+            mime="application/gzip",
+            key="download_tarball",
         )
 
 

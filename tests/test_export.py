@@ -1,156 +1,346 @@
-"""Tests for RDF export functionality."""
+"""Tests for YAML export functionality."""
 
-from rdflib import Graph, Namespace, URIRef
-from rdflib.namespace import OWL, RDF
+import io
+import tarfile
 
-from sieve.export import create_owl_axiom_annotation, expand_curie
+import pytest
+import yaml
 
-# Namespaces used in tests
-OBOINOWL = Namespace("http://www.geneontology.org/formats/oboInOwl#")
-SEPIO = Namespace("http://purl.obolibrary.org/obo/SEPIO_")
-ORCID = Namespace("https://orcid.org/")
-
-
-def test_expand_curie_mondo():
-    """Test CURIE expansion for MONDO IDs."""
-    assert expand_curie("MONDO:0000005") == "http://purl.obolibrary.org/obo/MONDO_0000005"
-
-
-def test_expand_curie_orcid():
-    """Test CURIE expansion for ORCID IDs."""
-    assert expand_curie("orcid:0000-0002-5002-8648") == "https://orcid.org/0000-0002-5002-8648"
+from sieve.db import CurationDatabase
+from sieve.export import (
+    create_export_tarball,
+    generate_export_records,
+    record_to_export_dict,
+    record_to_yaml,
+)
+from sieve.ingest import parse_curation_record
+from sieve.models import CurationDecision, DecisionType
 
 
-def test_expand_curie_rdfs():
-    """Test CURIE expansion for rdfs predicates."""
-    assert expand_curie("rdfs:subClassOf") == "http://www.w3.org/2000/01/rdf-schema#subClassOf"
+@pytest.fixture
+def db(tmp_path):
+    """Create a test database."""
+    db_path = tmp_path / "test.duckdb"
+    return CurationDatabase(str(db_path))
 
 
-def test_expand_curie_already_uri():
-    """Test that full URIs are returned unchanged."""
-    uri = "http://example.org/test"
-    assert expand_curie(uri) == uri
+@pytest.fixture
+def sample_record():
+    """Create a sample record dict as it would come from the database."""
+    return {
+        "id": "test-record-001",
+        "assertion_subject_id": "MONDO:0000005",
+        "assertion_subject_label": "asthma",
+        "assertion_predicate": "rdfs:subClassOf",
+        "assertion_predicate_label": "subClassOf",
+        "assertion_object_id": "MONDO:0100118",
+        "assertion_object_label": "respiratory system disorder",
+        "assertion_display_text": "asthma subClassOf respiratory system disorder",
+        "status": "ACCEPTED",
+        "evidence_steward": "orcid:0000-0001-2345-6789",
+        "confidence": 0.85,
+        "provenance": {
+            "attributed_to": ["orcid:0000-0001-1234-5678"],
+            "generated_at": "2024-01-15",
+        },
+        "evidence": [
+            {
+                "id": "ev-001",
+                "evidence_type": "LITERATURE",
+                "direction": "SUPPORTS",
+                "evidence_strength": 0.9,
+                "publication_id": "PMID:12345",
+                "quoted_text": "Asthma is a respiratory disease.",
+            }
+        ],
+    }
 
 
-def test_create_owl_axiom_annotation_basic():
-    """Test creating a basic OWL axiom annotation."""
-    g = Graph()
-    subject = URIRef("http://purl.obolibrary.org/obo/MONDO_0000005")
-    predicate = URIRef("http://www.w3.org/2000/01/rdf-schema#subClassOf")
-    obj = URIRef("http://purl.obolibrary.org/obo/MONDO_0100118")
-
-    axiom = create_owl_axiom_annotation(g, subject, predicate, obj)
-
-    # Check axiom type
-    assert (axiom, RDF.type, OWL.Axiom) in g
-
-    # Check annotated triple components
-    assert (axiom, OWL.annotatedSource, subject) in g
-    assert (axiom, OWL.annotatedProperty, predicate) in g
-    assert (axiom, OWL.annotatedTarget, obj) in g
+@pytest.fixture
+def sample_decision():
+    """Create a sample decision dict."""
+    return {
+        "id": "decision-001",
+        "record_id": "test-record-001",
+        "curator_orcid": "orcid:0000-0001-2345-6789",
+        "curator_name": "Test Curator",
+        "decision": "ACCEPT",
+        "certainty": 0.85,
+        "rationale": "Strong literature support",
+        "decided_at": "2024-01-20T10:30:00",
+    }
 
 
-def test_create_owl_axiom_annotation_with_curator():
-    """Test OWL axiom annotation with curator ORCID."""
-    g = Graph()
-    subject = URIRef("http://purl.obolibrary.org/obo/MONDO_0000005")
-    predicate = URIRef("http://www.w3.org/2000/01/rdf-schema#subClassOf")
-    obj = URIRef("http://purl.obolibrary.org/obo/MONDO_0100118")
+def test_record_to_export_dict_basic(sample_record):
+    """Test basic record conversion to export dict."""
+    export = record_to_export_dict(sample_record)
 
-    axiom = create_owl_axiom_annotation(
-        g, subject, predicate, obj,
-        curator_orcid="0000-0002-5002-8648"
+    assert export["id"] == "test-record-001"
+    assert export["status"] == "ACCEPTED"
+    assert export["assertion"]["subject_id"] == "MONDO:0000005"
+    assert export["assertion"]["predicate"] == "rdfs:subClassOf"
+    assert export["assertion"]["object_id"] == "MONDO:0100118"
+    assert export["evidence_steward"] == "orcid:0000-0001-2345-6789"
+    assert export["confidence"] == 0.85
+
+
+def test_record_to_export_dict_slot_order(sample_record):
+    """Test that export dict keys are in canonical order."""
+    export = record_to_export_dict(sample_record)
+
+    # Get the keys in order
+    keys = list(export.keys())
+
+    # Expected order: id, status, last_updated, evidence_steward, confidence, assertion, provenance, evidence
+    # Note: last_updated may be missing if not set in sample_record
+    expected_order = ["id", "status", "evidence_steward", "confidence", "assertion", "provenance", "evidence"]
+
+    # Filter to only keys that exist in export
+    actual_order = [k for k in keys]
+    expected_filtered = [k for k in expected_order if k in export]
+
+    assert actual_order == expected_filtered
+
+
+def test_record_to_export_dict_with_decision(sample_record, sample_decision):
+    """Test that decision is added as EXPERT_REVIEW evidence."""
+    export = record_to_export_dict(sample_record, sample_decision)
+
+    # Should have 2 evidence items - original + decision
+    assert len(export["evidence"]) == 2
+
+    # Find the decision evidence
+    decision_ev = [e for e in export["evidence"] if e.get("id") == "decision-001"]
+    assert len(decision_ev) == 1
+
+    ev = decision_ev[0]
+    assert ev["evidence_type"] == "EXPERT_REVIEW"
+    assert ev["direction"] == "SUPPORTS"
+    assert ev["evidence_strength"] == 0.85
+    assert ev["reviewer_orcid"] == "orcid:0000-0001-2345-6789"
+    assert "Strong literature support" in ev["description"]
+
+
+def test_record_to_export_dict_rejected_decision(sample_record):
+    """Test that REJECT decision has CONTRADICTS direction."""
+    decision = {
+        "id": "decision-002",
+        "decision": "REJECT",
+        "certainty": 0.9,
+        "curator_orcid": "orcid:0000-0002-3456-7890",
+    }
+
+    export = record_to_export_dict(sample_record, decision)
+    decision_ev = [e for e in export["evidence"] if e.get("id") == "decision-002"][0]
+
+    assert decision_ev["direction"] == "CONTRADICTS"
+
+
+def test_record_to_yaml_format(sample_record, sample_decision):
+    """Test that YAML output is valid and parseable."""
+    yaml_str = record_to_yaml(sample_record, sample_decision)
+
+    # Should be valid YAML
+    parsed = yaml.safe_load(yaml_str)
+
+    assert parsed["id"] == "test-record-001"
+    assert parsed["status"] == "ACCEPTED"
+    assert "assertion" in parsed
+    assert "evidence" in parsed
+
+
+def test_generate_export_records(db):
+    """Test generating export records from database."""
+    from datetime import datetime
+
+    # Create and insert a record
+    data = {
+        "id": "export-test-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+    }
+    record = parse_curation_record(data)
+    db.insert_record(record)
+
+    # Make a decision to move it to ACCEPTED
+    decision = CurationDecision(
+        id="decision-export-001",
+        record_id="export-test-001",
+        curator_orcid="orcid:0000-0001-2345-6789",
+        decision=DecisionType.ACCEPT,
+        certainty=0.8,
+        decided_at=datetime.now(),
+    )
+    db.record_decision(decision)
+
+    # Generate exports
+    exports = list(generate_export_records(db, statuses=["ACCEPTED"]))
+
+    assert len(exports) == 1
+    filename, yaml_content, status = exports[0]
+
+    assert status == "ACCEPTED"
+    assert filename.startswith("accepted/")
+    assert filename.endswith(".yaml")
+
+    # Verify YAML is valid
+    parsed = yaml.safe_load(yaml_content)
+    assert parsed["id"] == "export-test-001"
+    assert parsed["status"] == "ACCEPTED"
+
+
+def test_create_export_tarball(db):
+    """Test creating a tar.gz archive of records."""
+    from datetime import datetime
+
+    # Create and accept a record
+    data = {
+        "id": "tarball-test-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+    }
+    record = parse_curation_record(data)
+    db.insert_record(record)
+
+    decision = CurationDecision(
+        id="decision-tarball-001",
+        record_id="tarball-test-001",
+        curator_orcid="orcid:0000-0001-2345-6789",
+        decision=DecisionType.ACCEPT,
+        certainty=0.9,
+        decided_at=datetime.now(),
+    )
+    db.record_decision(decision)
+
+    # Create tarball
+    tarball_bytes = create_export_tarball(db)
+
+    # Verify it's a valid tar.gz
+    assert len(tarball_bytes) > 0
+
+    buffer = io.BytesIO(tarball_bytes)
+    with tarfile.open(fileobj=buffer, mode="r:gz") as tar:
+        names = tar.getnames()
+        assert len(names) == 1
+        assert names[0].startswith("accepted/")
+        assert names[0].endswith(".yaml")
+
+        # Extract and verify content
+        member = tar.getmember(names[0])
+        f = tar.extractfile(member)
+        content = f.read().decode("utf-8")
+        parsed = yaml.safe_load(content)
+        assert parsed["id"] == "tarball-test-001"
+
+
+def test_create_export_tarball_multiple_statuses(db):
+    """Test tarball with records of different statuses."""
+    from datetime import datetime
+
+    # Create accepted record
+    data1 = {
+        "id": "multi-test-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+    }
+    db.insert_record(parse_curation_record(data1))
+    db.record_decision(
+        CurationDecision(
+            id="dec-multi-001",
+            record_id="multi-test-001",
+            curator_orcid="orcid:0000-0001-2345-6789",
+            decision=DecisionType.ACCEPT,
+            certainty=0.9,
+            decided_at=datetime.now(),
+        )
     )
 
-    # Check oboInOwl:source points to ORCID
-    curator_uri = ORCID["0000-0002-5002-8648"]
-    assert (axiom, OBOINOWL.source, curator_uri) in g
-
-
-def test_create_owl_axiom_annotation_with_orcid_prefix():
-    """Test that orcid: prefix is handled correctly."""
-    g = Graph()
-    subject = URIRef("http://purl.obolibrary.org/obo/MONDO_0000005")
-    predicate = URIRef("http://www.w3.org/2000/01/rdf-schema#subClassOf")
-    obj = URIRef("http://purl.obolibrary.org/obo/MONDO_0100118")
-
-    axiom = create_owl_axiom_annotation(
-        g, subject, predicate, obj,
-        curator_orcid="orcid:0000-0002-5002-8648"
+    # Create rejected record
+    data2 = {
+        "id": "multi-test-002",
+        "assertion": {
+            "subject_id": "MONDO:0003",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0004",
+        },
+    }
+    db.insert_record(parse_curation_record(data2))
+    db.record_decision(
+        CurationDecision(
+            id="dec-multi-002",
+            record_id="multi-test-002",
+            curator_orcid="orcid:0000-0001-2345-6789",
+            decision=DecisionType.REJECT,
+            certainty=0.8,
+            rationale="Insufficient evidence",
+            decided_at=datetime.now(),
+        )
     )
 
-    # Check oboInOwl:source points to ORCID (prefix stripped)
-    curator_uri = ORCID["0000-0002-5002-8648"]
-    assert (axiom, OBOINOWL.source, curator_uri) in g
+    # Create tarball
+    tarball_bytes = create_export_tarball(db)
+
+    buffer = io.BytesIO(tarball_bytes)
+    with tarfile.open(fileobj=buffer, mode="r:gz") as tar:
+        names = tar.getnames()
+        assert len(names) == 2
+
+        # Check we have both directories
+        assert any(n.startswith("accepted/") for n in names)
+        assert any(n.startswith("rejected/") for n in names)
 
 
-def test_create_owl_axiom_annotation_with_evidence():
-    """Test OWL axiom annotation with evidence reference."""
-    g = Graph()
-    subject = URIRef("http://purl.obolibrary.org/obo/MONDO_0000005")
-    predicate = URIRef("http://www.w3.org/2000/01/rdf-schema#subClassOf")
-    obj = URIRef("http://purl.obolibrary.org/obo/MONDO_0100118")
-    evidence_uri = "https://evidence.monarchinitiative.org/record-123"
+def test_empty_export_tarball(db):
+    """Test tarball creation with no reviewed records."""
+    tarball_bytes = create_export_tarball(db)
 
-    axiom = create_owl_axiom_annotation(
-        g, subject, predicate, obj,
-        evidence_id=evidence_uri
-    )
-
-    # Check SEPIO:0000124 (has_evidence) points to evidence
-    assert (axiom, SEPIO["0000124"], URIRef(evidence_uri)) in g
+    # Should still be valid (empty) tar.gz
+    buffer = io.BytesIO(tarball_bytes)
+    with tarfile.open(fileobj=buffer, mode="r:gz") as tar:
+        names = tar.getnames()
+        assert len(names) == 0
 
 
-def test_create_owl_axiom_annotation_full():
-    """Test OWL axiom annotation with all fields."""
-    g = Graph()
-    subject = URIRef("http://purl.obolibrary.org/obo/MONDO_0000005")
-    predicate = URIRef("http://www.w3.org/2000/01/rdf-schema#subClassOf")
-    obj = URIRef("http://purl.obolibrary.org/obo/MONDO_0100118")
+def test_record_to_export_dict_with_evidence_ratings():
+    """Test that evidence ratings are included in export."""
+    record = {
+        "id": "test-ratings-export",
+        "status": "ACCEPTED",
+        "assertion_subject_id": "MONDO:0001",
+        "assertion_predicate": "rdfs:subClassOf",
+        "assertion_object_id": "MONDO:0002",
+        "evidence": [
+            {
+                "id": "ev-001",
+                "evidence_type": "LITERATURE",
+                "rating": "ACCEPTED",
+            },
+            {
+                "id": "ev-002",
+                "evidence_type": "CONCORDANCE",
+                "rating": "REJECTED",
+            },
+            {
+                "id": "ev-003",
+                "evidence_type": "COMPUTATIONAL",
+                # No rating set
+            },
+        ],
+    }
 
-    axiom = create_owl_axiom_annotation(
-        g, subject, predicate, obj,
-        curator_orcid="0000-0002-5002-8648",
-        evidence_id="https://evidence.monarchinitiative.org/record-123"
-    )
+    export = record_to_export_dict(record)
 
-    # Verify the graph is valid RDF by serializing to turtle
-    turtle_output = g.serialize(format="turtle")
-    assert "owl:Axiom" in turtle_output
-    assert "owl:annotatedSource" in turtle_output
-    assert "owl:annotatedProperty" in turtle_output
-    assert "owl:annotatedTarget" in turtle_output
-
-    # Verify it can also be serialized to RDF/XML
-    xml_output = g.serialize(format="xml")
-    assert "Axiom" in xml_output
-
-
-def test_owl_axiom_roundtrip():
-    """Test that exported RDF can be parsed back."""
-    g = Graph()
-    subject = URIRef("http://purl.obolibrary.org/obo/MONDO_0000005")
-    predicate = URIRef("http://www.w3.org/2000/01/rdf-schema#subClassOf")
-    obj = URIRef("http://purl.obolibrary.org/obo/MONDO_0100118")
-
-    # Add axiom annotation (no direct triple needed)
-    create_owl_axiom_annotation(
-        g, subject, predicate, obj,
-        curator_orcid="0000-0002-5002-8648",
-        evidence_id="https://evidence.monarchinitiative.org/record-123"
-    )
-
-    # Serialize and parse back
-    turtle = g.serialize(format="turtle")
-    g2 = Graph()
-    g2.parse(data=turtle, format="turtle")
-
-    # Check we have an axiom
-    axioms = list(g2.subjects(RDF.type, OWL.Axiom))
-    assert len(axioms) == 1
-
-    # Check the axiom has the correct annotated components
-    axiom = axioms[0]
-    assert (axiom, OWL.annotatedSource, subject) in g2
-    assert (axiom, OWL.annotatedProperty, predicate) in g2
-    assert (axiom, OWL.annotatedTarget, obj) in g2
+    # Check ratings are preserved
+    assert len(export["evidence"]) == 3
+    assert export["evidence"][0]["rating"] == "ACCEPTED"
+    assert export["evidence"][1]["rating"] == "REJECTED"
+    assert export["evidence"][2].get("rating") is None

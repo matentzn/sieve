@@ -1,14 +1,13 @@
 ---
-site_name: "sieve"
+site_name: "SIEVE"
+site_description: "Scientific Evidence Evaluation & Verification Environment"
 theme:
   name: material
-  # palette:
-  #  scheme: slate
-  #  primary: cyan
   features:
     - content.tabs.link
-
-# for adding extra css/js see https://www.mkdocs.org/user-guide/customizing-your-theme/
+    - navigation.sections
+    - navigation.expand
+    - toc.integrate
 
 plugins:
   - search
@@ -16,15 +15,47 @@ plugins:
       execute: false
   - mermaid2:
       version: 11.4.1
-  
-#watch:
-#  - src/sieve/schema
+
+markdown_extensions:
+  - tables
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - toc:
+      permalink: true
 
 nav:
   - Home: index.md
-  
+  - Getting Started:
+    - Architecture: architecture.md
+    - Data Model: data-model.md
+  - User Guide:
+    - CLI Reference: cli.md
+    - Workflows: workflows.md
+  - Developer Guide:
+    - Python API: api.md
+    - AI Integration: ai-integration.md
+  - Reference:
+    - Schema Documentation: elements/index.md
+
 exclude_docs: |
   /templates-linkml/
 
 site_url: https://matentzn.github.io/sieve
 repo_url: https://github.com/matentzn/sieve
+repo_name: matentzn/sieve
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/matentzn/sieve

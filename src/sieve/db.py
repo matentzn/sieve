@@ -503,6 +503,38 @@ class CurationDatabase:
         ).fetchone()
         return result is not None
 
+    def update_evidence_rating(
+        self, record_id: str, evidence_index: int, rating: str | None
+    ) -> bool:
+        """Update the rating for a specific evidence item.
+
+        Args:
+            record_id: The record ID
+            evidence_index: Index of the evidence item in the evidence array
+            rating: The rating value (UNREVIEWED, ACCEPTED, REJECTED, CONTROVERSIAL) or None
+
+        Returns:
+            True if successful, False if record or evidence not found
+        """
+        record = self.get_record(record_id)
+        if not record:
+            return False
+
+        evidence = record.get("evidence", [])
+        if evidence_index < 0 or evidence_index >= len(evidence):
+            return False
+
+        # Update the rating
+        evidence[evidence_index]["rating"] = rating
+
+        # Save back to database
+        evidence_json = json.dumps(evidence)
+        self.conn.execute(
+            "UPDATE curation_records SET evidence = ?, updated_at = ? WHERE id = ?",
+            [evidence_json, datetime.now(), record_id],
+        )
+        return True
+
     def close(self):
         """Close database connection."""
         self.conn.close()

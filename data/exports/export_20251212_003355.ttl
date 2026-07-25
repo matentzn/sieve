@@ -1,0 +1,17 @@
+@prefix cura: <https://w3id.org/curation-app/> .
+@prefix orcid: <https://orcid.org/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/curation-app/decision/http://purl.org/np/RA9876543210> a cura:CurationDecision ;
+    prov:generatedAtTime "2025-12-12T00:33:49.688959"^^xsd:dateTime ;
+    prov:wasAttributedTo orcid:0000-0000-0000-0000 ;
+    prov:wasDerivedFrom <http://purl.org/np/RA9876543210> ;
+    cura:approvedAssertion [ rdf:object <http://purl.obolibrary.org/obo/MONDO_0005275> ;
+            rdf:predicate rdfs:subClassOf ;
+            rdf:subject <http://purl.obolibrary.org/obo/MONDO_0004979> ] .
+
+<http://purl.obolibrary.org/obo/MONDO_0004979> rdfs:subClassOf <http://purl.obolibrary.org/obo/MONDO_0005275> .
+

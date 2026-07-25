@@ -1,11 +1,9 @@
 """Tests for ingestion module."""
 
 import pytest
-from pydantic import ValidationError
 
 from sieve.db import CurationDatabase
 from sieve.ingest import parse_curation_record
-from sieve.models import EvidenceSynthesis
 
 
 @pytest.fixture
@@ -358,105 +356,111 @@ def test_return_to_queue_clears_steward_and_confidence(db):
     assert returned_record["confidence"] is None
 
 
-def test_evidence_synthesis_model():
-    """Test that EvidenceSynthesis model can be created with required fields."""
-    synthesis = EvidenceSynthesis(
-        summary="Based on multiple concordance sources and literature evidence, "
-        "the assertion is well-supported.",
-        confidence=0.85,
-    )
-    assert synthesis.summary == (
-        "Based on multiple concordance sources and literature evidence, "
-        "the assertion is well-supported."
-    )
-    assert synthesis.confidence == 0.85
-
-
-def test_evidence_synthesis_confidence_validation():
-    """Test that confidence must be between 0 and 1."""
-    # Valid values
-    for valid_confidence in [0.0, 0.5, 1.0]:
-        synthesis = EvidenceSynthesis(
-            summary="Test summary",
-            confidence=valid_confidence,
-        )
-        assert synthesis.confidence == valid_confidence
-
-    # Invalid values
-    for invalid_confidence in [-0.1, 1.1, 2.0]:
-        with pytest.raises(ValidationError):
-            EvidenceSynthesis(
-                summary="Test summary",
-                confidence=invalid_confidence,
-            )
-
-
-def test_evidence_synthesis_creation():
-    """Test that EvidenceSynthesis can be created with required fields."""
-    synthesis = EvidenceSynthesis(
-        summary="The evidence strongly supports this assertion.",
-        confidence=0.95,
-    )
-    assert synthesis.summary == "The evidence strongly supports this assertion."
-    assert synthesis.confidence == 0.95
-
-
-def test_evidence_synthesis_missing_required_fields():
-    """Test that EvidenceSynthesis raises error when required fields are missing."""
-    # Missing summary
-    with pytest.raises(ValidationError):
-        EvidenceSynthesis(confidence=0.5)
-
-    # Missing confidence
-    with pytest.raises(ValidationError):
-        EvidenceSynthesis(summary="Test summary")
-
-    # Both missing
-    with pytest.raises(ValidationError):
-        EvidenceSynthesis()
-
-
-def test_parse_record_with_evidence_synthesis():
-    """Test that curation records can include evidence synthesis."""
+def test_update_evidence_rating(db):
+    """Test updating the rating for a specific evidence item."""
+    # Create a record with evidence
     data = {
-        "id": "test-synthesis-001",
+        "id": "test-rating-001",
         "assertion": {
             "subject_id": "MONDO:0001",
             "predicate": "rdfs:subClassOf",
             "object_id": "MONDO:0002",
         },
-        "evidence_synthesis": {
-            "summary": "Strong concordance across multiple ontologies.",
-            "confidence": 0.9,
-        },
+        "evidence": [
+            {
+                "id": "ev-001",
+                "evidence_type": "LITERATURE",
+                "publication_id": "PMID:12345",
+            },
+            {
+                "id": "ev-002",
+                "evidence_type": "CONCORDANCE",
+                "source_name": "DOID",
+            },
+        ],
     }
     record = parse_curation_record(data)
-    assert record.id == "test-synthesis-001"
-    assert record.evidence_synthesis is not None
-    assert record.evidence_synthesis.summary == "Strong concordance across multiple ontologies."
-    assert record.evidence_synthesis.confidence == 0.9
+    db.insert_record(record)
+
+    # Verify initial state - no ratings
+    initial_record = db.get_record("test-rating-001")
+    assert initial_record["evidence"][0].get("rating") is None
+    assert initial_record["evidence"][1].get("rating") is None
+
+    # Update rating for first evidence
+    success = db.update_evidence_rating("test-rating-001", 0, "ACCEPTED")
+    assert success
+
+    # Verify rating was set
+    updated_record = db.get_record("test-rating-001")
+    assert updated_record["evidence"][0]["rating"] == "ACCEPTED"
+    assert updated_record["evidence"][1].get("rating") is None
+
+    # Update rating for second evidence
+    success = db.update_evidence_rating("test-rating-001", 1, "REJECTED")
+    assert success
+
+    # Verify both ratings
+    final_record = db.get_record("test-rating-001")
+    assert final_record["evidence"][0]["rating"] == "ACCEPTED"
+    assert final_record["evidence"][1]["rating"] == "REJECTED"
 
 
-def test_parse_record_with_evidence_synthesis_confidence_clamping():
-    """Test that confidence values are clamped to [0.0, 1.0] range."""
-    # Test value above 1.0 is clamped
+def test_update_evidence_rating_clear(db):
+    """Test clearing an evidence rating by setting it to None."""
+    # Create a record with evidence that has a rating
     data = {
-        "id": "test-clamp-high",
+        "id": "test-rating-clear-001",
         "assertion": {
             "subject_id": "MONDO:0001",
             "predicate": "rdfs:subClassOf",
             "object_id": "MONDO:0002",
         },
-        "evidence_synthesis": {
-            "summary": "Test summary",
-            "confidence": 1.5,
-        },
+        "evidence": [
+            {
+                "id": "ev-001",
+                "evidence_type": "LITERATURE",
+                "rating": "ACCEPTED",
+            },
+        ],
     }
     record = parse_curation_record(data)
-    assert record.evidence_synthesis.confidence == 1.0
+    db.insert_record(record)
 
-    # Test value below 0.0 is clamped
-    data["id"] = "test-clamp-low"
-    data["evidence_synthesis"]["confidence"] = -0.5
+    # Verify initial rating
+    initial_record = db.get_record("test-rating-clear-001")
+    assert initial_record["evidence"][0]["rating"] == "ACCEPTED"
+
+    # Clear the rating
+    success = db.update_evidence_rating("test-rating-clear-001", 0, None)
+    assert success
+
+    # Verify rating was cleared
+    updated_record = db.get_record("test-rating-clear-001")
+    assert updated_record["evidence"][0]["rating"] is None
+
+
+def test_update_evidence_rating_invalid_index(db):
+    """Test that updating with invalid index returns False."""
+    data = {
+        "id": "test-rating-invalid-001",
+        "assertion": {
+            "subject_id": "MONDO:0001",
+            "predicate": "rdfs:subClassOf",
+            "object_id": "MONDO:0002",
+        },
+        "evidence": [
+            {"id": "ev-001", "evidence_type": "LITERATURE"},
+        ],
+    }
     record = parse_curation_record(data)
-    assert record.evidence_synthesis.confidence == 0.0
+    db.insert_record(record)
+
+    # Try to update with invalid index
+    assert not db.update_evidence_rating("test-rating-invalid-001", 5, "ACCEPTED")
+    assert not db.update_evidence_rating("test-rating-invalid-001", -1, "ACCEPTED")
+
+
+def test_update_evidence_rating_nonexistent_record(db):
+    """Test that updating nonexistent record returns False."""
+    assert not db.update_evidence_rating("nonexistent-record", 0, "ACCEPTED")

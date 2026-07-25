@@ -171,7 +171,6 @@ classes:
       evidence_type:
         range: EvidenceType
         required: true
-        designates_type: true
 
       direction:
         range: EvidenceDirection
@@ -184,6 +183,10 @@ classes:
         ifabsent: float(1.0)
         minimum_value: 0
         maximum_value: 1
+
+      rating:
+        range: CurationStatus
+        description: Knowledge steward's rating of this evidence item
 
       eco_code:
         range: uriorcurie
@@ -238,6 +241,7 @@ classes:
         description: SSSOM mapping set URI reference
 
 
+# LiteratureEvidence itself has many subtypes including metanalyses, just conclusions, etc
   LiteratureEvidence:
     description: Published literature evidence
     is_a: Evidence

@@ -1,5 +1,17 @@
 id: http://purl.org/np/RA9876543210
 last_updated: "2024-01-20"
+status: ACCEPTED
+
+synthesis: 
+  agent: orcid:0000-0002-6601-2165
+  value: >
+    After reviewing multiple lines of evidence, including cross-ontology concordance
+    with ICD-10, published literature, expert clinical review, and AI-assisted research,
+    the classification of asthma as a respiratory system disorder is well-supported.
+    The majority of evidence strongly supports this classification, with only minor
+    contradictory evidence from Disease Ontology. Overall, the evidence steward rates
+    this assertion as ACCEPTED with high confidence.
+
 assertion:
   subject_id: MONDO:0004979
   subject_label: asthma

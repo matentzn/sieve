@@ -106,12 +106,22 @@ def parse_curation_record(data: dict) -> CurationRecord:
         evidence_strength = ev_data.get("evidence_strength", 1.0)
         evidence_strength = max(0.0, min(1.0, float(evidence_strength)))
 
+        # Parse rating if present
+        rating = None
+        rating_str = ev_data.get("rating")
+        if rating_str:
+            try:
+                rating = CurationStatus(rating_str)
+            except ValueError:
+                rating = None
+
         evidence.append(
             EvidenceItem(
                 id=ev_data.get("id", generate_id()),
                 evidence_type=evidence_type,
                 direction=direction,
                 evidence_strength=evidence_strength,
+                rating=rating,
                 eco_code=ev_data.get("eco_code"),
                 eco_label=ev_data.get("eco_label"),
                 description=ev_data.get("description"),

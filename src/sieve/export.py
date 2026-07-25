@@ -1,176 +1,239 @@
-"""Export accepted assertions to RDF."""
+"""Export curation records as YAML packages."""
 
+import io
+import tarfile
 from datetime import datetime
 from pathlib import Path
+from typing import Generator
 
-from rdflib import BNode, Graph, Literal, Namespace, URIRef
-from rdflib.namespace import OWL, RDF, RDFS, XSD
+import yaml
 
 from sieve.db import CurationDatabase
 
-# Namespaces
-OBOINOWL = Namespace("http://www.geneontology.org/formats/oboInOwl#")
-SEPIO = Namespace("http://purl.obolibrary.org/obo/SEPIO_")
-ORCID = Namespace("https://orcid.org/")
 
+def record_to_export_dict(record: dict, decision: dict | None = None) -> dict:
+    """Convert a database record to an exportable dictionary.
 
-def expand_curie(curie: str) -> str:
-    """Expand common CURIEs to full URIs."""
-    prefix_map = {
-        "MONDO": "http://purl.obolibrary.org/obo/MONDO_",
-        "DOID": "http://purl.obolibrary.org/obo/DOID_",
-        "HP": "http://purl.obolibrary.org/obo/HP_",
-        "GO": "http://purl.obolibrary.org/obo/GO_",
-        "CHEBI": "http://purl.obolibrary.org/obo/CHEBI_",
-        "ECO": "http://purl.obolibrary.org/obo/ECO_",
-        "orcid": "https://orcid.org/",
-        "PMID": "https://pubmed.ncbi.nlm.nih.gov/",
-        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "owl": "http://www.w3.org/2002/07/owl#",
-        "skos": "http://www.w3.org/2004/02/skos/core#",
-    }
-
-    if "://" in curie:
-        return curie  # Already a URI
-
-    if ":" in curie:
-        prefix, local = curie.split(":", 1)
-        if prefix in prefix_map:
-            return prefix_map[prefix] + local
-
-    return curie
-
-
-def create_owl_axiom_annotation(
-    g: Graph,
-    subject: URIRef,
-    predicate: URIRef,
-    obj: URIRef,
-    curator_orcid: str | None = None,
-    evidence_id: str | None = None,
-) -> BNode:
-    """Create an OWL axiom annotation for a triple.
-
-    This creates standard OWL2 reification using owl:Axiom with
-    owl:annotatedSource, owl:annotatedProperty, owl:annotatedTarget.
+    This creates a complete evidence packet with slots in order:
+    id, status, last_updated, evidence_steward, confidence, assertion, provenance, evidence
 
     Args:
-        g: RDF graph to add triples to
-        subject: The subject of the annotated triple
-        predicate: The predicate of the annotated triple
-        obj: The object of the annotated triple
-        curator_orcid: Optional ORCID of the curator (used as oboInOwl:source)
-        evidence_id: Optional ID of the evidence packet (used as SEPIO:0000124)
+        record: Database record dict
+        decision: Optional decision dict (most recent decision for this record)
 
     Returns:
-        The BNode representing the axiom annotation
+        Dictionary suitable for YAML export with keys in canonical order
     """
-    axiom = BNode()
-    g.add((axiom, RDF.type, OWL.Axiom))
-    g.add((axiom, OWL.annotatedSource, subject))
-    g.add((axiom, OWL.annotatedProperty, predicate))
-    g.add((axiom, OWL.annotatedTarget, obj))
+    # Build assertion
+    assertion = {
+        "subject_id": record.get("assertion_subject_id"),
+        "predicate": record.get("assertion_predicate"),
+        "object_id": record.get("assertion_object_id"),
+    }
+    if record.get("assertion_subject_label"):
+        assertion["subject_label"] = record["assertion_subject_label"]
+    if record.get("assertion_predicate_label"):
+        assertion["predicate_label"] = record["assertion_predicate_label"]
+    if record.get("assertion_object_label"):
+        assertion["object_label"] = record["assertion_object_label"]
+    if record.get("assertion_display_text"):
+        assertion["display_text"] = record["assertion_display_text"]
 
-    if curator_orcid:
-        # Normalize ORCID to full URI
-        if curator_orcid.startswith("orcid:"):
-            curator_orcid = curator_orcid[6:]
-        curator_uri = ORCID[curator_orcid]
-        g.add((axiom, OBOINOWL.source, curator_uri))
+    # Build evidence list
+    evidence_list = list(record.get("evidence") or [])
 
-    if evidence_id:
-        evidence_uri = URIRef(evidence_id)
-        # SEPIO:0000124 = has_evidence
-        g.add((axiom, SEPIO["0000124"], evidence_uri))
+    # Add the review decision as an EXPERT_REVIEW evidence item
+    if decision:
+        review_evidence = {
+            "id": decision.get("id"),
+            "evidence_type": "EXPERT_REVIEW",
+            "direction": "SUPPORTS" if decision.get("decision") == "ACCEPT" else "CONTRADICTS",
+            "evidence_strength": decision.get("certainty", 1.0),
+            "description": f"Curator decision: {decision.get('decision')}",
+        }
 
-    return axiom
+        if decision.get("curator_orcid"):
+            review_evidence["reviewer_orcid"] = decision["curator_orcid"]
+        if decision.get("curator_name"):
+            review_evidence["reviewer_name"] = decision["curator_name"]
+        if decision.get("decided_at"):
+            decided_at = decision["decided_at"]
+            if hasattr(decided_at, "date"):
+                review_evidence["reviewed_at"] = decided_at.date().isoformat()
+            elif hasattr(decided_at, "isoformat"):
+                review_evidence["reviewed_at"] = decided_at.isoformat()
+            else:
+                review_evidence["reviewed_at"] = str(decided_at)[:10]
+        if decision.get("rationale"):
+            review_evidence["description"] = (
+                f"Curator decision: {decision.get('decision')}. "
+                f"Rationale: {decision.get('rationale')}"
+            )
+
+        evidence_list.append(review_evidence)
+
+    # Build export dict in canonical order:
+    # id, status, last_updated, evidence_steward, confidence, assertion, provenance, evidence
+    export = {"id": record.get("id")}
+    export["status"] = record.get("status")
+
+    # last_updated
+    if record.get("last_updated"):
+        last_updated = record["last_updated"]
+        if hasattr(last_updated, "isoformat"):
+            export["last_updated"] = last_updated.isoformat()
+        else:
+            export["last_updated"] = str(last_updated)
+
+    # evidence_steward
+    if record.get("evidence_steward"):
+        export["evidence_steward"] = record["evidence_steward"]
+
+    # confidence
+    if record.get("confidence") is not None:
+        export["confidence"] = record["confidence"]
+
+    # assertion
+    export["assertion"] = assertion
+
+    # provenance
+    if record.get("provenance"):
+        export["provenance"] = record["provenance"]
+
+    # evidence
+    if evidence_list:
+        export["evidence"] = evidence_list
+
+    return export
 
 
-def export_accepted_records(
+def record_to_yaml(record: dict, decision: dict | None = None) -> str:
+    """Convert a database record to YAML string.
+
+    Args:
+        record: Database record dict
+        decision: Optional decision dict
+
+    Returns:
+        YAML string representation
+    """
+    export_dict = record_to_export_dict(record, decision)
+    return yaml.dump(
+        export_dict,
+        default_flow_style=False,
+        allow_unicode=True,
+        sort_keys=False,
+        width=120,
+    )
+
+
+def generate_export_records(
     db: CurationDatabase,
-    output_path: Path,
-    format: str = "turtle",
-    include_provenance: bool = True,
-) -> Path:
-    """Export all accepted records to RDF with OWL axiom annotations.
+    statuses: list[str] | None = None,
+) -> Generator[tuple[str, str, str], None, None]:
+    """Generate exportable records as (filename, yaml_content, status) tuples.
+
+    This is a generator to handle large numbers of records efficiently.
 
     Args:
         db: Database connection
-        output_path: Directory for output file
-        format: RDF serialization format (turtle, xml, json-ld, n3)
-        include_provenance: Whether to include curation provenance as axiom annotations
+        statuses: List of statuses to export (default: ACCEPTED, REJECTED, CONTROVERSIAL)
+
+    Yields:
+        Tuples of (filename, yaml_content, status)
+    """
+    if statuses is None:
+        statuses = ["ACCEPTED", "REJECTED", "CONTROVERSIAL"]
+
+    for status in statuses:
+        records = db.get_records_by_status(status)
+
+        for record in records:
+            # Get the most recent decision
+            decisions = db.get_decisions_for_record(record["id"])
+            decision = decisions[0] if decisions else None
+
+            # Generate YAML
+            yaml_content = record_to_yaml(record, decision)
+
+            # Generate safe filename from record ID
+            record_id = record.get("id", "unknown")
+            safe_id = (
+                record_id.replace(":", "_")
+                .replace("/", "_")
+                .replace("\\", "_")
+                .replace(" ", "_")
+            )
+            filename = f"{status.lower()}/{safe_id}.yaml"
+
+            yield filename, yaml_content, status
+
+
+def create_export_tarball(
+    db: CurationDatabase,
+    statuses: list[str] | None = None,
+) -> bytes:
+    """Create a tar.gz archive of all exportable records.
+
+    Args:
+        db: Database connection
+        statuses: List of statuses to export (default: ACCEPTED, REJECTED, CONTROVERSIAL)
 
     Returns:
-        Path to generated file
+        Bytes of the tar.gz archive
     """
-    g = Graph()
+    buffer = io.BytesIO()
 
-    # Bind prefixes for cleaner output
-    g.bind("owl", OWL)
-    g.bind("rdfs", RDFS)
-    g.bind("oboInOwl", OBOINOWL)
-    g.bind("SEPIO", SEPIO)
-    g.bind("orcid", ORCID)
+    with tarfile.open(fileobj=buffer, mode="w:gz") as tar:
+        for filename, yaml_content, status in generate_export_records(db, statuses):
+            # Create a TarInfo object for this file
+            yaml_bytes = yaml_content.encode("utf-8")
+            tarinfo = tarfile.TarInfo(name=filename)
+            tarinfo.size = len(yaml_bytes)
+            tarinfo.mtime = int(datetime.now().timestamp())
 
-    accepted_records = db.get_records_by_status("ACCEPTED")
+            # Add to archive
+            tar.addfile(tarinfo, io.BytesIO(yaml_bytes))
 
-    for record in accepted_records:
-        # Create URIs for the assertion
-        subject = URIRef(expand_curie(record["assertion_subject_id"]))
-        predicate = URIRef(expand_curie(record["assertion_predicate"]))
-        obj = URIRef(expand_curie(record["assertion_object_id"]))
-
-        if include_provenance:
-            # Get decision info for curator ORCID
-            decisions = db.get_decisions_for_record(record["id"])
-            curator_orcid = None
-            if decisions:
-                decision = decisions[0]  # Most recent
-                curator_orcid = decision.get("curator_orcid")
-
-            # Use record ID directly as evidence packet reference
-            evidence_id = record.get("id")
-
-            # Create OWL axiom annotation (no direct triple needed)
-            create_owl_axiom_annotation(
-                g=g,
-                subject=subject,
-                predicate=predicate,
-                obj=obj,
-                curator_orcid=curator_orcid,
-                evidence_id=evidence_id,
-            )
-        else:
-            # Without provenance, just add the direct triple
-            g.add((subject, predicate, obj))
-
-    # Generate output filename
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    ext_map = {"turtle": "ttl", "xml": "rdf", "json-ld": "jsonld", "n3": "n3"}
-    ext = ext_map.get(format, "ttl")
-
-    output_dir = Path(output_path)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / f"export_{timestamp}.{ext}"
-
-    g.serialize(destination=str(output_file), format=format)
-
-    return output_file
+    buffer.seek(0)
+    return buffer.read()
 
 
-def export_record_as_rdf(record: dict, db: CurationDatabase) -> str:
-    """Export a single record to Turtle string."""
-    g = Graph()
-    g.bind("owl", OWL)
-    g.bind("rdfs", RDFS)
-    g.bind("oboInOwl", OBOINOWL)
-    g.bind("SEPIO", SEPIO)
-    g.bind("orcid", ORCID)
+def export_records_to_directory(
+    db: CurationDatabase,
+    output_dir: Path,
+    statuses: list[str] | None = None,
+) -> dict:
+    """Export all records to a directory structure.
 
-    subject = URIRef(expand_curie(record["assertion_subject_id"]))
-    predicate = URIRef(expand_curie(record["assertion_predicate"]))
-    obj = URIRef(expand_curie(record["assertion_object_id"]))
+    Creates:
+        output_dir/
+            accepted/
+                record1.yaml
+                record2.yaml
+            rejected/
+                record3.yaml
+            controversial/
+                record4.yaml
 
-    g.add((subject, predicate, obj))
+    Args:
+        db: Database connection
+        output_dir: Base directory for export
+        statuses: List of statuses to export
 
-    return g.serialize(format="turtle")
+    Returns:
+        Dict with counts per status
+    """
+    output_dir = Path(output_dir)
+    counts = {"accepted": 0, "rejected": 0, "controversial": 0}
+
+    for filename, yaml_content, status in generate_export_records(db, statuses):
+        file_path = output_dir / filename
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(yaml_content)
+
+        counts[status.lower()] = counts.get(status.lower(), 0) + 1
+
+    return counts

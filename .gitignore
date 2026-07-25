@@ -141,3 +141,6 @@ dmypy.json
 .vscode
 data/curation.duckdb.wal
 data/curation.duckdb
+sieve.config.json
+data/curation_state.json
+.DS_Store
