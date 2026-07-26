@@ -243,6 +243,10 @@ classes:
           How entities were mapped between sources (e.g., semapv:LexicalMatching,
           semapv:ManualMappingCuration). Uses SSSOM mapping justification vocabulary.
 
+      mappingSet:
+        range: uri
+        description: SSSOM mapping-set URI the concordance was drawn from.
+
 
   ComputationalResult:
     is_a: DataItem
@@ -352,6 +356,52 @@ classes:
           Inputs used by this activity (e.g., prompt versions, tools).
           Simplified alternative to SEPIO Activity.input for string-typed inputs.
 
+      pull_request:
+        range: uriorcurie
+        description: GitHub pull request URL associated with this activity.
+
+      issue:
+        range: uriorcurie
+        description: GitHub issue URL associated with this activity.
+
+      created_with:
+        range: uriorcurie
+        description: Tool or software used (e.g., a Protégé URI).
+
+
+  CurationDecision:
+    description: >-
+      A curator's decision on an EvidencePacket. One row per decision, preserving
+      history (richer than a single curated_by activity). Sieve-specific.
+    attributes:
+      id:
+        identifier: true
+        range: string
+      packet_id:
+        range: uriorcurie
+        required: true
+        description: Reference to the EvidencePacket.id this decision applies to.
+      curator:
+        range: uriorcurie
+        required: true
+        description: ORCID of the deciding curator.
+      curator_name:
+        range: string
+      decision:
+        range: DecisionType
+        required: true
+      rationale:
+        range: string
+        description: Explanation for the decision (required for rejections).
+      certainty:
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+        description: Curator's confidence in this decision (0-1).
+      decided_at:
+        range: datetime
+        required: true
+
 
   Score:
     description: >-
@@ -414,6 +464,16 @@ enums:
         description: Rejected as invalid.
       CONTROVERSIAL:
         description: Conflicting evidence, needs discussion.
+
+  DecisionType:
+    description: A curator's decision on an assertion.
+    permissible_values:
+      ACCEPT:
+        description: Accept the assertion.
+      REJECT:
+        description: Reject the assertion.
+      CONTROVERSIAL:
+        description: Mark as controversial for further discussion.
 
   EvidenceDirection:
     description: Direction of evidence support.
