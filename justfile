@@ -54,6 +54,10 @@ mypy:
 format:
 	uv run ruff check .
 
+# Regenerate the Pydantic datamodel from the canonical SIEVE schema
+gen-pydantic:
+  uv run gen-pydantic schema/sieve.yaml > src/sieve/datamodel/sieve_models.py
+
 # ============== Hidden internal recipes ==============
 
 _status:
