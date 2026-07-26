@@ -126,6 +126,23 @@ classes:
   # Evidence Items (extends SEPIO InformationEntity)
   # ===========================================================================
 
+  CuratedEvidence:
+    mixin: true
+    description: >-
+      Curation-workflow slots grafted onto every Sieve evidence item: a steward's
+      per-item verdict and an explicit ECO hook. (sieve-specific; not SEPIO)
+    attributes:
+      rating:
+        range: CurationStatus
+        description: The evidence steward's verdict on this individual evidence item.
+      eco_code:
+        range: uriorcurie
+        description: Evidence & Conclusion Ontology (ECO) term for this evidence item.
+      eco_label:
+        range: string
+        description: Human-readable label of the ECO term.
+
+
   SieveEvidenceItem:
     description: >-
       Base class for Sieve-specific evidence items. Extends SEPIO
@@ -139,12 +156,16 @@ classes:
 
   SieveDataItem:
     is_a: DataItem
+    mixins:
+      - CuratedEvidence
     description: >-
       Sieve extension of SEPIO DataItem.
 
 
   SieveDocument:
     is_a: Document
+    mixins:
+      - CuratedEvidence
     description: >-
       Sieve extension of SEPIO Document. Adds quote fields.
     attributes:
@@ -159,12 +180,16 @@ classes:
 
   SieveStudyResult:
     is_a: StudyResult
+    mixins:
+      - CuratedEvidence
     description: >-
       Sieve extension of SEPIO StudyResult.
 
 
   ConcordanceItem:
     is_a: SieveEvidenceItem
+    mixins:
+      - CuratedEvidence
     description: >-
       Evidence from concordance with another knowledge source (ontology,
       database, terminology). The concordant source contains a statement
@@ -221,6 +246,8 @@ classes:
 
   ComputationalResult:
     is_a: DataItem
+    mixins:
+      - CuratedEvidence
     description: >-
       Evidence from a computational method or algorithm. Extends SEPIO
       DataItem. The computed score/result is stored in inherited 'value'.
@@ -254,6 +281,8 @@ classes:
 
   AgentContribution:
     is_a: SieveEvidenceItem
+    mixins:
+      - CuratedEvidence
     description: >-
       Evidence from any human or organizational contribution. Captures
       orthogonal dimensions for scoring: who contributed (trust level),
