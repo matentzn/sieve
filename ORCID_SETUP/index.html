@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://matentzn.github.io/sieve/about/">
+        <link rel="canonical" href="https://matentzn.github.io/sieve/ORCID_SETUP/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>About SIEVE - SIEVE</title>
+        <title>ORCID OAuth Setup Guide - SIEVE</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#about-sieve" class="md-skip">
+        <a href="#orcid-oauth-setup-guide" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              About SIEVE
+              ORCID OAuth Setup Guide
             
           </span>
         </div>
@@ -708,55 +708,100 @@
   
 
 
-<h1 id="about-sieve">About SIEVE<a class="headerlink" href="#about-sieve" title="Permanent link">&para;</a></h1>
-<p>SIEVE (Scientific Evidence Evaluation &amp; Verification Environment) is an open-source framework for curating and managing evidence that supports ontological assertions.</p>
-<h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">&para;</a></h2>
-<p>Ontology development and maintenance requires careful evaluation of evidence supporting classification decisions. For example, when asserting that "asthma is a subclass of respiratory system disorder," curators need to:</p>
+<h1 id="orcid-oauth-setup-guide">ORCID OAuth Setup Guide<a class="headerlink" href="#orcid-oauth-setup-guide" title="Permanent link">&para;</a></h1>
+<p>This guide will help you set up ORCID authentication for Sieve. ORCID provides OAuth 2.0 authentication that works seamlessly on localhost for development.</p>
+<h2 id="step-1-create-a-sandbox-orcid-account-for-testing">Step 1: Create a Sandbox ORCID Account (for testing)<a class="headerlink" href="#step-1-create-a-sandbox-orcid-account-for-testing" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Go to https://sandbox.orcid.org/register</li>
+<li>Create a test account (this is separate from your real ORCID)</li>
+<li>Verify your email</li>
+</ol>
+<blockquote>
+<p><strong>Note</strong>: The sandbox is completely separate from production ORCID. Any test accounts or credentials created here won't affect your real ORCID record.</p>
+</blockquote>
+<h2 id="step-2-register-your-application">Step 2: Register Your Application<a class="headerlink" href="#step-2-register-your-application" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Log in to https://sandbox.orcid.org</li>
+<li>Click your name in the top right → <strong>Developer Tools</strong></li>
+<li>If prompted, accept the developer agreement</li>
+<li>Click <strong>Register for the free ORCID public API</strong></li>
+</ol>
+<p>Fill in the form:
+- <strong>Name of your application</strong>: <code>Sieve Curation App</code> (or any name you like)
+- <strong>Website URL</strong>: <code>http://localhost:8501</code>
+- <strong>Description</strong>: <code>Ontology assertion curation tool</code>
+- <strong>Redirect URIs</strong>: <code>http://localhost:8501/</code></p>
+<blockquote>
+<p><strong>Important</strong>: The redirect URI must include the trailing slash and match exactly!</p>
+</blockquote>
+<ol>
+<li>Click <strong>Save</strong></li>
+</ol>
+<h2 id="step-3-get-your-credentials">Step 3: Get Your Credentials<a class="headerlink" href="#step-3-get-your-credentials" title="Permanent link">&para;</a></h2>
+<p>After saving, you'll see your credentials:
+- <strong>Client ID</strong>: Looks like <code>APP-XXXXXXXXXXXXXXXXX</code>
+- <strong>Client Secret</strong>: Click "Show" to reveal it (looks like a UUID)</p>
+<p>Copy both of these values.</p>
+<h2 id="step-4-configure-sieve">Step 4: Configure Sieve<a class="headerlink" href="#step-4-configure-sieve" title="Permanent link">&para;</a></h2>
+<p>Create a <code>.env</code> file in the project root (copy from <code>.env.example</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+</code></pre></div>
+<p>Edit <code>.env</code> with your credentials:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ORCID_SANDBOX=true
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>ORCID_CLIENT_ID=APP-XXXXXXXXXXXXXXXXX
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>ORCID_CLIENT_SECRET=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>ORCID_REDIRECT_URI=http://localhost:8501/
+</code></pre></div>
+<h2 id="step-5-install-python-dotenv-optional-but-recommended">Step 5: Install python-dotenv (optional but recommended)<a class="headerlink" href="#step-5-install-python-dotenv-optional-but-recommended" title="Permanent link">&para;</a></h2>
+<p>To automatically load the <code>.env</code> file, install python-dotenv:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>uv<span class="w"> </span>add<span class="w"> </span>python-dotenv
+</code></pre></div>
+<p>Then add to the top of <code>src/sieve/app.py</code> (before other imports):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">load_dotenv</span><span class="p">()</span>
+</code></pre></div>
+<p>Alternatively, you can export the variables in your shell:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ORCID_SANDBOX</span><span class="o">=</span><span class="nb">true</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ORCID_CLIENT_ID</span><span class="o">=</span>APP-XXXXXXXXXXXXXXXXX
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ORCID_CLIENT_SECRET</span><span class="o">=</span>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ORCID_REDIRECT_URI</span><span class="o">=</span>http://localhost:8501/
+</code></pre></div>
+<h2 id="step-6-run-the-app">Step 6: Run the App<a class="headerlink" href="#step-6-run-the-app" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>uv<span class="w"> </span>run<span class="w"> </span>streamlit<span class="w"> </span>run<span class="w"> </span>src/sieve/app.py
+</code></pre></div>
+<p>You should see a "Login with ORCID" button in the sidebar. Click it to authenticate with your sandbox ORCID account.</p>
+<h2 id="switching-to-production">Switching to Production<a class="headerlink" href="#switching-to-production" title="Permanent link">&para;</a></h2>
+<p>When ready to use real ORCID accounts:</p>
+<ol>
+<li>Register your app at https://orcid.org/developer-tools (same process as sandbox)</li>
+<li>Update your <code>.env</code>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ORCID_SANDBOX=false
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>ORCID_CLIENT_ID=APP-YYYYYYYYYYYYYYYY
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>ORCID_CLIENT_SECRET=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+</code></pre></div></li>
+</ol>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="login-with-orcid-button-not-appearing">"Login with ORCID" button not appearing<a class="headerlink" href="#login-with-orcid-button-not-appearing" title="Permanent link">&para;</a></h3>
+<p>If you see the manual ORCID entry fields instead of the login button, the OAuth credentials are not configured. Check:
+- The <code>.env</code> file exists and has correct values
+- The environment variables are loaded (try <code>python-dotenv</code> or export manually)</p>
+<h3 id="failed-to-authenticate-with-orcid">"Failed to authenticate with ORCID"<a class="headerlink" href="#failed-to-authenticate-with-orcid" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Gather supporting evidence from literature, other ontologies, and expert review</li>
-<li>Evaluate contradicting evidence and edge cases</li>
-<li>Document the rationale for decisions</li>
-<li>Track who made decisions and when</li>
-<li>Export decisions in formats usable by ontology workflows</li>
+<li>Verify your Client ID and Secret are correct</li>
+<li>Check that the Redirect URI in your <code>.env</code> matches exactly what you registered with ORCID (including trailing slash)</li>
+<li>Make sure you're using sandbox credentials with <code>ORCID_SANDBOX=true</code></li>
 </ul>
-<p>SIEVE provides a structured framework for this entire process.</p>
-<h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
+<h3 id="redirect-uri-mismatch">Redirect URI mismatch<a class="headerlink" href="#redirect-uri-mismatch" title="Permanent link">&para;</a></h3>
+<p>ORCID is strict about redirect URIs. Ensure:
+- You registered <code>http://localhost:8501/</code> (with trailing slash)
+- Your <code>ORCID_REDIRECT_URI</code> env var is <code>http://localhost:8501/</code>
+- You're accessing the app at <code>http://localhost:8501</code> (not <code>127.0.0.1</code>)</p>
+<h2 id="security-notes">Security Notes<a class="headerlink" href="#security-notes" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Multi-source Evidence</strong>: Supports literature, cross-ontology concordance, expert review, and computational evidence</li>
-<li><strong>Evidence Scoring</strong>: Calculates Net Evidence Ratio to summarize supporting vs. contradicting evidence</li>
-<li><strong>Web Interface</strong>: Streamlit-based UI for interactive curation</li>
-<li><strong>ORCID Authentication</strong>: Tracks curator identity via ORCID OAuth</li>
-<li><strong>RDF Export</strong>: Generates OWL axiom annotations for ontology integration</li>
-<li><strong>Schema Validation</strong>: LinkML-based validation ensures data quality</li>
-<li><strong>Audit Trail</strong>: Records all decisions with timestamps and rationale</li>
+<li>Never commit your <code>.env</code> file or expose your Client Secret</li>
+<li>The <code>.env</code> file is already in <code>.gitignore</code></li>
+<li>For production, use proper secret management (environment variables, secret managers)</li>
 </ul>
-<h2 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Disease ontology curation (Mondo, DOID)</li>
-<li>Cross-ontology alignment validation</li>
-<li>Evidence-based ontology quality assurance</li>
-<li>Collaborative multi-curator review workflows</li>
-<li>AI-assisted evidence aggregation and synthesis</li>
-</ul>
-<h2 id="technology">Technology<a class="headerlink" href="#technology" title="Permanent link">&para;</a></h2>
-<p>SIEVE is built with:</p>
-<ul>
-<li><strong>Python 3.10+</strong> for the core framework</li>
-<li><strong>LinkML</strong> for data modeling</li>
-<li><strong>DuckDB</strong> for embedded database</li>
-<li><strong>Streamlit</strong> for web interface</li>
-<li><strong>RDFLib</strong> for RDF generation</li>
-<li><strong>Typer</strong> for CLI</li>
-</ul>
-<h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
-<p>SIEVE is open source and welcomes contributions. See the <a href="https://github.com/matentzn/sieve">GitHub repository</a> for:</p>
-<ul>
-<li>Issue tracking</li>
-<li>Pull requests</li>
-<li>Development guidelines</li>
-</ul>
-<h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
-<p>See the repository for license information.</p>
 
 
 
