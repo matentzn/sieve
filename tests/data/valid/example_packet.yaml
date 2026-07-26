@@ -1,0 +1,35 @@
+# Canonical valid EvidencePacket in the SEPIO/SIEVE shape.
+# SEPIO Entity requires id + type on every entity; evidence is authored as
+# explicit EvidenceLines (no auto-wrapping).
+id: sieve:pkt_asthma_0001
+status: UNREVIEWED
+statement:
+  id: stmt_asthma_0001
+  type: SieveStatement
+  subject: MONDO:0004979
+  subjectLabel: asthma
+  predicate:
+    code: rdfs:subClassOf
+    label: subClassOf
+  object: MONDO:0005275
+  objectLabel: respiratory system disorder
+  statementText: asthma subClassOf respiratory system disorder
+hasEvidenceLines:
+  - id: line_0001
+    type: SieveEvidenceLine
+    directionOfEvidenceProvided: supports
+    strengthOfEvidenceProvided: strong
+    scoreOfEvidenceProvided: 0.9
+    hasEvidenceItems:
+      - id: ev_concordance_0001
+        type: ConcordanceItem
+        sourceName: Disease Ontology
+        sourceId: DOID:2841
+        rating: ACCEPTED
+        eco_code: ECO:0000269
+      - id: ev_document_0001
+        type: SieveDocument
+        title: Example study
+        pmid: "12345678"
+        quote: asthma is a chronic respiratory disease
+        rating: ACCEPTED

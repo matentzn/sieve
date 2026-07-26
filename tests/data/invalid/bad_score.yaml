@@ -1,0 +1,17 @@
+# scoreOfEvidenceProvided has range float; a string is a deterministic type error.
+id: sieve:pkt_bad_0001
+status: UNREVIEWED
+statement:
+  id: stmt_bad_0001
+  type: SieveStatement
+  subject: MONDO:0004979
+  object: MONDO:0005275
+hasEvidenceLines:
+  - id: line_bad_0001
+    type: SieveEvidenceLine
+    directionOfEvidenceProvided: supports
+    scoreOfEvidenceProvided: not-a-float   # invalid: float expected
+    hasEvidenceItems:
+      - id: ev_bad_0001
+        type: ConcordanceItem
+        sourceName: DOID
