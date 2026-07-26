@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 from uuid import uuid4
 
 import yaml
@@ -220,7 +221,7 @@ def ingest_directory(inbox_path: Path, db: CurationDatabase) -> dict:
         inbox.mkdir(parents=True)
         return {"files": 0, "success": 0, "skipped": 0, "errors": 0}
 
-    stats = {"files": 0, "success": 0, "skipped": 0, "errors": 0, "error_details": []}
+    stats: dict[str, Any] = {"files": 0, "success": 0, "skipped": 0, "errors": 0, "error_details": []}
 
     for yaml_file in inbox.glob("**/*.yaml"):
         stats["files"] += 1

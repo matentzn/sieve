@@ -24,7 +24,7 @@ def run():
 @app.command()
 def export(
     input: Annotated[
-        Path,
+        Optional[Path],
         typer.Option(
             "-i", "--input",
             help="Input YAML file (single evidence packet)",
@@ -34,7 +34,7 @@ def export(
         ),
     ] = None,
     input_dir: Annotated[
-        Path,
+        Optional[Path],
         typer.Option(
             "-I", "--input-dir",
             help="Input directory containing YAML evidence packets",
@@ -44,7 +44,7 @@ def export(
         ),
     ] = None,
     output: Annotated[
-        Path,
+        Optional[Path],
         typer.Option(
             "-o", "--output",
             help="Output file path",
@@ -81,6 +81,7 @@ def export(
         raise typer.Exit(code=1)
 
     input_path = input if input is not None else input_dir
+    assert input_path is not None  # guaranteed by the checks above
 
     # Map output format to rdflib format
     format_map = {
@@ -180,7 +181,7 @@ def ingest(
 @app.command()
 def validate(
     input: Annotated[
-        Path,
+        Optional[Path],
         typer.Option(
             "-i", "--input",
             help="Input YAML file (single evidence packet)",
@@ -190,7 +191,7 @@ def validate(
         ),
     ] = None,
     input_dir: Annotated[
-        Path,
+        Optional[Path],
         typer.Option(
             "-I", "--input-dir",
             help="Input directory containing YAML evidence packets",
@@ -228,11 +229,12 @@ def validate(
         raise typer.Exit(code=1)
 
     input_path = input if input is not None else input_dir
+    assert input_path is not None  # guaranteed by the checks above
 
     total_files, valid_files, total_errors = validate_packets(input_path)
 
     # Print summary
-    typer.echo(f"\nValidation Summary:")
+    typer.echo("\nValidation Summary:")
     typer.echo(f"  Total files:  {total_files}")
     typer.echo(f"  Valid files:  {valid_files}")
     typer.echo(f"  Total errors: {total_errors}")

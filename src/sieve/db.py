@@ -3,7 +3,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import duckdb
 
@@ -226,14 +226,15 @@ class CurationDatabase:
 
         # Build WHERE clause
         where_clause = ""
-        params = []
+        params: list[Any] = []
         if status:
             where_clause = "WHERE status = ?"
             params.append(status)
 
         # Get total count
         count_query = f"SELECT COUNT(*) FROM curation_records {where_clause}"
-        total_count = self.conn.execute(count_query, params).fetchone()[0]
+        count_row = self.conn.execute(count_query, params).fetchone()
+        total_count = count_row[0] if count_row else 0
 
         # Get paginated results (lightweight columns only for table)
         query = f"""
@@ -302,7 +303,8 @@ class CurationDatabase:
 
         # Get total count
         count_query = "SELECT COUNT(*) FROM curation_records WHERE status = ?"
-        total_count = self.conn.execute(count_query, [status]).fetchone()[0]
+        count_row = self.conn.execute(count_query, [status]).fetchone()
+        total_count = count_row[0] if count_row else 0
 
         # Get paginated results with latest decision info
         # Using a subquery to get the most recent decision for each record

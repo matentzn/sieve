@@ -2,16 +2,23 @@
 
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 from uuid import uuid4
-
-from dotenv import load_dotenv
-
-load_dotenv(override=True)  # Load environment variables from .env file
 
 import curies
 import streamlit as st
 import streamlit.components.v1 as components
 import yaml
+from dotenv import load_dotenv
+
+from sieve.auth import get_curator_info, handle_oauth_callback, is_admin, is_authorized_curator, render_login_ui
+from sieve.db import CurationDatabase
+from sieve.export import create_export_tarball, record_to_yaml
+from sieve.ingest import ingest_directory, parse_curation_record
+from sieve.models import CurationDecision, DecisionType
+
+load_dotenv(override=True)  # Load environment variables from .env file
+
 
 @st.cache_resource
 def _get_obo_converter() -> curies.Converter:
@@ -19,7 +26,7 @@ def _get_obo_converter() -> curies.Converter:
     return curies.get_obo_converter()
 
 
-def expand_curie_to_link(curie: str) -> str:
+def expand_curie_to_link(curie: Optional[str]) -> str:
     """Expand a CURIE to a clickable markdown link using OBO converter."""
     if not curie:
         return "?"
@@ -101,11 +108,6 @@ def sanitize_mermaid_label(label: str) -> str:
     """Sanitize a label for use in mermaid diagrams."""
     return label.replace('"', "'").replace("(", "[").replace(")", "]").replace("<", "&lt;").replace(">", "&gt;")
 
-from sieve.auth import get_curator_info, handle_oauth_callback, is_admin, is_authorized_curator, render_login_ui
-from sieve.db import CurationDatabase
-from sieve.export import create_export_tarball, record_to_yaml
-from sieve.ingest import ingest_directory, parse_curation_record
-from sieve.models import CurationDecision, DecisionType
 
 # Page config
 st.set_page_config(
@@ -480,7 +482,7 @@ def render_review_panel(record: dict):
             st.rerun()
 
 
-def render_evidence_item(evidence: dict, index: int, record: dict = None, allow_rating: bool = True):
+def render_evidence_item(evidence: dict, index: int, record: Optional[dict] = None, allow_rating: bool = True):
     """Render a single evidence item.
 
     Args:
@@ -584,7 +586,7 @@ def render_evidence_item(evidence: dict, index: int, record: dict = None, allow_
             st.json(evidence)
 
 
-def render_concordance_evidence(evidence: dict, record: dict = None):
+def render_concordance_evidence(evidence: dict, record: Optional[dict] = None):
     """Render concordance evidence with mapping visualization."""
 
     # Source info
@@ -938,8 +940,8 @@ def render_status_list(status: str):
     )
 
     # Handle selection
-    if selection and selection.selection and selection.selection.rows:
-        selected_idx = selection.selection.rows[0]
+    if selection and selection.selection and selection.selection.rows:  # type: ignore[attr-defined]
+        selected_idx = selection.selection.rows[0]  # type: ignore[attr-defined]
         st.session_state[selected_key] = table_data[selected_idx]["id"]
 
     # Pagination controls

@@ -136,7 +136,7 @@ def packet_to_rdf(packet: dict, graph: Graph | None = None, source_path: Path | 
     predicate_uri = expand_curie(predicate, converter)
     object_uri = expand_curie(object_id, converter)
 
-    if not all([subject_uri, predicate_uri, object_uri]):
+    if subject_uri is None or predicate_uri is None or object_uri is None:
         return graph
 
     # Get packet ID and evidence steward
@@ -205,7 +205,7 @@ def packet_to_rdf(packet: dict, graph: Graph | None = None, source_path: Path | 
 
     elif status == "CONTROVERSIAL":
         # Use rdfs:comment for controversial assertions
-        graph.add((axiom, RDFS.comment, Literal(f"CONTROVERSIAL: See evidence packet for discussion")))
+        graph.add((axiom, RDFS.comment, Literal("CONTROVERSIAL: See evidence packet for discussion")))
         if packet_uri:
             graph.add((axiom, IAO["0000233"], packet_uri))
         # Add steward who marked it controversial

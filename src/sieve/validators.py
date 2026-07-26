@@ -26,9 +26,10 @@ def get_schema_path() -> Path:
     import importlib.resources
 
     try:
-        with importlib.resources.files("sieve").joinpath(
+        resource = importlib.resources.files("sieve").joinpath(
             "../schema/curation_model.yaml"
-        ) as p:
+        )
+        with importlib.resources.as_file(resource) as p:
             return Path(p)
     except (TypeError, FileNotFoundError):
         raise FileNotFoundError(

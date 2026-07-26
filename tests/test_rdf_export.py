@@ -1,6 +1,5 @@
 """Tests for RDF export functionality."""
 
-from pathlib import Path
 
 import pytest
 from rdflib import OWL, RDFS, Graph, Literal, Namespace
@@ -556,7 +555,7 @@ def test_packet_to_rdf_no_status_skipped(capsys):
     }
 
     graph = Graph()
-    result = packet_to_rdf(packet, graph)
+    packet_to_rdf(packet, graph)
 
     # Graph should be returned but empty (no axiom added)
     axioms = list(graph.subjects(predicate=OWL.annotatedSource))
@@ -582,7 +581,7 @@ def test_packet_to_rdf_unreviewed_status_skipped(capsys):
     }
 
     graph = Graph()
-    result = packet_to_rdf(packet, graph)
+    packet_to_rdf(packet, graph)
 
     axioms = list(graph.subjects(predicate=OWL.annotatedSource))
     assert len(axioms) == 0
