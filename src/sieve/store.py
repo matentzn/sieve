@@ -76,7 +76,9 @@ class PacketStore:
                 self._steward(packet),
                 str(packet.created) if packet.created else None,
                 str(packet.updated) if packet.updated else None,
-                packet.model_dump_json(exclude_none=True),
+                # serialize_as_any so polymorphic evidence items keep their
+                # subclass fields (otherwise they collapse to id+type).
+                packet.model_dump_json(exclude_none=True, serialize_as_any=True),
             ],
         )
         return str(packet.id)

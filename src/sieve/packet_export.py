@@ -19,6 +19,30 @@ IAO = Namespace("http://purl.obolibrary.org/obo/IAO_")
 VALID_STATUSES = {"ACCEPTED", "REJECTED", "CONTROVERSIAL"}
 
 
+def packet_to_yaml(packet: EvidencePacket) -> str:
+    """Serialize an EvidencePacket to YAML (drops null fields).
+
+    ``serialize_as_any`` is required so polymorphic evidence items serialize by
+    their runtime subclass, not the declared ``InformationEntity`` base (which
+    would drop subclass fields like ``value``/``sourceName``).
+    """
+    data = packet.model_dump(mode="json", exclude_none=True, serialize_as_any=True)
+    return yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+
+def export_packets_to_yaml(packets: list[EvidencePacket], output_path: Path) -> None:
+    """Write EvidencePackets to a multi-document YAML file."""
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    docs = [
+        p.model_dump(mode="json", exclude_none=True, serialize_as_any=True) for p in packets
+    ]
+    output_path.write_text(
+        yaml.dump_all(docs, default_flow_style=False, allow_unicode=True, sort_keys=False),
+        encoding="utf-8",
+    )
+
+
 def get_obo_converter() -> curies.Converter:
     """Get the OBO converter for CURIE expansion."""
     return curies.get_obo_converter()

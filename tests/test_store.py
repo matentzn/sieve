@@ -36,7 +36,10 @@ def test_insert_and_get_roundtrip():
     got = store.get_packet("sieve:pkt_1")
     assert got is not None
     assert got.statement.subject == "MONDO:0004979"
-    assert isinstance(got.hasEvidenceLines[0].hasEvidenceItems[0], ConcordanceItem)
+    item = got.hasEvidenceLines[0].hasEvidenceItems[0]
+    assert isinstance(item, ConcordanceItem)
+    # subclass fields must survive the JSON round-trip (serialize_as_any)
+    assert item.sourceName == "DOID"
 
 
 def test_promoted_columns_and_score():

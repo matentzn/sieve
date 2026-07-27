@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from rdflib import OWL, Graph, URIRef
+from rdflib import OWL, URIRef
 
 from sieve.datamodel.loaders import load_packet
 from sieve.datamodel import (
