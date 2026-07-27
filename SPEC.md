@@ -161,10 +161,6 @@ it on Python 3.10–3.13. `just gen-pydantic` regenerates the datamodel from
 
 ## 13. Known limitations
 
-- **`date` slot generation warning.** `gen-pydantic` emits an
-  `ArbitraryTypeWarning` for the SEPIO `date` slot (on `Activity`/`AgentContribution`),
-  which resolves to a `NoneType` annotation. Benign (Pydantic accepts any value)
-  but should be cleaned up if date validation on those fields becomes important.
 - **Docs pages.** `docs/architecture.md`, `docs/data-model.md`, `docs/api.md`,
   `docs/cli.md` still describe the legacy flat model and need updating to the
   EvidencePacket shape.

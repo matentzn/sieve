@@ -393,9 +393,12 @@ classes:
         required: false
         multivalued: false
       date:
-        description: The date that the Activity was completed.
+        description: The date that the Activity was completed (ISO 8601 string).
         status: Draft
-        range: date
+        # range is string, not the `date` type: a slot named `date` with range
+        # `date` makes gen-pydantic emit `date: Optional[date]`, which shadows the
+        # imported date type and fails to evaluate on Python 3.10.
+        range: string
         required: false
         multivalued: false
       performedBy:

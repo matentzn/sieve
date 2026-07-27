@@ -327,8 +327,10 @@ classes:
         description: The actual content of the contribution (what they said/provided).
 
       date:
-        range: date
-        description: When the contribution was made.
+        # range string (not the `date` type): see note in sepio_classes.yaml —
+        # a `date`-named slot with range `date` breaks gen-pydantic on Python 3.10.
+        range: string
+        description: When the contribution was made (ISO 8601 string).
 
 
   # ===========================================================================

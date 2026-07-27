@@ -518,7 +518,7 @@ class Activity(Entity):
 
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Document', 'DataItem', 'DataSet', 'Activity', 'Agent'],
          'status': 'Informative'} })
-    date: Optional[date] = Field(default=None, description="""The date that the Activity was completed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'AgentContribution'], 'status': 'Draft'} })
+    date: Optional[str] = Field(default=None, description="""The date that the Activity was completed (ISO 8601 string).""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'AgentContribution'], 'status': 'Draft'} })
     performedBy: Optional[list[Agent]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
     id: str = Field(default=..., description="""The logical identifier of the entity in the system of record, e.g. a UUID.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'EvidencePacket', 'CurationDecision'],
          'status': 'Draft'} })
@@ -540,7 +540,7 @@ class Contribution(Activity):
     activityType: Optional[list[Coding]] = Field(default=[], description="""The specific type of activity performed or role played by an agent in making the contribution.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'], 'status': 'Draft'} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Document', 'DataItem', 'DataSet', 'Activity', 'Agent'],
          'status': 'Informative'} })
-    date: Optional[date] = Field(default=None, description="""The date that the Activity was completed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'AgentContribution'], 'status': 'Draft'} })
+    date: Optional[str] = Field(default=None, description="""The date that the Activity was completed (ISO 8601 string).""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'AgentContribution'], 'status': 'Draft'} })
     performedBy: Optional[list[Agent]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
     id: str = Field(default=..., description="""The logical identifier of the entity in the system of record, e.g. a UUID.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'EvidencePacket', 'CurationDecision'],
          'status': 'Draft'} })
@@ -1005,7 +1005,7 @@ class AgentContribution(SieveEvidenceItem, CuratedEvidence):
     contributionType: Optional[ContributionType] = Field(default=None, description="""The nature of the contribution (suggestion, review, decision, etc.). Affects evidence weight.""", json_schema_extra = { "linkml_meta": {'domain_of': ['AgentContribution']} })
     reference: Optional[str] = Field(default=None, description="""URL or identifier for traceability (issue tracker link, email thread, submission ID, etc.).""", json_schema_extra = { "linkml_meta": {'domain_of': ['AgentContribution']} })
     content: Optional[str] = Field(default=None, description="""The actual content of the contribution (what they said/provided).""", json_schema_extra = { "linkml_meta": {'domain_of': ['AgentContribution']} })
-    date: Optional[date] = Field(default=None, description="""When the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'AgentContribution']} })
+    date: Optional[str] = Field(default=None, description="""When the contribution was made (ISO 8601 string).""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'AgentContribution']} })
     rating: Optional[CurationStatus] = Field(default=None, description="""The evidence steward's verdict on this individual evidence item.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CuratedEvidence']} })
     eco_code: Optional[str] = Field(default=None, description="""Evidence & Conclusion Ontology (ECO) term for this evidence item.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CuratedEvidence']} })
     eco_label: Optional[str] = Field(default=None, description="""Human-readable label of the ECO term.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CuratedEvidence']} })
@@ -1043,7 +1043,7 @@ class CurationActivity(Contribution):
     activityType: Optional[list[Coding]] = Field(default=[], description="""The specific type of activity performed or role played by an agent in making the contribution.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'], 'status': 'Draft'} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Document', 'DataItem', 'DataSet', 'Activity', 'Agent'],
          'status': 'Informative'} })
-    date: Optional[date] = Field(default=None, description="""The date that the Activity was completed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'AgentContribution'], 'status': 'Draft'} })
+    date: Optional[str] = Field(default=None, description="""The date that the Activity was completed (ISO 8601 string).""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'AgentContribution'], 'status': 'Draft'} })
     performedBy: Optional[list[Agent]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
     id: str = Field(default=..., description="""The logical identifier of the entity in the system of record, e.g. a UUID.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'EvidencePacket', 'CurationDecision'],
          'status': 'Draft'} })
