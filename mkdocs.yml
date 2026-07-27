@@ -36,6 +36,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Primer: primer.md
   - Getting Started:
     - Architecture: architecture.md
     - Data Model: data-model.md
