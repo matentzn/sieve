@@ -106,6 +106,36 @@ class PacketStore:
         ).fetchall()
         return {str(status): int(count) for status, count in rows}
 
+    def update_status(self, packet_id: str, status: str) -> None:
+        """Set a packet's status (in the promoted column and the stored JSON)."""
+        packet = self.get_packet(packet_id)
+        if packet is None:
+            return
+        packet.status = status  # type: ignore[assignment]
+        self.insert_packet(packet)
+
+    def set_item_rating(self, packet_id: str, item_id: str, rating: str) -> None:
+        """Set the steward's rating on a single evidence item, by item id."""
+        packet = self.get_packet(packet_id)
+        if packet is None:
+            return
+        for line in packet.hasEvidenceLines or []:
+            for item in line.hasEvidenceItems or []:
+                if getattr(item, "id", None) == item_id:
+                    item.rating = rating  # type: ignore[attr-defined]
+        self.insert_packet(packet)
+
+    def get_decisions(self, packet_id: str) -> list[dict[str, Any]]:
+        """Return the decision history for a packet, newest first."""
+        cols = ["id", "packet_id", "curator", "curator_name", "decision",
+                "rationale", "certainty", "decided_at"]
+        rows = self.conn.execute(
+            f"SELECT {', '.join(cols)} FROM packet_decisions "
+            "WHERE packet_id = ? ORDER BY decided_at DESC",
+            [packet_id],
+        ).fetchall()
+        return [dict(zip(cols, r)) for r in rows]
+
     def record_decision(self, decision: CurationDecision) -> str:
         self.conn.execute(
             """INSERT OR REPLACE INTO packet_decisions

@@ -63,3 +63,22 @@ def test_stats_and_decision():
             decided_at="2026-07-26T00:00:00",
         )
     )
+    decisions = store.get_decisions("sieve:pkt_1")
+    assert len(decisions) == 1
+    assert decisions[0]["decision"] == "ACCEPT"
+
+
+def test_update_status():
+    store = PacketStore(":memory:")
+    store.insert_packet(_packet())
+    store.update_status("sieve:pkt_1", "ACCEPTED")
+    assert store.get_stats() == {"ACCEPTED": 1}
+    assert store.get_packet("sieve:pkt_1").status == "ACCEPTED"
+
+
+def test_set_item_rating():
+    store = PacketStore(":memory:")
+    store.insert_packet(_packet())
+    store.set_item_rating("sieve:pkt_1", "e1", "ACCEPTED")
+    got = store.get_packet("sieve:pkt_1")
+    assert got.hasEvidenceLines[0].hasEvidenceItems[0].rating == "ACCEPTED"
