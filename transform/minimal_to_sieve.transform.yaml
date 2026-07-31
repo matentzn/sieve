@@ -1,0 +1,59 @@
+id: minimal-to-sieve
+title: minimal EvidencedClaim -> sieve EvidencePacket
+description: |-
+  Lifts a minimal EvidencedClaim into the full sieve model: the claim becomes an
+  EvidencePacket, each minimal EvidenceLine becomes a SieveEvidenceLine, and each
+  minimal TextSpan becomes a SieveDocument evidence item (snippet -> quote, the
+  reported_in Document -> pmid + title). Shows that the minimal model is a faithful
+  subset the richer sieve model can absorb.
+
+  Two things the richer model demands that the minimal one does not, supplied here:
+   - every SEPIO entity needs an `id` and a `type` designator (generated below);
+   - sieve records evidence direction as a lower-case free string.
+
+  minimal's line-level evidence_source has no home in sieve yet (the held phase-4
+  axis), so it is intentionally not carried.
+
+  Run with --unrestricted-eval (the exprs use attribute access and string methods).
+class_derivations:
+
+  EvidencePacket:
+    populated_from: EvidencedClaim
+    slot_derivations:
+      id:
+        expr: "'sieve:packet_fanconi_hsc_attrition'"
+      status:
+        expr: "'UNREVIEWED'"
+      statement:
+        expr: "{'id': 'stmt_fanconi_hsc_attrition', 'type': 'SieveStatement', 'statement_text': statement_text}"
+      has_evidence_lines:
+        populated_from: has_evidence_lines
+
+  SieveEvidenceLine:
+    populated_from: EvidenceLine
+    slot_derivations:
+      id:
+        expr: "'line_' + has_evidence_items[0].reported_in.id.replace('PMID:', 'pmid')"
+      type:
+        expr: "'SieveEvidenceLine'"
+      direction_of_evidence_provided:
+        # sieve records direction as a lower-case free string
+        expr: "str(direction_of_evidence_provided).lower()"
+      description:
+        populated_from: description
+      has_evidence_items:
+        populated_from: has_evidence_items
+
+  SieveDocument:
+    populated_from: TextSpan
+    slot_derivations:
+      id:
+        expr: "'doc_' + reported_in.id.replace('PMID:', '')"
+      type:
+        expr: "'SieveDocument'"
+      quote:
+        populated_from: value
+      pmid:
+        expr: "reported_in.id.replace('PMID:', '')"
+      title:
+        expr: "reported_in.title"

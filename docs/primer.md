@@ -15,9 +15,9 @@ statement:
   subject: MONDO:0004979        # asthma
   predicate: {code: rdfs:subClassOf}
   object: MONDO:0005275         # respiratory system disorder
-hasEvidenceLines:
-  - directionOfEvidenceProvided: supports
-    hasEvidenceItems:
+has_evidence_lines:
+  - direction_of_evidence_provided: supports
+    has_evidence_items:
       - type: SieveDocument
         pmid: "28884740"
         quote: "Asthma is a heterogeneous disease… of chronic airway inflammation."
@@ -63,13 +63,13 @@ Subject → predicate → object. Labels are optional but make packets readable.
 ```yaml
 statement:
   subject: MONDO:0004979
-  subjectLabel: asthma
+  subject_label: asthma
   predicate:
     code: rdfs:subClassOf
     label: subClassOf
   object: MONDO:0005275
-  objectLabel: respiratory system disorder
-  statementText: asthma subClassOf respiratory system disorder
+  object_label: respiratory system disorder
+  statement_text: asthma subClassOf respiratory system disorder
 ```
 
 ---
@@ -80,11 +80,11 @@ A line says **which way** the evidence points and **how strongly**; its items
 carry the actual content.
 
 ```yaml
-hasEvidenceLines:
-  - directionOfEvidenceProvided: supports     # supports | disputes | neutral
-    strengthOfEvidenceProvided: strong        # strong | moderate | weak
-    scoreOfEvidenceProvided: 0.9              # 0–1, used for scoring
-    hasEvidenceItems:
+has_evidence_lines:
+  - direction_of_evidence_provided: supports     # supports | disputes | neutral
+    strength_of_evidence_provided: strong        # strong | moderate | weak
+    score_of_evidence_provided: 0.9              # 0–1, used for scoring
+    has_evidence_items:
       - type: SieveDocument
         pmid: "28884740"
         quote: "Asthma is… characterized by chronic airway inflammation."
@@ -96,16 +96,16 @@ hasEvidenceLines:
 ## Kinds of evidence
 
 Pick the item `type` that matches where the evidence comes from. Each example is
-one item you'd drop into a line's `hasEvidenceItems`.
+one item you'd drop into a line's `has_evidence_items`.
 
 === "Another ontology agrees (ConcordanceItem)"
 
     ```yaml
     - type: ConcordanceItem
-      sourceName: ICD-10-CM
-      sourceSubject: ICD10CM:J45
-      sourceObject: ICD10CM:J00-J99          # "Diseases of the respiratory system"
-      mappingSet: https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv
+      source_name: ICD-10-CM
+      source_subject: ICD10CM:J45
+      source_object: ICD10CM:J00-J99          # "Diseases of the respiratory system"
+      mapping_set: https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv
     ```
 
 === "A publication (SieveDocument)"
@@ -115,7 +115,7 @@ one item you'd drop into a line's `hasEvidenceItems`.
       title: Pathophysiology of Asthma
       pmid: "31542051"
       quote: "Asthma is a chronic inflammatory disorder of the airways…"
-      quoteLocation: Abstract
+      quote_location: Abstract
     ```
 
 === "A person weighed in (AgentContribution)"
@@ -123,8 +123,8 @@ one item you'd drop into a line's `hasEvidenceItems`.
     ```yaml
     - type: AgentContribution
       contributor: {id: orcid:0000-0003-4567-8901, name: Dr. Sarah Chen}
-      trustLevel: domain_expert                # community | domain_expert | curator | authority
-      contributionType: review                 # suggestion | review | decision | provision
+      trust_level: domain_expert                # community | domain_expert | curator | authority
+      contribution_type: review                 # suggestion | review | decision | provision
       content: "Confirmed: asthma is a respiratory disorder."
       reference: https://github.com/monarch-initiative/mondo/issues/7890
     ```
@@ -133,7 +133,7 @@ one item you'd drop into a line's `hasEvidenceItems`.
 
     ```yaml
     - type: ComputationalResult
-      methodName: ChatGPT Deep Research
+      method_name: ChatGPT Deep Research
       value: "0.92"
       parameters: "Analysed 47 sources; unanimous respiratory classification."
     ```

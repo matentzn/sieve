@@ -37,12 +37,12 @@ def test_unreviewed_packet_emits_nothing():
         id="p_unrev",
         status="UNREVIEWED",
         statement=SieveStatement(id="s", type="SieveStatement", subject="MONDO:1", object="MONDO:2"),
-        hasEvidenceLines=[
+        has_evidence_lines=[
             SieveEvidenceLine(
                 id="l",
                 type="SieveEvidenceLine",
-                directionOfEvidenceProvided="supports",
-                hasEvidenceItems=[ConcordanceItem(id="e", type="ConcordanceItem", sourceName="X")],
+                direction_of_evidence_provided="supports",
+                has_evidence_items=[ConcordanceItem(id="e", type="ConcordanceItem", source_name="X")],
             )
         ],
     )

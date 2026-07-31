@@ -48,7 +48,7 @@ classes:
         range: string
         required: false
         multivalued: false
-      alternativeLabels:
+      alternative_labels:
         description: Alternative name(s) for the Entity.
         status: Draft
         range: string
@@ -77,7 +77,7 @@ classes:
     status: Draft
     is_a: Entity
     attributes:
-      isAbout:
+      is_about:
         description: An entity or concept that the information entity describes/is about.
         status: Informative
         range: string
@@ -91,13 +91,13 @@ classes:
         range: Contribution
         required: false
         multivalued: true
-      dateAuthored:
+      date_authored:
         description: When the information content was generated.
         status: Draft
         range: string
         required: false
         multivalued: false
-      specifiedBy:
+      specified_by:
         description: >-
           A specification that describes all or part of the process that led to
           creation of the Information Entity.
@@ -105,14 +105,14 @@ classes:
         range: string
         required: false
         multivalued: true
-      derivedFrom:
+      derived_from:
         description: >-
           Another Information Entity from which this one is derived.
         status: Draft
         range: InformationEntity
         required: false
         multivalued: true
-      reportedIn:
+      reported_in:
         description: A document in which the Information Entity is reported.
         status: Draft
         range: string
@@ -126,7 +126,7 @@ classes:
         range: string
         required: false
         multivalued: true
-      recordMetadata:
+      record_metadata:
         description: >-
           Provenance metadata about a specific concrete record of information.
         status: Draft
@@ -143,7 +143,7 @@ classes:
     status: Draft
     is_a: InformationEntity
     attributes:
-      statementText:
+      statement_text:
         description: A natural-language expression of what a Statement asserts to be true.
         status: Draft
         range: string
@@ -208,7 +208,7 @@ classes:
         range: float
         required: false
         multivalued: false
-      hasEvidenceLines:
+      has_evidence_lines:
         description: >-
           Evidence-based arguments that support or dispute the validity of
           the Statement's proposition.
@@ -216,7 +216,7 @@ classes:
         range: EvidenceLine
         required: false
         multivalued: true
-      hasEvidence:
+      has_evidence:
         description: >-
           A piece of information that contributes to an argument for or against
           the Statement's proposition. Shortcut bypassing EvidenceLine.
@@ -234,7 +234,7 @@ classes:
     status: Draft
     is_a: InformationEntity
     attributes:
-      hasEvidenceItems:
+      has_evidence_items:
         description: >-
           Individual pieces of information evaluated as evidence in building
           this argument.
@@ -242,7 +242,7 @@ classes:
         range: InformationEntity
         required: false
         multivalued: true
-      directionOfEvidenceProvided:
+      direction_of_evidence_provided:
         description: >-
           The direction of support toward its target Proposition
           (supports, disputes, neutral).
@@ -250,14 +250,14 @@ classes:
         range: string
         required: false
         multivalued: false
-      strengthOfEvidenceProvided:
+      strength_of_evidence_provided:
         description: >-
           The qualitative strength of support for or against its target Proposition.
         status: Draft
         range: string
         required: false
         multivalued: false
-      scoreOfEvidenceProvided:
+      score_of_evidence_provided:
         description: >-
           A quantitative score indicating the strength of support.
         status: Draft
@@ -345,13 +345,13 @@ classes:
         range: string
         required: false
         multivalued: false
-      dataItems:
+      data_items:
         description: Data items included in the StudyResult.
         status: Informative
         range: DataItem
         required: false
         multivalued: true
-      sourceDataSet:
+      source_data_set:
         description: A larger DataSet from which this content was derived.
         status: Draft
         range: DataSet
@@ -401,7 +401,7 @@ classes:
         range: string
         required: false
         multivalued: false
-      performedBy:
+      performed_by:
         description: An Agent who participated in executing the Activity.
         status: Draft
         range: Agent
@@ -422,7 +422,7 @@ classes:
         range: Agent
         required: false
         multivalued: false
-      activityType:
+      activity_type:
         description: >-
           The specific type of activity performed or role played by an agent
           in making the contribution.
@@ -460,7 +460,7 @@ classes:
     status: Informative
     is_a: Entity
     attributes:
-      propositionText:
+      proposition_text:
         description: A natural-language expression of the Proposition's meaning.
         status: Informative
         range: string
@@ -517,7 +517,7 @@ classes:
         range: string
         required: false
         multivalued: false
-      systemVersion:
+      system_version:
         description: Version of the terminology or code system.
         range: string
         required: false
@@ -556,12 +556,12 @@ classes:
         range: string
         required: true
         multivalued: false
-      systemURL:
+      system_url:
         description: A URL for the nomenclature system.
         range: uriorcurie
         required: false
         multivalued: false
-      systemVersion:
+      system_version:
         description: The version of the nomenclature system.
         range: string
         required: false
@@ -573,7 +573,7 @@ classes:
     from_schema: https://w3id.org/sepio-model
     is_a: Utility
     attributes:
-      extensionDescription:
+      extension_description:
         description: Description of the extension element's intended meaning and use.
         range: string
         required: false
@@ -595,25 +595,25 @@ classes:
     status: Draft
     is_a: Utility
     attributes:
-      recordIdentifier:
+      record_identifier:
         description: The identifier of the record.
         status: Draft
         range: string
         required: false
         multivalued: false
-      recordVersion:
+      record_version:
         description: The version number of the record.
         status: Draft
         range: string
         required: false
         multivalued: false
-      derivedFromRecord:
+      derived_from_record:
         description: Another data record from which this was derived.
         status: Draft
         range: string
         required: false
         multivalued: true
-      dateRecordCreated:
+      date_record_created:
         description: The date the record was initially created.
         status: Draft
         range: string
@@ -656,13 +656,13 @@ classes:
     status: Draft
     is_a: Entity
     attributes:
-      memberCount:
+      member_count:
         description: Total number of members in the StudyGroup.
         status: Informative
         range: integer
         required: false
         multivalued: false
-      isSubsetOf:
+      is_subset_of:
         description: A larger StudyGroup of which this is a subset.
         status: Draft
         range: StudyGroup

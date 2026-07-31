@@ -13,7 +13,7 @@ def test_yaml_roundtrip_preserves_subject_and_items():
     packet = load_packet(EX)
     reloaded = packet_from_dict(yaml.safe_load(packet_to_yaml(packet)))
     assert reloaded.statement.subject == "MONDO:0004979"
-    assert isinstance(reloaded.hasEvidenceLines[0].hasEvidenceItems[0], ConcordanceItem)
+    assert isinstance(reloaded.has_evidence_lines[0].has_evidence_items[0], ConcordanceItem)
 
 
 def test_export_multi_document(tmp_path):

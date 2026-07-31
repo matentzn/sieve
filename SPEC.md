@@ -61,15 +61,15 @@ The LinkML schema is the source of truth; `just gen-pydantic` regenerates
 EvidencePacket                     (tree_root; not a SEPIO Entity → no id/type tax)
 ├── id
 ├── statement: SieveStatement      is_a SEPIO Statement
-│   ├── subject / subjectLabel
+│   ├── subject / subject_label
 │   ├── predicate: Coding          (code + label + system)
-│   ├── object / objectLabel
-│   └── statementText
-├── hasEvidenceLines: [SieveEvidenceLine]      is_a SEPIO EvidenceLine
-│   ├── directionOfEvidenceProvided  supports | disputes | neutral
-│   ├── strengthOfEvidenceProvided   strong | moderate | weak
-│   ├── scoreOfEvidenceProvided      float
-│   └── hasEvidenceItems: [ … ]      polymorphic InformationEntity subclasses:
+│   ├── object / object_label
+│   └── statement_text
+├── has_evidence_lines: [SieveEvidenceLine]      is_a SEPIO EvidenceLine
+│   ├── direction_of_evidence_provided  supports | disputes | neutral
+│   ├── strength_of_evidence_provided   strong | moderate | weak
+│   ├── score_of_evidence_provided      float
+│   └── has_evidence_items: [ … ]      polymorphic InformationEntity subclasses:
 │         ConcordanceItem | SieveDocument | SieveDataItem |
 │         SieveStudyResult | ComputationalResult | AgentContribution
 ├── evidence_synthesis: EvidenceSynthesis   (summary, Score, direction, cited_evidence)
@@ -89,11 +89,11 @@ requires `id` + `type`. Standalone classes (`EvidencePacket`, `Score`,
 - **`CurationDecision`** + `DecisionType` — a decision *history* (curator, rationale,
   certainty, timestamp), stored in its own table.
 - **GitHub/tool provenance** — `pull_request`, `issue`, `created_with` on
-  `CurationActivity`; `mappingSet` (SSSOM) on `ConcordanceItem`.
+  `CurationActivity`; `mapping_set` (SSSOM) on `ConcordanceItem`.
 
 `AgentContribution` carries the orthogonal scoring dimensions from SEPIO/SIEVE:
-`trustLevel` (community/domain_expert/curator/authority) × `channel` ×
-`contributionType`.
+`trust_level` (community/domain_expert/curator/authority) × `channel` ×
+`contribution_type`.
 
 ## 5. Ingest
 
@@ -114,9 +114,9 @@ rendered by type + NER), per-item Accept/Reject rating, and decision recording
 ## 7. Scoring
 
 `scoring.net_evidence_ratio(packet)` = `(S⁺ − S⁻) / (S⁺ + S⁻ + S⁰)` over
-`hasEvidenceLines[]`, grouping each line's weight by `directionOfEvidenceProvided`.
-A line's weight is its `scoreOfEvidenceProvided`, else a qualitative
-`strengthOfEvidenceProvided` map (strong 1.0 / moderate 0.6 / weak 0.3), else 1.0.
+`has_evidence_lines[]`, grouping each line's weight by `direction_of_evidence_provided`.
+A line's weight is its `score_of_evidence_provided`, else a qualitative
+`strength_of_evidence_provided` map (strong 1.0 / moderate 0.6 / weak 0.3), else 1.0.
 
 ## 8. Export
 

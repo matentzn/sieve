@@ -16,8 +16,8 @@ def test_example_has_all_item_types():
     packet = load_packet(EX)
     types = {
         type(i).__name__
-        for line in packet.hasEvidenceLines
-        for i in line.hasEvidenceItems
+        for line in packet.has_evidence_lines
+        for i in line.has_evidence_items
     }
     assert {
         "ConcordanceItem",

@@ -144,3 +144,6 @@ data/curation.duckdb
 sieve.config.json
 data/curation_state.json
 .DS_Store
+
+# Generated linkml-map transform outputs
+transform/build/

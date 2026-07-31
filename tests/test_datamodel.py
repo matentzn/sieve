@@ -30,7 +30,7 @@ def test_curated_evidence_item_accepts_rating_and_eco():
         type="ConcordanceItem",
         rating="ACCEPTED",
         eco_code="ECO:0000269",
-        sourceName="DOID",
+        source_name="DOID",
     )
     assert item.rating == "ACCEPTED"
     assert item.eco_code == "ECO:0000269"

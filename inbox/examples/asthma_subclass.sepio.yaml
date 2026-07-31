@@ -11,13 +11,13 @@ statement:
   id: stmt_asthma_resp
   type: SieveStatement
   subject: MONDO:0004979
-  subjectLabel: asthma
+  subject_label: asthma
   predicate:
     code: rdfs:subClassOf
     label: subClassOf
   object: MONDO:0005275
-  objectLabel: respiratory system disorder
-  statementText: asthma subClassOf respiratory system disorder
+  object_label: respiratory system disorder
+  statement_text: asthma subClassOf respiratory system disorder
 
 curated_by:
   id: act_asthma_curation
@@ -29,52 +29,52 @@ curated_by:
   pull_request: https://github.com/monarch-initiative/mondo/pull/2345
   created_with: https://protege.stanford.edu/
 
-hasEvidenceLines:
+has_evidence_lines:
   - id: line_concordance_icd10
     type: SieveEvidenceLine
-    directionOfEvidenceProvided: supports
-    strengthOfEvidenceProvided: strong
-    scoreOfEvidenceProvided: 0.9
-    hasEvidenceItems:
+    direction_of_evidence_provided: supports
+    strength_of_evidence_provided: strong
+    score_of_evidence_provided: 0.9
+    has_evidence_items:
       - id: ev_concordance_icd10
         type: ConcordanceItem
         rating: ACCEPTED
         eco_code: ECO:0000204
         eco_label: similarity evidence
-        sourceName: ICD-10-CM
-        sourceId: https://bioportal.bioontology.org/ontologies/ICD10CM
-        sourceSubject: ICD10CM:J45
-        sourceSubjectLabel: Asthma
-        sourcePredicate: rdfs:subClassOf
-        sourceObject: ICD10CM:J00-J99
-        sourceObjectLabel: Diseases of the respiratory system
+        source_name: ICD-10-CM
+        source_id: https://bioportal.bioontology.org/ontologies/ICD10CM
+        source_subject: ICD10CM:J45
+        source_subject_label: Asthma
+        source_predicate: rdfs:subClassOf
+        source_object: ICD10CM:J00-J99
+        source_object_label: Diseases of the respiratory system
 
   - id: line_concordance_doid
     type: SieveEvidenceLine
-    directionOfEvidenceProvided: disputes
-    strengthOfEvidenceProvided: moderate
-    scoreOfEvidenceProvided: 0.7
-    hasEvidenceItems:
+    direction_of_evidence_provided: disputes
+    strength_of_evidence_provided: moderate
+    score_of_evidence_provided: 0.7
+    has_evidence_items:
       - id: ev_concordance_doid
         type: ConcordanceItem
         rating: REJECTED
         eco_code: ECO:0000204
         eco_label: similarity evidence
-        sourceName: Disease Ontology
-        sourceId: http://purl.obolibrary.org/obo/doid.owl
-        sourceSubject: DOID:2841
-        sourceSubjectLabel: asthma
-        sourcePredicate: rdfs:subClassOf
-        sourceObject: DOID:0050155
-        sourceObjectLabel: sensory system disease
-        mappingSet: https://w3id.org/sssom/mappings/mondo-doid.sssom.tsv
+        source_name: Disease Ontology
+        source_id: http://purl.obolibrary.org/obo/doid.owl
+        source_subject: DOID:2841
+        source_subject_label: asthma
+        source_predicate: rdfs:subClassOf
+        source_object: DOID:0050155
+        source_object_label: sensory system disease
+        mapping_set: https://w3id.org/sssom/mappings/mondo-doid.sssom.tsv
 
   - id: line_literature_gina
     type: SieveEvidenceLine
-    directionOfEvidenceProvided: supports
-    strengthOfEvidenceProvided: strong
-    scoreOfEvidenceProvided: 0.95
-    hasEvidenceItems:
+    direction_of_evidence_provided: supports
+    strength_of_evidence_provided: strong
+    score_of_evidence_provided: 0.95
+    has_evidence_items:
       - id: ev_literature_gina
         type: SieveDocument
         rating: ACCEPTED
@@ -86,14 +86,14 @@ hasEvidenceLines:
           Asthma is a heterogeneous disease, usually characterized by chronic airway
           inflammation. It is defined by the history of respiratory symptoms such as
           wheeze, shortness of breath, chest tightness and cough.
-        quoteLocation: Chapter 1, Definition, page 14
+        quote_location: Chapter 1, Definition, page 14
 
   - id: line_literature_patho
     type: SieveEvidenceLine
-    directionOfEvidenceProvided: supports
-    strengthOfEvidenceProvided: moderate
-    scoreOfEvidenceProvided: 0.85
-    hasEvidenceItems:
+    direction_of_evidence_provided: supports
+    strength_of_evidence_provided: moderate
+    score_of_evidence_provided: 0.85
+    has_evidence_items:
       - id: ev_literature_patho
         type: SieveDocument
         rating: ACCEPTED
@@ -105,14 +105,14 @@ hasEvidenceLines:
           Asthma is a chronic inflammatory disorder of the airways involving multiple
           cell types, associated with airway hyperresponsiveness leading to recurrent
           episodes of wheezing, breathlessness, chest tightness, and coughing.
-        quoteLocation: Abstract
+        quote_location: Abstract
 
   - id: line_expert_review
     type: SieveEvidenceLine
-    directionOfEvidenceProvided: supports
-    strengthOfEvidenceProvided: strong
-    scoreOfEvidenceProvided: 0.8
-    hasEvidenceItems:
+    direction_of_evidence_provided: supports
+    strength_of_evidence_provided: strong
+    score_of_evidence_provided: 0.8
+    has_evidence_items:
       - id: ev_expert_review
         type: AgentContribution
         rating: ACCEPTED
@@ -122,9 +122,9 @@ hasEvidenceLines:
           id: orcid:0000-0003-4567-8901
           type: Agent
           name: Dr. Sarah Chen
-        trustLevel: domain_expert
+        trust_level: domain_expert
         channel: issue_tracker
-        contributionType: review
+        contribution_type: review
         reference: https://github.com/monarch-initiative/mondo/issues/7890
         content: >-
           Clinical pulmonologist review confirming classification of asthma as a
@@ -133,18 +133,18 @@ hasEvidenceLines:
 
   - id: line_ai_research
     type: SieveEvidenceLine
-    directionOfEvidenceProvided: supports
-    strengthOfEvidenceProvided: moderate
-    scoreOfEvidenceProvided: 0.75
-    hasEvidenceItems:
+    direction_of_evidence_provided: supports
+    strength_of_evidence_provided: moderate
+    score_of_evidence_provided: 0.75
+    has_evidence_items:
       - id: ev_ai_research
         type: ComputationalResult
         rating: ACCEPTED
         eco_code: ECO:0008006
         eco_label: computational evidence
         value: "0.92"
-        methodName: ChatGPT Deep Research
-        methodId: https://openai.com/chatgpt
+        method_name: ChatGPT Deep Research
+        method_id: https://openai.com/chatgpt
         parameters: >-
           Deep research analysis of 47 sources (textbooks, peer-reviewed articles,
           clinical guidelines). Unanimous consensus that asthma is a respiratory
