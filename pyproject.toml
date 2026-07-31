@@ -38,6 +38,7 @@ dev = [
     "jupyter>=1.0.0",
     "mknotebooks>= 0.8.0",
     "pytest>=7.0.0",
+    "linkml-map>=0.4.0",
 ]
 
 [project.scripts]

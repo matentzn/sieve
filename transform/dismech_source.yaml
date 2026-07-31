@@ -1,0 +1,86 @@
+id: https://w3id.org/dismech/evidence-snapshot
+name: dismech-evidence-snapshot
+title: DisMech evidence shape (vendored snapshot)
+description: |-
+  A faithful, self-contained snapshot of the DisMech evidence shape needed to run
+  the dismech -> minimal transform inside this repo, without depending on the
+  DisMech repository being checked out.
+
+  Copied 2026-07-31 from
+  ~/ws/projects/dismech/src/dismech/schema/dismech.yaml
+  (classes Pathophysiology and EvidenceItem; enums EvidenceItemSupportEnum,
+  EvidenceSourceEnum). Only the slots the transform reads are retained.
+prefixes:
+  linkml: https://w3id.org/linkml/
+  dismech: https://w3id.org/dismech/
+  PMID: http://www.ncbi.nlm.nih.gov/pubmed/
+default_prefix: dismech
+default_range: string
+imports:
+  - linkml:types
+
+classes:
+
+  Pathophysiology:
+    description: A discrete assertion that a pathophysiological feature is associated with a disease.
+    attributes:
+      name:
+        description: The name of the pathophysiological feature (the claim).
+      description:
+        description: Free-text description of the feature.
+      evidence:
+        range: EvidenceItem
+        multivalued: true
+        inlined_as_list: true
+        description: Evidence items supporting or disputing the assertion.
+
+  EvidenceItem:
+    description: >-
+      DisMech's flat evidence item: a verbatim snippet from a reference, with a
+      support direction and a provenance source.
+    attributes:
+      reference:
+        range: uriorcurie
+        description: Authoritative reference (e.g. a PMID CURIE).
+      reference_title:
+        description: Human-readable title of the reference.
+      supports:
+        range: EvidenceItemSupportEnum
+        description: The level/direction of support the evidence gives the claim.
+      evidence_source:
+        range: EvidenceSourceEnum
+        description: The provenance/source kind of the evidence item.
+      snippet:
+        description: Verbatim excerpt from the reference.
+      explanation:
+        description: How the evidence bears on the claim.
+
+enums:
+
+  EvidenceItemSupportEnum:
+    description: The level of support for an evidence item.
+    permissible_values:
+      WRONG_STATEMENT:
+        description: The claim contains a demonstrable factual error.
+      SUPPORT:
+        description: The cited evidence directly supports the claim.
+      REFUTE:
+        description: The cited evidence directly contradicts the claim.
+      NO_EVIDENCE:
+        description: The cited reference does not contain evidence relevant to the claim.
+      PARTIAL:
+        description: The cited evidence partially or indirectly supports the claim.
+
+  EvidenceSourceEnum:
+    description: The provenance/source of the evidence item.
+    permissible_values:
+      HUMAN_CLINICAL:
+        description: Human clinical observations.
+      MODEL_ORGANISM:
+        description: In vivo animal evidence.
+      IN_VITRO:
+        description: In vitro or ex vivo assays.
+      COMPUTATIONAL:
+        description: In silico / modeling studies.
+      OTHER:
+        description: Evidence not fitting the above.

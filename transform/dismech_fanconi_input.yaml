@@ -1,0 +1,22 @@
+# A single Pathophysiology assertion extracted verbatim (2026-07-31) from the DisMech
+# Fanconi Anemia record: ~/ws/projects/dismech/kb/disorders/Fanconi_Anemia.yaml
+# (the "Hematopoietic Stem Cell Attrition" pathophysiology node, lines ~395-409).
+# Two evidence items with different support directions and sources — a good case for
+# showing how each dismech evidence item becomes its own minimal EvidenceLine.
+name: Hematopoietic Stem Cell Attrition
+description: >-
+  Progressive depletion of long-term hematopoietic stem cells in bone marrow due to
+  replication stress, aldehyde-induced DNA damage, and chronic inflammatory signaling.
+evidence:
+  - reference: PMID:38424108
+    reference_title: "Deregulated protein homeostasis constrains fetal hematopoietic stem cell pool expansion in Fanconi anemia."
+    supports: SUPPORT
+    evidence_source: MODEL_ORGANISM
+    snippet: "proteostasis deregulation itself is driven by excess sterile inflammatory activity in hematopoietic and stromal cells within the fetal liver, and dampened Type I interferon signaling similarly restores fetal Fancd2-/- long-term hematopoietic stem cells to wild type-equivalent numbers."
+    explanation: Demonstrates that inflammatory signaling drives HSC pool deficits in FA, and that dampening inflammation rescues HSC numbers.
+  - reference: PMID:24037726
+    reference_title: "Variant ALDH2 is associated with accelerated progression of bone marrow failure in Japanese Fanconi anemia patients."
+    supports: PARTIAL
+    evidence_source: HUMAN_CLINICAL
+    snippet: "the FA proteins might counteract aldehyde-induced genotoxicity in hematopoietic stem cells"
+    explanation: Establishes that aldehydes cause genotoxicity in HSCs and FA proteins normally protect against this damage.
