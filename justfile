@@ -68,8 +68,8 @@ _update-template:
   copier update --trust --skip-answered
 
 
-# Run documentation server
-_serve:
+# Run documentation server (regenerates the schema reference first)
+_serve: gen-docs
   uv run mkdocs serve
 
 # Initialize git repository

@@ -30,3 +30,17 @@ transform-minimal-to-sieve: transform-dismech
 # Run the whole DisMech -> minimal -> sieve pipeline end to end.
 transform-all: transform-minimal-to-sieve
     @echo "Pipeline complete: DisMech -> minimal -> sieve (both outputs validated)."
+
+
+# ============== Schema reference docs (linkml gen-doc) ==============
+# Generates the per-class/slot markdown reference the "Schema Reference" nav section
+# serves. Output (docs/elements/) is gitignored and regenerated on build/deploy.
+
+# Generate the LinkML schema reference into docs/elements/.
+gen-docs:
+    uv run gen-doc -d docs/elements schema/sieve.yaml
+    @echo "Schema reference generated in docs/elements/ (from schema/sieve.yaml)"
+
+# Serve the docs locally with a freshly generated schema reference.
+serve-docs: gen-docs
+    uv run mkdocs serve

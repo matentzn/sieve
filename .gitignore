@@ -147,3 +147,7 @@ data/curation_state.json
 
 # Generated linkml-map transform outputs
 transform/build/
+
+# Generated LinkML schema reference (regenerated on build/deploy)
+docs/elements/*
+!docs/elements/.gitkeep
