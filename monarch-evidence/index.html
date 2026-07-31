@@ -477,8 +477,10 @@ SEPIO model.</p>
 </tr>
 </tbody>
 </table>
-<p><code>Direction</code> (<code>SUPPORTS</code>/<code>REFUTES</code>/<code>PARTIAL</code>/…), <code>EvidenceSource</code> (<code>HUMAN_CLINICAL</code>/
-<code>MODEL_ORGANISM</code>/…, each mapping onto an ECO branch), and <code>DocumentType</code> round it out.
+<p><code>Direction</code> (<code>SUPPORTS</code>/<code>REFUTES</code>/<code>NEUTRAL</code> — polarity only), <code>Strength</code>
+(<code>STRONG</code>/<code>MODERATE</code>/<code>WEAK</code> — kept separate from direction), <code>EvidenceSource</code>
+(<code>HUMAN_CLINICAL</code>/<code>MODEL_ORGANISM</code>/…, each mapping onto an ECO branch), and
+<code>DocumentType</code> round it out.
 A future <code>TextMiningResult</code> (<strong>C</strong>) will subclass <code>TextSpan</code> to carry extraction
 metadata (score, offsets, method) — so the minimal "A" shape stays valid while richer
 "C" evidence is <em>is-a</em> compatible.</p>
@@ -520,9 +522,13 @@ Attrition" node from the Fanconi Anemia record
 <code>EvidencedClaim</code> and turns <strong>each DisMech evidence item into its own <code>EvidenceLine</code></strong>
 holding a single <code>TextSpan</code>. The per-item <code>supports</code>/<code>evidence_source</code> — which DisMech
 stores on the item — move up to the line, matching the minimal rule that <em>one line has
-one direction and one source</em>. The enums are translated (<code>SUPPORT → SUPPORTS</code>,
-<code>REFUTE → REFUTES</code>); the <code>snippet</code> becomes the span's <code>value</code>, and <code>reference</code> +
-<code>reference_title</code> become its <code>Document</code>:</p>
+one direction and one source</em>. Crucially, DisMech's <code>supports</code> enum conflates three
+things, so the transform <strong>splits</strong> it: <code>SUPPORT</code>/<code>REFUTE</code> become the <code>direction</code>;
+<code>PARTIAL</code> becomes <code>direction: SUPPORTS</code> <strong>plus</strong> <code>strength: WEAK</code> (partial support is a
+<em>strength</em>, not a direction); and the operational values (<code>NO_EVIDENCE</code>,
+<code>WRONG_STATEMENT</code>) are curation signals that don't belong in the evidence model at all.
+The <code>snippet</code> becomes the span's <code>value</code>, and <code>reference</code> + <code>reference_title</code> become its
+<code>Document</code>:</p>
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="nt">statement_text</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Hematopoietic Stem Cell Attrition</span>
 <a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="nt">has_evidence_lines</span><span class="p">:</span>
 <a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SUPPORTS</span>
@@ -533,24 +539,25 @@ one direction and one source</em>. The enums are translated (<code>SUPPORT → S
 <a href="#__codelineno-2-8" id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="w">        </span><span class="nt">reported_in</span><span class="p">:</span>
 <a href="#__codelineno-2-9" id="__codelineno-2-9" name="__codelineno-2-9"></a><span class="w">          </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PMID:38424108</span>
 <a href="#__codelineno-2-10" id="__codelineno-2-10" name="__codelineno-2-10"></a><span class="w">          </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"Deregulated</span><span class="nv"> </span><span class="s">protein</span><span class="nv"> </span><span class="s">homeostasis</span><span class="nv"> </span><span class="s">constrains</span><span class="nv"> </span><span class="s">fetal</span><span class="nv"> </span><span class="s">HSC</span><span class="nv"> </span><span class="s">pool</span><span class="nv"> </span><span class="s">expansion</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">Fanconi</span><span class="nv"> </span><span class="s">anemia."</span>
-<a href="#__codelineno-2-11" id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PARTIAL</span>
-<a href="#__codelineno-2-12" id="__codelineno-2-12" name="__codelineno-2-12"></a><span class="w">    </span><span class="nt">evidence_source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HUMAN_CLINICAL</span>
-<a href="#__codelineno-2-13" id="__codelineno-2-13" name="__codelineno-2-13"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Establishes that aldehydes cause genotoxicity in HSCs ...</span>
-<a href="#__codelineno-2-14" id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="w">    </span><span class="nt">has_evidence_items</span><span class="p">:</span>
-<a href="#__codelineno-2-15" id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"the</span><span class="nv"> </span><span class="s">FA</span><span class="nv"> </span><span class="s">proteins</span><span class="nv"> </span><span class="s">might</span><span class="nv"> </span><span class="s">counteract</span><span class="nv"> </span><span class="s">aldehyde-induced</span><span class="nv"> </span><span class="s">genotoxicity</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">hematopoietic</span><span class="nv"> </span><span class="s">stem</span><span class="nv"> </span><span class="s">cells"</span>
-<a href="#__codelineno-2-16" id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="w">        </span><span class="nt">reported_in</span><span class="p">:</span>
-<a href="#__codelineno-2-17" id="__codelineno-2-17" name="__codelineno-2-17"></a><span class="w">          </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PMID:24037726</span>
-<a href="#__codelineno-2-18" id="__codelineno-2-18" name="__codelineno-2-18"></a><span class="w">          </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"Variant</span><span class="nv"> </span><span class="s">ALDH2</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">associated</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">accelerated</span><span class="nv"> </span><span class="s">progression</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">bone</span><span class="nv"> </span><span class="s">marrow</span><span class="nv"> </span><span class="s">failure</span><span class="nv"> </span><span class="s">..."</span>
+<a href="#__codelineno-2-11" id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SUPPORTS</span>
+<a href="#__codelineno-2-12" id="__codelineno-2-12" name="__codelineno-2-12"></a><span class="w">    </span><span class="nt">strength_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">WEAK</span><span class="w">      </span><span class="c1"># dismech PARTIAL -&gt; direction + strength</span>
+<a href="#__codelineno-2-13" id="__codelineno-2-13" name="__codelineno-2-13"></a><span class="w">    </span><span class="nt">evidence_source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HUMAN_CLINICAL</span>
+<a href="#__codelineno-2-14" id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Establishes that aldehydes cause genotoxicity in HSCs ...</span>
+<a href="#__codelineno-2-15" id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="w">    </span><span class="nt">has_evidence_items</span><span class="p">:</span>
+<a href="#__codelineno-2-16" id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"the</span><span class="nv"> </span><span class="s">FA</span><span class="nv"> </span><span class="s">proteins</span><span class="nv"> </span><span class="s">might</span><span class="nv"> </span><span class="s">counteract</span><span class="nv"> </span><span class="s">aldehyde-induced</span><span class="nv"> </span><span class="s">genotoxicity</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">hematopoietic</span><span class="nv"> </span><span class="s">stem</span><span class="nv"> </span><span class="s">cells"</span>
+<a href="#__codelineno-2-17" id="__codelineno-2-17" name="__codelineno-2-17"></a><span class="w">        </span><span class="nt">reported_in</span><span class="p">:</span>
+<a href="#__codelineno-2-18" id="__codelineno-2-18" name="__codelineno-2-18"></a><span class="w">          </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PMID:24037726</span>
+<a href="#__codelineno-2-19" id="__codelineno-2-19" name="__codelineno-2-19"></a><span class="w">          </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"Variant</span><span class="nv"> </span><span class="s">ALDH2</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">associated</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">accelerated</span><span class="nv"> </span><span class="s">progression</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">bone</span><span class="nv"> </span><span class="s">marrow</span><span class="nv"> </span><span class="s">failure</span><span class="nv"> </span><span class="s">..."</span>
 </code></pre></div>
 <p>This output validates against <code>schema/minimal.yaml</code>.</p>
 <div class="admonition tip">
 <p class="admonition-title">One line per item — and when to merge</p>
 <p>The mechanical transform gives one line per DisMech item. That is correct here,
-because the two items differ in <strong>both</strong> direction (SUPPORT vs PARTIAL) and source
-(model organism vs human clinical). When several items share a direction <em>and</em>
-source <em>and</em> document, a curation step may merge them into a single line with
-several <code>has_evidence_items</code> — an <code>EvidenceLine</code> is a line of reasoning, not a
-sentence.</p>
+because the two items differ in source (model organism vs human clinical) and
+strength (full vs partial/<code>WEAK</code>). When several items share a direction <em>and</em>
+strength <em>and</em> source <em>and</em> document, a curation step may merge them into a single
+line with several <code>has_evidence_items</code> — an <code>EvidenceLine</code> is a line of reasoning,
+not a sentence.</p>
 </div>
 <h2 id="lifting-into-sieve">Lifting into sieve<a class="headerlink" href="#lifting-into-sieve" title="Permanent link">¶</a></h2>
 <p>The full sieve model is a superset. The second transform
