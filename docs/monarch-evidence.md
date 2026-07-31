@@ -45,8 +45,10 @@ The model has three concepts and three enums:
 | `TextSpan` (**A**) | a verbatim text span used as evidence, plus its document | `sepio:DataItem` |
 | `Document` | the publication a span was drawn from | `sepio:Document` |
 
-`Direction` (`SUPPORTS`/`REFUTES`/`PARTIAL`/…), `EvidenceSource` (`HUMAN_CLINICAL`/
-`MODEL_ORGANISM`/…, each mapping onto an ECO branch), and `DocumentType` round it out.
+`Direction` (`SUPPORTS`/`REFUTES`/`NEUTRAL` — polarity only), `Strength`
+(`STRONG`/`MODERATE`/`WEAK` — kept separate from direction), `EvidenceSource`
+(`HUMAN_CLINICAL`/`MODEL_ORGANISM`/…, each mapping onto an ECO branch), and
+`DocumentType` round it out.
 A future `TextMiningResult` (**C**) will subclass `TextSpan` to carry extraction
 metadata (score, offsets, method) — so the minimal "A" shape stays valid while richer
 "C" evidence is *is-a* compatible.
@@ -98,9 +100,13 @@ The transform (`transform/dismech_to_minimal.transform.yaml`) makes the assertio
 `EvidencedClaim` and turns **each DisMech evidence item into its own `EvidenceLine`**
 holding a single `TextSpan`. The per-item `supports`/`evidence_source` — which DisMech
 stores on the item — move up to the line, matching the minimal rule that *one line has
-one direction and one source*. The enums are translated (`SUPPORT → SUPPORTS`,
-`REFUTE → REFUTES`); the `snippet` becomes the span's `value`, and `reference` +
-`reference_title` become its `Document`:
+one direction and one source*. Crucially, DisMech's `supports` enum conflates three
+things, so the transform **splits** it: `SUPPORT`/`REFUTE` become the `direction`;
+`PARTIAL` becomes `direction: SUPPORTS` **plus** `strength: WEAK` (partial support is a
+*strength*, not a direction); and the operational values (`NO_EVIDENCE`,
+`WRONG_STATEMENT`) are curation signals that don't belong in the evidence model at all.
+The `snippet` becomes the span's `value`, and `reference` + `reference_title` become its
+`Document`:
 
 ```yaml
 statement_text: Hematopoietic Stem Cell Attrition
@@ -113,7 +119,8 @@ has_evidence_lines:
         reported_in:
           id: PMID:38424108
           title: "Deregulated protein homeostasis constrains fetal HSC pool expansion in Fanconi anemia."
-  - direction_of_evidence_provided: PARTIAL
+  - direction_of_evidence_provided: SUPPORTS
+    strength_of_evidence_provided: WEAK      # dismech PARTIAL -> direction + strength
     evidence_source: HUMAN_CLINICAL
     description: Establishes that aldehydes cause genotoxicity in HSCs ...
     has_evidence_items:
@@ -127,11 +134,11 @@ This output validates against `schema/minimal.yaml`.
 
 !!! tip "One line per item — and when to merge"
     The mechanical transform gives one line per DisMech item. That is correct here,
-    because the two items differ in **both** direction (SUPPORT vs PARTIAL) and source
-    (model organism vs human clinical). When several items share a direction *and*
-    source *and* document, a curation step may merge them into a single line with
-    several `has_evidence_items` — an `EvidenceLine` is a line of reasoning, not a
-    sentence.
+    because the two items differ in source (model organism vs human clinical) and
+    strength (full vs partial/`WEAK`). When several items share a direction *and*
+    strength *and* source *and* document, a curation step may merge them into a single
+    line with several `has_evidence_items` — an `EvidenceLine` is a line of reasoning,
+    not a sentence.
 
 ## Lifting into sieve
 

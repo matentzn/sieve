@@ -115,9 +115,14 @@ structure onto their own container without the kernel imposing one.
 Enums (each permissible value carries a `meaning:` IRI — this is the reconciliation
 mechanism):
 
-- **`Direction`** — superset from the 07-12 spec's `SupportDirection`
-  (`SUPPORTS`, `REFUTES`, `PARTIAL`, `NO_EVIDENCE`, `WRONG_STATEMENT`, `UNCERTAIN`),
-  `meaning:` → SEPIO direction terms where they exist.
+- **`Direction`** — polarity ONLY: `SUPPORTS`, `REFUTES`, `NEUTRAL`,
+  `meaning:` → SEPIO direction terms where they exist. (Revised after SEPIO review:
+  the 07-12 `SupportDirection` superset conflated three concerns — direction was split
+  out from **`Strength`** below, and DisMech's `PARTIAL` moves to strength; the
+  operational values `NO_EVIDENCE`/`WRONG_STATEMENT` are curation/QC signals that do
+  not persist as evidence and are dropped from the model.)
+- **`Strength`** — `STRONG`, `MODERATE`, `WEAK`; a qualitative strength scale on
+  `strength_of_evidence_provided`, orthogonal to direction (DisMech `PARTIAL` → `WEAK`).
 - **`EvidenceSource`** — `HUMAN_CLINICAL`, `MODEL_ORGANISM`, `IN_VITRO`,
   `COMPUTATIONAL`, `EXPERT_CONSENSUS`, `OTHER`; each `meaning:` → the corresponding
   **ECO** branch term.

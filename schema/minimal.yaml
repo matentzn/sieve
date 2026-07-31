@@ -65,7 +65,16 @@ classes:
       direction_of_evidence_provided:
         slot_uri: sepio:direction_of_evidence_provided
         range: Direction
-        description: Whether the line supports, disputes, or is neutral toward the claim.
+        description: >-
+          Whether the line supports, disputes, or is neutral toward the claim.
+          This is polarity ONLY — how strongly it does so is
+          `strength_of_evidence_provided`.
+      strength_of_evidence_provided:
+        slot_uri: sepio:strength_of_evidence_provided
+        range: Strength
+        description: >-
+          How strongly the line bears on the claim, in the stated direction
+          (e.g. partial/indirect support is WEAK). Orthogonal to direction.
       evidence_source:
         range: EvidenceSource
         description: >-
@@ -144,21 +153,33 @@ classes:
 enums:
 
   Direction:
-    description: Polarity of an evidence line toward a claim.
+    description: >-
+      Polarity of an evidence line toward a claim — direction ONLY. Strength lives
+      on `strength_of_evidence_provided`; do not fold "partial" into direction, and
+      do not fold operational/QC signals (a source that turned out to carry no
+      relevant evidence, or an extracted claim found to be factually wrong) in here
+      — those are curation signals that lead to reviewing/dropping the claim, not
+      evidence that persists in released data.
     enum_uri: sepio:Direction
     permissible_values:
       SUPPORTS:
         description: The evidence supports the claim.
       REFUTES:
         description: The evidence disputes or contradicts the claim.
-      PARTIAL:
-        description: The evidence partially or indirectly supports the claim.
-      NO_EVIDENCE:
-        description: The reference contains no evidence relevant to the claim.
-      WRONG_STATEMENT:
-        description: The claim contains a demonstrable factual error.
-      UNCERTAIN:
-        description: Direction is uncertain or neutral.
+      NEUTRAL:
+        description: The evidence bears on the claim but is inconclusive either way.
+
+  Strength:
+    description: >-
+      How strongly a line supports/disputes the claim, in its stated direction.
+      A qualitative scale; item-level or numeric scores can refine it later.
+    permissible_values:
+      STRONG:
+        description: Strong, direct support/dispute.
+      MODERATE:
+        description: Moderate support/dispute.
+      WEAK:
+        description: Weak, partial, or indirect support/dispute.
 
   EvidenceSource:
     description: >-

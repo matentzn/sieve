@@ -39,6 +39,8 @@ class_derivations:
       direction_of_evidence_provided:
         # sieve records direction as a lower-case free string
         expr: "str(direction_of_evidence_provided).lower()"
+      strength_of_evidence_provided:
+        expr: "str(strength_of_evidence_provided).lower() if strength_of_evidence_provided else None"
       description:
         populated_from: description
       has_evidence_items:

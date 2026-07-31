@@ -54,8 +54,13 @@ def test_dismech_to_minimal_then_sieve(tmp_path):
     )
     # Two dismech evidence items -> two minimal evidence lines (one per item).
     assert len(claim["has_evidence_lines"]) == 2
+    # dismech's `supports` enum is split: SUPPORT and PARTIAL are both the SUPPORTS
+    # *direction*; PARTIAL additionally sets strength WEAK (it is a strength, not a
+    # direction).
     directions = {ln["direction_of_evidence_provided"] for ln in claim["has_evidence_lines"]}
-    assert directions == {"SUPPORTS", "PARTIAL"}
+    assert directions == {"SUPPORTS"}
+    strengths = {ln.get("strength_of_evidence_provided") for ln in claim["has_evidence_lines"]}
+    assert strengths == {None, "WEAK"}
     assert validate(claim, _schema("minimal.yaml"), "EvidencedClaim").results == []
 
     # Stage 2: minimal EvidencedClaim -> sieve EvidencePacket

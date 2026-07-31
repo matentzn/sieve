@@ -23,8 +23,16 @@ class_derivations:
   EvidenceLine:
     populated_from: EvidenceItem
     slot_derivations:
+      # dismech's `supports` enum conflates three SEPIO concerns, so it is split here:
+      #  - direction (SUPPORT/REFUTE) -> direction_of_evidence_provided
+      #  - strength  (PARTIAL = partial/indirect) -> strength_of_evidence_provided
+      #  - operational/QC (NO_EVIDENCE, WRONG_STATEMENT) -> NOT evidence; a real
+      #    pipeline drops the item / flags the claim. Mapped to NEUTRAL here only as a
+      #    safe fallback; neither appears in the Fanconi example.
       direction_of_evidence_provided:
-        populated_from: supports
+        expr: "'REFUTES' if supports == 'REFUTE' else ('NEUTRAL' if supports == 'NO_EVIDENCE' or supports == 'WRONG_STATEMENT' else 'SUPPORTS')"
+      strength_of_evidence_provided:
+        expr: "'WEAK' if supports == 'PARTIAL' else None"
       evidence_source:
         populated_from: evidence_source
       description:
@@ -35,14 +43,8 @@ class_derivations:
 
 enum_derivations:
 
-  Direction:
-    populated_from: EvidenceItemSupportEnum
-    permissible_value_derivations:
-      SUPPORTS: {populated_from: SUPPORT}
-      REFUTES: {populated_from: REFUTE}
-      PARTIAL: {populated_from: PARTIAL}
-      NO_EVIDENCE: {populated_from: NO_EVIDENCE}
-      WRONG_STATEMENT: {populated_from: WRONG_STATEMENT}
+  # Direction/strength are derived by expr above (one dismech `supports` value feeds
+  # two SEPIO slots), so no Direction enum_derivation is needed here.
 
   EvidenceSource:
     populated_from: EvidenceSourceEnum
