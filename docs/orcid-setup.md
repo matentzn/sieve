@@ -52,22 +52,11 @@ ORCID_CLIENT_SECRET=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ORCID_REDIRECT_URI=http://localhost:8501/
 ```
 
-## Step 5: Install python-dotenv (optional but recommended)
+## Step 5: (Optional) Load the `.env` automatically
 
-To automatically load the `.env` file, install python-dotenv:
+The app already loads `.env` on startup (`app.py` calls `load_dotenv(override=True)`), so a `.env` file in the project root is picked up with no extra setup.
 
-```bash
-uv add python-dotenv
-```
-
-Then add to the top of `src/sieve/app.py` (before other imports):
-
-```python
-from dotenv import load_dotenv
-load_dotenv()
-```
-
-Alternatively, you can export the variables in your shell:
+Alternatively, you can export the variables in your shell instead of using a `.env` file:
 
 ```bash
 export ORCID_SANDBOX=true

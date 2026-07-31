@@ -37,21 +37,23 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Primer: primer.md
-  - Minimal Evidence Model: monarch_evidence.md
-  - Getting Started:
-    - Architecture: architecture.md
+  - Minimal Evidence Model: monarch-evidence.md
+  - Model Reference:
     - Data Model: data-model.md
+    - Architecture: architecture.md
+    - Schema Reference: elements/index.md
   - User Guide:
     - CLI Reference: cli.md
     - Workflows: workflows.md
+    - ORCID Setup: orcid-setup.md
   - Developer Guide:
     - Python API: api.md
     - AI Integration: ai-integration.md
-  - Reference:
-    - Schema Documentation: elements/index.md
 
-exclude_docs: |
-  /templates-linkml/
+# The generated per-class/slot pages under elements/ are reachable from
+# elements/index.md but intentionally not listed individually in the nav.
+not_in_nav: |
+  /elements/*.md
 
 site_url: https://matentzn.github.io/sieve
 repo_url: https://github.com/matentzn/sieve
