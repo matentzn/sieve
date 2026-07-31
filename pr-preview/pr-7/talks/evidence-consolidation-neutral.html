@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Evidence Models Across Monarch Repositories</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    /* ===== cold minimal · light ===== */
+    --bg:#ffffff;
+    --bg2:#f6f7f9;
+    --panel:#ffffff;
+    --ink:#14181e;
+    --muted:#525c68;
+    --faint:#8b949e;
+    --line:rgba(18,24,32,.11);
+    --line2:rgba(18,24,32,.2);
+
+    --accent:#2f6fb0;      /* steel blue     */
+    --accent2:#6b7480;     /* cool gray      */
+    --accent3:#2f8a76;     /* muted teal     */
+    --accent4:#5a5fa6;     /* muted indigo   */
+    --grad:linear-gradient(115deg,var(--accent),var(--accent4));
+
+    --serif:"Spectral",Georgia,serif;
+    --sans:"IBM Plex Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+  #deck{position:relative;z-index:2;height:100vh;width:100vw}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:clamp(28px,5.5vw,104px);opacity:0;visibility:hidden;transform:translateY(18px);transition:opacity .45s ease,transform .5s cubic-bezier(.2,.7,.2,1);overflow:hidden}
+  .slide.active{opacity:1;visibility:visible;transform:none}
+  .slide.past{transform:translateY(-18px)}
+  .wrap{width:min(1160px,100%);margin:0 auto;max-height:100%}
+
+  .slide.active .stag{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+  .slide.active .stag:nth-child(1){animation-delay:.04s}
+  .slide.active .stag:nth-child(2){animation-delay:.09s}
+  .slide.active .stag:nth-child(3){animation-delay:.14s}
+  .slide.active .stag:nth-child(4){animation-delay:.19s}
+  .slide.active .stag:nth-child(5){animation-delay:.24s}
+  .slide.active .stag:nth-child(6){animation-delay:.29s}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.07;letter-spacing:-.01em;color:var(--ink)}
+  .kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem;font-weight:500}
+  h1.title{font-size:clamp(2.3rem,5.6vw,4.7rem);font-weight:700;line-height:1.02;letter-spacing:-.02em}
+  h2{font-size:clamp(1.5rem,3.5vw,2.7rem)}
+  h3{font-size:clamp(1.02rem,2vw,1.42rem)}
+  p{color:var(--muted);font-size:clamp(1rem,1.3vw,1.14rem);line-height:1.55;max-width:68ch}
+  p.lead{color:var(--ink);font-weight:300;font-size:clamp(1.08rem,1.6vw,1.36rem);max-width:64ch}
+  strong{color:var(--ink);font-weight:600}
+  em{font-style:italic;color:var(--accent)}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .eyebrow-row{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+  ul.clean{list-style:none;display:flex;flex-direction:column;gap:.65rem;margin-top:1.2rem}
+  ul.clean li{position:relative;padding-left:1.4rem;color:var(--muted);font-size:clamp(.96rem,1.28vw,1.1rem);line-height:1.45;max-width:74ch}
+  ul.clean li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:1px;background:var(--accent)}
+  ul.clean li strong{color:var(--ink)}
+
+  .cols{display:grid;gap:clamp(1rem,2.2vw,1.9rem)}
+  .c2{grid-template-columns:1fr 1fr}
+  .c3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:820px){.c2,.c3{grid-template-columns:1fr}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:clamp(1rem,1.8vw,1.45rem);position:relative;overflow:hidden}
+  .card .ico{font-family:var(--mono);font-size:.64rem;letter-spacing:.15em;color:var(--faint);text-transform:uppercase}
+  .card h3{margin:.35rem 0 .45rem;font-size:clamp(1rem,1.6vw,1.28rem)}
+  .card p{font-size:.93rem;max-width:none}
+
+  .badge{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--mono);font-size:.63rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.32em .7em;border-radius:5px;border:1px solid currentColor;line-height:1}
+  .badge::before{content:"";width:6px;height:6px;border-radius:1px;background:currentColor}
+  .b1{color:var(--accent)} .b2{color:var(--accent2)} .b3{color:var(--accent3)} .b4{color:var(--accent4)}
+
+  .code{font-family:var(--mono);background:var(--bg2);border:1px solid var(--line);border-radius:10px;font-size:clamp(.72rem,1vw,.86rem);line-height:1.6;overflow:hidden;color:#232a33}
+  .code .bar{display:flex;align-items:center;gap:.5rem;padding:.48rem .9rem;border-bottom:1px solid var(--line);background:rgba(18,24,32,.03)}
+  .code .bar .dot{width:8px;height:8px;border-radius:50%}
+  .code .bar .fname{font-size:.67rem;color:var(--muted);margin-left:.4rem;letter-spacing:.03em}
+  .code pre{padding:.85rem 1.1rem;overflow:auto;max-height:58vh}
+  .code pre::-webkit-scrollbar{height:8px;width:8px}
+  .code pre::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px}
+  .k{color:var(--accent)} .s{color:#2f7d4f} .n{color:#9a6b1f} .cm{color:var(--faint)}
+  .hl{background:rgba(211,161,94,.22);border-radius:3px;padding:0 .25em;margin:0 -.25em}
+  .hlg{background:rgba(47,138,118,.16);border-radius:3px;padding:0 .25em;margin:0 -.25em}
+
+  .stat{font-family:var(--serif);font-weight:700;font-size:clamp(2rem,4.8vw,3.5rem);line-height:1;letter-spacing:-.03em;color:var(--ink)}
+
+  table{width:100%;border-collapse:collapse;font-size:clamp(.78rem,1.05vw,.94rem)}
+  th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td{color:var(--muted)} td strong{color:var(--ink)}
+  td .mono,.mono{font-family:var(--mono);color:var(--accent);font-size:.92em}
+
+  .flow{display:flex;align-items:stretch;gap:.5rem;flex-wrap:wrap}
+  .flow .node{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:.8rem;text-align:center}
+  .flow .node .t{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .flow .node .m{font-weight:600;color:var(--ink);margin-top:.28rem;font-size:.95rem}
+  .flow .node.hl{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+  .flow .arrow{align-self:center;color:var(--faint);font-family:var(--mono)}
+
+  .pill{display:inline-block;font-family:var(--mono);font-size:.72rem;letter-spacing:.05em;color:var(--accent);border:1px solid var(--line2);border-radius:5px;padding:.3em .75em;margin:.2rem .3rem .2rem 0}
+  .two-pane{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1rem,2.4vw,2rem);align-items:start}
+  @media(max-width:880px){.two-pane{grid-template-columns:1fr}}
+  .footnote{font-family:var(--mono);font-size:.69rem;color:var(--faint);margin-top:1.1rem;letter-spacing:.02em;line-height:1.5}
+  .divider{justify-content:center;align-items:flex-start}
+
+  #progress{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:50;transition:width .45s cubic-bezier(.2,.7,.2,1)}
+  .chrome{position:fixed;z-index:40;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;color:var(--faint)}
+  #brand{top:26px;left:30px;display:flex;align-items:center;gap:.6rem}
+  #brand .dotm{width:8px;height:8px;border-radius:1px;background:var(--accent)}
+  #brand b{color:var(--ink);font-weight:600;letter-spacing:.15em}
+  #counter{bottom:24px;right:30px;color:var(--muted)}
+  #counter b{color:var(--ink)}
+  #hint{bottom:24px;left:30px}
+  #hint kbd{font-family:var(--mono);background:var(--bg2);border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:.12em .45em;color:var(--ink);font-size:.68rem}
+  .nav-zone{position:fixed;top:0;bottom:0;width:16%;z-index:30;cursor:pointer}
+  #navPrev{left:0} #navNext{right:0}
+  @media(max-width:820px){#hint{display:none}}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<div class="chrome" id="brand"><span class="dotm"></span><b>EVIDENCE MODELS</b><span>· Monarch</span></div>
+<div class="chrome" id="counter"><b id="cur">01</b> / <span id="tot">00</span></div>
+<div class="chrome" id="hint"><kbd>←</kbd> <kbd>→</kbd> navigate · <kbd>F</kbd> fullscreen</div>
+<div class="nav-zone" id="navPrev"></div>
+<div class="nav-zone" id="navNext"></div>
+
+<main id="deck">
+<!-- ===================== SLIDES START ===================== -->
+
+  <!-- 1 · Title -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">2026-07-16</div>
+      <h1 class="title stag">Evidence models across <span class="grad">Monarch repositories</span></h1>
+      <p class="lead stag" style="margin-top:1.5rem">Current representation of evidence, two consolidation options, migration examples.</p>
+    </div>
+  </section>
+
+  <!-- 2 · Context -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Context</div>
+      <h2 class="stag">A growing share of assertions is machine-generated</h2>
+      <ul class="clean stag">
+        <li>Assertions increasingly enter the knowledge bases via <strong>extraction, synthesis, and drafting</strong>, not manual authoring.</li>
+        <li>AI-assisted pipelines already in the ecosystem: <strong>DisMech</strong>, deep-research artifact ingestion.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3 · divider: current state -->
+  <section class="slide divider">
+    <div class="wrap">
+      <div class="kicker stag">Part I</div>
+      <h1 class="title stag">Current state</h1>
+    </div>
+  </section>
+
+  <!-- 4 · two functions -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Two functions of "evidence"</div>
+      <h2 class="stag">Two records, one name</h2>
+      <div class="two-pane stag" style="margin-top:1.5rem">
+        <div class="card">
+          <span class="badge b1">Scientific evidence</span>
+          <h3 style="margin-top:.65rem">Does a source support or refute the claim?</h3>
+          <p style="margin-top:.45rem"><span class="mono">reference</span>, <span class="mono">snippet</span>, <span class="mono">direction</span>, <span class="mono">ECO code</span></p>
+        </div>
+        <div class="card">
+          <span class="badge b2">Provenance / attribution</span>
+          <h3 style="margin-top:.65rem">What produced the statement, from where?</h3>
+          <p style="margin-top:.45rem"><span class="mono">agent / method</span>, <span class="mono">source</span>, <span class="mono">knowledge level</span></p>
+        </div>
+      </div>
+      <ul class="clean stag">
+        <li>Manual curation: provenance is <strong>implicit</strong> — the curator's identity.</li>
+        <li>Machine-generated statements carry <strong>no implicit attribution</strong>; the fields above are the explicit record.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5 · models overview -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Models in use</div>
+      <h2 class="stag">Three distinct models, none interoperable</h2>
+      <table class="stag" style="margin-top:1.4rem">
+        <thead><tr><th>Repository</th><th>Evidence representation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DisMech</strong></td><td>flat <span class="mono">EvidenceItem</span> class</td></tr>
+          <tr><td><strong>SEPIO/Sieve</strong> <span class="mono">(under construction)</span></td><td>polymorphic <span class="mono">Evidence</span> hierarchy</td></tr>
+          <tr><td><strong>koza ingests</strong> <span class="mono">(e.g. alliance-genotype-ingest)</span></td><td>Biolink association evidence + provenance slots</td></tr>
+        </tbody>
+      </table>
+      <div class="footnote stag">Three confirmed. Others likely exist; no exhaustive count made.</div>
+    </div>
+  </section>
+
+  <!-- 6 · Model 1 DisMech -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow-row stag"><span class="badge b1">Model 1</span><div class="kicker" style="margin:0">DisMech · <span class="mono">EvidenceItem</span></div></div>
+      <div class="code stag" style="margin-top:1.1rem">
+        <div class="bar"><span class="dot" style="background:#cf6b63"></span><span class="dot" style="background:#c9a24e"></span><span class="dot" style="background:#4f9a6d"></span><span class="fname">dismech · src/dismech/schema/dismech.yaml</span></div>
+<pre><span class="k">EvidenceItem</span>:
+  slots: [reference, reference_title, supports,
+          evidence_source, snippet, explanation, images]
+
+<span class="k">EvidenceItemSupportEnum</span>: [SUPPORT, REFUTE, PARTIAL,
+                          NO_EVIDENCE, WRONG_STATEMENT]
+<span class="k">EvidenceSourceEnum</span>:      [HUMAN_CLINICAL, MODEL_ORGANISM,
+                          IN_VITRO, COMPUTATIONAL, OTHER]</pre>
+      </div>
+      <ul class="clean stag">
+        <li><span class="mono">reference</span> → <span class="mono">implements: linkml:authoritative_reference</span>; <span class="mono">snippet</span> → <span class="mono">linkml:excerpt</span>.</li>
+        <li><span class="mono">evidence</span> is <span class="mono">multivalued</span>, <span class="mono">inlined_as_list</span>, reused on ~8 classes; validated with <span class="mono">linkml.validator.Validator</span>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 7 · Model 2 Sieve -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow-row stag"><span class="badge b3">Model 2</span><div class="kicker" style="margin:0">SEPIO/Sieve (under construction) · <span class="mono">Evidence</span> hierarchy</div></div>
+      <div class="code stag" style="margin-top:1.1rem">
+        <div class="bar"><span class="dot" style="background:#cf6b63"></span><span class="dot" style="background:#c9a24e"></span><span class="dot" style="background:#4f9a6d"></span><span class="fname">sieve · schema/curation_model.yaml</span></div>
+<pre><span class="k">Evidence</span> (abstract):
+  slots: [evidence_type, direction, evidence_strength,
+          rating, eco_code, eco_label, description]
+
+<span class="cm"># subclasses — discriminated by evidence_type:</span>
+ConcordanceEvidence · LiteratureEvidence
+ExpertReviewEvidence · ComputationalEvidence
+
+<span class="k">EvidenceDirection</span>: [SUPPORTS, CONTRADICTS, UNCERTAIN]
+<span class="k">EvidenceType</span>:      [CONCORDANCE, LITERATURE,
+                    EXPERT_REVIEW, COMPUTATIONAL, OTHER]</pre>
+      </div>
+      <ul class="clean stag">
+        <li>Adds <span class="mono">evidence_strength</span> (float 0–1) and a separate <span class="mono">EvidenceSynthesis</span> class (summary + confidence).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 8 · Model 3 koza -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow-row stag"><span class="badge b2">Model 3</span><div class="kicker" style="margin:0">Biolink association · koza ingests</div></div>
+      <p class="stag" style="margin-top:.8rem">Every association carries a standardized evidence + provenance block:</p>
+      <div class="code stag" style="margin-top:.8rem">
+        <div class="bar"><span class="dot" style="background:#cf6b63"></span><span class="dot" style="background:#c9a24e"></span><span class="dot" style="background:#4f9a6d"></span><span class="fname">monarchinitiative.org · association details — Col1a1 mouse model → Ehlers-Danlos ("model of")</span></div>
+<pre><span class="k">has_evidence</span>:                [<span class="s">ECO:0000033</span>]
+<span class="k">publications</span>:                [<span class="s">PMID:24443344</span>]
+<span class="k">primary_knowledge_source</span>:    <span class="s">infores:mgi</span>
+<span class="k">aggregator_knowledge_source</span>: [<span class="s">alliance_disease</span>, <span class="s">monarchinitiative</span>]
+<span class="k">agent_type</span>:                  <span class="s">manual_agent</span>
+<span class="k">knowledge_level</span>:             <span class="s">knowledge_assertion</span></pre>
+      </div>
+      <ul class="clean stag">
+        <li>Spans <strong>both functions</strong>: scientific (<span class="mono">has_evidence</span> ECO, <span class="mono">publications</span>) + provenance (source, <span class="mono">agent_type</span>, <span class="mono">knowledge_level</span>).</li>
+        <li>Populated subset <strong>varies by ingest</strong>: <span class="mono">allele.py</span> (variant→gene) sets source/agent/level only; the disease ingest adds ECO + publications.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9 · divider: consolidation -->
+  <section class="slide divider">
+    <div class="wrap">
+      <div class="kicker stag">Part II</div>
+      <h1 class="title stag">Consolidation options</h1>
+    </div>
+  </section>
+
+  <!-- 10 · the choice: one goal, three ways -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">The choice</div>
+      <h2 class="stag">One goal, three ways</h2>
+      <p class="lead stag" style="margin-top:.75rem">Goal: stop each repository inventing its own evidence model.</p>
+      <div class="cols c3 stag" style="margin-top:1.35rem">
+        <div class="card"><span class="badge b4">A</span><h3 style="margin-top:.55rem">One rich standard</h3><p style="margin-top:.4rem">Everyone conforms to a single expressive model (SEPIO). Most powerful, most work.</p></div>
+        <div class="card"><span class="badge b1">B</span><h3 style="margin-top:.55rem">One small class</h3><p style="margin-top:.4rem">Everyone imports the same tiny evidence class. Covers the common case, easy to adopt.</p></div>
+        <div class="card"><span class="badge b2">C</span><h3 style="margin-top:.55rem">Own model, then map</h3><p style="margin-top:.4rem">No shared model. Each system is mapped to a reference and scored for completeness. Least coordination, most ongoing mapping.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · SEPIO facts -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow-row stag"><span class="badge b4">Option A</span><div class="kicker" style="margin:0">SEPIO</div></div>
+      <h3 class="stag" style="margin-top:.65rem">Scientific Evidence and Provenance Information Ontology</h3>
+      <div class="flow stag" style="margin-top:1.15rem">
+        <div class="node"><div class="t">commits to</div><div class="m">Assertion</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="t">supported by</div><div class="m">Evidence line</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="t">composed of</div><div class="m">Evidence item</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="t">references</div><div class="m">Source</div></div>
+      </div>
+      <ul class="clean stag">
+        <li>First-class <strong>agents, activities, methods, dates</strong>; evidence about evidence; disputing evidence.</li>
+        <li>In use by <strong>GO-CAM</strong> and <strong>ClinGen</strong> (variant pathogenicity).</li>
+        <li>Structure is a <strong>graph</strong>, not a flat record.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 12 · Option B facts -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow-row stag"><span class="badge b1">Option B</span><div class="kicker" style="margin:0">Shared microschema</div></div>
+      <ul class="clean stag" style="margin-top:.75rem">
+        <li>A single LinkML module (<span class="mono">evidence.yaml</span>) published at a stable URI, imported by other schemas.</li>
+        <li>Consumers <span class="mono">imports:</span> it and point their <span class="mono">evidence</span> slot at the shared class.</li>
+        <li>No provenance graph; no evidence-for-evidence.</li>
+      </ul>
+      <div class="two-pane stag" style="margin-top:1.25rem">
+        <div class="card"><div class="ico">field group · scientific</div><p style="margin-top:.5rem"><span class="pill">reference</span><span class="pill">snippet</span><span class="pill">direction</span><span class="pill">strength</span><span class="pill">eco_code</span></p></div>
+        <div class="card"><div class="ico">field group · provenance</div><p style="margin-top:.5rem"><span class="pill">agent_type</span><span class="pill">knowledge_level</span><span class="pill">knowledge_source</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 · Option C facts -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow-row stag"><span class="badge b2">Option C</span><div class="kicker" style="margin:0">Own model, then map &amp; score</div></div>
+      <h3 class="stag" style="margin-top:.55rem">No shared model — a reference standard + <span class="mono">linkml-map</span></h3>
+      <div class="flow stag" style="margin-top:1.05rem">
+        <div class="node"><div class="t">each system</div><div class="m">own evidence model</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="t">linkml-map</div><div class="m">transform</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="t">reference</div><div class="m">evidence standard</div></div>
+        <div class="arrow">→</div>
+        <div class="node hl"><div class="t">output</div><div class="m">completeness score + gaps</div></div>
+      </div>
+      <ul class="clean stag">
+        <li>Each repository keeps its own evidence model; a reference standard defines the target.</li>
+        <li><span class="mono">linkml-map</span> transforms declare how each model maps to the standard.</li>
+        <li>Unmapped slots = a per-system completeness score and a list of what to add or change.</li>
+        <li>No convergence guarantee; a map is maintained per system and re-checked as each schema drifts.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 14 · comparison (after all three explained) -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Side by side</div>
+      <table class="stag" style="margin-top:.65rem">
+        <thead><tr><th></th><th>A · rich standard</th><th>B · small shared class</th><th>C · own + map</th></tr></thead>
+        <tbody>
+          <tr><td><strong>What is shared</strong></td><td>one expressive model (SEPIO)</td><td>one small imported class</td><td>nothing — a reference yardstick</td></tr>
+          <tr><td><strong>Adopt effort</strong></td><td>high</td><td>low</td><td>low per system</td></tr>
+          <tr><td><strong>Interoperability</strong></td><td>by construction</td><td>by construction</td><td>via post-hoc mapping</td></tr>
+          <tr><td><strong>Ongoing cost</strong></td><td>conform to a large model</td><td>trivial</td><td>maintain a map per system</td></tr>
+          <tr><td><strong>Adopters</strong></td><td>GO-CAM, ClinGen</td><td>DisMech PoC</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 15 · divider: migration -->
+  <section class="slide divider">
+    <div class="wrap">
+      <div class="kicker stag">Part III</div>
+      <h1 class="title stag">Migration</h1>
+    </div>
+  </section>
+
+  <!-- 14 · migration mechanism -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Migration · 1 / 3 — mechanism</div>
+      <h2 class="stag">One module, imported by reference</h2>
+      <div class="flow stag" style="margin-top:1.25rem">
+        <div class="node"><div class="t">author</div><div class="m">evidence.yaml</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="t">publish</div><div class="m">w3id.org/…/evidence</div></div>
+        <div class="arrow">→</div>
+        <div class="node hl"><div class="t">consume</div><div class="m">imports: [evidence]</div></div>
+      </div>
+      <ul class="clean stag">
+        <li>Each consuming schema adds <span class="mono">imports: [evidence]</span> and references the shared class.</li>
+        <li>LinkML supports <strong>import by URL</strong>.</li>
+        <li>Precedent: <span class="mono">linkml-microschemas-envar</span> imports a shared profile from a raw GitHub URL.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 15 · migration DisMech -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Migration · 2 / 3 — DisMech</div>
+      <div class="two-pane stag" style="margin-top:.4rem">
+        <div class="code">
+          <div class="bar"><span class="dot" style="background:#cf6b63"></span><span class="fname">before — DisMech defines its own</span></div>
+<pre><span class="k">EvidenceItem</span>:
+  slots: [reference, ...,
+          supports, evidence_source]
+<span class="k">EvidenceItemSupportEnum</span>:
+  [SUPPORT, REFUTE, PARTIAL, ...]</pre>
+        </div>
+        <div class="code">
+          <div class="bar"><span class="dot" style="background:#4f9a6d"></span><span class="fname">after — DisMech imports the shared model</span></div>
+<pre><span class="k">imports</span>: [linkml:types, <span class="hlg">evidence</span>]
+<span class="k">slots</span>:
+  evidence:
+    range: <span class="hlg">EvidenceItem</span>
+    multivalued: true
+    inlined_as_list: true</pre>
+        </div>
+      </div>
+      <ul class="clean stag">
+        <li>Data change: <span class="mono">supports → direction</span>; <span class="mono">SUPPORT → SUPPORTS</span>, <span class="mono">REFUTE → REFUTES</span>. The 8 consuming classes are unchanged.</li>
+        <li>PoC acceptance: import resolves; <span class="mono">gen-python</span> runs; one real record converts + validates; old enum value fails.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 16 · migration koza -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Migration · 3 / 3 — koza / alliance-genotype-ingest</div>
+      <div class="two-pane stag" style="margin-top:.4rem">
+        <div class="code">
+          <div class="bar"><span class="dot" style="background:#cf6b63"></span><span class="fname">today — per-ingest, spelled in Biolink</span></div>
+<pre><span class="k">has_evidence</span>, <span class="k">publications</span>,
+<span class="k">primary_knowledge_source</span>,
+<span class="k">aggregator_knowledge_source</span>,
+<span class="k">knowledge_level</span>, <span class="k">agent_type</span></pre>
+        </div>
+        <div class="card">
+          <div class="ico">consolidated</div>
+          <ul class="clean" style="margin-top:.5rem">
+            <li>These Biolink slots map onto the shared <span class="mono">evidence.yaml</span> vocabulary, defined once.</li>
+            <li>Ingests keep emitting Biolink edges; the evidence semantics are shared, not re-specified per ingest.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footnote stag"><span class="mono">agent_type</span> range already includes <span class="mono">automated_agent</span>, <span class="mono">text_mining_agent</span>, <span class="mono">computational_model</span>.</div>
+    </div>
+  </section>
+
+  <!-- 17 · open question evidence_level -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Open question · dismech #5000</div>
+      <h2 class="stag">Level of evidence (study strength)</h2>
+      <ul class="clean stag" style="margin-top:.9rem">
+        <li>Optional <span class="mono">evidence_level</span> slot — GRADE (<span class="mono">HIGH/MODERATE/LOW/VERY_LOW</span>) or Oxford CEBM levels.</li>
+        <li><strong>Orthogonal</strong> to <span class="mono">evidence_source</span>: an RCT and a case series are both <span class="mono">HUMAN_CLINICAL</span>.</li>
+        <li>Distinct from SEPIO/Sieve's <span class="mono">evidence_strength</span> (continuous float, not bound to a scheme).</li>
+        <li>Source quality and per-claim interpretation are <strong>separable axes</strong> (celiac ZED1227 example).</li>
+      </ul>
+      <div class="cols c3 stag" style="margin-top:1.25rem">
+        <div class="card"><div class="stat">0.47%</div><p style="margin-top:.35rem">pathophysiology evidence items citing a MEDLINE-tagged RCT</p></div>
+        <div class="card"><div class="stat">2.26%</div><p style="margin-top:.35rem">SR + RCT + guideline combined, pathophysiology</p></div>
+        <div class="card"><div class="stat">66.7%</div><p style="margin-top:.35rem"><span class="mono">clinical_trials</span> section that is SR/RCT/guideline-tier</p></div>
+      </div>
+      <div class="footnote stag">GRADE inter-annotator agreement, trained methodologists: κ ≈ 0.44 (Hartling 2012). Framework not decided. Pilot: dismech #5000 / PR #5090.</div>
+    </div>
+  </section>
+
+  <!-- 18 · the twist: A and B interoperate -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">The twist</div>
+      <h2 class="stag">A and B need not compete</h2>
+      <p class="lead stag" style="margin-top:.7rem">Implement both, and maintain a <span class="mono">linkml-map</span> between them.</p>
+      <div class="flow stag" style="margin-top:1.1rem">
+        <div class="node"><div class="t">B</div><div class="m">EvidenceItem</div></div>
+        <div class="arrow">↔</div>
+        <div class="node hl"><div class="t">linkml-map</div><div class="m">transform</div></div>
+        <div class="arrow">↔</div>
+        <div class="node"><div class="t">A</div><div class="m">one SEPIO evidence line</div></div>
+      </div>
+      <div class="two-pane stag" style="margin-top:1.15rem">
+        <div class="card"><div class="ico">maps cleanly</div><ul class="clean" style="margin-top:.4rem">
+          <li>one <span class="mono">EvidenceItem</span> ≙ a single evidence line</li>
+          <li>N items ≙ N independent <em>n-of-1</em> evidence lines</li>
+        </ul></div>
+        <div class="card"><div class="ico">out of scope · rest of SEPIO</div><ul class="clean" style="margin-top:.4rem">
+          <li>evidence supporting other evidence</li>
+          <li>nested / linked argumentation</li>
+          <li>methods &amp; agents shared across lines</li>
+        </ul></div>
+      </div>
+      <div class="footnote stag">The map reaches only a small slice of a full SEPIO graph — which makes "strict subset of SEPIO" concrete and testable, not just a claim.</div>
+    </div>
+  </section>
+
+  <!-- 19 · summary -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Summary</div>
+      <ul class="clean stag" style="margin-top:.4rem">
+        <li>Three confirmed, non-interoperable evidence models: DisMech, SEPIO/Sieve, koza ingests.</li>
+        <li>Two directions: <strong>SEPIO-aligned</strong> (graph) and <strong>shared flat microschema</strong> (import).</li>
+        <li>A and B interoperate via a <span class="mono">linkml-map</span>: the microschema is a <strong>strict subset of SEPIO</strong> — one evidence line, or N independent <em>n-of-1</em> lines.</li>
+        <li>Migration mechanism (LinkML import by URL) is <strong>proven</strong>; a DisMech PoC scopes the change.</li>
+        <li><span class="mono">evidence_level</span> is an <strong>open, orthogonal</strong> question (dismech #5000).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 19 · appendix -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Appendix</div>
+      <div class="cols c2 stag" style="margin-top:.9rem">
+        <div class="card">
+          <div class="ico">field mapping — flat model → SEPIO</div>
+          <ul class="clean" style="margin-top:.5rem">
+            <li><span class="mono">reference</span> → evidence item source</li>
+            <li><span class="mono">agent_type</span> → SEPIO agent</li>
+            <li><span class="mono">knowledge_level / evidence_level</span> → assertion method / criterion</li>
+            <li><span class="mono">direction</span> → evidence-line polarity</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="ico">Biolink association provenance slots</div>
+          <p style="margin-top:.5rem"><span class="pill">primary_knowledge_source</span><span class="pill">aggregator_knowledge_source</span><span class="pill">knowledge_level</span><span class="pill">agent_type</span><span class="pill">publications</span><span class="pill">has_evidence</span></p>
+        </div>
+      </div>
+      <div class="footnote stag">Sources — dismech <span class="mono">src/dismech/schema/dismech.yaml</span> · sieve <span class="mono">schema/curation_model.yaml</span> · alliance-genotype <span class="mono">src/alliance_genotype/allele.py</span> · envar <span class="mono">src/linkml_microschemas_envar/schema/</span></div>
+    </div>
+  </section>
+
+<!-- ====================== SLIDES END ====================== -->
+</main>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let i = 0;
+  const progress = document.getElementById('progress');
+  const cur = document.getElementById('cur');
+  document.getElementById('tot').textContent = String(total).padStart(2,'0');
+
+  function render(){
+    slides.forEach((s,n)=>{ s.classList.toggle('active', n===i); s.classList.toggle('past', n<i); });
+    progress.style.width = (i/(total-1)*100)+'%';
+    cur.textContent = String(i+1).padStart(2,'0');
+    location.hash = i+1;
+  }
+  function go(n){ i = Math.max(0, Math.min(total-1, n)); render(); }
+  function next(){ go(i+1); } function prev(){ go(i-1); }
+
+  document.addEventListener('keydown', e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+    else if(e.key==='Home'){ go(0); } else if(e.key==='End'){ go(total-1); }
+    else if(e.key==='f'||e.key==='F'){ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  });
+  document.getElementById('navNext').addEventListener('click', next);
+  document.getElementById('navPrev').addEventListener('click', prev);
+  let tx=0;
+  document.addEventListener('touchstart',e=>tx=e.changedTouches[0].clientX,{passive:true});
+  document.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>55){ dx<0?next():prev(); } },{passive:true});
+  const start = parseInt(location.hash.replace('#',''));
+  if(start>=1 && start<=total) i=start-1;
+  render();
+</script>
+</body>
+</html>

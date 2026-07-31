@@ -1,0 +1,1124 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Scientific Evidence Evaluation & Verification Environment">
+      
+      
+      
+        <link rel="canonical" href="https://matentzn.github.io/sieve/talks/evidence-consolidation/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>One Evidence Model to Rule Them All - SIEVE</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/ansi-colours.css">
+    
+      <link rel="stylesheet" href="../../css/jupyter-cells.css">
+    
+      <link rel="stylesheet" href="../../css/pandas-dataframe.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#one-evidence-model-to-rule-them-all" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SIEVE" class="md-header__button md-logo" aria-label="SIEVE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SIEVE
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              One Evidence Model to Rule Them All
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/matentzn/sieve" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    matentzn/sieve
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SIEVE" class="md-nav__button md-logo" aria-label="SIEVE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SIEVE
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/matentzn/sieve" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    matentzn/sieve
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../primer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../monarch_evidence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Minimal Evidence Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ai-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../elements/index.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schema Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="one-evidence-model-to-rule-them-all">One Evidence Model to Rule Them All<a class="headerlink" href="#one-evidence-model-to-rule-them-all" title="Permanent link">&para;</a></h1>
+<p><em>A proposal to the Monarch tech team — speaker script + slides</em>
+<em>Nico Matentzoglu · 2026-07-12</em></p>
+<blockquote>
+<p>How to use this file: each block is one slide. <strong>On screen</strong> is what the audience
+sees (keep it sparse). <strong>Say</strong> is the script — roughly what I'll actually say, in my
+voice. Timings assume ~18–20 minutes plus discussion. Cut slides 7–8 to the appendix
+if we're short.</p>
+</blockquote>
+<hr />
+<h2 id="slide-1-title">Slide 1 — Title<a class="headerlink" href="#slide-1-title" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- <strong>One Evidence Model to Rule Them All</strong>
+- Consolidating how Monarch records <em>why we believe things</em>
+- Nico Matentzoglu</p>
+<p><strong>Say:</strong>
+"I want to make one argument today, and get one decision out of you. The argument is
+that the way we've been recording evidence — fifteen different ways, mostly by accident —
+is about to become the thing that breaks us, because of AI. The decision I want is: do
+we agree to consolidate on a single, shared evidence model that every repo imports. That's
+it. Everything in between is me trying to convince you."</p>
+<hr />
+<h2 id="slide-2-the-shift-is-already-here">Slide 2 — The shift is already here<a class="headerlink" href="#slide-2-the-shift-is-already-here" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- We are becoming an AI-driven knowledge base.
+- Not "will be." <em>Are.</em>
+- Extraction, synthesis, triage, drafting — increasingly machine-first, human-second.</p>
+<p><strong>Say:</strong>
+"Let's be honest about where we are. A growing share of the statements entering our
+graphs were not written by a curator. They were extracted, summarised, or drafted by a
+model, and a human — maybe — glanced at them afterward. DisMech is already this. The
+deep-research pipelines are this. This is not a slide about the future. It's a slide about
+the pull request you merged last week. The question is not whether we go AI-driven. It's
+whether our infrastructure is honest about the fact that we already have."</p>
+<p><em>(Purpose 1: everyone leaves knowing we're AI-driven.)</em></p>
+<hr />
+<h2 id="slide-3-the-thing-ai-quietly-broke-trust">Slide 3 — The thing AI quietly broke: trust<a class="headerlink" href="#slide-3-the-thing-ai-quietly-broke-trust" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- Human era: <strong>the curator <em>was</em> the evidence.</strong>
+- You trusted the person. Their name was the warrant.
+- Machine era: "trust me" is gone. The warrant has to travel <em>with the statement</em>.</p>
+<p><strong>Say:</strong>
+"Here's the part I really want to land. For twenty years, our evidence model was a
+person. When Sabrina asserted a disease–gene link, the evidence was <em>Sabrina</em> — her
+name, her expertise, her reputation. We didn't write down why, because the who was
+enough. That's not sloppiness; it's how human curation worked, and it worked.</p>
+<p>A model has no reputation you can lean on. When a machine emits a statement, 'trust me'
+is worth nothing — it can be confidently, fluently wrong, and it will be. So the warrant
+can no longer live in a person's head. It has to be attached to the statement itself,
+mechanically, every time. The uncomfortable consequence: <strong>evidence stops being a nice-to-have
+on important claims and becomes mandatory infrastructure on all of them.</strong>"</p>
+<p><em>(Purpose 2: evidence is now urgent, not optional; trust doesn't scale.)</em></p>
+<hr />
+<h2 id="slide-4-evidence-is-now-two-different-things">Slide 4 — "Evidence" is now two different things<a class="headerlink" href="#slide-4-evidence-is-now-two-different-things" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- Contrary to the human-curation days, <strong>essentially every slot now needs evidence.</strong>
+- Sometimes that's <strong>scientific evidence</strong> — a paper, a snippet, a direction of support.
+- Sometimes it's a <strong>thin provenance layer</strong> — <em>which model extracted this statement, from where, how sure.</em>
+- Both are evidence. Both need a home in the schema.</p>
+<p><strong>Say:</strong>
+"And 'evidence' now means two quite different things, which is exactly why our schemas
+are a mess. Sometimes a claim is a scientific assertion — 'this drug treats this disease'
+— and the evidence is a publication, a verbatim snippet, whether it supports or refutes.
+That's the classic case.</p>
+<p>But most slots aren't like that. Most slots are just… a value a model produced. 'This
+label came from GPT-x reading Orphanet.' There's no paper. The evidence <em>is</em> the
+provenance: which agent, which source, what confidence, was a human in the loop. It's thin,
+but it is not optional — it's the difference between a statement we can stand behind and a
+hallucination we can't distinguish from one. A real evidence model has to hold <em>both</em>
+shapes, because in an AI pipeline every single field wants one or the other."</p>
+<hr />
+<h2 id="slide-5-we-have-quietly-built-this-fifteen-times">Slide 5 — We have quietly built this fifteen times<a class="headerlink" href="#slide-5-we-have-quietly-built-this-fifteen-times" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Repo</th>
+<th>"Evidence" looks like</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DisMech</strong></td>
+<td><code>EvidenceItem{reference, supports, snippet, explanation, evidence_source, images}</code></td>
+</tr>
+<tr>
+<td><strong>Sieve</strong></td>
+<td>abstract <code>Evidence</code> → <code>Concordance / Literature / ExpertReview / Computational</code>, <code>direction</code>, <code>evidence_strength</code>, <code>eco_code</code></td>
+</tr>
+<tr>
+<td><strong>koza ingests</strong> (e.g. alliance-genotype)</td>
+<td>edge slots: <code>primary_knowledge_source</code>, <code>aggregator_knowledge_source</code>, <code>knowledge_level</code>, <code>agent_type</code></td>
+</tr>
+<tr>
+<td><strong>…and ~a dozen more</strong></td>
+<td>phenopacket refs, Mondo provenance, per-ingest one-offs</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Say:</strong>
+"Now the embarrassing slide. Every one of us solved this independently. DisMech has a flat
+<code>EvidenceItem</code>. Sieve has a whole polymorphic hierarchy with support strength and ECO
+codes. Every koza-based ingest — alliance-genotype is my example — stamps a different set
+of fields on every edge: knowledge source, knowledge level, agent type. Same idea,
+three incompatible spellings, and that's just the three I looked at this morning. Across
+Monarch it's easily a dozen-plus. None of them talk to each other. If you wanted to ask
+'show me everything a text-mining agent asserted with no human review,' you couldn't —
+because that question has a different shape in every repo. We didn't decide to build
+fifteen evidence models. We just never decided <em>not</em> to."</p>
+<p><em>(Purpose 3: we've built ~15 redundant models.)</em></p>
+<hr />
+<h2 id="slide-6-two-honest-options">Slide 6 — Two honest options<a class="headerlink" href="#slide-6-two-honest-options" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- <strong>Option A — Full, SEPIO-aligned evidence model.</strong> Model the epistemics properly.
+- <strong>Option B — A small, shared "evidence" class everyone imports.</strong> The 90% case, shippable.
+- Same question underneath: <em>stop building it fifteen times.</em></p>
+<p><strong>Say:</strong>
+"So there are two honest ways to fix this, and I want to give both a fair hearing before I
+tell you which one I'd pick."</p>
+<hr />
+<h2 id="slide-7-option-a-the-full-sepio-aligned-model">Slide 7 — Option A: the full SEPIO-aligned model<a class="headerlink" href="#slide-7-option-a-the-full-sepio-aligned-model" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- <strong>SEPIO</strong> — Scientific Evidence &amp; Provenance Information Ontology (GO-CAM, ClinGen use it).
+- Assertion ← evidence line ← evidence item ← source.
+- First-class <strong>agents, activities, methods, dates</strong>; evidence <em>for</em> evidence; disputes.
+- It is a <em>provenance graph</em>, not a flat record.
+- ✅ Correct, expressive, exactly built for machine-generated chains of reasoning.
+- ⚠️ Heavy. Steep to author, steep to adopt, easy to do badly.</p>
+<p><strong>Say:</strong>
+"Option A is to do it properly, with SEPIO. SEPIO already models everything I've been
+describing: an assertion is backed by evidence lines, evidence lines are made of evidence
+items, items point at sources — and crucially every node carries who made it, by what
+method, when. It even lets evidence support other evidence, which is <em>exactly</em> what a chain
+of automated agents is. GO and ClinGen run on this. It is not academic; it is the gold
+standard.</p>
+<p>The catch is that it's a graph, not a field. It asks every contributor to think like an
+epistemologist. If we mandated full SEPIO across fifteen repos tomorrow, we'd get fifteen
+subtly-wrong SEPIO implementations and a revolt. It's the right model and the wrong ask —
+today."</p>
+<hr />
+<h2 id="slide-8-option-b-a-small-shared-evidence-class">Slide 8 — Option B: a small shared evidence class<a class="headerlink" href="#slide-8-option-b-a-small-shared-evidence-class" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- One <code>evidence</code> microschema. One <code>EvidenceItem</code> class. Imported, not re-typed.
+- Flat: <code>reference</code>, <code>snippet</code>, <code>direction</code>, <code>strength</code>, <code>evidence_source</code>, <code>eco_code</code> …
+- …plus a <strong>provenance profile</strong>: <code>agent_type</code>, <code>knowledge_level</code>, <code>knowledge_source</code>.
+- Covers the scientific case <em>and</em> the "which model extracted this" case.
+- ✅ Shippable this quarter. Adoptable without a PhD. ⚠️ Deliberately less expressive.</p>
+<p><strong>Say:</strong>
+"Option B is a small, shared LinkML class — a microschema — that every repo <em>imports</em>
+instead of hand-rolling. One <code>EvidenceItem</code>: a reference, a snippet, a direction of
+support, a strength, an ECO code for the scientific case; and the same class also carries
+the thin provenance fields — agent type, knowledge level, knowledge source — for the
+'a model produced this' case. It's deliberately a slightly degenerate SEPIO: flatter, less
+expressive, no full provenance graph. But it fits in your head, it validates in CI, and
+you can adopt it in an afternoon."</p>
+<hr />
+<h2 id="slide-9-my-call-b-now-built-as-an-on-ramp-to-a">Slide 9 — My call: B now, built as an on-ramp to A<a class="headerlink" href="#slide-9-my-call-b-now-built-as-an-on-ramp-to-a" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- I favour <strong>Option B</strong> — for practical reasons: ship now, adopt everywhere, cover the 90%.
+- <strong>But:</strong> in the age of AI, <strong>A is where the puck is going.</strong>
+- So B must be a <strong>strict subset / on-ramp to SEPIO</strong>, not a dead end.
+- Design rule: every field in B has a clean SEPIO mapping. We grow <em>into</em> the graph, never <em>away</em> from it.</p>
+<p><strong>Say:</strong>
+"Here's my recommendation, and my honest hedge. I favour B. Practically, it's the only one
+we can actually get fifteen repos to adopt this year, and it captures the vast majority of
+what we record. So: B.</p>
+<p>But I don't want to sell it to you as <em>the</em> answer, because in an AI-driven world it isn't.
+When our pipelines are chains of agents checking other agents, we will <em>want</em> evidence for
+evidence, provenance graphs, methods as first-class objects — we will want SEPIO. So the
+condition I put on Option B is that we build it as a strict subset of SEPIO. Every field
+maps cleanly upward. B is the on-ramp, not the destination. We ship the small thing, and we
+leave ourselves the ability to grow into the real thing without a rewrite. If we can't
+promise that mapping, I'd rather we argue about it now than repaint ourselves into a corner."</p>
+<hr />
+<h2 id="slide-10-migration-13-the-shape-of-the-fix">Slide 10 — Migration [1/3]: the shape of the fix<a class="headerlink" href="#slide-10-migration-13-the-shape-of-the-fix" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- Author once: <code>evidence.yaml</code> → published at <code>w3id.org/linkml/microschemas/evidence</code>.
+- Everyone else: <code>imports: [evidence]</code> and point their <code>evidence</code> slot at the shared class.
+- Two profiles of one class:
+  - <strong>Scientific</strong> → <code>reference</code>, <code>snippet</code>, <code>direction</code>, <code>eco_code</code>
+  - <strong>Provenance</strong> → <code>agent_type</code>, <code>knowledge_level</code>, <code>knowledge_source</code>
+- LinkML already does this. (envar imports the microschema profile by URL — proven.)</p>
+<p><strong>Say:</strong>
+"So what does consolidation actually look like? One file. We author the evidence model
+once, publish it at a w3id, and every repo imports it — the same way the envar microschema
+already imports a shared profile by URL today, so we know LinkML handles this. Nobody
+re-types <code>EvidenceItem</code> ever again. And the one class has two faces: populate the
+scientific fields when you have a paper, populate the provenance fields when you have a
+model. Same vocabulary everywhere."</p>
+<hr />
+<h2 id="slide-11-migration-23-dismech-concretely">Slide 11 — Migration [2/3]: DisMech, concretely<a class="headerlink" href="#slide-11-migration-23-dismech-concretely" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong></p>
+<p><em>Before (DisMech owns it):</em>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">EvidenceItem</span><span class="p">:</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">slots</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">reference</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">reference_title</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">supports</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">evidence_source</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">snippet</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">explanation</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">images</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">EvidenceItemSupportEnum</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">SUPPORT</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">REFUTE</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">PARTIAL</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">NO_EVIDENCE</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">WRONG_STATEMENT</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<em>After (DisMech imports it):</em>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">imports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">linkml</span><span class="p p-Indicator">:</span><span class="nv">types</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">evidence</span><span class="p p-Indicator">]</span><span class="w">      </span><span class="c1"># ← shared</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">slots</span><span class="p">:</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">evidence</span><span class="p">:</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EvidenceItem</span><span class="w">                </span><span class="c1"># ← shared class</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="nt">inlined_as_list</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+- Cost: rename <code>supports → direction</code>, <code>SUPPORT → SUPPORTS</code> (mechanical, one converter).
+- Proven: import resolves, <code>gen-python</code> still runs, a real record converts + validates.</p>
+<p><strong>Say:</strong>
+"Concretely, DisMech. Today it defines its own <code>EvidenceItem</code> and its own support enum.
+After: it deletes both and imports the shared model, and its eight evidence-bearing classes
+don't even notice — they point at the same <code>evidence</code> slot, whose type is now the shared
+class. The only real cost is a mechanical rename — <code>supports</code> becomes <code>direction</code>, <code>SUPPORT</code>
+becomes <code>SUPPORTS</code> — one converter, run once over the data. I've speced this out and the
+proof is small and concrete: the import resolves, LinkML still generates DisMech's Python
+dataclasses, and one real Antiphospholipid record converts and validates against the shared
+class — while the old spelling correctly fails. That's the whole risk surface, and it's
+green."</p>
+<hr />
+<h2 id="slide-12-migration-33-koza-alliance-genotype-ingest">Slide 12 — Migration [3/3]: koza / alliance-genotype-ingest<a class="headerlink" href="#slide-12-migration-33-koza-alliance-genotype-ingest" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong></p>
+<p>Today, <code>allele.py</code> stamps every edge:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">primary_knowledge_source</span>   <span class="o">=</span> <span class="s2">&quot;infores:agrkb&quot;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">aggregator_knowledge_source</span><span class="o">=</span> <span class="p">[</span><span class="s2">&quot;infores:monarchinitiative&quot;</span><span class="p">,</span> <span class="s2">&quot;infores:agrkb&quot;</span><span class="p">]</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">knowledge_level</span>            <span class="o">=</span> <span class="n">KnowledgeLevelEnum</span><span class="o">.</span><span class="n">knowledge_assertion</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">agent_type</span>                 <span class="o">=</span> <span class="n">AgentTypeEnum</span><span class="o">.</span><span class="n">manual_agent</span>      <span class="c1"># ← today</span>
+</code></pre></div>
+- That block <strong>is an evidence record.</strong> It's just spelled in Biolink, per-repo.
+- Consolidation: those slots become the <strong>provenance profile</strong> of the shared model — defined once, mapped to Biolink.
+- The tell: <code>agent_type = manual_agent</code> today → <code>automated_agent</code> / <code>text_mining_agent</code> tomorrow.
+- The socket for <em>"which model extracted this"</em> is already there. We just need it to mean the same thing everywhere.</p>
+<p><strong>Say:</strong>
+"And the koza world, which looks different but isn't. Every alliance-genotype edge already
+carries four provenance fields — knowledge source, aggregator, knowledge level, and agent
+type. Look at that block: that <em>is</em> an evidence record. It's the thin-provenance case from
+slide four, already in production, just spelled in Biolink and redefined in every single
+ingest.</p>
+<p>Consolidation here doesn't mean ripping out Biolink. It means those four slots become the
+provenance profile of the <em>shared</em> evidence model — defined once, with a mapping to Biolink
+— so 'knowledge_level' means the same thing in DisMech, in Sieve, and in forty koza ingests.
+And here's the punchline for the whole talk: that field says <code>agent_type = manual_agent</code>
+today. The day a model writes that edge, it says <code>automated_agent</code>. The socket for 'which
+machine made this claim, and did a human check' is <em>already in the data</em>. We are not
+inventing a new requirement. We are admitting we already have one — and agreeing to spell it
+the same way."</p>
+<hr />
+<h2 id="slide-13-the-ask">Slide 13 — The ask<a class="headerlink" href="#slide-13-the-ask" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+Do we agree:
+1. We are <strong>AI-driven</strong> — already, not eventually.
+2. That makes evidence <strong>mandatory infrastructure</strong>, because trust doesn't transfer to machines.
+3. We have <strong>~15 redundant evidence models</strong> and it's costing us interoperability.
+4. <strong>Consolidating</strong> is worth doing.
+5. The mechanism is <strong>one shared <code>evidence</code> microschema, imported by every repo</strong> — flat now (Option B), mapped as a strict subset of SEPIO so we can grow into the full model (Option A).</p>
+<p><strong>Say:</strong>
+"So the ask. Five things, and I want a nod on each. One: we're AI-driven now. Two: that
+makes evidence mandatory, not optional, because we can't inherit a machine's trust. Three:
+we've accidentally built this fifteen times. Four: it's worth consolidating. Five: the way
+we do it is a single evidence microschema that everyone imports — flat and shippable now,
+but built as a strict subset of SEPIO so the day we need the full power, it's a growth, not
+a rewrite."</p>
+<p><em>(Purposes 4 and 5: agree to consolidate; agree the mechanism is a shared imported evidence class.)</em></p>
+<hr />
+<h2 id="slide-14-what-i-want-to-walk-out-with">Slide 14 — What I want to walk out with<a class="headerlink" href="#slide-14-what-i-want-to-walk-out-with" title="Permanent link">&para;</a></h2>
+<p><strong>On screen:</strong>
+- ✅ Agreement in principle to a shared evidence microschema.
+- ✅ A volunteer repo #2 after DisMech (koza ingest? Sieve?).
+- ✅ Owners for the <strong>B→SEPIO mapping table</strong> — so "on-ramp not dead-end" is real, not a promise.
+- Next: I circulate the spec + the DisMech proof-of-concept.</p>
+<p><strong>Say:</strong>
+"What I'd love to leave with: agreement in principle, one volunteer repo to be the second
+adopter after DisMech so we prove it generalises, and one or two people to own the mapping
+from our flat model up to SEPIO — because that mapping is what makes the difference between
+'pragmatic first step' and 'fifteenth evidence model.' I'll send round the spec and the
+working DisMech proof-of-concept. Thank you — let's argue."</p>
+<hr />
+<h3 id="appendix-backup-slides">Appendix / backup slides<a class="headerlink" href="#appendix-backup-slides" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>A1 — The B→SEPIO mapping table</strong> (field-by-field: <code>reference</code> → evidence item source;
+  <code>agent_type</code> → SEPIO agent; <code>knowledge_level</code> → assertion method; etc.).</li>
+<li><strong>A2 — Why not just mandate Biolink association slots everywhere?</strong> (They cover provenance,
+  not scientific evidence — no snippet, no direction, no ECO. Half the model.)</li>
+<li><strong>A3 — Governance:</strong> where <code>evidence.yaml</code> lives, versioning, who reviews changes.</li>
+<li><strong>A4 — The <code>todo.md</code> case:</strong> pattern-generated statements (DOSDP) as a distinct
+  <code>agent_type</code> / evidence source — a concrete near-term test of the provenance profile.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/matentzn/sieve" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "navigation.sections", "navigation.expand", "toc.integrate"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
