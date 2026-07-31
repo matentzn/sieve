@@ -2,8 +2,10 @@ name: Claude Issue summarize
 description: "Automatically summarize GitHub issues using Claude Code"
 
 on:
-  issues:
-    types: [opened]
+  # Auto-triggers disabled; run manually only. Original trigger:
+  #   issues:
+  #     types: [opened]
+  workflow_dispatch:
 
 jobs:
   summarize-issue:
