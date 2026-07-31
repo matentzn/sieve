@@ -1,425 +1,126 @@
-# AI Integration Guide
+# Authoring Packets as an AI Agent
 
-This document provides guidance for AI agents (LLMs, autonomous systems) working with SIEVE. It explains the data model, expected behaviors, and integration patterns.
+This page is for AI agents (LLMs, autonomous pipelines) that **produce evidence
+packets** for SIEVE. It covers only the AI-specific parts: how to author a valid
+packet and how to exercise judgment honestly.
 
-## Understanding SIEVE's Purpose
+It deliberately does **not** re-teach the data model. Read these first:
 
-SIEVE (Scientific Evidence Evaluation & Verification Environment) manages **evidence packets** that support or contradict ontological assertions. An ontological assertion is a statement about the classification or relationship between concepts, such as:
+- [SIEVE in Plain Terms](primer.md) — the concepts (statement, evidence lines,
+  items, verdict).
+- [Data Model](data-model.md) — the authoritative, field-by-field reference.
 
-> "asthma is a subclass of respiratory system disorder"
+## What you produce
 
-AI agents typically interact with SIEVE to:
-1. **Generate** evidence packets from analysis of literature, ontologies, or other sources
-2. **Validate** evidence packets against the schema
-3. **Process** or transform evidence data
-4. **Export** curated evidence to RDF for ontology integration
+An AI agent's output is a single **valid `EvidencePacket` YAML** in the current
+SEPIO/SIEVE shape: one `statement`, a list of `has_evidence_lines`, and each line
+a list of `has_evidence_items`. Every item carries a `type:` discriminator that
+says which kind of evidence it is. Leave `status: UNREVIEWED` — a human makes the
+final decision.
 
-## Core Data Structures
+See [Data Model](data-model.md) for every field; this page assumes you already
+know the shape.
 
-### Evidence Packet Structure
+## Choosing an item `type:`
 
-An evidence packet is a YAML document with this structure:
+Every evidence item **must** have a `type:`. Pick from these six:
 
-```yaml
-# Required fields
-id: <unique-identifier>           # URI or CURIE
-status: <UNREVIEWED|ACCEPTED|REJECTED|CONTROVERSIAL>
-assertion:                        # The claim being evaluated
-  subject_id: <CURIE>            # e.g., MONDO:0004979
-  predicate: <CURIE>             # e.g., rdfs:subClassOf
-  object_id: <CURIE>             # e.g., MONDO:0005275
+| `type:` | Use when the evidence is… |
+|---------|---------------------------|
+| `SieveDocument` | a publication, guideline, or textbook you can quote (`pmid`, `title`, `quote`, `quote_location`). |
+| `ConcordanceItem` | another ontology, terminology, or database that already makes the aligned assertion. |
+| `AgentContribution` | a person or organization who weighed in (expert review, curator note, community suggestion). |
+| `ComputationalResult` | the output of a method or algorithm — including your own analysis (`method_name`, `value`, `parameters`). |
+| `SieveDataItem` | a raw data record that stands as evidence on its own. |
+| `SieveStudyResult` | a reported result from a study or experiment. |
 
-# Optional but recommended
-evidence: []                      # List of evidence items
-provenance: {}                    # Origin information
-evidence_synthesis: {}            # Summary synthesis
-evidence_steward: <ORCID>        # Who made final decision
-confidence: <0.0-1.0>            # Decision confidence
-```
+When your own analysis *is* the evidence, use `ComputationalResult` and name the
+method honestly — do not dress an LLM summary up as a `SieveDocument`.
 
-### Evidence Item Structure
+## Direction, strength, score
 
-Each evidence item follows a type-specific structure:
+Each **evidence line** declares which way it points and how strongly. Set these
+on the line, not the item:
 
-```yaml
-# Common fields (all evidence types)
-id: <identifier>
-evidence_type: <CONCORDANCE|LITERATURE|EXPERT_REVIEW|COMPUTATIONAL|OTHER>
-direction: <SUPPORTS|CONTRADICTS|UNCERTAIN>
-evidence_strength: <0.0-1.0>     # How strong is this evidence?
-rating: <UNREVIEWED|ACCEPTED|REJECTED|CONTROVERSIAL>  # Curator's rating
-description: <text>
+- `direction_of_evidence_provided`: `supports` | `disputes` | `neutral`
+  (lowercase). Add a line with `disputes` when evidence points against the
+  statement — do not silently drop it.
+- `strength_of_evidence_provided`: `strong` | `moderate` | `weak` — your
+  qualitative read of the argument.
+- `score_of_evidence_provided`: a number in `0–1` used for scoring. Be
+  conservative; reserve values near `1.0` for direct, unambiguous evidence.
 
-# Type-specific fields vary by evidence_type
-```
+Set these to reflect the *evidence*, not your eagerness for a particular verdict.
+An item may also carry an optional curator `rating` and an `eco_code`.
 
-## Evidence Type Specifications
-
-### CONCORDANCE Evidence
-
-Use for cross-ontology or cross-terminology agreement:
+## A minimal valid packet
 
 ```yaml
-evidence_type: CONCORDANCE
-direction: SUPPORTS
-evidence_strength: 0.9
-source: https://bioportal.bioontology.org/ontologies/ICD10CM
-source_name: ICD-10-CM
-source_type: TERMINOLOGY  # ONTOLOGY, TERMINOLOGY, DATABASE, OTHER
-source_subject_id: ICD10CM:J45
-source_subject_label: Asthma
-source_object_id: ICD10CM:J00-J99
-source_object_label: Diseases of the respiratory system
-mapping_set: https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv
+id: sieve:pkt_asthma_0001
+status: UNREVIEWED
+statement:
+  id: stmt_asthma_0001
+  type: SieveStatement
+  subject: MONDO:0004979
+  subject_label: asthma
+  predicate:
+    code: rdfs:subClassOf
+    label: subClassOf
+  object: MONDO:0005275
+  object_label: respiratory system disorder
+  statement_text: asthma subClassOf respiratory system disorder
+has_evidence_lines:
+  - id: line_0001
+    type: SieveEvidenceLine
+    direction_of_evidence_provided: supports
+    strength_of_evidence_provided: strong
+    score_of_evidence_provided: 0.9
+    has_evidence_items:
+      - id: ev_concordance_0001
+        type: ConcordanceItem
+        source_name: Disease Ontology
+        source_id: DOID:2841
+        rating: ACCEPTED
+        eco_code: ECO:0000269
+      - id: ev_document_0001
+        type: SieveDocument
+        title: Example study
+        pmid: "12345678"
+        quote: asthma is a chronic respiratory disease
+        rating: ACCEPTED
 ```
 
-**When to use**: When another authoritative source (ontology, terminology, classification system) contains an equivalent or analogous relationship.
+Every entity (`statement`, each line, each item) needs an `id` and a `type`.
 
-**Key considerations**:
-- `source_type` should reflect the nature of the source
-- Include `mapping_set` if mappings come from SSSOM
-- `source_subject_id` and `source_object_id` should be CURIEs from the source
+## Validating your output
 
-### LITERATURE Evidence
-
-Use for published literature citations:
-
-```yaml
-evidence_type: LITERATURE
-direction: SUPPORTS
-evidence_strength: 0.95
-publication_id: PMID:28884740
-publication_title: "Global Strategy for Asthma Management"
-quoted_text: >-
-  Asthma is a heterogeneous disease, usually characterized by chronic airway
-  inflammation. It is defined by the history of respiratory symptoms...
-quote_location: "Chapter 1, Definition, page 14"
-explanation: >-
-  This text explicitly defines asthma as a disease characterized by respiratory
-  symptoms, directly supporting its classification as a respiratory disorder.
-```
-
-**When to use**: When citing peer-reviewed publications, clinical guidelines, or authoritative textbooks.
-
-**Key considerations**:
-- Always include `publication_id` (prefer PMID, DOI)
-- `quoted_text` should be verbatim from the source
-- `explanation` connects the quote to the assertion
-- `evidence_strength` should reflect publication quality and relevance
-
-### EXPERT_REVIEW Evidence
-
-Use for domain expert assessments:
-
-```yaml
-evidence_type: EXPERT_REVIEW
-direction: SUPPORTS
-evidence_strength: 0.8
-reviewer_orcid: orcid:0000-0003-4567-8901
-reviewer_name: Dr. Sarah Chen
-reviewer_affiliation: Johns Hopkins Medicine
-reviewed_at: "2024-01-20"
-issue: https://github.com/monarch-initiative/mondo/issues/7890
-description: "Clinical pulmonologist review confirming classification"
-```
-
-**When to use**: When a domain expert has explicitly reviewed and commented on the assertion.
-
-**Key considerations**:
-- `reviewer_orcid` should be a valid ORCID
-- `issue` can link to GitHub discussions
-- Expert credentials (affiliation) add credibility
-
-### COMPUTATIONAL Evidence
-
-Use for algorithmic or AI-generated analysis:
-
-```yaml
-evidence_type: COMPUTATIONAL
-direction: SUPPORTS
-evidence_strength: 0.75
-method: ChatGPT Deep Research
-method_uri: https://openai.com/chatgpt
-confidence_score: 0.92
-parameters: >-
-  Prompt: "Analyze the medical literature to determine whether asthma
-  should be classified as a respiratory system disorder..."
-
-  Summary: Analysis of 47 sources found unanimous consensus...
-description: "AI analysis of asthma classification in medical literature"
-```
-
-**When to use**: When evidence comes from computational methods, ML models, or AI analysis.
-
-**Key considerations**:
-- Clearly document the `method` and parameters used
-- Include the `confidence_score` from the method if available
-- Be transparent about limitations in the `description`
-
-## AI Agent Workflows
-
-### Workflow 1: Evidence Generation
-
-AI agents generating evidence packets should:
-
-1. **Structure output as valid YAML** following the schema
-2. **Use appropriate evidence types** for each source
-3. **Set reasonable evidence_strength values**:
-   - 0.9-1.0: Very strong, direct evidence
-   - 0.7-0.9: Strong supporting evidence
-   - 0.5-0.7: Moderate evidence
-   - 0.3-0.5: Weak evidence
-   - 0.0-0.3: Very weak or tangential
-4. **Include all available metadata** (IDs, labels, sources)
-5. **Set status to UNREVIEWED** for human review
-
-Example generation prompt pattern:
-
-```
-Generate a SIEVE evidence packet for the assertion:
-"{subject_label} ({subject_id}) {predicate} {object_label} ({object_id})"
-
-Search for:
-1. Cross-ontology concordance (ICD-10, SNOMED CT, DOID, etc.)
-2. Literature evidence (PubMed citations)
-3. Expert consensus (clinical guidelines)
-
-Output as YAML following the SIEVE schema.
-```
-
-### Workflow 2: Evidence Synthesis
-
-AI agents creating `evidence_synthesis` blocks should:
-
-1. **Summarize all evidence items** objectively
-2. **Acknowledge contradicting evidence** if present
-3. **Calculate a weighted assessment**
-4. **Express appropriate uncertainty**
-
-Example synthesis:
-
-```yaml
-evidence_synthesis:
-  summary: >
-    After reviewing 5 evidence items (4 supporting, 1 contradicting),
-    the classification of asthma as a respiratory system disorder is
-    well-supported. Supporting evidence includes concordance with ICD-10
-    and SNOMED CT, peer-reviewed literature defining asthma as a respiratory
-    condition, and expert clinical review. The single contradicting evidence
-    from Disease Ontology (which classifies asthma under sensory system disease)
-    appears to be an outlier not supported by other sources.
-  confidence: 0.92
-```
-
-### Workflow 3: Validation and Quality Check
-
-AI agents should validate generated packets:
+Write packets to a directory and run:
 
 ```bash
-# Validate schema compliance
-sieve validate -i generated_packet.yaml
+sieve validate -I inbox/examples/      # validate every packet in a directory
+sieve validate -i my_packet.yaml       # validate one file
 ```
 
-Check for common issues:
-- Missing required fields
-- Invalid CURIEs (should be `PREFIX:localId`)
-- Evidence strength outside 0.0-1.0 range
-- Invalid enum values
+`validate` reports each file as `OK` or lists the schema errors and exits
+non-zero if anything fails. Always validate before handing packets off.
 
-### Workflow 4: Batch Processing
+## DO / DON'T
 
-For processing multiple assertions:
+**DO**
 
-```python
-from sieve.ingest import parse_curation_record
-from sieve.validators import validate_json_schema
-import yaml
+- Set a `type:` on every evidence item and an `id` + `type` on every entity.
+- Quote source text **verbatim** in `SieveDocument.quote`.
+- Cite real, resolvable identifiers (real `PMID`s, real ontology CURIEs).
+- Add a `disputes` line when the evidence genuinely cuts against the statement.
+- Leave `status: UNREVIEWED` and let a human decide.
 
-def process_assertion(assertion_data, evidence_sources):
-    """Generate and validate an evidence packet."""
+**DON'T**
 
-    packet = {
-        "id": generate_id(assertion_data),
-        "status": "UNREVIEWED",
-        "assertion": assertion_data,
-        "evidence": evidence_sources,
-    }
-
-    # Validate before output
-    report = validate_json_schema(packet)
-    if any(r.severity.value <= 2 for r in report.results):
-        raise ValueError(f"Invalid packet: {report.results}")
-
-    return packet
-```
-
-## Integration Patterns
-
-### Pattern 1: Evidence Aggregator
-
-An AI agent that collects evidence from multiple sources:
-
-```
-Input: Ontology axiom to evaluate
-Process:
-  1. Query cross-reference databases for concordance
-  2. Search PubMed for relevant literature
-  3. Check existing expert reviews/GitHub issues
-  4. Run computational analysis if appropriate
-Output: SIEVE evidence packet with aggregated evidence
-```
-
-### Pattern 2: Evidence Synthesizer
-
-An AI agent that summarizes evidence:
-
-```
-Input: SIEVE evidence packet with multiple evidence items
-Process:
-  1. Analyze each evidence item
-  2. Weigh by evidence_strength and direction
-  3. Identify consensus and conflicts
-  4. Generate natural language synthesis
-Output: Updated packet with evidence_synthesis block
-```
-
-### Pattern 3: Curation Assistant
-
-An AI agent that assists human curators:
-
-```
-Input: Evidence packet for review
-Process:
-  1. Summarize key evidence points
-  2. Highlight potential issues or conflicts
-  3. Suggest decision with rationale
-  4. Flag items needing closer human review
-Output: Curation recommendations (human makes final decision)
-```
-
-## Best Practices for AI Agents
-
-### DO:
-
-1. **Be transparent** about AI-generated content
-   - Set `evidence_type: COMPUTATIONAL` for AI analysis
-   - Document the method and parameters used
-
-2. **Express uncertainty appropriately**
-   - Use `evidence_strength` to indicate confidence
-   - Include caveats in descriptions
-
-3. **Cite sources accurately**
-   - Verify publication IDs exist
-   - Quote text verbatim when possible
-
-4. **Follow the schema strictly**
-   - Use valid CURIEs (PREFIX:localId)
-   - Use correct enum values
-   - Include required fields
-
-5. **Support human review**
-   - Set `status: UNREVIEWED` for human verification
-   - Provide clear explanations
-   - Flag uncertain items
-
-### DON'T:
-
-1. **Don't fabricate evidence**
-   - Only cite real publications
-   - Don't invent concordance that doesn't exist
-
-2. **Don't overstate confidence**
-   - Be conservative with `evidence_strength`
-   - Acknowledge limitations
-
-3. **Don't bypass human review**
-   - New packets should be UNREVIEWED
-   - Final decisions require human judgment
-
-4. **Don't ignore contradicting evidence**
-   - Include evidence with `direction: CONTRADICTS`
-   - Document conflicts in synthesis
-
-## CURIE Reference
-
-Common prefixes used in SIEVE:
-
-| Prefix | Expansion | Example |
-|--------|-----------|---------|
-| `MONDO` | http://purl.obolibrary.org/obo/MONDO_ | MONDO:0004979 |
-| `DOID` | http://purl.obolibrary.org/obo/DOID_ | DOID:2841 |
-| `HP` | http://purl.obolibrary.org/obo/HP_ | HP:0002099 |
-| `ECO` | http://purl.obolibrary.org/obo/ECO_ | ECO:0000006 |
-| `PMID` | https://pubmed.ncbi.nlm.nih.gov/ | PMID:28884740 |
-| `orcid` | https://orcid.org/ | orcid:0000-0001-2345-6789 |
-| `rdfs` | http://www.w3.org/2000/01/rdf-schema# | rdfs:subClassOf |
-| `owl` | http://www.w3.org/2002/07/owl# | owl:equivalentClass |
-
-## Error Handling
-
-Common errors and solutions:
-
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `'assertion' is a required property` | Missing assertion block | Add assertion with subject_id, predicate, object_id |
-| `'UNKNOWN' is not valid under any of the given schemas` | Invalid enum value | Use valid status: UNREVIEWED, ACCEPTED, REJECTED, CONTROVERSIAL |
-| `evidence_strength must be <= 1` | Value out of range | Use value between 0.0 and 1.0 |
-| `Invalid CURIE format` | Malformed identifier | Use PREFIX:localId format |
-
-## Example Complete Packet
-
-Here's a complete, well-formed evidence packet suitable for AI generation:
-
-```yaml
-id: http://example.org/evidence/mondo-0004979-respiratory
-status: UNREVIEWED
-
-assertion:
-  subject_id: MONDO:0004979
-  subject_label: asthma
-  predicate: rdfs:subClassOf
-  predicate_label: subClassOf
-  object_id: MONDO:0005275
-  object_label: respiratory system disorder
-  display_text: "asthma subClassOf respiratory system disorder"
-
-evidence:
-  - id: ev-concordance-001
-    evidence_type: CONCORDANCE
-    direction: SUPPORTS
-    evidence_strength: 0.9
-    eco_code: ECO:0000204
-    description: "ICD-10-CM places asthma under respiratory diseases"
-    source_name: ICD-10-CM
-    source_type: TERMINOLOGY
-    source_subject_id: ICD10CM:J45
-    source_object_id: ICD10CM:J00-J99
-
-  - id: ev-literature-001
-    evidence_type: LITERATURE
-    direction: SUPPORTS
-    evidence_strength: 0.95
-    eco_code: ECO:0000006
-    publication_id: PMID:28884740
-    publication_title: "Global Strategy for Asthma Management (GINA)"
-    quoted_text: "Asthma is characterized by chronic airway inflammation"
-    explanation: "Defines asthma in respiratory terms"
-
-  - id: ev-computational-001
-    evidence_type: COMPUTATIONAL
-    direction: SUPPORTS
-    evidence_strength: 0.75
-    method: Literature Analysis
-    method_uri: https://example.org/analysis-tool
-    confidence_score: 0.88
-    description: "Automated analysis of 50 publications confirms classification"
-
-evidence_synthesis:
-  summary: >
-    Multiple lines of evidence support classifying asthma as a respiratory
-    system disorder: concordance with ICD-10 classification, GINA guidelines
-    definition, and computational literature analysis. No significant
-    contradicting evidence found.
-  confidence: 0.90
-```
+- Don't fabricate references, PMIDs, or concordances that don't exist.
+- Don't overstate — inflated `strength`/`score` values are worse than honest weak
+  ones.
+- Don't use the deleted flat model (`assertion`, flat `evidence[]`,
+  `evidence_type`, `direction: CONTRADICTS`, `evidence_strength`). The current
+  shape is `statement` + `has_evidence_lines` → `has_evidence_items` with `type:`.
+- Don't pass your own LLM analysis off as a publication — use
+  `ComputationalResult`.

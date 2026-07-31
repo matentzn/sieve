@@ -1,260 +1,225 @@
-# Architecture Overview
+# Architecture
 
-This document describes the system architecture of SIEVE, including its components, data flow, and design decisions.
+SIEVE turns YAML **evidence packets** into curated, machine-readable axioms. This
+page describes how the running system is put together: the modules, how they
+talk to a DuckDB store, and how a packet flows from authoring to RDF export. For
+the packet shape itself, start with the [Primer](primer.md); for the
+field-by-field model, see the [Data Model](data-model.md).
 
-## System Components
+## The pieces
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         SIEVE System                            │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐        │
-│  │     CLI      │   │   Web UI     │   │  Python API  │        │
-│  │  (cli.py)    │   │  (app.py)    │   │  (modules)   │        │
-│  └──────┬───────┘   └──────┬───────┘   └──────┬───────┘        │
-│         │                  │                  │                 │
-│         └──────────────────┴──────────────────┘                 │
-│                            │                                    │
-│  ┌─────────────────────────┴─────────────────────────┐         │
-│  │              Core Services Layer                   │         │
-│  ├────────────┬────────────┬────────────┬───────────┤         │
-│  │  ingest.py │  export.py │ rdf_export │ validators │         │
-│  │            │            │    .py     │    .py     │         │
-│  └────────────┴────────────┴────────────┴───────────┘         │
-│                            │                                    │
-│  ┌─────────────────────────┴─────────────────────────┐         │
-│  │               Data Layer                           │         │
-│  ├─────────────────────────┬─────────────────────────┤         │
-│  │       db.py             │       models.py         │         │
-│  │   (CurationDatabase)    │   (Pydantic models)     │         │
-│  └─────────────────────────┴─────────────────────────┘         │
-│                            │                                    │
-│  ┌─────────────────────────┴─────────────────────────┐         │
-│  │             Storage Layer                          │         │
-│  ├─────────────────────────┬─────────────────────────┤         │
-│  │     DuckDB Database     │   YAML/RDF Files        │         │
-│  │  (data/curation.duckdb) │   (inbox/, exports/)    │         │
-│  └─────────────────────────┴─────────────────────────┘         │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    Y[YAML packets<br/>inbox/] --> ING[packet_ingest<br/>validate + load]
+    ING --> DB[(DuckDB<br/>PacketStore)]
+    DB --> UI[app.py<br/>Streamlit review]
+    UI -->|rate items,<br/>record decisions| DB
+    DB --> EXP[packet_export<br/>RDF / YAML]
+    EXP --> OUT[accepted.ttl<br/>owl:Axiom annotations]
+    CLI[cli.py<br/>Typer] -.-> ING
+    CLI -.-> EXP
+    AUTH[auth.py<br/>ORCID] -.-> UI
+    SCORE[scoring.py<br/>NER] -.-> DB
+    SCORE -.-> UI
+    LOAD[datamodel/loaders<br/>polymorphic load] -.-> ING
+    LOAD -.-> DB
 ```
 
-## Module Descriptions
+Everything is built on the generated Pydantic model in
+`datamodel/sieve_models.py`. Ingest, storage, the UI and export all pass the
+same `EvidencePacket` objects around.
 
-### Entry Points
+## Modules
 
-#### `cli.py` - Command Line Interface
-The Typer-based CLI provides commands for:
-- `sieve run` - Launch the Streamlit web interface
-- `sieve ingest` - Load YAML evidence packets into the database
-- `sieve export` - Export evidence packets to RDF or YAML
-- `sieve validate` - Validate packets against the LinkML schema
+### `datamodel/` — the model
 
-#### `app.py` - Web Interface
-A Streamlit application providing:
-- Dashboard with curation statistics
-- Record browsing and filtering
-- Evidence review interface with rating controls
-- Decision making (Accept/Reject/Controversial)
-- Export functionality
+- **`sieve_models.py`** — Pydantic classes generated from `schema/sieve.yaml`
+  (`EvidencePacket`, `SieveStatement`, `SieveEvidenceLine`, the evidence-item
+  subclasses `ConcordanceItem` / `SieveDocument` / `SieveDataItem` /
+  `SieveStudyResult` / `ComputationalResult` / `AgentContribution`,
+  `CurationDecision`, `DecisionType`, and supporting types). Re-exported from
+  `datamodel/__init__.py`.
+- **`loaders.py`** — polymorphic loading. Evidence items are a union of
+  `InformationEntity` subclasses, and validating them through the base class
+  drops subclass-specific fields. `load_packet(path)` / `packet_from_dict(data)`
+  dispatch each item to its concrete class via the `type:` discriminator
+  (`EVIDENCE_ITEM_TYPES`, which also aliases the bare `Document` / `DataItem` /
+  `StudyResult` names) before validating the whole packet.
 
-### Core Services
+### `packet_ingest.py` — YAML in
 
-#### `ingest.py` - Data Ingestion
-Parses YAML evidence packets and loads them into the database:
-- `parse_curation_record(data)` - Convert dict to CurationRecord
-- `ingest_file(path, db)` - Load a single YAML file
-- `ingest_directory(path, db)` - Batch load from directory
+- `validate_packet_dict(data)` validates a packet dict against the merged LinkML
+  schema (`schema/sieve.yaml` with imports resolved) and returns the list of
+  validation results (empty means valid).
+- `ingest_packet_file(path, store)` loads one YAML packet (via `load_packet`)
+  and inserts it.
+- `ingest_packet_directory(path, store)` walks `**/*.yaml` / `**/*.yml`,
+  ingesting each and returning per-file stats (`files`, `success`, `errors`,
+  `error_details`).
 
-#### `export.py` - YAML Export
-Exports curated records back to YAML format:
-- `record_to_export_dict(record)` - Convert DB record to export dict
-- `record_to_yaml(record)` - Serialize to YAML string
-- `create_export_tarball(db)` - Create tar.gz archive
-- `export_records_to_directory(db, path)` - Export to directory structure
+### `store.py` — the DuckDB store
 
-#### `rdf_export.py` - RDF Export
-Generates OWL axiom annotations from evidence packets:
-- `packet_to_rdf(packet)` - Convert packet to RDF graph
-- `export_to_rdf(input_path, output_path)` - Batch export to RDF file
-- Expands CURIEs to full URIs using the OBO converter
-- Creates owl:Axiom annotations with appropriate properties based on status
+`PacketStore` wraps a DuckDB connection (default `data/sieve.duckdb`,
+`:memory:` for tests) and owns the schema. It stores the full packet as JSON
+plus a handful of promoted columns for querying:
 
-#### `validators.py` - Schema Validation
-Validates evidence packets against the LinkML schema:
-- `validate_json_schema(data)` - Validate dict against schema
-- `validate_packet(path)` - Validate a YAML file
-- `validate_packets(path)` - Validate multiple files
+- `insert_packet(packet)` — upsert; recomputes `evidence_score` (NER) and the
+  steward, and serializes the packet with `serialize_as_any=True` so polymorphic
+  items keep their subclass fields.
+- `get_packet(id)` — reload an `EvidencePacket` from stored JSON (through the
+  polymorphic loader).
+- `list_packets(status=None)` — promoted columns for the queue/dashboard.
+- `get_stats()` — packet counts grouped by status.
+- `update_status(id, status)` — set status on the packet and re-store.
+- `set_item_rating(id, item_id, rating)` — set a single evidence item's steward
+  rating (`ACCEPTED` / `REJECTED`) by item id.
+- `record_decision(decision)` / `get_decisions(id)` — append a
+  `CurationDecision` and read the history (newest first).
 
-### Data Layer
+### `scoring.py` — Net Evidence Ratio
 
-#### `models.py` - Pydantic Models
-Defines the data structures:
-- `CurationRecord` - Main evidence packet model
-- `Assertion` - The ontological statement being curated
-- `Evidence` - Evidence item with type-specific fields
-- `CurationDecision` - A curator's decision
-- Enums: `CurationStatus`, `EvidenceType`, `EvidenceDirection`, etc.
+`net_evidence_ratio(packet)` collapses the evidence lines into one number in
+`[-1, +1]`. Each line contributes a weight — its explicit
+`score_of_evidence_provided`, else a value mapped from
+`strength_of_evidence_provided` (`strong`=1.0, `moderate`=0.6, `weak`=0.3), else
+1.0 (`line_score`). Lines are bucketed by `direction_of_evidence_provided`:
 
-#### `db.py` - Database Layer
-DuckDB-backed repository providing:
-- `CurationDatabase` class with CRUD operations
-- Evidence score calculation (Net Evidence Ratio)
-- Decision recording and status updates
-- Pagination and filtering for large datasets
-
-### Authentication
-
-#### `auth.py` - ORCID Authentication
-Handles curator authentication:
-- ORCID OAuth 2.0 flow (sandbox and production)
-- Curator authorization via `curators.yaml`
-- Role-based access (admin, curator)
-- Development mode bypass
-
-## Data Flow
-
-### Ingestion Flow
-
-```
-YAML File -> parse_curation_record() -> CurationRecord -> db.insert_record()
-                     │                        │
-                     ├── Parse assertion      ├── Calculate evidence_score
-                     ├── Parse provenance     ├── Serialize to JSON
-                     ├── Parse evidence[]     └── Insert into DuckDB
-                     └── Parse status
+```text
+        S+ (supports)  −  S− (disputes)
+NER = ─────────────────────────────────────
+        S+  +  S−  +  S0 (neutral / other)
 ```
 
-### Review Flow
+(0.0 when there are no lines.) The store persists this as `evidence_score`; the
+UI shows it live.
 
-```
-Web UI -> get_record() -> Display evidence -> User rates evidence
-                                                    │
-                                                    ▼
-                                          update_evidence_rating()
-                                                    │
-                                                    ▼
-                               User makes decision -> record_decision()
-                                                           │
-                                                           ├── Insert decision
-                                                           ├── Update status
-                                                           └── Set evidence_steward
-```
+### `cli.py` — Typer CLI
 
-### Export Flow
+Four commands:
 
-```
-                    ┌────────────────────────────────┐
-                    │        Export Request          │
-                    └───────────────┬────────────────┘
-                                    │
-                    ┌───────────────┴────────────────┐
-                    │                                │
-                    ▼                                ▼
-            ┌───────────────┐              ┌─────────────────┐
-            │  RDF Export   │              │   YAML Export   │
-            │ (rdf_export)  │              │    (export)     │
-            └───────┬───────┘              └────────┬────────┘
-                    │                               │
-                    ▼                               ▼
-            ┌───────────────┐              ┌─────────────────┐
-            │ OWL Axiom     │              │ Evidence Packet │
-            │ Annotations   │              │     YAML        │
-            └───────────────┘              └─────────────────┘
-```
+- `sieve run` — launch the Streamlit app (`streamlit run src/sieve/app.py`).
+- `sieve ingest -I <dir> [--db <path>]` — ingest a directory into the store.
+- `sieve validate (-i <file> | -I <dir>)` — validate against the schema; exits
+  non-zero on any errors.
+- `sieve export (-i <file> | -I <dir>) [-o <out>] [-O <format>]` — export loaded
+  packets. `-O` accepts RDF flavours (`rdf`/`turtle`/`ttl`, `xml`, `n3`, `nt`)
+  or `yaml`.
 
-## Database Schema
+### `app.py` — Streamlit review UI
 
-### curation_records table
+A single-page app with a sidebar (live stats, ORCID login) and four views:
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | VARCHAR (PK) | Unique record identifier |
-| last_updated | DATE | Last update date |
-| assertion_subject_id | VARCHAR | Subject CURIE |
-| assertion_predicate | VARCHAR | Predicate CURIE |
-| assertion_object_id | VARCHAR | Object CURIE |
-| evidence | JSON | Array of evidence items |
-| evidence_score | DOUBLE | Calculated Net Evidence Ratio |
-| status | VARCHAR | UNREVIEWED/ACCEPTED/REJECTED/CONTROVERSIAL |
-| evidence_steward | VARCHAR | ORCID of decision maker |
-| confidence | DOUBLE | Steward's confidence (0-1) |
+- **Dashboard** — packet counts by status.
+- **Review Queue** — pick a status, open a packet, and see its statement,
+  evidence lines/items, and NER. Authorized curators get per-item **Accept
+  item** / **Reject item** buttons (`set_item_rating`) and an
+  **Accept / Reject / Controversial** decision panel that writes a
+  `CurationDecision` (`record_decision`) and updates the packet status
+  (`update_status`).
+- **Ingest** — ingest a directory through the UI.
+- **Export** — serialize the `ACCEPTED` packets to Turtle.
 
-### curation_decisions table
+### `auth.py` — ORCID authentication
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | VARCHAR (PK) | Decision identifier |
-| record_id | VARCHAR (FK) | Reference to curation_records |
-| curator_orcid | VARCHAR | Curator's ORCID |
-| decision | VARCHAR | ACCEPT/REJECT/CONTROVERSIAL |
-| certainty | DOUBLE | Decision confidence (0-1) |
-| rationale | TEXT | Optional explanation |
-| decided_at | TIMESTAMP | When decision was made |
+ORCID OAuth 2.0 (sandbox or production, selected by config) with an authorized-
+curator allowlist read from `curators.yaml` (roles `admin` / `curator`).
+`is_authorized_curator` / `get_curator_info` gate the write controls in the UI;
+`SIEVE_DEV_MODE=true` bypasses login and records decisions as a placeholder
+curator. Secrets come from Streamlit secrets or the environment.
 
-## Evidence Score Calculation
+### `packet_export.py` — RDF and YAML out
 
-SIEVE calculates a **Net Evidence Ratio (NER)** to summarize evidence:
+- `export_packets_to_yaml(packets, path)` / `packet_to_yaml(packet)` — round-trip
+  YAML (again with `serialize_as_any=True`).
+- `packet_to_rdf(packet, graph=None)` / `export_packets_to_rdf(packets, path,
+  format)` — emit OWL axiom annotations (see below).
 
-```
-NER = (S+ - S-) / (S+ + S- + S?)
-```
+## Data flow
 
-Where:
-- S+ = Sum of evidence_strength for SUPPORTS items
-- S- = Sum of evidence_strength for CONTRADICTS items
-- S? = Sum of evidence_strength for UNCERTAIN items
+**Ingest.** `sieve ingest` (or the UI) walks a directory, loads each YAML file
+into an `EvidencePacket` through the polymorphic loader, and calls
+`store.insert_packet`, which computes the NER and writes JSON + promoted columns
+to DuckDB.
 
-The NER ranges from -1 (all contradicting) to +1 (all supporting).
+**Review.** The Streamlit app reads packets from the store, shows statement,
+evidence and NER, and lets an authorized curator rate individual items and
+record a decision. Ratings and decisions are written straight back to the store,
+and the packet's status moves `UNREVIEWED → ACCEPTED / REJECTED / CONTROVERSIAL`.
 
-## RDF Export Format
+**Export.** `sieve export` loads packets (from files) and serializes them to RDF
+or YAML. The UI export view pulls the `ACCEPTED` packets from the store and
+serializes them to Turtle.
 
-SIEVE exports evidence packets as OWL axiom annotations following OBO conventions:
+## Storage schema
+
+Two tables, created on connect by `PacketStore._init_schema`.
+
+### `evidence_packets`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | VARCHAR (PK) | Packet id |
+| `subject_id` | VARCHAR | Statement subject CURIE |
+| `predicate` | VARCHAR | Statement predicate `code` |
+| `object_id` | VARCHAR | Statement object CURIE |
+| `status` | VARCHAR | `UNREVIEWED` / `ACCEPTED` / `REJECTED` / `CONTROVERSIAL` |
+| `evidence_score` | DOUBLE | NER, recomputed on every insert |
+| `evidence_steward` | VARCHAR | Steward id from `curated_by.contributor` |
+| `created` | VARCHAR | |
+| `updated` | VARCHAR | |
+| `packet_json` | JSON | Full serialized packet (source of truth for reload) |
+
+### `packet_decisions`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | VARCHAR (PK) | Decision id |
+| `packet_id` | VARCHAR | The packet decided on |
+| `curator` | VARCHAR | Curator ORCID |
+| `curator_name` | VARCHAR | |
+| `decision` | VARCHAR | `ACCEPT` / `REJECT` / `CONTROVERSIAL` |
+| `rationale` | VARCHAR | Optional |
+| `certainty` | DOUBLE | Optional confidence |
+| `decided_at` | VARCHAR | Timestamp |
+
+The full packet lives in `packet_json`; the other columns are promoted copies
+for filtering and listing, refreshed whenever the packet is re-inserted.
+
+## RDF export
+
+`packet_to_rdf` emits an `owl:Axiom` reifying the statement, annotated with the
+evidence. Only reviewed packets produce triples — a packet whose status is not
+one of `ACCEPTED` / `REJECTED` / `CONTROVERSIAL` is skipped with a warning.
+CURIEs are expanded to full URIs via the OBO converter (`curies`), with special
+handling for `orcid:`, `rdfs:`, `owl:` and already-expanded URLs.
 
 ```turtle
-_:axiom a owl:Axiom ;
-    owl:annotatedSource <subject_uri> ;
-    owl:annotatedProperty rdfs:subClassOf ;
-    owl:annotatedTarget <object_uri> ;
-    SEPIO:0000124 <evidence_packet_uri> ;    # has_evidence
-    oboInOwl:source <evidence_steward_orcid> .
+[] a owl:Axiom ;
+   owl:annotatedSource   <subject> ;
+   owl:annotatedProperty <predicate> ;      # defaults to rdfs:subClassOf
+   owl:annotatedTarget   <object> ;
+   SEPIO:0000124         <packet_uri> .      # "has evidence"
 ```
 
-### Status-Specific Properties
+Status then adds provenance:
 
-| Status | Properties Added |
-|--------|------------------|
-| ACCEPTED | `oboInOwl:source` with steward ORCID and accepted evidence sources |
-| REJECTED | `IAO:0000233` (term tracker item) with reference to packet |
-| CONTROVERSIAL | `rdfs:comment` with controversy note, `IAO:0000233` |
+- **ACCEPTED** — `oboInOwl:source` with the steward ORCID, plus one
+  `oboInOwl:source` per accepted item source. Those sources come from
+  **ACCEPTED-rated items on supporting lines only** (`_accepted_item_sources`):
+  their `pmid` / `doi` / `source_id` / `source_subject`, and any contributor id.
+- **REJECTED** — `IAO:0000233` (term-tracker item) pointing at the packet, plus
+  the steward `oboInOwl:source`.
+- **CONTROVERSIAL** — an `rdfs:comment` flagging the controversy, `IAO:0000233`,
+  and the steward `oboInOwl:source`.
 
-## Design Decisions
+## Design notes
 
-### Why DuckDB?
-
-- Embedded database requiring no server setup
-- Excellent performance for analytical queries
-- Native JSON support for storing evidence arrays
-- Simple deployment (single file)
-
-### Why LinkML?
-
-- Schema-first approach ensures data consistency
-- Generates JSON Schema for validation
-- Supports rich ontological annotations
-- Standard format for biomedical data modeling
-
-### Why YAML for Evidence Packets?
-
-- Human-readable and editable
-- Easy to version control with Git
-- Compatible with existing ontology workflows
-- Supports complex nested structures
-
-### Why Streamlit?
-
-- Rapid UI development in Python
-- Interactive widgets for evidence review
-- Built-in session state for authentication
-- Easy deployment to Streamlit Cloud
+- **DuckDB** — embedded, single-file, no server; native JSON so the whole packet
+  can live in one column with promoted columns for queries.
+- **Full-JSON storage** — `packet_json` is the source of truth; the flat columns
+  are derived and rebuilt on every insert, so the model schema can evolve without
+  a migration.
+- **LinkML + generated Pydantic** — the schema (`schema/sieve.yaml`) drives both
+  validation and the runtime model, keeping the two in step.
+- **YAML packets** — human-readable, diff-friendly, and easy to keep under
+  version control alongside ontology work.

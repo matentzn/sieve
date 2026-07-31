@@ -69,7 +69,7 @@ sieve ingest [OPTIONS]
 | Option | Short | Description | Default |
 |--------|-------|-------------|---------|
 | `--input-dir` | `-I` | Input directory containing YAML files | `inbox/` |
-| `--db` | - | Path to DuckDB database file | `data/curation.duckdb` |
+| `--db` | - | Path to DuckDB database file | `data/sieve.duckdb` |
 
 **Examples:**
 
@@ -87,16 +87,15 @@ sieve ingest -I inbox/ --db custom.duckdb
 **Output:**
 
 ```
-Ingested 15 new records
-Skipped 3 existing records
+Ingested 15 of 18 packets
 ```
 
 **Behavior:**
 
 - Recursively finds all `.yaml` and `.yml` files in the directory
-- Skips records that already exist (based on `id` field)
-- Calculates evidence scores automatically
-- Reports success, skip, and error counts
+- Parses and validates each file as an `EvidencePacket`, then upserts it into DuckDB
+- Computes the Net Evidence Ratio and promotes filter columns (subject/predicate/object, status, steward)
+- Reports how many packets were ingested out of the total files found
 
 ---
 
@@ -157,10 +156,9 @@ The RDF export creates OWL axiom annotations following OBO conventions:
    - **REJECTED**: Adds `IAO:0000233` (term tracker item) linking to the evidence packet
    - **CONTROVERSIAL**: Adds `rdfs:comment` with controversy note and `IAO:0000233`
 
-3. **Evidence Sources**: For ACCEPTED packets, evidence items with `direction: SUPPORTS` and `rating: ACCEPTED` contribute additional sources:
-   - `publication_id` (from LITERATURE or CONCORDANCE evidence)
-   - `source_subject_id` (from CONCORDANCE evidence)
-   - `reviewer_orcid` (from EXPERT_REVIEW evidence)
+3. **Evidence Sources**: For ACCEPTED packets, evidence items on supporting lines that are themselves `rating: ACCEPTED` contribute additional `oboInOwl:source` values, drawn from whichever of these fields the item carries:
+   - `pmid` / `doi` (e.g. from a `SieveDocument`)
+   - `source_id` / `source_subject` (e.g. from a `ConcordanceItem`)
 
 **Example RDF Output:**
 
@@ -213,13 +211,9 @@ sieve validate -I exports/accepted/
 **Output:**
 
 ```
-ERROR (inbox/bad_packet.yaml): 'assertion' is a required property
-WARNING (inbox/packet2.yaml): Unknown field 'extra_field'
+ERROR (inbox/bad_packet.yaml): 'statement' is a required property
 
-Validation Summary:
-  Total files:  10
-  Valid files:  8
-  Total errors: 2
+Validated 10 file(s); 2 total error(s)
 ```
 
 **Exit Codes:**
@@ -231,11 +225,13 @@ Validation Summary:
 
 **What is Validated:**
 
-- Required fields present (`id`, `assertion`, `status`)
-- Field types match schema (strings, numbers, dates)
-- Enum values are valid (CurationStatus, EvidenceType, etc.)
-- Numeric constraints (e.g., `0.0 <= evidence_strength <= 1.0`)
-- Nested object structure (assertion, evidence items, provenance)
+Each file is validated as an `EvidencePacket` against `schema/sieve.yaml`:
+
+- Required fields present (`id`, `statement`, `status`)
+- Field types match the schema (strings, numbers, dates)
+- Enum values are valid (`CurationStatus`, `direction_of_evidence_provided`, item `type`, etc.)
+- Numeric constraints (e.g. `0.0 <= score_of_evidence_provided <= 1.0`)
+- Nested structure: `statement`, `has_evidence_lines` → `has_evidence_items` (each with a valid `type`)
 
 ---
 
