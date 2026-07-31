@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://matentzn.github.io/sieve/api/">
       
       
-        <link rel="prev" href="../workflows/">
+        <link rel="prev" href="../orcid-setup/">
       
       
         <link rel="next" href="../ai-integration/">
@@ -286,7 +286,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../monarch_evidence/" class="md-nav__link">
+      <a href="../monarch-evidence/" class="md-nav__link">
         
   
   
@@ -338,7 +338,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Model Reference
   
 
     
@@ -354,11 +354,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Model Reference
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -395,14 +423,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../data-model/" class="md-nav__link">
+      <a href="../elements/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Data Model
+    Schema Reference
   
 
     
@@ -520,6 +548,34 @@
     
   
     Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../orcid-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ORCID Setup
   
 
     
@@ -661,10 +717,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
+  <a href="#sievedatamodel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module Overview
+        sieve.datamodel
       
     </span>
   </a>
@@ -672,88 +728,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sievemodels" class="md-nav__link">
+  <a href="#sievedatamodelloaders" class="md-nav__link">
     <span class="md-ellipsis">
       
-        sieve.models
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="sieve.models">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#enumerations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Enumerations
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#core-models" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Core Models
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sievedb" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sieve.db
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="sieve.db">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#curationdatabase" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CurationDatabase
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#evidence-score-calculation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Evidence Score Calculation
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sieveingest" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sieve.ingest
+        sieve.datamodel.loaders
       
     </span>
   </a>
@@ -761,10 +739,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sieveexport" class="md-nav__link">
+  <a href="#sievestore" class="md-nav__link">
     <span class="md-ellipsis">
       
-        sieve.export
+        sieve.store
       
     </span>
   </a>
@@ -772,10 +750,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sieverdf_export" class="md-nav__link">
+  <a href="#sievepacket_ingest" class="md-nav__link">
     <span class="md-ellipsis">
       
-        sieve.rdf_export
+        sieve.packet_ingest
       
     </span>
   </a>
@@ -783,10 +761,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sievevalidators" class="md-nav__link">
+  <a href="#sievepacket_export" class="md-nav__link">
     <span class="md-ellipsis">
       
-        sieve.validators
+        sieve.packet_export
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sievescoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sieve.scoring
       
     </span>
   </a>
@@ -801,62 +790,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="sieve.auth">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#curatorsyaml-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        curators.yaml Format
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#usage-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Usage Examples
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Usage Examples">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#batch-processing-pipeline" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Batch Processing Pipeline
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#programmatic-decision-making" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Programmatic Decision Making
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -904,95 +837,6 @@
   
 
     
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Reference
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../elements/index.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Schema Documentation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
   </ul>
 </nav>
                   </div>
@@ -1014,8 +858,12 @@
 
 
 <h1 id="python-api-reference">Python API Reference<a class="headerlink" href="#python-api-reference" title="Permanent link">&para;</a></h1>
-<p>This document describes the Python modules and functions available in SIEVE for programmatic access.</p>
-<h2 id="module-overview">Module Overview<a class="headerlink" href="#module-overview" title="Permanent link">&para;</a></h2>
+<p>SIEVE is usable as a library, not just a CLI. This page documents the public
+Python API: the Pydantic data model, the loaders, the DuckDB store, and the
+ingest / export / scoring / auth helpers.</p>
+<p>Every signature below is taken from the source. For what the model <em>fields</em>
+mean (statements, evidence lines, evidence items, ratings), see the
+<a href="../data-model/">Data Model</a> page.</p>
 <table>
 <thead>
 <tr>
@@ -1025,474 +873,272 @@
 </thead>
 <tbody>
 <tr>
-<td><code>sieve.models</code></td>
-<td>Pydantic data models</td>
+<td><code>sieve.datamodel</code></td>
+<td>Generated Pydantic models (<code>EvidencePacket</code>, …)</td>
 </tr>
 <tr>
-<td><code>sieve.db</code></td>
-<td>Database operations</td>
+<td><code>sieve.datamodel.loaders</code></td>
+<td>Build packets from YAML / dicts with correct item polymorphism</td>
 </tr>
 <tr>
-<td><code>sieve.ingest</code></td>
-<td>YAML ingestion</td>
+<td><code>sieve.store</code></td>
+<td><code>PacketStore</code> — DuckDB persistence for packets and decisions</td>
 </tr>
 <tr>
-<td><code>sieve.export</code></td>
-<td>YAML export</td>
+<td><code>sieve.packet_ingest</code></td>
+<td>Validate and ingest YAML packets into a store</td>
 </tr>
 <tr>
-<td><code>sieve.rdf_export</code></td>
-<td>RDF generation</td>
+<td><code>sieve.packet_export</code></td>
+<td>Export packets to RDF (OWL axiom annotations) and YAML</td>
 </tr>
 <tr>
-<td><code>sieve.validators</code></td>
-<td>Schema validation</td>
+<td><code>sieve.scoring</code></td>
+<td>Net Evidence Ratio over a packet's evidence lines</td>
 </tr>
 <tr>
 <td><code>sieve.auth</code></td>
-<td>Authentication</td>
+<td>ORCID OAuth and curator authorization (Streamlit)</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="sievemodels">sieve.models<a class="headerlink" href="#sievemodels" title="Permanent link">&para;</a></h2>
-<p>Pydantic models representing the data structures.</p>
-<h3 id="enumerations">Enumerations<a class="headerlink" href="#enumerations" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">CurationStatus</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">DecisionType</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">EvidenceType</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">EvidenceDirection</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">SourceType</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># CurationStatus values</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">CurationStatus</span><span class="o">.</span><span class="n">UNREVIEWED</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">CurationStatus</span><span class="o">.</span><span class="n">ACCEPTED</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">CurationStatus</span><span class="o">.</span><span class="n">REJECTED</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">CurationStatus</span><span class="o">.</span><span class="n">CONTROVERSIAL</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="c1"># DecisionType values</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">DecisionType</span><span class="o">.</span><span class="n">ACCEPT</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">DecisionType</span><span class="o">.</span><span class="n">REJECT</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="n">DecisionType</span><span class="o">.</span><span class="n">CONTROVERSIAL</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="c1"># EvidenceType values</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="n">EvidenceType</span><span class="o">.</span><span class="n">CONCORDANCE</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="n">EvidenceType</span><span class="o">.</span><span class="n">LITERATURE</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="n">EvidenceType</span><span class="o">.</span><span class="n">EXPERT_REVIEW</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="n">EvidenceType</span><span class="o">.</span><span class="n">COMPUTATIONAL</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="n">EvidenceType</span><span class="o">.</span><span class="n">OTHER</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="c1"># EvidenceDirection values</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="n">EvidenceDirection</span><span class="o">.</span><span class="n">SUPPORTS</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="n">EvidenceDirection</span><span class="o">.</span><span class="n">CONTRADICTS</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="n">EvidenceDirection</span><span class="o">.</span><span class="n">UNCERTAIN</span>
+<h2 id="sievedatamodel">sieve.datamodel<a class="headerlink" href="#sievedatamodel" title="Permanent link">&para;</a></h2>
+<p>The data model is generated from <code>schema/sieve.yaml</code> into
+<code>sieve.datamodel.sieve_models</code> and re-exported from <code>sieve.datamodel</code>. All
+classes are Pydantic v2 <code>BaseModel</code> subclasses.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.datamodel</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">EvidencePacket</span><span class="p">,</span>        <span class="c1"># top-level packet: statement + evidence lines + status</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">SieveStatement</span><span class="p">,</span>        <span class="c1"># subject / predicate / object being curated</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">SieveEvidenceLine</span><span class="p">,</span>     <span class="c1"># one argument (direction + strength), holds items</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">SieveEvidenceItem</span><span class="p">,</span>     <span class="c1"># base class for evidence items</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">ConcordanceItem</span><span class="p">,</span>       <span class="c1"># evidence: another ontology/vocabulary agrees</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">SieveDocument</span><span class="p">,</span>         <span class="c1"># evidence: a publication</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">SieveDataItem</span><span class="p">,</span>         <span class="c1"># evidence: a database record</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">SieveStudyResult</span><span class="p">,</span>      <span class="c1"># evidence: a study result</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">ComputationalResult</span><span class="p">,</span>   <span class="c1"># evidence: a computation / model output</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">AgentContribution</span><span class="p">,</span>     <span class="c1"># evidence: a person weighed in</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">CurationActivity</span><span class="p">,</span>      <span class="c1"># who curated the packet</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">CurationDecision</span><span class="p">,</span>      <span class="c1"># a recorded accept/reject/controversial decision</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">DecisionType</span><span class="p">,</span>          <span class="c1"># ACCEPT | REJECT | CONTROVERSIAL</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">EvidenceSynthesis</span><span class="p">,</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">Score</span><span class="p">,</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">Coding</span><span class="p">,</span>                <span class="c1"># a code + label (used for predicates)</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">Agent</span><span class="p">,</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">)</span>
 </code></pre></div>
-<h3 id="core-models">Core Models<a class="headerlink" href="#core-models" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">CurationRecord</span><span class="p">,</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">Assertion</span><span class="p">,</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">Evidence</span><span class="p">,</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">AssertionProvenance</span><span class="p">,</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">CurationActivity</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">EvidenceSynthesis</span><span class="p">,</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">CurationDecision</span><span class="p">,</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">)</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># Create an assertion</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="n">assertion</span> <span class="o">=</span> <span class="n">Assertion</span><span class="p">(</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">subject_id</span><span class="o">=</span><span class="s2">&quot;MONDO:0004979&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="n">subject_label</span><span class="o">=</span><span class="s2">&quot;asthma&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="n">predicate</span><span class="o">=</span><span class="s2">&quot;rdfs:subClassOf&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="n">object_id</span><span class="o">=</span><span class="s2">&quot;MONDO:0005275&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    <span class="n">object_label</span><span class="o">=</span><span class="s2">&quot;respiratory system disorder&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="p">)</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="c1"># Create evidence</span>
-<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="n">evidence</span> <span class="o">=</span> <span class="n">Evidence</span><span class="p">(</span>
-<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;ev-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    <span class="n">evidence_type</span><span class="o">=</span><span class="n">EvidenceType</span><span class="o">.</span><span class="n">LITERATURE</span><span class="p">,</span>
-<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>    <span class="n">direction</span><span class="o">=</span><span class="n">EvidenceDirection</span><span class="o">.</span><span class="n">SUPPORTS</span><span class="p">,</span>
-<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>    <span class="n">evidence_strength</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
-<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>    <span class="n">publication_id</span><span class="o">=</span><span class="s2">&quot;PMID:12345&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>    <span class="n">quoted_text</span><span class="o">=</span><span class="s2">&quot;Asthma is a respiratory disease...&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="p">)</span>
-<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>
-<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="c1"># Create a curation record</span>
-<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="n">record</span> <span class="o">=</span> <span class="n">CurationRecord</span><span class="p">(</span>
-<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;http://example.org/record1&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>    <span class="n">assertion</span><span class="o">=</span><span class="n">assertion</span><span class="p">,</span>
-<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>    <span class="n">evidence</span><span class="o">=</span><span class="p">[</span><span class="n">evidence</span><span class="p">],</span>
-<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>    <span class="n">status</span><span class="o">=</span><span class="n">CurationStatus</span><span class="o">.</span><span class="n">UNREVIEWED</span><span class="p">,</span>
-<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a><span class="p">)</span>
-<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>
-<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="c1"># Serialize to dict</span>
-<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="n">record_dict</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<p>Two enums used on packets live in <code>sieve.datamodel.sieve_models</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.datamodel.sieve_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurationStatus</span><span class="p">,</span> <span class="n">DecisionType</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">CurationStatus</span><span class="o">.</span><span class="n">UNREVIEWED</span>   <span class="c1"># also ACCEPTED, REJECTED, CONTROVERSIAL</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">DecisionType</span><span class="o">.</span><span class="n">ACCEPT</span>         <span class="c1"># also REJECT, CONTROVERSIAL</span>
+</code></pre></div>
+<p>An <code>EvidencePacket</code> requires an <code>id</code> and a <code>statement</code>; <code>status</code> defaults to
+<code>UNREVIEWED</code> and <code>has_evidence_lines</code> defaults to an empty list:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">packet</span> <span class="o">=</span> <span class="n">EvidencePacket</span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;pkt_000001&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">statement</span><span class="o">=</span><span class="n">SieveStatement</span><span class="p">(</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;stmt_1&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">subject</span><span class="o">=</span><span class="s2">&quot;MONDO:0004979&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">predicate</span><span class="o">=</span><span class="n">Coding</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s2">&quot;rdfs:subClassOf&quot;</span><span class="p">),</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="nb">object</span><span class="o">=</span><span class="s2">&quot;MONDO:0005275&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="p">),</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">)</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">packet</span><span class="o">.</span><span class="n">status</span>                       <span class="c1"># CurationStatus.UNREVIEWED</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="n">packet</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><code>CurationDecision</code> is the record written to the store's decision log:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.datamodel</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurationDecision</span><span class="p">,</span> <span class="n">DecisionType</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">decision</span> <span class="o">=</span> <span class="n">CurationDecision</span><span class="p">(</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;dec_1&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">packet_id</span><span class="o">=</span><span class="s2">&quot;pkt_000001&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">curator</span><span class="o">=</span><span class="s2">&quot;orcid:0000-0001-2345-6789&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">curator_name</span><span class="o">=</span><span class="s2">&quot;Dr. Jane Smith&quot;</span><span class="p">,</span>   <span class="c1"># optional</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">decision</span><span class="o">=</span><span class="n">DecisionType</span><span class="o">.</span><span class="n">ACCEPT</span><span class="p">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">rationale</span><span class="o">=</span><span class="s2">&quot;Strong concordance across sources.&quot;</span><span class="p">,</span>  <span class="c1"># optional</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">certainty</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>                   <span class="c1"># optional, 0–1</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">decided_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">),</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">)</span>
 </code></pre></div>
 <hr />
-<h2 id="sievedb">sieve.db<a class="headerlink" href="#sievedb" title="Permanent link">&para;</a></h2>
-<p>Database operations using DuckDB.</p>
-<h3 id="curationdatabase">CurationDatabase<a class="headerlink" href="#curationdatabase" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurationDatabase</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Initialize database (creates file if not exists)</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">db</span> <span class="o">=</span> <span class="n">CurationDatabase</span><span class="p">(</span><span class="s2">&quot;data/curation.duckdb&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># Insert a record</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">record_id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">insert_record</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1"># Get a single record</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">record</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">&quot;record-id&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1"># Returns dict with all fields including parsed JSON</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="c1"># Check if record exists</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">exists</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">record_exists</span><span class="p">(</span><span class="s2">&quot;record-id&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="c1"># Get records by status</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="n">unreviewed</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_records_by_status</span><span class="p">(</span><span class="s2">&quot;UNREVIEWED&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="n">accepted</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_records_by_status</span><span class="p">(</span><span class="s2">&quot;ACCEPTED&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="c1"># Get paginated records</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="n">records</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_records_paginated</span><span class="p">(</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;UNREVIEWED&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>    <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>    <span class="n">limit</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>    <span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;evidence_score&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>    <span class="n">sort_order</span><span class="o">=</span><span class="s2">&quot;DESC&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="p">)</span>
-<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>
-<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="c1"># Get records with decision info</span>
-<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="n">records</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_records_with_decisions_paginated</span><span class="p">(</span>
-<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;ACCEPTED&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>    <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>    <span class="n">limit</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="p">)</span>
-<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>
-<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="c1"># Update record status</span>
-<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="n">db</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span>
-<a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a>    <span class="n">record_id</span><span class="o">=</span><span class="s2">&quot;record-id&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a>    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;ACCEPTED&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a>    <span class="n">evidence_steward</span><span class="o">=</span><span class="s2">&quot;orcid:0000-0001-2345-6789&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a>    <span class="n">confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
-<a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a><span class="p">)</span>
-<a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a>
-<a id="__codelineno-2-44" name="__codelineno-2-44" href="#__codelineno-2-44"></a><span class="c1"># Update evidence rating</span>
-<a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a><span class="n">db</span><span class="o">.</span><span class="n">update_evidence_rating</span><span class="p">(</span>
-<a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a>    <span class="n">record_id</span><span class="o">=</span><span class="s2">&quot;record-id&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a>    <span class="n">evidence_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># First evidence item</span>
-<a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a>    <span class="n">rating</span><span class="o">=</span><span class="s2">&quot;ACCEPTED&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="p">)</span>
-<a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a>
-<a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a><span class="c1"># Record a decision</span>
-<a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<a id="__codelineno-2-53" name="__codelineno-2-53" href="#__codelineno-2-53"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurationDecision</span><span class="p">,</span> <span class="n">DecisionType</span>
-<a id="__codelineno-2-54" name="__codelineno-2-54" href="#__codelineno-2-54"></a>
-<a id="__codelineno-2-55" name="__codelineno-2-55" href="#__codelineno-2-55"></a><span class="n">decision</span> <span class="o">=</span> <span class="n">CurationDecision</span><span class="p">(</span>
-<a id="__codelineno-2-56" name="__codelineno-2-56" href="#__codelineno-2-56"></a>    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;decision-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-57" name="__codelineno-2-57" href="#__codelineno-2-57"></a>    <span class="n">record_id</span><span class="o">=</span><span class="s2">&quot;record-id&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-58" name="__codelineno-2-58" href="#__codelineno-2-58"></a>    <span class="n">curator_orcid</span><span class="o">=</span><span class="s2">&quot;orcid:0000-0001-2345-6789&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-59" name="__codelineno-2-59" href="#__codelineno-2-59"></a>    <span class="n">curator_name</span><span class="o">=</span><span class="s2">&quot;Dr. Smith&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-60" name="__codelineno-2-60" href="#__codelineno-2-60"></a>    <span class="n">decision</span><span class="o">=</span><span class="n">DecisionType</span><span class="o">.</span><span class="n">ACCEPT</span><span class="p">,</span>
-<a id="__codelineno-2-61" name="__codelineno-2-61" href="#__codelineno-2-61"></a>    <span class="n">certainty</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
-<a id="__codelineno-2-62" name="__codelineno-2-62" href="#__codelineno-2-62"></a>    <span class="n">rationale</span><span class="o">=</span><span class="s2">&quot;Strong evidence from multiple sources&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-63" name="__codelineno-2-63" href="#__codelineno-2-63"></a>    <span class="n">decided_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-<a id="__codelineno-2-64" name="__codelineno-2-64" href="#__codelineno-2-64"></a><span class="p">)</span>
-<a id="__codelineno-2-65" name="__codelineno-2-65" href="#__codelineno-2-65"></a><span class="n">db</span><span class="o">.</span><span class="n">record_decision</span><span class="p">(</span><span class="n">decision</span><span class="p">)</span>
-<a id="__codelineno-2-66" name="__codelineno-2-66" href="#__codelineno-2-66"></a>
-<a id="__codelineno-2-67" name="__codelineno-2-67" href="#__codelineno-2-67"></a><span class="c1"># Get decisions for a record</span>
-<a id="__codelineno-2-68" name="__codelineno-2-68" href="#__codelineno-2-68"></a><span class="n">decisions</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_decisions_for_record</span><span class="p">(</span><span class="s2">&quot;record-id&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-69" name="__codelineno-2-69" href="#__codelineno-2-69"></a>
-<a id="__codelineno-2-70" name="__codelineno-2-70" href="#__codelineno-2-70"></a><span class="c1"># Return to queue (undo decision)</span>
-<a id="__codelineno-2-71" name="__codelineno-2-71" href="#__codelineno-2-71"></a><span class="n">db</span><span class="o">.</span><span class="n">return_to_queue</span><span class="p">(</span><span class="s2">&quot;record-id&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-72" name="__codelineno-2-72" href="#__codelineno-2-72"></a>
-<a id="__codelineno-2-73" name="__codelineno-2-73" href="#__codelineno-2-73"></a><span class="c1"># Get statistics</span>
-<a id="__codelineno-2-74" name="__codelineno-2-74" href="#__codelineno-2-74"></a><span class="n">stats</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span>
-<a id="__codelineno-2-75" name="__codelineno-2-75" href="#__codelineno-2-75"></a><span class="c1"># Returns: {&quot;total&quot;: 100, &quot;unreviewed&quot;: 50, &quot;accepted&quot;: 30, ...}</span>
-<a id="__codelineno-2-76" name="__codelineno-2-76" href="#__codelineno-2-76"></a>
-<a id="__codelineno-2-77" name="__codelineno-2-77" href="#__codelineno-2-77"></a><span class="c1"># Close connection</span>
-<a id="__codelineno-2-78" name="__codelineno-2-78" href="#__codelineno-2-78"></a><span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</code></pre></div>
-<h3 id="evidence-score-calculation">Evidence Score Calculation<a class="headerlink" href="#evidence-score-calculation" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_evidence_score</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">evidence_list</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="p">{</span><span class="s2">&quot;direction&quot;</span><span class="p">:</span> <span class="s2">&quot;SUPPORTS&quot;</span><span class="p">,</span> <span class="s2">&quot;evidence_strength&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">},</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="p">{</span><span class="s2">&quot;direction&quot;</span><span class="p">:</span> <span class="s2">&quot;SUPPORTS&quot;</span><span class="p">,</span> <span class="s2">&quot;evidence_strength&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">},</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="p">{</span><span class="s2">&quot;direction&quot;</span><span class="p">:</span> <span class="s2">&quot;CONTRADICTS&quot;</span><span class="p">,</span> <span class="s2">&quot;evidence_strength&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">]</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">score</span> <span class="o">=</span> <span class="n">calculate_evidence_score</span><span class="p">(</span><span class="n">evidence_list</span><span class="p">)</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Returns Net Evidence Ratio: (0.9 + 0.8 - 0.5) / (0.9 + 0.8 + 0.5) = 0.545</span>
-</code></pre></div>
-<hr />
-<h2 id="sieveingest">sieve.ingest<a class="headerlink" href="#sieveingest" title="Permanent link">&para;</a></h2>
-<p>Functions for loading YAML evidence packets.</p>
+<h2 id="sievedatamodelloaders">sieve.datamodel.loaders<a class="headerlink" href="#sievedatamodelloaders" title="Permanent link">&para;</a></h2>
+<p>Evidence items are a polymorphic union; loading through the base class would
+drop subclass fields. These loaders dispatch each item to its concrete class by
+its <code>type</code> field before validating.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.ingest</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">parse_curation_record</span><span class="p">,</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">ingest_file</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">ingest_directory</span><span class="p">,</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">load_yaml_file</span><span class="p">,</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">generate_id</span><span class="p">,</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">)</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurationDatabase</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># Generate a unique ID</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">new_id</span> <span class="o">=</span> <span class="n">generate_id</span><span class="p">()</span>  <span class="c1"># e.g., &quot;cura:a1b2c3d4e5f6&quot;</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="c1"># Load and parse a YAML file</span>
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="n">data</span> <span class="o">=</span> <span class="n">load_yaml_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;packet.yaml&quot;</span><span class="p">))</span>
-<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="n">record</span> <span class="o">=</span> <span class="n">parse_curation_record</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>
-<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="c1"># Ingest a single file</span>
-<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="n">db</span> <span class="o">=</span> <span class="n">CurationDatabase</span><span class="p">(</span><span class="s2">&quot;data/curation.duckdb&quot;</span><span class="p">)</span>
-<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="n">success_count</span><span class="p">,</span> <span class="n">skip_count</span> <span class="o">=</span> <span class="n">ingest_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;packet.yaml&quot;</span><span class="p">),</span> <span class="n">db</span><span class="p">)</span>
-<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>
-<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="c1"># Ingest a directory</span>
-<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="n">stats</span> <span class="o">=</span> <span class="n">ingest_directory</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;inbox/&quot;</span><span class="p">),</span> <span class="n">db</span><span class="p">)</span>
-<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="c1"># Returns: {</span>
-<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="c1">#     &quot;files&quot;: 10,</span>
-<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="c1">#     &quot;success&quot;: 8,</span>
-<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="c1">#     &quot;skipped&quot;: 2,</span>
-<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="c1">#     &quot;errors&quot;: 0,</span>
-<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="c1">#     &quot;error_details&quot;: []</span>
-<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="c1"># }</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.datamodel.loaders</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_packet</span><span class="p">,</span> <span class="n">packet_from_dict</span><span class="p">,</span> <span class="n">EVIDENCE_ITEM_TYPES</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">load_packet</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvidencePacket</span>        <span class="c1"># load from a YAML file</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">def</span><span class="w"> </span><span class="nf">packet_from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvidencePacket</span>   <span class="c1"># build from a raw dict</span>
+</code></pre></div>
+<p><code>EVIDENCE_ITEM_TYPES</code> is the <code>type</code> discriminator registry — a
+<code>dict[str, type[BaseModel]]</code> mapping an item's <code>type</code> string to its class. It
+includes both the concrete names (<code>"ConcordanceItem"</code>, <code>"AgentContribution"</code>,
+<code>"ComputationalResult"</code>, <code>"SieveDocument"</code>, <code>"SieveDataItem"</code>,
+<code>"SieveStudyResult"</code>) and the base-type aliases <code>"Document"</code>, <code>"DataItem"</code>,
+<code>"StudyResult"</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">packet</span> <span class="o">=</span> <span class="n">load_packet</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;inbox/examples/asthma.yaml&quot;</span><span class="p">))</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">packet</span> <span class="o">=</span> <span class="n">packet_from_dict</span><span class="p">({</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;pkt_000001&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">&quot;statement&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;subject&quot;</span><span class="p">:</span> <span class="s2">&quot;MONDO:0004979&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>                  <span class="s2">&quot;predicate&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;rdfs:subClassOf&quot;</span><span class="p">},</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>                  <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;MONDO:0005275&quot;</span><span class="p">},</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="s2">&quot;has_evidence_lines&quot;</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="p">{</span><span class="s2">&quot;direction_of_evidence_provided&quot;</span><span class="p">:</span> <span class="s2">&quot;supports&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>         <span class="s2">&quot;has_evidence_items&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;SieveDocument&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;d1&quot;</span><span class="p">,</span> <span class="s2">&quot;pmid&quot;</span><span class="p">:</span> <span class="s2">&quot;28884740&quot;</span><span class="p">}]},</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="p">],</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">})</span>
 </code></pre></div>
 <hr />
-<h2 id="sieveexport">sieve.export<a class="headerlink" href="#sieveexport" title="Permanent link">&para;</a></h2>
-<p>Functions for exporting records to YAML.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.export</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">record_to_export_dict</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">record_to_yaml</span><span class="p">,</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">generate_export_records</span><span class="p">,</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">create_export_tarball</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">export_records_to_directory</span><span class="p">,</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">)</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurationDatabase</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="n">db</span> <span class="o">=</span> <span class="n">CurationDatabase</span><span class="p">(</span><span class="s2">&quot;data/curation.duckdb&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="c1"># Convert a database record to export dict</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="n">record</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">&quot;record-id&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="n">decisions</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_decisions_for_record</span><span class="p">(</span><span class="s2">&quot;record-id&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="n">export_dict</span> <span class="o">=</span> <span class="n">record_to_export_dict</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">decisions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">decisions</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="c1"># Convert to YAML string</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="n">yaml_str</span> <span class="o">=</span> <span class="n">record_to_yaml</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">decisions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">decisions</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="c1"># Generate all exportable records</span>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">yaml_content</span><span class="p">,</span> <span class="n">status</span> <span class="ow">in</span> <span class="n">generate_export_records</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="c1"># Create a tar.gz archive</span>
-<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="n">tarball_bytes</span> <span class="o">=</span> <span class="n">create_export_tarball</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">statuses</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ACCEPTED&quot;</span><span class="p">,</span> <span class="s2">&quot;REJECTED&quot;</span><span class="p">])</span>
-<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;export.tar.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tarball_bytes</span><span class="p">)</span>
-<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>
-<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="c1"># Export to directory structure</span>
-<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="n">counts</span> <span class="o">=</span> <span class="n">export_records_to_directory</span><span class="p">(</span>
-<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>    <span class="n">db</span><span class="p">,</span>
-<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a>    <span class="n">output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;exports/&quot;</span><span class="p">),</span>
-<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a>    <span class="n">statuses</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ACCEPTED&quot;</span><span class="p">,</span> <span class="s2">&quot;REJECTED&quot;</span><span class="p">,</span> <span class="s2">&quot;CONTROVERSIAL&quot;</span><span class="p">],</span>
-<a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a><span class="p">)</span>
-<a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a><span class="c1"># Creates: exports/accepted/*.yaml, exports/rejected/*.yaml, etc.</span>
+<h2 id="sievestore">sieve.store<a class="headerlink" href="#sievestore" title="Permanent link">&para;</a></h2>
+<p><code>PacketStore</code> persists packets as full JSON plus a few promoted columns for
+querying, alongside a decision log. The DuckDB file defaults to
+<code>data/sieve.duckdb</code>; pass <code>":memory:"</code> for an ephemeral store.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.store</span><span class="w"> </span><span class="kn">import</span> <span class="n">PacketStore</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">PacketStore</span><span class="p">:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;data/sieve.duckdb&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">insert_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet</span><span class="p">:</span> <span class="n">EvidencePacket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvidencePacket</span> <span class="o">|</span> <span class="kc">None</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">list_packets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_item_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">item_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_decisions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">record_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decision</span><span class="p">:</span> <span class="n">CurationDecision</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Notes on behavior (from the source):</p>
+<ul>
+<li><code>insert_packet</code> upserts by packet <code>id</code> (INSERT OR REPLACE) and returns the id.
+  It computes and stores the Net Evidence Ratio into the <code>evidence_score</code>
+  column.</li>
+<li><code>get_packet</code> returns <code>None</code> if the id is unknown.</li>
+<li><code>list_packets</code> returns dicts with keys <code>id</code>, <code>subject_id</code>, <code>predicate</code>,
+  <code>object_id</code>, <code>status</code>, <code>evidence_score</code>.</li>
+<li><code>get_stats</code> returns a <code>{status: count}</code> map.</li>
+<li><code>update_status</code> and <code>set_item_rating</code> are no-ops if the packet id is unknown.</li>
+<li><code>get_decisions</code> returns rows newest-first with keys <code>id</code>, <code>packet_id</code>,
+  <code>curator</code>, <code>curator_name</code>, <code>decision</code>, <code>rationale</code>, <code>certainty</code>, <code>decided_at</code>.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">store</span> <span class="o">=</span> <span class="n">PacketStore</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">store</span><span class="o">.</span><span class="n">insert_packet</span><span class="p">(</span><span class="n">packet</span><span class="p">)</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">store</span><span class="o">.</span><span class="n">list_packets</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;UNREVIEWED&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">store</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span>                      <span class="c1"># e.g. {&quot;UNREVIEWED&quot;: 1}</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">store</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="s2">&quot;pkt_000001&quot;</span><span class="p">,</span> <span class="s2">&quot;ACCEPTED&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">store</span><span class="o">.</span><span class="n">set_item_rating</span><span class="p">(</span><span class="s2">&quot;pkt_000001&quot;</span><span class="p">,</span> <span class="s2">&quot;d1&quot;</span><span class="p">,</span> <span class="s2">&quot;ACCEPTED&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="n">store</span><span class="o">.</span><span class="n">record_decision</span><span class="p">(</span><span class="n">decision</span><span class="p">)</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="n">store</span><span class="o">.</span><span class="n">get_decisions</span><span class="p">(</span><span class="s2">&quot;pkt_000001&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="n">store</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
 <hr />
-<h2 id="sieverdf_export">sieve.rdf_export<a class="headerlink" href="#sieverdf_export" title="Permanent link">&para;</a></h2>
-<p>Functions for generating RDF axiom annotations.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">rdflib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Graph</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.rdf_export</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">packet_to_rdf</span><span class="p">,</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">load_packet</span><span class="p">,</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">iter_packets</span><span class="p">,</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">export_to_rdf</span><span class="p">,</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="n">expand_curie</span><span class="p">,</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">get_obo_converter</span><span class="p">,</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">)</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="c1"># Load a single packet</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="n">packet</span> <span class="o">=</span> <span class="n">load_packet</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;packet.yaml&quot;</span><span class="p">))</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="c1"># Convert to RDF</span>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="n">graph</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">()</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="n">packet_to_rdf</span><span class="p">(</span><span class="n">packet</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="c1"># Serialize</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="n">turtle_str</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;turtle&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>
-<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="c1"># Expand CURIEs</span>
-<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="n">converter</span> <span class="o">=</span> <span class="n">get_obo_converter</span><span class="p">()</span>
-<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="n">uri</span> <span class="o">=</span> <span class="n">expand_curie</span><span class="p">(</span><span class="s2">&quot;MONDO:0004979&quot;</span><span class="p">,</span> <span class="n">converter</span><span class="p">)</span>
-<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="c1"># Returns: URIRef(&quot;http://purl.obolibrary.org/obo/MONDO_0004979&quot;)</span>
-<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>
-<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="c1"># Iterate over packets in a directory</span>
-<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="k">for</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">packet_dict</span> <span class="ow">in</span> <span class="n">iter_packets</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;exports/accepted/&quot;</span><span class="p">)):</span>
-<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a>
-<a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a><span class="c1"># Export to file</span>
-<a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a><span class="n">rdf_str</span> <span class="o">=</span> <span class="n">export_to_rdf</span><span class="p">(</span>
-<a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a>    <span class="n">input_path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;exports/accepted/&quot;</span><span class="p">),</span>
-<a id="__codelineno-6-34" name="__codelineno-6-34" href="#__codelineno-6-34"></a>    <span class="n">output_path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;axioms.ttl&quot;</span><span class="p">),</span>
-<a id="__codelineno-6-35" name="__codelineno-6-35" href="#__codelineno-6-35"></a>    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;turtle&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-36" name="__codelineno-6-36" href="#__codelineno-6-36"></a><span class="p">)</span>
-<a id="__codelineno-6-37" name="__codelineno-6-37" href="#__codelineno-6-37"></a>
-<a id="__codelineno-6-38" name="__codelineno-6-38" href="#__codelineno-6-38"></a><span class="c1"># Export to different formats</span>
-<a id="__codelineno-6-39" name="__codelineno-6-39" href="#__codelineno-6-39"></a><span class="n">export_to_rdf</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;packet.yaml&quot;</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;output.rdf&quot;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;xml&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-40" name="__codelineno-6-40" href="#__codelineno-6-40"></a><span class="n">export_to_rdf</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;packet.yaml&quot;</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;output.n3&quot;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;n3&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-41" name="__codelineno-6-41" href="#__codelineno-6-41"></a><span class="n">export_to_rdf</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;packet.yaml&quot;</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;output.nt&quot;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;nt&quot;</span><span class="p">)</span>
+<h2 id="sievepacket_ingest">sieve.packet_ingest<a class="headerlink" href="#sievepacket_ingest" title="Permanent link">&para;</a></h2>
+<p>Validate packet dicts against the LinkML schema and load YAML packets into a
+<code>PacketStore</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.packet_ingest</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">validate_packet_dict</span><span class="p">,</span>     <span class="c1"># (data: dict) -&gt; list   ([] means valid)</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">ingest_packet_file</span><span class="p">,</span>       <span class="c1"># (path: Path, store: PacketStore) -&gt; str</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">ingest_packet_directory</span><span class="p">,</span>  <span class="c1"># (path: Path, store: PacketStore) -&gt; dict</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><code>validate_packet_dict</code> returns a list of LinkML validation results; an empty
+  list means the dict is valid against the <code>EvidencePacket</code> class.</li>
+<li><code>ingest_packet_file</code> loads one YAML packet and inserts it, returning its id.</li>
+<li><code>ingest_packet_directory</code> walks <code>**/*.yaml</code> and <code>**/*.yml</code>, ingesting each and
+  collecting per-file errors. It returns
+  <code>{"files": int, "success": int, "errors": int, "error_details": [...]}</code>.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">store</span> <span class="o">=</span> <span class="n">PacketStore</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">)</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">validate_packet_dict</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">stats</span> <span class="o">=</span> <span class="n">ingest_packet_directory</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;inbox/examples/&quot;</span><span class="p">),</span> <span class="n">store</span><span class="p">)</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> ingested&quot;</span><span class="p">)</span>
 </code></pre></div>
 <hr />
-<h2 id="sievevalidators">sieve.validators<a class="headerlink" href="#sievevalidators" title="Permanent link">&para;</a></h2>
-<p>Functions for validating evidence packets against the LinkML schema.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.validators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">validate_json_schema</span><span class="p">,</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">validate_packet</span><span class="p">,</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">validate_packets</span><span class="p">,</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">print_validation_report</span><span class="p">,</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="n">get_schema_path</span><span class="p">,</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">)</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1"># Get schema path</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">schema_path</span> <span class="o">=</span> <span class="n">get_schema_path</span><span class="p">()</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="c1"># Validate a dictionary</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;test-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>    <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;UNREVIEWED&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>    <span class="s2">&quot;assertion&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>        <span class="s2">&quot;subject_id&quot;</span><span class="p">:</span> <span class="s2">&quot;MONDO:0001&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>        <span class="s2">&quot;predicate&quot;</span><span class="p">:</span> <span class="s2">&quot;rdfs:subClassOf&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>        <span class="s2">&quot;object_id&quot;</span><span class="p">:</span> <span class="s2">&quot;MONDO:0002&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>    <span class="p">},</span>
-<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="p">}</span>
-<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="n">report</span> <span class="o">=</span> <span class="n">validate_json_schema</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">target_class</span><span class="o">=</span><span class="s2">&quot;CurationRecord&quot;</span><span class="p">)</span>
-<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>
-<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="c1"># Print validation results</span>
-<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="n">error_count</span> <span class="o">=</span> <span class="n">print_validation_report</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
-<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>
-<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="c1"># Validate a file</span>
-<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="n">report</span><span class="p">,</span> <span class="n">error_count</span> <span class="o">=</span> <span class="n">validate_packet</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;packet.yaml&quot;</span><span class="p">))</span>
-<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a>
-<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="c1"># Validate multiple files</span>
-<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="n">total_files</span><span class="p">,</span> <span class="n">valid_files</span><span class="p">,</span> <span class="n">total_errors</span> <span class="o">=</span> <span class="n">validate_packets</span><span class="p">(</span>
-<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a>    <span class="n">input_path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;inbox/&quot;</span><span class="p">),</span>
-<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a>    <span class="n">fail_on_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a><span class="p">)</span>
-<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Valid: </span><span class="si">{</span><span class="n">valid_files</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total_files</span><span class="si">}</span><span class="s2">, Errors: </span><span class="si">{</span><span class="n">total_errors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<h2 id="sievepacket_export">sieve.packet_export<a class="headerlink" href="#sievepacket_export" title="Permanent link">&para;</a></h2>
+<p>Serialize packets to YAML, and turn ACCEPTED / REJECTED / CONTROVERSIAL packets
+into OWL axiom annotations (RDF). Serialization uses <code>serialize_as_any</code> so
+polymorphic evidence items keep their subclass fields.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">rdflib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Graph</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.packet_export</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">packet_to_yaml</span><span class="p">,</span>          <span class="c1"># (packet: EvidencePacket) -&gt; str</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">export_packets_to_yaml</span><span class="p">,</span>  <span class="c1"># (packets: list[EvidencePacket], output_path: Path) -&gt; None</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="n">packet_to_rdf</span><span class="p">,</span>           <span class="c1"># (packet: EvidencePacket, graph: Graph | None = None) -&gt; Graph</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="n">export_packets_to_rdf</span><span class="p">,</span>   <span class="c1"># (packets, output_path=None, format=&quot;turtle&quot;) -&gt; str</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">expand_curie</span><span class="p">,</span>            <span class="c1"># (curie: str | None, converter) -&gt; URIRef | None</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="n">get_obo_converter</span><span class="p">,</span>       <span class="c1"># () -&gt; curies.Converter</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="p">)</span>
 </code></pre></div>
+<ul>
+<li><code>packet_to_rdf</code> only emits triples for packets whose status is one of
+  <code>ACCEPTED</code>, <code>REJECTED</code>, <code>CONTROVERSIAL</code>; others are skipped with a warning and
+  an (unchanged) graph is returned. Pass an existing <code>graph</code> to accumulate.</li>
+<li><code>export_packets_to_rdf</code> builds one graph over all packets, serializes it in
+  <code>format</code> (any rdflib format, e.g. <code>"turtle"</code>, <code>"xml"</code>, <code>"nt"</code>), optionally
+  writes it to <code>output_path</code>, and returns the serialized string.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">graph</span> <span class="o">=</span> <span class="n">packet_to_rdf</span><span class="p">(</span><span class="n">packet</span><span class="p">)</span>                     <span class="c1"># empty unless packet is decided</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">turtle</span> <span class="o">=</span> <span class="n">export_packets_to_rdf</span><span class="p">([</span><span class="n">packet</span><span class="p">],</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;axioms.ttl&quot;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;turtle&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">export_packets_to_yaml</span><span class="p">([</span><span class="n">packet</span><span class="p">],</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;out/packets.yaml&quot;</span><span class="p">))</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="n">yaml_text</span> <span class="o">=</span> <span class="n">packet_to_yaml</span><span class="p">(</span><span class="n">packet</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="sievescoring">sieve.scoring<a class="headerlink" href="#sievescoring" title="Permanent link">&para;</a></h2>
+<p>The <strong>Net Evidence Ratio</strong> (NER) reduces a packet's evidence lines to a single
+number in <code>[-1, +1]</code>. Each line is weighted by its explicit
+<code>score_of_evidence_provided</code>, else mapped from <code>strength_of_evidence_provided</code>
+(<code>strong</code>=1.0, <code>moderate</code>=0.6, <code>weak</code>=0.3), else 1.0.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.scoring</span><span class="w"> </span><span class="kn">import</span> <span class="n">net_evidence_ratio</span><span class="p">,</span> <span class="n">line_score</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">net_evidence_ratio</span><span class="p">(</span><span class="n">packet</span><span class="p">:</span> <span class="n">EvidencePacket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span>   <span class="c1"># (S+ - S-) / (S+ + S- + S0)</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">line_score</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span>                             <span class="c1"># weight of a single line</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">ner</span> <span class="o">=</span> <span class="n">net_evidence_ratio</span><span class="p">(</span><span class="n">packet</span><span class="p">)</span>   <span class="c1"># +1 all supporting, -1 all disputing, 0 if empty</span>
+</code></pre></div>
+<p>See the <a href="../primer/#from-evidence-to-a-score">primer</a> for a worked example.</p>
 <hr />
 <h2 id="sieveauth">sieve.auth<a class="headerlink" href="#sieveauth" title="Permanent link">&para;</a></h2>
-<p>Authentication and authorization functions.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.auth</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="n">is_dev_mode</span><span class="p">,</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">is_orcid_configured</span><span class="p">,</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">is_authorized_curator</span><span class="p">,</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">is_admin</span><span class="p">,</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="n">get_curator_role</span><span class="p">,</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="n">get_curator_info</span><span class="p">,</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="n">load_authorized_curators</span><span class="p">,</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="n">get_authorization_url</span><span class="p">,</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="n">exchange_code_for_token</span><span class="p">,</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    <span class="n">OrcidUser</span><span class="p">,</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>    <span class="n">AuthorizedCurator</span><span class="p">,</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="p">)</span>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="c1"># Check modes</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="k">if</span> <span class="n">is_dev_mode</span><span class="p">():</span>
-<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running in development mode&quot;</span><span class="p">)</span>
-<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
-<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="k">if</span> <span class="n">is_orcid_configured</span><span class="p">():</span>
-<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>    <span class="n">auth_url</span> <span class="o">=</span> <span class="n">get_authorization_url</span><span class="p">()</span>
-<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Login at: </span><span class="si">{</span><span class="n">auth_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>
-<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="c1"># Check authorization</span>
-<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="n">orcid</span> <span class="o">=</span> <span class="s2">&quot;0000-0001-2345-6789&quot;</span>
-<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="k">if</span> <span class="n">is_authorized_curator</span><span class="p">(</span><span class="n">orcid</span><span class="p">):</span>
-<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>    <span class="n">role</span> <span class="o">=</span> <span class="n">get_curator_role</span><span class="p">(</span><span class="n">orcid</span><span class="p">)</span>  <span class="c1"># &quot;admin&quot; or &quot;curator&quot;</span>
-<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>    <span class="k">if</span> <span class="n">is_admin</span><span class="p">(</span><span class="n">orcid</span><span class="p">):</span>
-<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User is an admin&quot;</span><span class="p">)</span>
-<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>
-<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="c1"># Load all authorized curators</span>
-<a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="n">curators</span> <span class="o">=</span> <span class="n">load_authorized_curators</span><span class="p">()</span>
-<a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a><span class="k">for</span> <span class="n">orcid</span><span class="p">,</span> <span class="n">curator</span> <span class="ow">in</span> <span class="n">curators</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">curator</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">curator</span><span class="o">.</span><span class="n">role</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a>
-<a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a><span class="c1"># Exchange OAuth code for token (in OAuth callback)</span>
-<a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a><span class="n">user</span> <span class="o">=</span> <span class="n">exchange_code_for_token</span><span class="p">(</span><span class="n">authorization_code</span><span class="p">)</span>
-<a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a><span class="k">if</span> <span class="n">user</span><span class="p">:</span>
-<a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Logged in as </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">orcid</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<p>ORCID OAuth login and curator authorization for the Streamlit review UI. The
+UI-rendering helpers depend on Streamlit session state; the checks below are the
+parts useful outside a running app.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.auth</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="n">OrcidUser</span><span class="p">,</span>                  <span class="c1"># dataclass: orcid, name, access_token</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="n">AuthorizedCurator</span><span class="p">,</span>          <span class="c1"># dataclass: orcid, name, role (&quot;admin&quot;|&quot;curator&quot;)</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="n">is_dev_mode</span><span class="p">,</span>                <span class="c1"># () -&gt; bool  (SIEVE_DEV_MODE=true bypasses auth)</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">is_orcid_configured</span><span class="p">,</span>        <span class="c1"># () -&gt; bool</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">get_orcid_config</span><span class="p">,</span>           <span class="c1"># () -&gt; dict</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="n">get_authorization_url</span><span class="p">,</span>      <span class="c1"># () -&gt; str</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="n">exchange_code_for_token</span><span class="p">,</span>    <span class="c1"># (code: str) -&gt; OrcidUser | None</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="n">load_authorized_curators</span><span class="p">,</span>   <span class="c1"># () -&gt; dict[str, AuthorizedCurator]  (keyed by ORCID)</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    <span class="n">is_authorized_curator</span><span class="p">,</span>      <span class="c1"># (orcid: str | None) -&gt; bool  (True in dev mode)</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    <span class="n">get_curator_role</span><span class="p">,</span>           <span class="c1"># (orcid: str | None) -&gt; str | None</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="n">is_admin</span><span class="p">,</span>                   <span class="c1"># (orcid: str | None) -&gt; bool  (True in dev mode)</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>    <span class="n">get_curator_info</span><span class="p">,</span>           <span class="c1"># () -&gt; tuple[str | None, str | None]  (orcid, name)</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="p">)</span>
 </code></pre></div>
-<h3 id="curatorsyaml-format">curators.yaml Format<a class="headerlink" href="#curatorsyaml-format" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">curators</span><span class="p">:</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">orcid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0000-0001-2345-6789&quot;</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dr.</span><span class="nv"> </span><span class="s">Jane</span><span class="nv"> </span><span class="s">Smith&quot;</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">orcid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0000-0002-3456-7890&quot;</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dr.</span><span class="nv"> </span><span class="s">John</span><span class="nv"> </span><span class="s">Doe&quot;</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">curator</span>
+<p>Authorized curators are read from <code>curators.yaml</code> (path overridable via the
+<code>CURATORS_FILE</code> env var), cached for 60 seconds:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">curators</span><span class="p">:</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">orcid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0000-0001-2345-6789&quot;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dr.</span><span class="nv"> </span><span class="s">Jane</span><span class="nv"> </span><span class="s">Smith&quot;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">orcid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0000-0002-3456-7890&quot;</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dr.</span><span class="nv"> </span><span class="s">John</span><span class="nv"> </span><span class="s">Doe&quot;</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">    </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">curator</span>
 </code></pre></div>
-<hr />
-<h2 id="usage-examples">Usage Examples<a class="headerlink" href="#usage-examples" title="Permanent link">&para;</a></h2>
-<h3 id="batch-processing-pipeline">Batch Processing Pipeline<a class="headerlink" href="#batch-processing-pipeline" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurationDatabase</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.ingest</span><span class="w"> </span><span class="kn">import</span> <span class="n">ingest_directory</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_packets</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.rdf_export</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_to_rdf</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Validate input</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">total</span><span class="p">,</span> <span class="n">valid</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">validate_packets</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;input/&quot;</span><span class="p">))</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="k">if</span> <span class="n">errors</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation failed with </span><span class="si">{</span><span class="n">errors</span><span class="si">}</span><span class="s2"> errors&quot;</span><span class="p">)</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="c1"># Ingest</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="n">db</span> <span class="o">=</span> <span class="n">CurationDatabase</span><span class="p">(</span><span class="s2">&quot;data/curation.duckdb&quot;</span><span class="p">)</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="n">stats</span> <span class="o">=</span> <span class="n">ingest_directory</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;input/&quot;</span><span class="p">),</span> <span class="n">db</span><span class="p">)</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ingested </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> records&quot;</span><span class="p">)</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="c1"># ... (manual curation in web UI) ...</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="c1"># Export accepted to RDF</span>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="n">export_to_rdf</span><span class="p">(</span>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;exports/accepted/&quot;</span><span class="p">),</span>
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;accepted_axioms.ttl&quot;</span><span class="p">),</span>
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;turtle&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">if</span> <span class="n">is_authorized_curator</span><span class="p">(</span><span class="s2">&quot;0000-0001-2345-6789&quot;</span><span class="p">):</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="n">role</span> <span class="o">=</span> <span class="n">get_curator_role</span><span class="p">(</span><span class="s2">&quot;0000-0001-2345-6789&quot;</span><span class="p">)</span>   <span class="c1"># &quot;admin&quot;</span>
 </code></pre></div>
-<h3 id="programmatic-decision-making">Programmatic Decision Making<a class="headerlink" href="#programmatic-decision-making" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurationDatabase</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurationDecision</span><span class="p">,</span> <span class="n">DecisionType</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="n">db</span> <span class="o">=</span> <span class="n">CurationDatabase</span><span class="p">(</span><span class="s2">&quot;data/curation.duckdb&quot;</span><span class="p">)</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1"># Get unreviewed records with high evidence scores</span>
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="n">records</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_records_paginated</span><span class="p">(</span>
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;UNREVIEWED&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>    <span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;evidence_score&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>    <span class="n">sort_order</span><span class="o">=</span><span class="s2">&quot;DESC&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>    <span class="n">limit</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="p">)</span>
-<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>
-<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="c1"># Auto-accept records with very high scores</span>
-<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
-<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>    <span class="k">if</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;evidence_score&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.9</span><span class="p">:</span>
-<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>        <span class="n">decision</span> <span class="o">=</span> <span class="n">CurationDecision</span><span class="p">(</span>
-<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;auto-</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>            <span class="n">record_id</span><span class="o">=</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
-<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a>            <span class="n">curator_orcid</span><span class="o">=</span><span class="s2">&quot;orcid:0000-0000-0000-0000&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a>            <span class="n">curator_name</span><span class="o">=</span><span class="s2">&quot;Automated System&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a>            <span class="n">decision</span><span class="o">=</span><span class="n">DecisionType</span><span class="o">.</span><span class="n">ACCEPT</span><span class="p">,</span>
-<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a>            <span class="n">certainty</span><span class="o">=</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;evidence_score&quot;</span><span class="p">],</span>
-<a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a>            <span class="n">rationale</span><span class="o">=</span><span class="s2">&quot;Automatically accepted due to high evidence score&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-26" name="__codelineno-11-26" href="#__codelineno-11-26"></a>            <span class="n">decided_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-<a id="__codelineno-11-27" name="__codelineno-11-27" href="#__codelineno-11-27"></a>        <span class="p">)</span>
-<a id="__codelineno-11-28" name="__codelineno-11-28" href="#__codelineno-11-28"></a>        <span class="n">db</span><span class="o">.</span><span class="n">record_decision</span><span class="p">(</span><span class="n">decision</span><span class="p">)</span>
-</code></pre></div>
+<p>Streamlit-bound helpers (<code>get_current_user</code>, <code>set_current_user</code>, <code>logout</code>,
+<code>handle_oauth_callback</code>, <code>render_login_ui</code>) are used by the app and require an
+active Streamlit session.</p>
 
 
 

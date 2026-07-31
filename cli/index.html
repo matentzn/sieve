@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://matentzn.github.io/sieve/cli/">
       
       
-        <link rel="prev" href="../data-model/">
+        <link rel="prev" href="../elements/">
       
       
         <link rel="next" href="../workflows/">
@@ -286,7 +286,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../monarch_evidence/" class="md-nav__link">
+      <a href="../monarch-evidence/" class="md-nav__link">
         
   
   
@@ -338,7 +338,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Model Reference
   
 
     
@@ -354,11 +354,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Model Reference
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -395,14 +423,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../data-model/" class="md-nav__link">
+      <a href="../elements/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Data Model
+    Schema Reference
   
 
     
@@ -746,6 +774,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../orcid-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ORCID Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -850,95 +906,6 @@
     
   
     AI Integration
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Reference
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../elements/index.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Schema Documentation
   
 
     
@@ -1098,7 +1065,7 @@
 <td><code>--db</code></td>
 <td>-</td>
 <td>Path to DuckDB database file</td>
-<td><code>data/curation.duckdb</code></td>
+<td><code>data/sieve.duckdb</code></td>
 </tr>
 </tbody>
 </table>
@@ -1113,15 +1080,14 @@
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>sieve<span class="w"> </span>ingest<span class="w"> </span>-I<span class="w"> </span>inbox/<span class="w"> </span>--db<span class="w"> </span>custom.duckdb
 </code></pre></div>
 <p><strong>Output:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Ingested 15 new records
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>Skipped 3 existing records
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Ingested 15 of 18 packets
 </code></pre></div>
 <p><strong>Behavior:</strong></p>
 <ul>
 <li>Recursively finds all <code>.yaml</code> and <code>.yml</code> files in the directory</li>
-<li>Skips records that already exist (based on <code>id</code> field)</li>
-<li>Calculates evidence scores automatically</li>
-<li>Reports success, skip, and error counts</li>
+<li>Parses and validates each file as an <code>EvidencePacket</code>, then upserts it into DuckDB</li>
+<li>Computes the Net Evidence Ratio and promotes filter columns (subject/predicate/object, status, steward)</li>
+<li>Reports how many packets were ingested out of the total files found</li>
 </ul>
 <hr />
 <h2 id="sieve-export">sieve export<a class="headerlink" href="#sieve-export" title="Permanent link">&para;</a></h2>
@@ -1233,11 +1199,10 @@
 <p><strong>CONTROVERSIAL</strong>: Adds <code>rdfs:comment</code> with controversy note and <code>IAO:0000233</code></p>
 </li>
 <li>
-<p><strong>Evidence Sources</strong>: For ACCEPTED packets, evidence items with <code>direction: SUPPORTS</code> and <code>rating: ACCEPTED</code> contribute additional sources:</p>
+<p><strong>Evidence Sources</strong>: For ACCEPTED packets, evidence items on supporting lines that are themselves <code>rating: ACCEPTED</code> contribute additional <code>oboInOwl:source</code> values, drawn from whichever of these fields the item carries:</p>
 </li>
-<li><code>publication_id</code> (from LITERATURE or CONCORDANCE evidence)</li>
-<li><code>source_subject_id</code> (from CONCORDANCE evidence)</li>
-<li><code>reviewer_orcid</code> (from EXPERT_REVIEW evidence)</li>
+<li><code>pmid</code> / <code>doi</code> (e.g. from a <code>SieveDocument</code>)</li>
+<li><code>source_id</code> / <code>source_subject</code> (e.g. from a <code>ConcordanceItem</code>)</li>
 </ol>
 <p><strong>Example RDF Output:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">owl:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2002/07/owl#&gt;</span><span class="w"> </span><span class="p">.</span>
@@ -1295,13 +1260,9 @@
 <a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-I<span class="w"> </span>exports/accepted/
 </code></pre></div>
 <p><strong>Output:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>ERROR (inbox/bad_packet.yaml): &#39;assertion&#39; is a required property
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>WARNING (inbox/packet2.yaml): Unknown field &#39;extra_field&#39;
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Validation Summary:
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>  Total files:  10
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>  Valid files:  8
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>  Total errors: 2
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>ERROR (inbox/bad_packet.yaml): &#39;statement&#39; is a required property
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Validated 10 file(s); 2 total error(s)
 </code></pre></div>
 <p><strong>Exit Codes:</strong></p>
 <table>
@@ -1323,12 +1284,13 @@
 </tbody>
 </table>
 <p><strong>What is Validated:</strong></p>
+<p>Each file is validated as an <code>EvidencePacket</code> against <code>schema/sieve.yaml</code>:</p>
 <ul>
-<li>Required fields present (<code>id</code>, <code>assertion</code>, <code>status</code>)</li>
-<li>Field types match schema (strings, numbers, dates)</li>
-<li>Enum values are valid (CurationStatus, EvidenceType, etc.)</li>
-<li>Numeric constraints (e.g., <code>0.0 &lt;= evidence_strength &lt;= 1.0</code>)</li>
-<li>Nested object structure (assertion, evidence items, provenance)</li>
+<li>Required fields present (<code>id</code>, <code>statement</code>, <code>status</code>)</li>
+<li>Field types match the schema (strings, numbers, dates)</li>
+<li>Enum values are valid (<code>CurationStatus</code>, <code>direction_of_evidence_provided</code>, item <code>type</code>, etc.)</li>
+<li>Numeric constraints (e.g. <code>0.0 &lt;= score_of_evidence_provided &lt;= 1.0</code>)</li>
+<li>Nested structure: <code>statement</code>, <code>has_evidence_lines</code> → <code>has_evidence_items</code> (each with a valid <code>type</code>)</li>
 </ul>
 <hr />
 <h2 id="common-workflows">Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
