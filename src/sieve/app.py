@@ -104,20 +104,20 @@ def render_packet_detail(store: PacketStore, packet_id: str) -> None:
         return
 
     stmt = packet.statement
-    st.header(getattr(stmt, "statementText", None) or packet_id)
+    st.header(getattr(stmt, "statement_text", None) or packet_id)
     st.write(
-        f"**{getattr(stmt, 'subjectLabel', '') or getattr(stmt, 'subject', '')}** "
+        f"**{getattr(stmt, 'subject_label', '') or getattr(stmt, 'subject', '')}** "
         f"*{_predicate_label(packet)}* "
-        f"**{getattr(stmt, 'objectLabel', '') or getattr(stmt, 'object', '')}**"
+        f"**{getattr(stmt, 'object_label', '') or getattr(stmt, 'object', '')}**"
     )
     st.write(f"Status: `{packet.status}`  ·  NER: `{net_evidence_ratio(packet):.2f}`")
 
     st.subheader("Evidence")
-    for line in packet.hasEvidenceLines or []:
-        direction = line.directionOfEvidenceProvided or "?"
-        score = line.scoreOfEvidenceProvided
+    for line in packet.has_evidence_lines or []:
+        direction = line.direction_of_evidence_provided or "?"
+        score = line.score_of_evidence_provided
         st.markdown(f"**Line** — {direction} (score {score})")
-        for item in line.hasEvidenceItems or []:
+        for item in line.has_evidence_items or []:
             render_item(store, packet_id, item)
 
     render_decisions(store, packet)
@@ -130,8 +130,8 @@ def render_item(store: PacketStore, packet_id: str, item: object) -> None:
     with st.container(border=True):
         st.markdown(f"`{kind}` — rating: **{getattr(item, 'rating', None) or 'unrated'}**")
         for attr in (
-            "sourceName", "sourceId", "sourceObject", "title", "pmid", "doi",
-            "quote", "methodName", "value", "trustLevel", "contributionType", "content",
+            "source_name", "source_id", "source_object", "title", "pmid", "doi",
+            "quote", "method_name", "value", "trust_level", "contribution_type", "content",
         ):
             val = getattr(item, attr, None)
             if val:

@@ -18,13 +18,13 @@ def _packet():
             subject="MONDO:0004979",
             object="MONDO:0005275",
         ),
-        hasEvidenceLines=[
+        has_evidence_lines=[
             SieveEvidenceLine(
                 id="l1",
                 type="SieveEvidenceLine",
-                directionOfEvidenceProvided="supports",
-                scoreOfEvidenceProvided=0.9,
-                hasEvidenceItems=[ConcordanceItem(id="e1", type="ConcordanceItem", sourceName="DOID")],
+                direction_of_evidence_provided="supports",
+                score_of_evidence_provided=0.9,
+                has_evidence_items=[ConcordanceItem(id="e1", type="ConcordanceItem", source_name="DOID")],
             )
         ],
     )
@@ -36,10 +36,10 @@ def test_insert_and_get_roundtrip():
     got = store.get_packet("sieve:pkt_1")
     assert got is not None
     assert got.statement.subject == "MONDO:0004979"
-    item = got.hasEvidenceLines[0].hasEvidenceItems[0]
+    item = got.has_evidence_lines[0].has_evidence_items[0]
     assert isinstance(item, ConcordanceItem)
     # subclass fields must survive the JSON round-trip (serialize_as_any)
-    assert item.sourceName == "DOID"
+    assert item.source_name == "DOID"
 
 
 def test_promoted_columns_and_score():
@@ -81,4 +81,4 @@ def test_set_item_rating():
     store.insert_packet(_packet())
     store.set_item_rating("sieve:pkt_1", "e1", "ACCEPTED")
     got = store.get_packet("sieve:pkt_1")
-    assert got.hasEvidenceLines[0].hasEvidenceItems[0].rating == "ACCEPTED"
+    assert got.has_evidence_lines[0].has_evidence_items[0].rating == "ACCEPTED"

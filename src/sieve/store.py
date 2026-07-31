@@ -119,8 +119,8 @@ class PacketStore:
         packet = self.get_packet(packet_id)
         if packet is None:
             return
-        for line in packet.hasEvidenceLines or []:
-            for item in line.hasEvidenceItems or []:
+        for line in packet.has_evidence_lines or []:
+            for item in line.has_evidence_items or []:
                 if getattr(item, "id", None) == item_id:
                     item.rating = rating  # type: ignore[attr-defined]
         self.insert_packet(packet)

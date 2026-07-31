@@ -58,12 +58,12 @@ statement:
   subject: MONDO:0005015
   predicate: {code: rdfs:subClassOf, label: subClassOf}
   object: MONDO:0005151
-hasEvidenceLines:
+has_evidence_lines:
   - id: line_1
     type: SieveEvidenceLine
-    directionOfEvidenceProvided: supports
-    scoreOfEvidenceProvided: 0.9
-    hasEvidenceItems:
+    direction_of_evidence_provided: supports
+    score_of_evidence_provided: 0.9
+    has_evidence_items:
       - id: ev_1
         type: SieveDocument
         pmid: "12345678"

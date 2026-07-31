@@ -7,24 +7,24 @@ statement:
   id: stmt_asthma_0001
   type: SieveStatement
   subject: MONDO:0004979
-  subjectLabel: asthma
+  subject_label: asthma
   predicate:
     code: rdfs:subClassOf
     label: subClassOf
   object: MONDO:0005275
-  objectLabel: respiratory system disorder
-  statementText: asthma subClassOf respiratory system disorder
-hasEvidenceLines:
+  object_label: respiratory system disorder
+  statement_text: asthma subClassOf respiratory system disorder
+has_evidence_lines:
   - id: line_0001
     type: SieveEvidenceLine
-    directionOfEvidenceProvided: supports
-    strengthOfEvidenceProvided: strong
-    scoreOfEvidenceProvided: 0.9
-    hasEvidenceItems:
+    direction_of_evidence_provided: supports
+    strength_of_evidence_provided: strong
+    score_of_evidence_provided: 0.9
+    has_evidence_items:
       - id: ev_concordance_0001
         type: ConcordanceItem
-        sourceName: Disease Ontology
-        sourceId: DOID:2841
+        source_name: Disease Ontology
+        source_id: DOID:2841
         rating: ACCEPTED
         eco_code: ECO:0000269
       - id: ev_document_0001

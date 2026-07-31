@@ -24,7 +24,7 @@ def packet_to_yaml(packet: EvidencePacket) -> str:
 
     ``serialize_as_any`` is required so polymorphic evidence items serialize by
     their runtime subclass, not the declared ``InformationEntity`` base (which
-    would drop subclass fields like ``value``/``sourceName``).
+    would drop subclass fields like ``value``/``source_name``).
     """
     data = packet.model_dump(mode="json", exclude_none=True, serialize_as_any=True)
     return yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
@@ -80,13 +80,13 @@ def _packet_uri(packet_id: Optional[str]) -> Optional[URIRef]:
 def _accepted_item_sources(packet: EvidencePacket) -> list[str]:
     """CURIE/identifier sources from ACCEPTED items on supporting lines."""
     sources: list[str] = []
-    for line in packet.hasEvidenceLines or []:
-        if (line.directionOfEvidenceProvided or "").lower() != "supports":
+    for line in packet.has_evidence_lines or []:
+        if (line.direction_of_evidence_provided or "").lower() != "supports":
             continue
-        for item in line.hasEvidenceItems or []:
+        for item in line.has_evidence_items or []:
             if getattr(item, "rating", None) != "ACCEPTED":
                 continue
-            for attr in ("pmid", "doi", "sourceId", "sourceSubject"):
+            for attr in ("pmid", "doi", "source_id", "source_subject"):
                 val = getattr(item, attr, None)
                 if val:
                     sources.append(str(val))

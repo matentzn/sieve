@@ -7,7 +7,7 @@ def _packet(lines):
         id="p",
         status="UNREVIEWED",
         statement=SieveStatement(id="s", type="SieveStatement", subject="MONDO:1", object="MONDO:2"),
-        hasEvidenceLines=lines,
+        has_evidence_lines=lines,
     )
 
 
@@ -17,8 +17,8 @@ def test_all_supporting_is_plus_one():
             SieveEvidenceLine(
                 id="l1",
                 type="SieveEvidenceLine",
-                directionOfEvidenceProvided="supports",
-                scoreOfEvidenceProvided=0.9,
+                direction_of_evidence_provided="supports",
+                score_of_evidence_provided=0.9,
             )
         ]
     )
@@ -31,14 +31,14 @@ def test_mixed_directions():
             SieveEvidenceLine(
                 id="l1",
                 type="SieveEvidenceLine",
-                directionOfEvidenceProvided="supports",
-                scoreOfEvidenceProvided=1.0,
+                direction_of_evidence_provided="supports",
+                score_of_evidence_provided=1.0,
             ),
             SieveEvidenceLine(
                 id="l2",
                 type="SieveEvidenceLine",
-                directionOfEvidenceProvided="disputes",
-                scoreOfEvidenceProvided=1.0,
+                direction_of_evidence_provided="disputes",
+                score_of_evidence_provided=1.0,
             ),
         ]
     )
@@ -55,8 +55,8 @@ def test_qualitative_strength_fallback():
             SieveEvidenceLine(
                 id="l1",
                 type="SieveEvidenceLine",
-                directionOfEvidenceProvided="supports",
-                strengthOfEvidenceProvided="strong",
+                direction_of_evidence_provided="supports",
+                strength_of_evidence_provided="strong",
             )
         ]
     )

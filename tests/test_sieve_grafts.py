@@ -29,4 +29,4 @@ def test_curation_decision_and_provenance_grafts():
     activity_slots = {s.name for s in sv.class_induced_slots("CurationActivity")}
     assert {"pull_request", "issue", "created_with"} <= activity_slots
     concordance_slots = {s.name for s in sv.class_induced_slots("ConcordanceItem")}
-    assert "mappingSet" in concordance_slots
+    assert "mapping_set" in concordance_slots

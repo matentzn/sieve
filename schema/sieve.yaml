@@ -67,7 +67,7 @@ classes:
         ifabsent: string(UNREVIEWED)
         description: Current curation workflow status.
 
-      hasEvidenceLines:
+      has_evidence_lines:
         range: SieveEvidenceLine
         multivalued: true
         inlined_as_list: true
@@ -95,17 +95,17 @@ classes:
   SieveStatement:
     description: >-
       Sieve extension of SEPIO Statement. A subject-predicate-object assertion
-      being curated. Inherits subject, predicate (Coding), object, statementText,
+      being curated. Inherits subject, predicate (Coding), object, statement_text,
       and evidence-linking attributes from SEPIO Statement. Adds human-readable
       labels for subject and object. Evidence lines are kept on the EvidencePacket
       container, not nested here.
     is_a: Statement
     attributes:
-      subjectLabel:
+      subject_label:
         range: string
         description: Human-readable label for the subject.
 
-      objectLabel:
+      object_label:
         range: string
         description: Human-readable label for the object.
 
@@ -149,7 +149,7 @@ classes:
       InformationEntity.
     is_a: InformationEntity
     attributes:
-      evidenceItemType:
+      evidence_item_type:
         range: EvidenceItemType
         description: Type of evidence item (for polymorphism).
 
@@ -173,7 +173,7 @@ classes:
         range: string
         description: Relevant quote from the document.
 
-      quoteLocation:
+      quote_location:
         range: string
         description: Location of quote (page, section, figure).
 
@@ -196,54 +196,54 @@ classes:
       that aligns with the statement being curated.
     comments:
       - "Use inherited 'sources' to reference the concordant knowledge source."
-      - "Use inherited 'derivedFrom' if linking to a formal InformationEntity."
-      - "The sourceSubject/Predicate/Object fields capture the concordant assertion."
+      - "Use inherited 'derived_from' if linking to a formal InformationEntity."
+      - "The source_subject/Predicate/Object fields capture the concordant assertion."
     attributes:
-      sourceName:
+      source_name:
         range: string
         description: >-
           Human-readable name of the concordant source (e.g., "Disease Ontology").
           Convenience field; formal source can be in inherited 'sources'.
 
-      sourceId:
+      source_id:
         range: uriorcurie
         description: Identifier of the concordant source (e.g., database ID, ontology IRI).
 
-      sourceVersion:
+      source_version:
         range: string
         description: Version/release of the concordant source.
 
-      sourceSubject:
+      source_subject:
         range: uriorcurie
         description: Subject of the concordant assertion in the source.
 
-      sourceSubjectLabel:
+      source_subject_label:
         range: string
         description: Human-readable label of the subject in the source.
 
-      sourcePredicate:
+      source_predicate:
         range: uriorcurie
         description: Predicate/relationship in the concordant assertion.
 
-      sourcePredicateLabel:
+      source_predicate_label:
         range: string
         description: Human-readable label of the predicate in the source.
 
-      sourceObject:
+      source_object:
         range: uriorcurie
         description: Object of the concordant assertion in the source.
 
-      sourceObjectLabel:
+      source_object_label:
         range: string
         description: Human-readable label of the object in the source.
 
-      mappingJustification:
+      mapping_justification:
         range: uriorcurie
         description: >-
           How entities were mapped between sources (e.g., semapv:LexicalMatching,
           semapv:ManualMappingCuration). Uses SSSOM mapping justification vocabulary.
 
-      mappingSet:
+      mapping_set:
         range: uri
         description: SSSOM mapping-set URI the concordance was drawn from.
 
@@ -255,30 +255,30 @@ classes:
     description: >-
       Evidence from a computational method or algorithm. Extends SEPIO
       DataItem. The computed score/result is stored in inherited 'value'.
-      Method details can be referenced via inherited 'specifiedBy' or
+      Method details can be referenced via inherited 'specified_by' or
       the convenience attributes below.
     comments:
       - "Use inherited 'value' for the primary result (e.g., confidence score)."
       - "Use inherited 'subtype' (Coding) to categorize the computation type."
-      - "Use inherited 'specifiedBy' to reference formal method specifications."
+      - "Use inherited 'specified_by' to reference formal method specifications."
     attributes:
-      methodName:
+      method_name:
         range: string
         description: >-
           Human-readable name of the computational method.
-          Convenience field; formal method can be in inherited 'specifiedBy'.
+          Convenience field; formal method can be in inherited 'specified_by'.
 
-      methodId:
+      method_id:
         range: uriorcurie
         description: >-
           Identifier for the method (e.g., OBI term).
-          Convenience field; formal method can be in inherited 'specifiedBy'.
+          Convenience field; formal method can be in inherited 'specified_by'.
 
       parameters:
         range: string
         description: Method parameters (as JSON string or key=value format).
 
-      softwareVersion:
+      software_version:
         range: string
         description: Version of software/tool used.
 
@@ -298,7 +298,7 @@ classes:
         inlined: true
         description: The agent (person or organization) who made the contribution.
 
-      trustLevel:
+      trust_level:
         range: TrustLevel
         description: >-
           Level of trust/authority assigned to the contributor.
@@ -310,7 +310,7 @@ classes:
           How the contribution was communicated/submitted.
           Affects traceability and reliability scoring.
 
-      contributionType:
+      contribution_type:
         range: ContributionType
         description: >-
           The nature of the contribution (suggestion, review, decision, etc.).

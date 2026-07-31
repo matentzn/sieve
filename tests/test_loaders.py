@@ -9,20 +9,20 @@ def test_items_dispatch_to_subclasses():
         "id": "sieve:pkt_1",
         "status": "UNREVIEWED",
         "statement": {"id": "stmt_1", "type": "SieveStatement", "subject": "MONDO:1", "object": "MONDO:2"},
-        "hasEvidenceLines": [
+        "has_evidence_lines": [
             {
                 "id": "line_1",
                 "type": "SieveEvidenceLine",
-                "directionOfEvidenceProvided": "supports",
-                "hasEvidenceItems": [
-                    {"id": "ev_1", "type": "ConcordanceItem", "sourceName": "DOID", "rating": "ACCEPTED"},
+                "direction_of_evidence_provided": "supports",
+                "has_evidence_items": [
+                    {"id": "ev_1", "type": "ConcordanceItem", "source_name": "DOID", "rating": "ACCEPTED"},
                     {"id": "ev_2", "type": "SieveDocument", "quote": "…", "pmid": "12345678"},
                 ],
             }
         ],
     }
     packet = packet_from_dict(data)
-    items = packet.hasEvidenceLines[0].hasEvidenceItems
+    items = packet.has_evidence_lines[0].has_evidence_items
     assert isinstance(items[0], ConcordanceItem)
     assert items[0].rating == "ACCEPTED"
     assert isinstance(items[1], SieveDocument)

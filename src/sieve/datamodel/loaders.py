@@ -36,8 +36,8 @@ EVIDENCE_ITEM_TYPES: dict[str, type[BaseModel]] = {
 
 
 def _convert_evidence_items(data: dict[str, Any]) -> dict[str, Any]:
-    for line in data.get("hasEvidenceLines") or []:
-        items = line.get("hasEvidenceItems")
+    for line in data.get("has_evidence_lines") or []:
+        items = line.get("has_evidence_items")
         if not items:
             continue
         converted: list[Any] = []
@@ -47,7 +47,7 @@ def _convert_evidence_items(data: dict[str, Any]) -> dict[str, Any]:
                 converted.append(cls.model_validate(item) if cls else item)
             else:
                 converted.append(item)
-        line["hasEvidenceItems"] = converted
+        line["has_evidence_items"] = converted
     return data
 
 
