@@ -1,0 +1,56 @@
+id: dismech-to-minimal
+title: DisMech Pathophysiology assertion -> minimal EvidencedClaim
+description: |-
+  Maps a DisMech Pathophysiology assertion (a claim + a flat list of evidence items)
+  onto the minimal microschema: the assertion becomes an EvidencedClaim, and EACH
+  dismech evidence item becomes its own EvidenceLine holding one TextSpan. Per-item
+  direction/source (which dismech records on each item) move to the line, matching the
+  minimal semantics of "one line = one direction + one source".
+
+  Source schema: transform/dismech_source.yaml (vendored snapshot of dismech's shape).
+  Target schema: schema/minimal.yaml.
+
+class_derivations:
+
+  EvidencedClaim:
+    populated_from: Pathophysiology
+    slot_derivations:
+      statement_text:
+        populated_from: name
+      has_evidence_lines:
+        populated_from: evidence
+
+  EvidenceLine:
+    populated_from: EvidenceItem
+    slot_derivations:
+      # dismech's `supports` enum conflates three SEPIO concerns, so it is split here:
+      #  - direction (SUPPORT/REFUTE) -> direction_of_evidence_provided
+      #  - strength  (PARTIAL = partial/indirect) -> strength_of_evidence_provided
+      #  - operational/QC (NO_EVIDENCE, WRONG_STATEMENT) -> NOT evidence; a real
+      #    pipeline drops the item / flags the claim. Mapped to NEUTRAL here only as a
+      #    safe fallback; neither appears in the Fanconi example.
+      direction_of_evidence_provided:
+        expr: "'REFUTES' if supports == 'REFUTE' else ('NEUTRAL' if supports == 'NO_EVIDENCE' or supports == 'WRONG_STATEMENT' else 'SUPPORTS')"
+      strength_of_evidence_provided:
+        expr: "'WEAK' if supports == 'PARTIAL' else None"
+      evidence_source:
+        populated_from: evidence_source
+      description:
+        populated_from: explanation
+      has_evidence_items:
+        # each dismech item carries exactly one text span; wrap it as a single TextSpan
+        expr: "[{'value': snippet, 'reported_in': {'id': reference, 'title': reference_title}}]"
+
+enum_derivations:
+
+  # Direction/strength are derived by expr above (one dismech `supports` value feeds
+  # two SEPIO slots), so no Direction enum_derivation is needed here.
+
+  EvidenceSource:
+    populated_from: EvidenceSourceEnum
+    permissible_value_derivations:
+      HUMAN_CLINICAL: {populated_from: HUMAN_CLINICAL}
+      MODEL_ORGANISM: {populated_from: MODEL_ORGANISM}
+      IN_VITRO: {populated_from: IN_VITRO}
+      COMPUTATIONAL: {populated_from: COMPUTATIONAL}
+      OTHER: {populated_from: OTHER}

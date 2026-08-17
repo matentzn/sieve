@@ -1,0 +1,208 @@
+id: M2
+title: A "not indicated for" sentence with nowhere to go, and a silent scope narrowing that every confidence number scores 1.0
+source:
+  repo: medic
+  path: products/indication_list.yaml
+  entity: "IndicationAssociation CHEBI:10124 (zolmitriptan) INDICATION MONDO:0005475 (migraine with aura)"
+challenges: [R1, R4, R13, R16, R22, Q7]
+
+summary: >-
+  Two defects in one record, both invisible to MeDIC's own quality machinery. (1) The label
+  reads "migraine with OR WITHOUT aura"; the extractor emitted "migraine with aura" and grounded
+  it to MONDO:0005475 — a narrower disease. Every step is marked `quality: verbatim` /
+  `lexical_exact` with `confidence: 1.0`, and no `scope_narrowed` flag fires, because each step
+  is individually correct: the output string IS a substring of the input. (2) The same section
+  carries a `LIMITATION_STATEMENT` span containing an explicit non-indication — the one genuinely
+  REFUTES-shaped signal in the whole product — which MeDIC deliberately retains, roles, and
+  keeps out of the positive claim's negation scope, but then has no slot to express.
+
+# ---------------------------------------------------------------------------
+as_is:
+  drug_id: CHEBI:10124
+  drug_label: zolmitriptan
+  disease_id: MONDO:0005475
+  disease_label: migraine with aura              # <- narrower than what the label says
+  relationship_type: INDICATION
+  reliability: HIGH                              # <- MeDIC believes this record is fine
+  assertions:
+    - source: DAILYMED
+      jurisdiction: USA
+      document: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+      assertion:
+        relationship: INDICATION
+        trigger_cue: indication_phrase
+        trigger_span: are indicated for
+        method: LLM
+        agent: {agent_name: anthropic/claude-haiku-4-5-20251001, agent_type: AI_AGENT}
+        confidence: {basis: MEASURED, subject: 0.9, object: 1.0, relationship: 1.0, overall: 0.9}
+        flags: []                                # <- no AssertionFlag fired
+        negation_scope: [0]                      # only span 0 is in scope for negation
+      disease:
+        id: MEDICNE:6b146c8c-c364-5687-a2bd-c356ae42c11e
+        original_literal: migraine with aura     # <- what the extractor produced
+        resolution:
+          confidence: 1.0
+          input_value: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+          output_value: MONDO:0005475
+          pipeline:
+            - category: EXTRACTION
+              method: LLM
+              output_value: migraine with aura
+              quality: verbatim                  # <- technically true: it IS a substring
+              span_role: SECTION_TEXT
+              confidence: 1.0
+              confidence_basis: MEASURED
+              flags: []                          # <- no `scope_narrowed`
+            - {category: GROUNDING, method: LEXICAL_MATCH, predicate_id: "skos:exactMatch", quality: lexical_exact, confidence: 1.0, output_value: "MONDO:0005475"}
+            - {category: NORMALIZATION, method: DETERMINISTIC_RULE, quality: identity, confidence: 1.0, output_value: "MONDO:0005475"}
+      evidence:
+        source_type: REGULATORY
+        source_role: INTERMEDIARY
+        approval_status: APPROVED
+        confidence: HIGH
+        snippet: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults. Limitations of Use…"
+      regulatory_status: {authority: FDA, status: APPROVED, approval_date: '19971125'}
+      spans:
+        - role: SECTION_TEXT
+          section_code: LOINC:34067-9
+          text: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+        - role: SUBSECTION_HEADER
+          section_code: LOINC:34067-9
+          text: "Limitations of Use"
+        - role: LIMITATION_STATEMENT              # <- the REFUTES-shaped span
+          section_code: LOINC:34067-9
+          text: >-
+            Only use zolmitriptan orally disintegrating tablets if a clear diagnosis of migraine
+            has been established. If a patient has no response to zolmitriptan for the first
+            migraine attack, reconsider the diagnosis of migraine before zolmitriptan is
+            administered to treat any subsequent attacks. Zolmitriptan orally disintegrating
+            tablets are not indicated for the prophylactic therapy of migraine or for the
+            treatment of hemiplegic or basilar migraine.
+
+# ---------------------------------------------------------------------------
+# TRACK 1 — the minimal microschema
+# The limitation statement becomes an evidence line on a DIFFERENT statement (a different
+# predicate, per medic hazard H3 — a non-indication is not counter-evidence to an indication).
+# The scope narrowing is corrected at the statement level, not hidden in a confidence number.
+# ---------------------------------------------------------------------------
+minimal:
+  - id: medic:CHEBI_10124--INDICATION--MONDO_0005277
+    statement_text: zolmitriptan is indicated for the acute treatment of migraine
+    _note: >-
+      MONDO:0005277 (migraine disorder) is the correct grounding for "migraine with or without
+      aura". The as-is record's MONDO:0005475 (migraine with aura) is a narrowing error.
+    has_evidence_lines:
+      - direction_of_evidence_provided: SUPPORTS
+        strength_of_evidence_provided: STRONG
+        evidence_source: REGULATORY
+        description: FDA-approved acute-treatment indication from the structured product label.
+        has_evidence_items:
+          - value: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+            reported_in:
+              id: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+              title: ZOLMITRIPTAN orally disintegrating tablets — structured product label
+              document_type: REGULATORY_LABEL
+
+  - id: medic:CHEBI_10124--INDICATION--MONDO_prophylaxis_of_migraine
+    statement_text: zolmitriptan is indicated for the prophylactic therapy of migraine
+    has_evidence_lines:
+      - direction_of_evidence_provided: REFUTES        # the FDA label explicitly says it is not
+        strength_of_evidence_provided: STRONG
+        evidence_source: REGULATORY
+        description: Explicit non-indication in the label's Limitations of Use subsection.
+        has_evidence_items:
+          - value: "Zolmitriptan orally disintegrating tablets are not indicated for the prophylactic therapy of migraine…"
+            reported_in: {id: "DailyMed:3f0040a6-…", document_type: REGULATORY_LABEL}
+
+  - id: medic:CHEBI_10124--INDICATION--<TODO:hemiplegic_migraine>
+    statement_text: zolmitriptan is indicated for hemiplegic migraine
+    _note: >-
+      Mondo has `MONDO:0000700 familial hemiplegic migraine` and `MONDO:0020757 sporadic
+      hemiplegic migraine` but no grouping term for "hemiplegic migraine" as the label writes
+      it. A faithful evidence model must be able to hold the claim with the grounding
+      unresolved, rather than forcing it to a narrower child — the same failure as the
+      `migraine with aura` narrowing above.
+    has_evidence_lines:
+      - direction_of_evidence_provided: REFUTES
+        strength_of_evidence_provided: STRONG
+        evidence_source: REGULATORY
+        description: Explicit non-indication in the label's Limitations of Use subsection.
+        has_evidence_items:
+          - value: "…or for the treatment of hemiplegic or basilar migraine."
+            reported_in: {id: "DailyMed:3f0040a6-…", document_type: REGULATORY_LABEL}
+
+# ---------------------------------------------------------------------------
+sepio_monarch:
+  id: sieve:pkt_medic_zolmitriptan_migraine
+  status: CONTROVERSIAL          # flagged: the grounding is narrower than the source text
+  statement:
+    type: SieveStatement
+    subject: CHEBI:10124
+    predicate: {code: INDICATION, label: is indicated for}
+    object: MONDO:0005277
+    object_label: migraine disorder
+  has_evidence_lines:
+    - id: line_zolmi_indication
+      type: SieveEvidenceLine
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: strong
+      evidence_source: REGULATORY
+      has_evidence_items:
+        - id: span_zolmi_indication
+          type: TextMiningResult
+          value: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+          reported_in: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+          document_section: "LOINC:34067-9 INDICATIONS AND USAGE"
+          extraction_method: "medic-extractor/1 + claude-haiku-4-5"
+          extraction_score: 1.0
+          eco_code: <TODO — needs OLS lookup, not invention; spec blocker B2>
+          rating: REJECTED               # per-item curation verdict: the mention was narrowed
+          data_quality:
+            flags: [scope_narrowed]      # what SHOULD have fired
+            note: >-
+              Extracted mention "migraine with aura" is narrower than the source phrase
+              "migraine with or without aura". Each pipeline step scored 1.0 because each step
+              is locally correct; the error is in the span boundary chosen at extraction.
+    - id: line_zolmi_limitation
+      type: SieveEvidenceLine
+      direction_of_evidence_provided: neutral      # relative to THIS statement it only restricts scope
+      strength_of_evidence_provided: strong
+      evidence_source: REGULATORY
+      description: >-
+        A limitation statement restricting the claim made elsewhere in the section. It refutes
+        the prophylaxis and hemiplegic/basilar statements (separate packets), and merely bounds
+        this one.
+      has_evidence_items:
+        - id: span_zolmi_limitation
+          type: TextMiningResult
+          value: "Zolmitriptan orally disintegrating tablets are not indicated for the prophylactic therapy of migraine or for the treatment of hemiplegic or basilar migraine."
+          reported_in: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+          document_section: "LOINC:34067-9 Limitations of Use"
+          span_role: LIMITATION_STATEMENT
+  decisions:
+    - {decision_type: FLAG, rationale: "Grounding narrower than source text; re-ground to MONDO:0005277.", certainty: high}
+
+# ---------------------------------------------------------------------------
+gaps:
+  quality_gates_miss_composed_errors: >-
+    The scope narrowing is invisible to every gate MeDIC has, because each step is individually
+    correct and the failure only exists in the composition. This is a general lesson for
+    AI-curated evidence: per-step confidence does not compose into claim correctness, and a
+    product of 1.0s can still be wrong. It is also why a human-facing verbatim span is
+    non-negotiable — a curator reading the span spots this in one second.
+  refutes_has_no_home: >-
+    `LIMITATION_STATEMENT` is a first-class span role that MeDIC deliberately retains and
+    excludes from the positive claim's negation scope — real engineering effort spent on data it
+    then cannot use. Under Track 1 it becomes a REFUTES line on a DIFFERENT statement. Do NOT
+    map it to a REFUTES line on the indication statement: "indicated for X" and "not indicated
+    for prophylaxis of X" are different propositions (medic hazard H3).
+  operational_flags_are_not_evidence: >-
+    `scope_narrowed`, `negated_inversion`, `over_extraction`, `wrong_section` are extraction
+    failure modes. They belong on the item as data quality (and drive `rating`/curation), never
+    in the `Direction` enum — the same rule that keeps DisMech's `NO_EVIDENCE` and
+    `WRONG_STATEMENT` out of the model (R16).
+  one_span_many_statements: >-
+    A single limitation sentence refutes at least three distinct statements (prophylaxis,
+    hemiplegic migraine, basilar migraine). This is the reuse case (R8/Q2) that DOES occur
+    naturally: the same data item, interpreted into three different evidence lines against
+    three different claims. Worth showing Matt as the counterexample to "reuse never happens".

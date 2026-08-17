@@ -141,3 +141,18 @@ dmypy.json
 .vscode
 data/curation.duckdb.wal
 data/curation.duckdb
+sieve.config.json
+data/curation_state.json
+.DS_Store
+
+# Generated linkml-map transform outputs
+transform/build/
+
+# Generated LinkML schema reference (regenerated on build/deploy)
+docs/elements/*
+!docs/elements/.gitkeep
+/issues
+monarch_evidence/spec-deck.pdf
+/docs/superpowers/plans
+/docs/superpowers/specs
+monarch_evidence/materials/evidence-consolidation-neutral.pdf

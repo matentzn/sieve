@@ -62,6 +62,10 @@ NEVER required, if you think you need them, it's likely a bad smell that your lo
 - `mkdocs.yml` - Documentation configuration
 - `uv.lock` - Locked dependency versions
 
+## Future Considerations
+
+- **URL routing**: Currently using Streamlit with query params (`?packet=pkt_000001`) for packet URLs. Consider switching to FastAPI + templates for proper REST-style URLs (`/packets/pkt_000001`) if sharing/bookmarking becomes important.
+
 ## Development Workflow
 
 1. Dependencies are managed via `uv` - use `uv add` for new dependencies

@@ -1,0 +1,217 @@
+id: M1
+title: Six regulatory documents, four jurisdictions, one claim — corroboration without a notion of independence
+source:
+  repo: medic
+  path: products/indication_list.yaml
+  entity: "IndicationAssociation CHEBI:748790 (exenatide) INDICATION MONDO:0005148 (type 2 diabetes mellitus)"
+challenges: [R3, R5, R9, R13, R20, R21, Q6]
+
+summary: >-
+  MeDIC's best-case shape. One canonical pair carries six `SourceAssertion`s — one per source
+  DOCUMENT — from FDA/DailyMed, EMA (twice: Bydureon and Byetta), CDSCO India, and PMDA Japan
+  (twice). Each assertion is internally single-source by construction: the drug mention, the
+  disease mention and every span come from that one document. The pair-level `confidence` is a
+  noisy-OR over the six assertions and reaches 0.999998, while the pair's `reliability` tier is
+  only MEDIUM — because the two numbers measure different things and neither is an
+  evidence-strength judgement. There is no `direction` slot anywhere: every assertion is
+  implicitly SUPPORTS, so MeDIC structurally cannot record a regulator saying "not indicated".
+
+# ---------------------------------------------------------------------------
+as_is:
+  drug_id: CHEBI:748790
+  drug_label: exenatide
+  disease_id: MONDO:0005148
+  disease_label: type 2 diabetes mellitus
+  relationship_type: INDICATION
+  reliability: MEDIUM                      # cross-source quality tier, computed in reliability.py
+  confidence:
+    method: NOISY_OR
+    n_assertions: 6
+    overall: 0.999998                      # <- a DATA-QUALITY number, not a belief
+  assertions:
+    - source: DAILYMED
+      jurisdiction: USA
+      document: DailyMed:53d03c03-ebf7-418d-88a8-533eabd2ee4f
+      assertion:
+        relationship: INDICATION
+        trigger_cue: indication_phrase
+        trigger_span: is indicated as an adjunct to
+        method: LLM
+        agent: {agent_name: anthropic/claude-haiku-4-5-20251001, agent_type: AI_AGENT, agent_version: claude-haiku-4-5-20251001}
+        tool: medic-extractor
+        tool_version: '1'
+        confidence: {basis: MEASURED, subject: 0.9, object: 1.0, relationship: 1.0, overall: 0.9}
+        flags: []
+        negation_scope: [0]
+        span_index: 0
+        input_value: >-
+          BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in
+          adults with type 2 diabetes mellitus. Limitations of Use • BYETTA contains exenatide.
+          Coadministration with other exenatide-containing products is not recommended.
+      disease:
+        id: MEDICNE:0d9602db-dfaa-5690-b197-280e24fc1abe     # stable uuid5 of the surface form
+        original_literal: type 2 diabetes mellitus
+        mention_source: DAILYMED
+        resolution:
+          confidence: 1.0
+          output_value: MONDO:0005148
+          pipeline:
+            - {category: EXTRACTION, method: LLM, char_start: 98, char_end: 122, quality: verbatim, span_role: SECTION_TEXT, confidence: 1.0, confidence_basis: MEASURED, output_value: type 2 diabetes mellitus}
+            - {category: GROUNDING, method: LEXICAL_MATCH, predicate_id: "skos:exactMatch", source_vocabulary: MONDO, quality: lexical_exact, confidence: 1.0, output_value: "MONDO:0005148"}
+            - {category: NORMALIZATION, method: DETERMINISTIC_RULE, quality: identity, confidence: 1.0, confidence_basis: DETERMINISTIC, output_value: "MONDO:0005148"}
+      evidence:
+        source_type: REGULATORY
+        source_role: INTERMEDIARY          # DailyMed republishes the FDA label
+        jurisdiction: USA
+        approval_status: APPROVED
+        confidence: HIGH                   # <- an EVIDENCE judgement, unlike the numbers above
+        snippet: "BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."
+        explanation: FDA-approved indication from DailyMed structured product label
+      regulatory_status: {authority: FDA, status: APPROVED, source_role: INTERMEDIARY}
+      spans:
+        - {document: "DailyMed:53d03c03-…", role: SECTION_TEXT, section_code: "LOINC:34067-9", text: "BYETTA is indicated as an adjunct to diet and exercise…"}
+
+    - {source: EMA, jurisdiction: EU, document: "EMA:bydureon", trigger_cue: indication_phrase, trigger_span: is indicated in, evidence_confidence: HIGH, source_role: PRIMARY}
+    - {source: EMA, jurisdiction: EU, document: "EMA:byetta", trigger_cue: indication_phrase, trigger_span: is indicated for, evidence_confidence: HIGH, source_role: PRIMARY}
+    - {source: INDIA, jurisdiction: INDIA, document: "INDIA:Approved-New-Drugs", trigger_cue: section_header, section_warrant: INDIA, span_role: TABLE_CELL, assertion_confidence_overall: 0.8}
+    - {source: PMDA, jurisdiction: JAPAN, document: "PMDA:EXENATIDE#151-20120330", trigger_cue: treatment_verb, trigger_span: for the treatment of}
+    - {source: PMDA, jurisdiction: JAPAN, document: "PMDA:EXENATIDE#161-20101027", trigger_cue: indication_phrase, trigger_span: indicated for the treatment of}
+
+# ---------------------------------------------------------------------------
+# TRACK 1 — the minimal microschema
+# The mapping is clean and almost mechanical: one SourceAssertion -> one EvidenceLine,
+# one span -> one TextSpan, the document -> Document. This is the kernel's own guidance
+# ("one line per source document") arrived at independently by MeDIC.
+# ---------------------------------------------------------------------------
+minimal:
+  id: medic:CHEBI_748790--INDICATION--MONDO_0005148
+  statement_text: exenatide is indicated for type 2 diabetes mellitus
+  has_evidence_lines:
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: STRONG        # evidence.confidence HIGH + regulator is the authority
+      evidence_source: REGULATORY                  # <- PROPOSED enum value, does not exist yet (SPEC Q7)
+      description: FDA-approved indication from the DailyMed structured product label.
+      has_evidence_items:
+        - value: "BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."
+          reported_in:
+            id: DailyMed:53d03c03-ebf7-418d-88a8-533eabd2ee4f
+            title: BYETTA (exenatide) injection — structured product label
+            document_type: REGULATORY_LABEL        # <- PROPOSED enum value (SPEC Q7)
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: STRONG
+      evidence_source: REGULATORY
+      description: EMA summary of product characteristics (Bydureon).
+      has_evidence_items:
+        - value: "Bydureon is indicated in adults 18 years and older with type 2 diabetes mellitus to improve glycaemic control…"
+          reported_in: {id: "EMA:bydureon", document_type: REGULATORY_LABEL}
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: STRONG
+      evidence_source: REGULATORY
+      description: EMA summary of product characteristics (Byetta).
+      has_evidence_items:
+        - value: "Byetta is indicated for treatment of type-2 diabetes mellitus in combination with: metformin; sulphonylureas; …"
+          reported_in: {id: "EMA:byetta", document_type: REGULATORY_LABEL}
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: MODERATE      # section_header cue only, table cell, no indication phrase
+      evidence_source: REGULATORY
+      description: CDSCO India approved-new-drugs table; the claim rests on the section, not a phrase.
+      has_evidence_items:
+        - value: "For treatment of type 2 diabetes mellitus in combination with Metformin Sulphonylurea Thiazolidinedione…"
+          reported_in: {id: "INDIA:Approved-New-Drugs", document_type: DATABASE_RECORD}
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: STRONG
+      evidence_source: REGULATORY
+      description: PMDA review report, new active ingredient (2010).
+      has_evidence_items:
+        - value: "Drugs with a new active ingredient indicated for the treatment of type 2 diabetes mellitus…"
+          reported_in: {id: "PMDA:EXENATIDE#161-20101027", document_type: REGULATORY_LABEL}
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: STRONG
+      evidence_source: REGULATORY
+      description: PMDA review report, additional indication/dosage form (2012).
+      has_evidence_items:
+        - value: "A drug with a new additional indication and a new dosage in a new dosage form for the treatment of type 2 diabetes mellitus."
+          reported_in: {id: "PMDA:EXENATIDE#151-20120330", document_type: REGULATORY_LABEL}
+
+# ---------------------------------------------------------------------------
+sepio_monarch:
+  id: sieve:pkt_medic_exenatide_t2dm
+  status: UNREVIEWED
+  statement:
+    id: stmt_medic_exenatide_t2dm
+    type: SieveStatement
+    subject: CHEBI:748790
+    subject_label: exenatide
+    predicate: {code: INDICATION, label: is indicated for, system: "https://w3id.org/monarch-initiative/medic/"}
+    object: MONDO:0005148
+    object_label: type 2 diabetes mellitus
+  has_evidence_lines:
+    - id: line_medic_dailymed_53d03c03
+      type: SieveEvidenceLine
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: strong
+      evidence_source: REGULATORY
+      has_evidence_items:
+        # the SPAN is the evidence item …
+        - id: span_dailymed_53d03c03_0
+          type: TextMiningResult
+          value: "BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."
+          reported_in: DailyMed:53d03c03-ebf7-418d-88a8-533eabd2ee4f
+          document_section: "LOINC:34067-9 INDICATIONS AND USAGE"
+          text_location: "chars 0-122"            # MeDIC has char_start/char_end; the kernel has one string (SPEC Q7)
+          extraction_method: "medic-extractor/1 + anthropic/claude-haiku-4-5-20251001"
+          extraction_score: 0.9
+          # … and the whole RESOLUTION CHAIN rides along as a data-quality annotation on the
+          # item, ordered and contiguous, NOT decomposed into sibling items (R21 / hazard H5).
+          data_quality:
+            resolution_confidence: 1.0
+            confidence_basis: MEASURED
+            pipeline: [EXTRACTION, GROUNDING, NORMALIZATION]
+            flags: []
+            mention_id: MEDICNE:0d9602db-dfaa-5690-b197-280e24fc1abe
+      # the interpretation act: an LLM read this span as asserting an indication
+      contributions:
+        - type: Contribution
+          contributor: {id: "anthropic/claude-haiku-4-5-20251001", type: Agent, subtype: software}
+          contribution_type: interpretation
+          specified_by: "medic-extractor/1, trigger_cue=indication_phrase"
+  # (five more evidence lines follow, one per source document)
+  evidence_synthesis:
+    summary: >-
+      Six regulatory documents from four jurisdictions attest the indication. Two of the six
+      (EMA Bydureon, EMA Byetta) are different products under one authority and are NOT
+      independent corroborations; likewise the two PMDA review reports. The effective count is
+      four authorities, not six documents.
+    score: {value: 1.0, description: Net Evidence Ratio (NER)}
+    direction: supports
+    method_note: >-
+      MeDIC's own noisy-OR (0.999998) is a data-quality aggregate and must NOT be reported here
+      as an evidence score.
+
+# ---------------------------------------------------------------------------
+gaps:
+  no_direction_R1: >-
+    MeDIC has no `direction` slot at all. Every assertion is implicitly SUPPORTS, so NER over
+    MeDIC packets is always exactly 1.0 and tells a curator nothing (medic hazard H4). Adding
+    direction is the single largest semantic gain available to MeDIC, and it has the data
+    already — see M2.
+  independence_R20: >-
+    The noisy-OR treats six documents as six independent corroborations and reaches 0.999998.
+    But EMA:bydureon and EMA:byetta are two products authorised by ONE authority reviewing one
+    dossier lineage, and the two PMDA reports are two milestones for one drug. Corroboration
+    arithmetic needs a notion of source independence; without one, "more documents" inflates
+    confidence mechanically. Note MeDIC's own `reliability: MEDIUM` disagrees with 0.999998 —
+    they are measuring different things and both are reported.
+  two_confidences_one_word: >-
+    `confidence.overall: 0.999998` (pair, data quality), `assertion.confidence.overall: 0.9`
+    (linking fidelity), and `evidence.confidence: HIGH` (an evidence judgement) all use the
+    word "confidence". Only the last one maps to `strength_of_evidence_provided`. This is
+    hazard H2 and it is a live trap for any integration.
+  source_role_is_evidence: >-
+    `source_role: PRIMARY | INTERMEDIARY | NON_REGULATORY` is a genuine evidence-strength
+    signal (the regulator itself beats a republisher) and has no home in the kernel today. It
+    should feed `strength_of_evidence_provided` together with `evidence.confidence`.
+  regulatory_vocabulary_missing: >-
+    Neither `EvidenceSource: REGULATORY` nor `DocumentType: REGULATORY_LABEL` exists. Forcing a
+    drug label into `EXPERT_CONSENSUS` or `DATABASE_RECORD` is wrong, and MeDIC is ~9,700 rows
+    of the use case. Contribute upward before B2 closes.

@@ -1,0 +1,174 @@
+id: N1
+title: Three ontologies agreeing — evidence lines whose "strength" is a hard-coded source reliability, and an NER that cannot fall below 1.0
+source:
+  repo: mondo-ai
+  path: packet_store_merged/packets_000.jsonl (packet pkt_000564)
+  entity: "MONDO:0010425 hasExactSynonym 'LECD'"
+challenges: [R5, R6, R9, R13, R18, R20]
+provenance_note: verbatim from the production store (camelCase keys as stored)
+
+summary: >-
+  The shape mondo-ai actually produces at scale — 160,187 packets, of which 155,004 have exactly
+  one evidence line and all 165,818 evidence items are `ConcordanceItem`s. This one has three
+  lines because three source ontologies (OMIM, Orphanet, DOID) each carry the synonym "LECD" for
+  the term Mondo calls Lisch epithelial corneal dystrophy. Each line's
+  `scoreOfEvidenceProvided` is a per-source constant configured in the pipeline (OMIM 0.95, ORDO
+  0.90, DOID 0.85), not a judgement about this particular synonym. The NER is 1.0 — and can only
+  ever be 1.0, because concordance evidence is constructed only where sources agree: a source
+  that LACKS the synonym contributes no line at all, so absence is silent.
+
+# ---------------------------------------------------------------------------
+as_is:
+  id: pkt_000564
+  statement:
+    id: stmt_18a47f16593f
+    type: SieveStatement
+    statementText: "Lisch epithelial corneal dystrophy has exact synonym 'LECD'"
+    subject: MONDO:0010425
+    subjectLabel: Lisch epithelial corneal dystrophy
+    predicate: {code: "oio:hasExactSynonym", label: exact synonym, system: "http://www.geneontology.org/formats/oboInOwl#"}
+    object: LECD
+    objectLabel: LECD
+  status: UNREVIEWED
+  hasEvidenceLines:
+    - id: el_omim_0564
+      type: SieveEvidenceLine
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.95              # <- source constant, not an item judgement
+      hasEvidenceItems:
+        - id: ev_omim_0564
+          type: ConcordanceItem
+          evidenceItemType: ConcordanceItem
+          description: "Synonym from OMIM: 'LECD'"
+          sourceName: OMIM
+          sourceId: omim
+          sourceSubject: OMIM:620763
+          sourceSubjectLabel: corneal dystrophy, lisch epithelial
+          mappingJustification: "skos:exactMatch"
+    - id: el_ordo_29022
+      type: SieveEvidenceLine
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.9
+      hasEvidenceItems:
+        - id: ev_ordo_29022
+          type: ConcordanceItem
+          evidenceItemType: ConcordanceItem
+          description: "Synonym from Orphanet (ORDO): 'LECD'"
+          sourceName: Orphanet (ORDO)
+          sourceId: ordo
+          sourceSubject: Orphanet:98955
+          sourceSubjectLabel: Lisch epithelial corneal dystrophy
+          mappingJustification: "skos:exactMatch"
+    - id: el_doid_59964
+      type: SieveEvidenceLine
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.85
+      hasEvidenceItems:
+        - id: ev_doid_59964
+          type: ConcordanceItem
+          evidenceItemType: ConcordanceItem
+          description: "Synonym from Disease Ontology: 'LECD'"
+          sourceName: Disease Ontology
+          sourceId: doid
+          sourceSubject: DOID:0060450
+          sourceSubjectLabel: Lisch epithelial corneal dystrophy
+          mappingJustification: "skos:exactMatch"
+  evidence_synthesis:
+    summary: Scored by deterministic evidence scorer
+    score: {value: 1.0, description: Net Evidence Ratio (NER)}
+  created: '2026-03-18'
+  updated: '2026-03-18'
+
+# ---------------------------------------------------------------------------
+# TRACK 1 — the minimal microschema
+# The awkward part: a ConcordanceItem has no `value` and no `reported_in`. It is not a text
+# span. To express it as an "A" shape you have to invent a quote, which is dishonest, or
+# treat the source term itself as the document, which is a stretch. This is the one place in
+# the corpus where the kernel's TextSpan-only item range genuinely does not fit.
+# ---------------------------------------------------------------------------
+minimal:
+  id: mondo-ai:pkt_000564
+  statement_text: "Lisch epithelial corneal dystrophy has exact synonym 'LECD'"
+  has_evidence_lines:
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: STRONG
+      evidence_source: OTHER                     # concordance is not a study kind — see gaps
+      description: "OMIM:620763 (corneal dystrophy, lisch epithelial) carries the synonym 'LECD'; skos:exactMatch to MONDO:0010425."
+      has_evidence_items:
+        - value: LECD                            # the synonym string, treated as the data item
+          reported_in:
+            id: OMIM:620763
+            title: "corneal dystrophy, lisch epithelial"
+            document_type: DATABASE_RECORD
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: STRONG
+      evidence_source: OTHER
+      description: "Orphanet:98955 carries the synonym 'LECD'; skos:exactMatch to MONDO:0010425."
+      has_evidence_items:
+        - value: LECD
+          reported_in: {id: "Orphanet:98955", title: Lisch epithelial corneal dystrophy, document_type: DATABASE_RECORD}
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: MODERATE    # DOID's 0.85 weight demoted honestly
+      evidence_source: OTHER
+      description: "DOID:0060450 carries the synonym 'LECD'; skos:exactMatch to MONDO:0010425."
+      has_evidence_items:
+        - value: LECD
+          reported_in: {id: "DOID:0060450", title: Lisch epithelial corneal dystrophy, document_type: DATABASE_RECORD}
+
+# ---------------------------------------------------------------------------
+# TRACK 2 — what the packet should carry that it does not
+# ---------------------------------------------------------------------------
+sepio_monarch:
+  id: sieve:pkt_000564
+  status: UNREVIEWED
+  statement: "… as in `as_is` …"
+  has_evidence_lines: "… as in `as_is`, plus per line: …"
+  line_extensions:
+    eco_code: <TODO — needs OLS lookup, not invention; spec blocker B2>
+    mapping_set: mondo.sssom.tsv                 # WHICH mapping asserted OMIM:620763 == MONDO:0010425
+    contributions:
+      - type: Contribution
+        contributor: {id: "mondo-ai:OWLExtractor", type: Agent, subtype: software}
+        contribution_type: provision
+        date: '2026-03-18'
+        specified_by: "mondo-ai pipeline, ResourceConfig weights omim=0.95 ordo=0.90 doid=0.85"
+  evidence_synthesis:
+    summary: >-
+      Three source ontologies independently carry this exact synonym. No source is known to
+      lack it (see gaps — absence is not represented). Recommend CONFIRM.
+    score: {value: 1.0, description: Net Evidence Ratio (NER)}
+    direction: supports
+    cited_evidence: [el_omim_0564, el_ordo_29022, el_doid_59964]
+    method: "NER over 3 supporting lines, weights 0.95/0.90/0.85"
+    generated_by: {type: CurationActivity, contributor: {id: "mondo-ai:Scorer", type: Agent}, date: '2026-03-18'}
+
+# ---------------------------------------------------------------------------
+gaps:
+  score_is_source_reliability_not_evidence_strength: >-
+    `scoreOfEvidenceProvided: 0.95` is a configured constant for OMIM, applied identically to
+    every OMIM-derived line in 160k packets. It is a prior about the SOURCE, not an assessment
+    of THIS evidence. That is defensible — it is exactly the "declared, revisable trust in an
+    interpreter/source" the vision calls for — but it should be recorded as such (a trust level
+    on the source agent, R12) rather than silently occupying the per-line score slot, or the
+    number will be read as "this synonym is 95% right".
+  NER_is_degenerate: >-
+    With `directionOfEvidenceProvided: supports` on every line and no mechanism that can emit a
+    `disputes` line, NER is identically 1.0 across the store. A metric that cannot vary is not
+    a metric. Compare medic hazard H4 — the same defect from the same cause.
+  absence_is_silent_R20: >-
+    A source that does NOT carry the synonym contributes nothing, so "3 of 3 sources agree" and
+    "3 of 12 sources agree" are indistinguishable in the packet. Real concordance evidence needs
+    a denominator. This is the same independence problem as M1 seen from the other side.
+  concordance_is_not_a_text_span: >-
+    A `ConcordanceItem` has `sourceSubject` and `mappingJustification` but no `value` and no
+    `reported_in`. Squeezing it into the kernel's `TextSpan` range is the one genuine misfit in
+    the corpus. Either the kernel needs a second concrete item shape (a "record match"), or
+    `has_evidence_items` must range over the abstract `EvidenceItem` and let profiles subclass.
+    **This should be raised with SEPIO** — it affects the kernel's class list, not just its enums.
+  no_curation_state_used: >-
+    All 160,187 packets are `UNREVIEWED`. The curation machinery exists and has never been
+    exercised at scale; nothing in the corpus shows a real ACCEPTED/REJECTED decision with a
+    rationale. Any claim that the trust-accumulation model works is currently untested.

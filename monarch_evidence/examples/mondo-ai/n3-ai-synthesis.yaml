@@ -1,0 +1,203 @@
+id: N3
+title: An LLM reads the packet and returns a verdict — synthesis as a first-class object, and a self-reported confidence pretending to be a score
+source:
+  repo: mondo-ai
+  path: "src/mondo_ai/agents/synthesis.py + agents/prompts.py; enrichment/enricher.py"
+  entity: "an enriched EvidencePacket after `mondo-ai enrich` then `mondo-ai synthesize`"
+challenges: [R9, R11, R12, R13, R18, Q3]
+provenance_note: >-
+  Reconstructed from `SynthesisAgent.synthesize_async` and `PacketEnricher._build_literature_line`.
+  The production store contains only the deterministic-scorer synthesis
+  (`summary: "Scored by deterministic evidence scorer"`); no AI-synthesised packet is committed.
+  Field names and constants below are exactly what the code emits.
+
+summary: >-
+  The end state of the mondo-ai pipeline and the concrete instance of the vision's core claim —
+  that weak trust in any single AI interpretation, accumulated across many verifiable evidence
+  lines, yields a defensible aggregate. A packet gets concordance lines (N1), then PubMed
+  enrichment adds `SieveDocument` lines with an actual quote, then a `SynthesisAgent` (Claude or
+  GPT, selected by config) reads the whole packet and returns
+  `{action, confidence, summary, key_evidence}`. That becomes an `EvidenceSynthesis` with a
+  `CurationActivity` naming the model and the prompt version. Two things are right about this
+  (the synthesis is an object with provenance; the action maps to a direction) and two are
+  wrong (the model's self-reported confidence is stored as if it were a measured score; the
+  synthesis is not itself an evidence line, so a second interpreter cannot disagree with it).
+
+# ---------------------------------------------------------------------------
+as_is:
+  packet_before_synthesis:
+    id: pkt_000564
+    statement:
+      type: SieveStatement
+      subject: MONDO:0010425
+      predicate: {code: "oio:hasExactSynonym", label: exact synonym}
+      object: LECD
+      statementText: "Lisch epithelial corneal dystrophy has exact synonym 'LECD'"
+    status: UNREVIEWED
+    hasEvidenceLines:
+      - {id: el_omim_0564, directionOfEvidenceProvided: supports, strengthOfEvidenceProvided: strong, scoreOfEvidenceProvided: 0.95, hasEvidenceItems: [{type: ConcordanceItem, sourceName: OMIM, sourceSubject: "OMIM:620763"}]}
+      - {id: el_ordo_29022, directionOfEvidenceProvided: supports, strengthOfEvidenceProvided: strong, scoreOfEvidenceProvided: 0.9, hasEvidenceItems: [{type: ConcordanceItem, sourceName: "Orphanet (ORDO)", sourceSubject: "Orphanet:98955"}]}
+      - {id: el_doid_59964, directionOfEvidenceProvided: supports, strengthOfEvidenceProvided: strong, scoreOfEvidenceProvided: 0.85, hasEvidenceItems: [{type: ConcordanceItem, sourceName: Disease Ontology, sourceSubject: "DOID:0060450"}]}
+      # added by `mondo-ai enrich` — the FIRST item in the packet with a real quote
+      - id: el_lit_9f3c1a72
+        type: SieveEvidenceLine
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: moderate
+        scoreOfEvidenceProvided: 0.5            # flat default for all literature, see gaps
+        hasEvidenceItems:
+          - id: ev_lit_1b04ef55
+            type: SieveDocument
+            pmid: '16109854'
+            title: "Lisch epithelial corneal dystrophy (LECD): a rare X-linked disorder"
+            quote: "Lisch epithelial corneal dystrophy (LECD) is characterised by feathery grey opacities…"
+            quoteLocation: Abstract
+            urls: [https://pubmed.ncbi.nlm.nih.gov/16109854/]
+            description: "Literature from Cornea: Lisch epithelial corneal dystrophy (LECD): a rare X-linked disorder"
+
+  prompt_sent_to_the_model: |
+    # (agents/prompts.py — SYSTEM_PROMPT + SYNTHESIS_PROMPT_TEMPLATE, abridged)
+    You are an expert ontology curator specializing in the Mondo Disease Ontology.
+    Recommend ADD / CONFIRM / REJECT / REVIEW. Consider: the type and strength of each
+    evidence item; whether evidence supports or contradicts; the reliability of sources
+    (concordance from major ontologies is strong); literature evidence and its relevance;
+    the overall balance of evidence. Cite specific evidence items by ID.
+    ---
+    ## Statement
+    - Subject: Lisch epithelial corneal dystrophy (MONDO:0010425)
+    - Predicate: oio:hasExactSynonym
+    - Object: LECD
+    ## Evidence Lines
+    ### Evidence Line: el_omim_0564  (direction supports, strength strong, score 0.95) …
+    ## Current Score
+    Net Evidence Ratio: 1.0
+
+  model_response:
+    action: CONFIRM
+    confidence: 0.95                            # <- the model's own number, unvalidated
+    summary: >-
+      Three major disease ontologies independently record 'LECD' as an exact synonym, and the
+      literature uses the abbreviation in the same sense. No contradicting evidence.
+    key_evidence: [el_omim_0564, el_ordo_29022, el_lit_9f3c1a72]
+
+  packet_after_synthesis:
+    evidence_synthesis:
+      summary: >-
+        Three major disease ontologies independently record 'LECD' as an exact synonym, and the
+        literature uses the abbreviation in the same sense. No contradicting evidence.
+      score: {value: 0.95, description: AI confidence score}     # <- stored as a Score
+      direction: supports                                        # CONFIRM -> supports
+      cited_evidence: [el_omim_0564, el_ordo_29022, el_lit_9f3c1a72]
+      generated_by:
+        id: act_7c2f91ab
+        type: CurationActivity
+        contributor: {id: claude-sonnet-4-20250514, type: Agent, name: claude-sonnet-4-20250514, description: "AI synthesis agent (anthropic)"}
+        date: '2026-08-13'
+        used: ["prompt_version:v1.0"]
+
+# ---------------------------------------------------------------------------
+# TRACK 1 — the microschema has no synthesis at all.
+# The only thing that survives is the enrichment line, which is a clean "A" shape.
+# ---------------------------------------------------------------------------
+minimal:
+  id: mondo-ai:pkt_000564
+  statement_text: "Lisch epithelial corneal dystrophy has exact synonym 'LECD'"
+  has_evidence_lines:
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: MODERATE
+      evidence_source: OTHER
+      description: PubMed literature uses the abbreviation LECD for this disorder.
+      has_evidence_items:
+        - value: "Lisch epithelial corneal dystrophy (LECD) is characterised by feathery grey opacities…"
+          reported_in:
+            id: PMID:16109854
+            title: "Lisch epithelial corneal dystrophy (LECD): a rare X-linked disorder"
+            document_type: PRIMARY_LITERATURE
+  # (plus the three concordance lines from N1)
+  _lost: ["the synthesis, its author, its prompt version, and the recommended action"]
+
+# ---------------------------------------------------------------------------
+# TRACK 2 — the same synthesis, with the corrections the corpus argues for
+# ---------------------------------------------------------------------------
+sepio_monarch:
+  id: sieve:pkt_000564
+  status: UNREVIEWED
+  statement: "… as in as_is …"
+  has_evidence_lines: "… four lines as in as_is, plus per line: …"
+
+  # PROPOSED: the interpretation act on each line, not only on the synthesis (R11).
+  # Today mondo-ai records the model only once, at the synthesis; which model read which line
+  # is unrecoverable.
+  line_extensions:
+    contributions:
+      - type: Contribution
+        contributor: {id: claude-sonnet-4-20250514, type: Agent, subtype: software}
+        contribution_type: interpretation
+        date: '2026-08-13'
+        specified_by: "mondo-ai prompt v1.0"
+
+  evidence_synthesis:
+    summary: >-
+      Three major disease ontologies independently record 'LECD' as an exact synonym, and the
+      literature uses the abbreviation in the same sense. No contradicting evidence.
+    direction: supports
+    recommended_action: CONFIRM
+    cited_evidence: [el_omim_0564, el_ordo_29022, el_lit_9f3c1a72]
+    score:
+      value: 0.95
+      description: model self-reported confidence
+      basis: SELF_REPORTED            # <- PROPOSED, borrowed from MeDIC's confidence_basis
+    # the number that should actually drive curation: the ORGANISATION's declared trust in
+    # this interpreter, times what it concluded. Revisable by deliberation, not by the model.
+    interpreter_trust:
+      agent: claude-sonnet-4-20250514
+      trust_level: 0.65
+      declared_by: monarch-evidence-stewards
+      declared_on: '2026-08-01'
+      rationale: Organisational judgement; revised on review of disagreements with curators.
+    generated_by:
+      type: CurationActivity
+      contributor: {id: claude-sonnet-4-20250514, type: Agent, description: "AI synthesis agent (anthropic)"}
+      date: '2026-08-13'
+      used: ["prompt_version:v1.0"]
+
+  # PROPOSED: a second interpreter, so synthesis can be DISAGREED with. This is the shape the
+  # vision needs — many weak interpretations accumulating — and it does not exist today.
+  alternative_syntheses:
+    - direction: neutral
+      recommended_action: REVIEW
+      score: {value: 0.55, description: model self-reported confidence, basis: SELF_REPORTED}
+      summary: "'LECD' is also used for Lisch nodules in the literature; the abbreviation may be ambiguous."
+      generated_by: {type: CurationActivity, contributor: {id: gpt-4o, type: Agent}}
+      interpreter_trust: {trust_level: 0.56, declared_by: monarch-evidence-stewards}
+
+# ---------------------------------------------------------------------------
+gaps:
+  self_reported_confidence_is_not_a_score: >-
+    `Score(value=0.95, description="AI confidence score")` is a number the model produced about
+    its own output, stored in the same slot type as a computed NER. A downstream consumer cannot
+    tell them apart. Adopt MeDIC's `confidence_basis` discipline: SELF_REPORTED is a PRIOR, not
+    a MEASURED value. This matters more here than anywhere else in the corpus, because it is the
+    number the vision's whole trust-accumulation argument rests on.
+  trust_belongs_to_the_organisation_not_the_model: >-
+    Per the vision, the meaningful number is not the model's confidence but the curating
+    organisation's declared trust in that interpreter (Opus 65%, Sonnet 56%) — a human judgement,
+    revisable through deliberation. Nothing in mondo-ai records it. `AgentContribution.trust_level`
+    exists but is an enum (community/domain_expert/curator/authority) with no place for a
+    numeric, dated, attributed declaration.
+  synthesis_cannot_be_disputed: >-
+    `evidence_synthesis` is a single-valued slot. Two interpreters reading the same packet and
+    disagreeing cannot both be recorded, which is precisely the scenario the accumulation
+    argument depends on. Either synthesis becomes multivalued, or an AI verdict becomes an
+    EvidenceLine in its own right (with the packet's other lines as its items) — the latter is
+    more SEPIO-shaped and lets a verdict be evidence for a later verdict.
+  input_provenance_of_the_synthesis: >-
+    `used: ["prompt_version:v1.0"]` is a good instinct but not enough to reproduce a synthesis.
+    The full prompt, the model id (present), the temperature, and the exact set of lines shown
+    are the inputs; only two are recorded. Compare MeDIC, which pins the dated model id
+    precisely because a model upgrade silently changes output.
+  flat_literature_weight: >-
+    Every enriched literature line gets `scoreOfEvidenceProvided: 0.5` regardless of what the
+    paper says. The known open question in mondo-ai's own SPEC (journal-quality weighting) is
+    the wrong framing: the missing judgement is whether the quote actually supports the
+    statement, which is an interpretation act and should produce a direction and strength, not
+    a constant.

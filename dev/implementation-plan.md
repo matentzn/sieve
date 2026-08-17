@@ -1,4 +1,4 @@
-# Curation App — Implementation Plan & Architecture
+# Sieve — Implementation Plan & Architecture
 
 ## Overview
 
@@ -56,7 +56,7 @@ curation-app/
 [project]
 name = "curation-app"
 version = "0.1.0"
-description = "Ontology assertion curation application"
+description = "Knowledge assertion curation application"
 requires-python = ">=3.11"
 dependencies = [
     "streamlit>=1.28.0",
@@ -110,7 +110,7 @@ Create `schema/curation_model.yaml`:
 ```yaml
 id: https://w3id.org/curation-app
 name: curation_app
-title: Curation App Data Model
+title: Sieve Data Model
 description: Data model for ontology assertion curation
 
 prefixes:
@@ -900,7 +900,7 @@ from .export import export_accepted_records, export_record_as_rdf
 
 # Page config
 st.set_page_config(
-    page_title="Curation App",
+    page_title="Sieve",
     page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded"

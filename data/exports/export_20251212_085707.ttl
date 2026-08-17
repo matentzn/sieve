@@ -1,0 +1,27 @@
+@prefix SEPIO: <http://purl.obolibrary.org/obo/SEPIO_> .
+@prefix oboInOwl: <http://www.geneontology.org/formats/oboInOwl#> .
+@prefix orcid: <https://orcid.org/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+[] a owl:Axiom ;
+    SEPIO:0000124 <http://purl.org/np/RA3456789012> ;
+    oboInOwl:source orcid:0000-0000-0000-0000 ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource <http://purl.obolibrary.org/obo/MONDO_0005546> ;
+    owl:annotatedTarget <http://purl.obolibrary.org/obo/MONDO_0005554> .
+
+[] a owl:Axiom ;
+    SEPIO:0000124 <http://purl.org/np/RA1234567890> ;
+    oboInOwl:source orcid:0000-0000-0000-0000 ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource <http://purl.obolibrary.org/obo/MONDO_0005015> ;
+    owl:annotatedTarget <http://purl.obolibrary.org/obo/MONDO_0005151> .
+
+[] a owl:Axiom ;
+    SEPIO:0000124 <http://purl.org/np/RA9876543210> ;
+    oboInOwl:source orcid:0000-0000-0000-0000 ;
+    owl:annotatedProperty rdfs:subClassOf ;
+    owl:annotatedSource <http://purl.obolibrary.org/obo/MONDO_0004979> ;
+    owl:annotatedTarget <http://purl.obolibrary.org/obo/MONDO_0005275> .
+

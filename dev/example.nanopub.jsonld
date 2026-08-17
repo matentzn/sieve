@@ -1,0 +1,254 @@
+Content is user-generated and unverified.
+3
+{
+  "@context": {
+    "np": "http://www.nanopub.org/nschema#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dct": "http://purl.org/dc/terms/",
+    "pav": "http://purl.org/pav/",
+    "prov": "http://www.w3.org/ns/prov#",
+    "orcid": "https://orcid.org/",
+    "mondo": "http://purl.obolibrary.org/obo/MONDO_",
+    "obo": "http://purl.obolibrary.org/obo/",
+    "eco": "http://purl.obolibrary.org/obo/ECO_",
+    "sepio": "http://purl.obolibrary.org/obo/SEPIO_",
+    "cito": "http://purl.org/spar/cito/",
+    "pmid": "https://pubmed.ncbi.nlm.nih.gov/",
+    "icd10": "http://purl.bioontology.org/ontology/ICD10CM/",
+    "doid": "http://purl.obolibrary.org/obo/DOID_",
+    "schema": "http://schema.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "sssom": "https://w3id.org/sssom/",
+    "this": "http://purl.org/np/RA1234567890#"
+  },
+  "@id": "http://purl.org/np/RA1234567890",
+  "@type": "np:Nanopublication",
+
+  "np:hasAssertion": {
+    "@id": "this:assertion",
+    "@graph": {
+      "@id": "mondo:0005015",
+      "rdfs:subClassOf": { "@id": "mondo:0005151" }
+    }
+  },
+
+  "np:hasProvenance": {
+    "@id": "this:provenance",
+    "@graph": [
+
+      {
+        "@id": "this:assertion",
+        "prov:wasAttributedTo": { "@id": "orcid:0000-0002-9553-7227" },
+        "prov:generatedAtTime": { "@type": "xsd:date", "@value": "2019-03-22" },
+        "prov:wasGeneratedBy": { "@id": "this:curation-activity" },
+        "pav:importedFrom": { "@id": "http://purl.obolibrary.org/obo/mondo/releases/2019-03-22/mondo.owl" }
+      },
+
+      {
+        "@id": "this:curation-activity",
+        "@type": "prov:Activity",
+        "dct:description": "Mondo disease ontology curation: addition of diabetes mellitus classification",
+        "prov:wasAssociatedWith": [
+          { "@id": "orcid:0000-0002-9553-7227" },
+          { "@id": "https://monarchinitiative.org/" }
+        ],
+        "prov:used": { "@id": "this:curation-input-sources" },
+        "prov:startedAtTime": { "@type": "xsd:date", "@value": "2019-03-20" },
+        "prov:endedAtTime": { "@type": "xsd:date", "@value": "2019-03-22" },
+        "pav:createdWith": {
+          "@id": "https://protege.stanford.edu/",
+          "rdfs:label": "Protégé"
+        },
+        "dct:isPartOf": {
+          "@id": "https://github.com/monarch-initiative/mondo/pull/1234",
+          "@type": "prov:Activity",
+          "dct:description": "Mondo release 2019-03-22 curation cycle"
+        }
+      },
+
+      {
+        "@id": "this:curation-input-sources",
+        "@type": "prov:Collection",
+        "dct:description": "Source materials consulted during curation",
+        "prov:hadMember": [
+          { "@id": "http://purl.obolibrary.org/obo/doid.owl" },
+          { "@id": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm" },
+          { "@id": "https://www.omim.org/" }
+        ]
+      },
+
+      {
+        "@id": "this:assertion",
+        "sepio:0000124": [
+          { "@id": "this:concordance-icd10" },
+          { "@id": "this:concordance-doid" },
+          { "@id": "this:expert-review" },
+          { "@id": "this:literature-evidence-1" },
+          { "@id": "this:literature-evidence-2" }
+        ]
+      },
+
+      {
+        "@id": "this:concordance-icd10",
+        "@type": "sepio:0000149",
+        "dct:description": "Cross-ontology concordance with ICD-10: The Mondo subClassOf axiom is mirrored by equivalent hierarchical structure in ICD-10",
+        "sepio:0000398": { "@id": "eco:0000204" },
+        "sepio:0000084": [
+          { "@id": "this:mapping-mondo-icd10-subject" },
+          { "@id": "this:mapping-mondo-icd10-object" },
+          { "@id": "this:source-axiom-icd10" }
+        ]
+      },
+
+      {
+        "@id": "this:mapping-mondo-icd10-subject",
+        "@type": "sssom:Mapping",
+        "dct:description": "Mapping: Mondo diabetes → ICD-10 E11",
+        "sssom:subject_id": { "@id": "mondo:0005015" },
+        "sssom:predicate_id": { "@id": "skos:exactMatch" },
+        "sssom:object_id": { "@id": "icd10:E11" },
+        "prov:wasDerivedFrom": {
+          "@id": "https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv",
+          "@type": "sssom:MappingSet",
+          "dct:title": "Mondo to ICD-10-CM mappings",
+          "pav:version": "2024-05-01"
+        }
+      },
+
+      {
+        "@id": "this:mapping-mondo-icd10-object",
+        "@type": "sssom:Mapping",
+        "dct:description": "Mapping: Mondo endocrine system disorder → ICD-10 E00-E89",
+        "sssom:subject_id": { "@id": "mondo:0005151" },
+        "sssom:predicate_id": { "@id": "skos:exactMatch" },
+        "sssom:object_id": { "@id": "icd10:E00-E89" },
+        "prov:wasDerivedFrom": {
+          "@id": "https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv"
+        }
+      },
+
+      {
+        "@id": "this:source-axiom-icd10",
+        "@type": "sepio:0000149",
+        "dct:description": "Original hierarchical relationship in ICD-10",
+        "sepio:0000124": {
+          "@id": "icd10:E11",
+          "rdfs:subClassOf": { "@id": "icd10:E00-E89" }
+        },
+        "prov:wasDerivedFrom": {
+          "@id": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm",
+          "pav:version": "2024"
+        }
+      },
+
+      {
+        "@id": "this:concordance-doid",
+        "@type": "sepio:0000149",
+        "dct:description": "Cross-ontology concordance with Disease Ontology: The Mondo subClassOf axiom is mirrored by equivalent hierarchical structure in DOID",
+        "sepio:0000398": { "@id": "eco:0000204" },
+        "sepio:0000084": [
+          { "@id": "this:mapping-mondo-doid-subject" },
+          { "@id": "this:mapping-mondo-doid-object" },
+          { "@id": "this:source-axiom-doid" }
+        ]
+      },
+
+      {
+        "@id": "this:mapping-mondo-doid-subject",
+        "@type": "sssom:Mapping",
+        "dct:description": "Mapping: Mondo diabetes → DOID:9351",
+        "sssom:subject_id": { "@id": "mondo:0005015" },
+        "sssom:predicate_id": { "@id": "skos:exactMatch" },
+        "sssom:object_id": { "@id": "doid:9351" },
+        "prov:wasDerivedFrom": {
+          "@id": "https://w3id.org/sssom/mappings/mondo-doid.sssom.tsv",
+          "@type": "sssom:MappingSet",
+          "dct:title": "Mondo to DOID mappings",
+          "pav:version": "2024-05-01"
+        }
+      },
+
+      {
+        "@id": "this:mapping-mondo-doid-object",
+        "@type": "sssom:Mapping",
+        "dct:description": "Mapping: Mondo endocrine system disorder → DOID:28",
+        "sssom:subject_id": { "@id": "mondo:0005151" },
+        "sssom:predicate_id": { "@id": "skos:exactMatch" },
+        "sssom:object_id": { "@id": "doid:28" },
+        "prov:wasDerivedFrom": {
+          "@id": "https://w3id.org/sssom/mappings/mondo-doid.sssom.tsv"
+        }
+      },
+
+      {
+        "@id": "this:source-axiom-doid",
+        "@type": "sepio:0000149",
+        "dct:description": "Original subClassOf axiom in Disease Ontology",
+        "sepio:0000124": {
+          "@id": "doid:9351",
+          "rdfs:subClassOf": { "@id": "doid:28" }
+        },
+        "prov:wasDerivedFrom": {
+          "@id": "http://purl.obolibrary.org/obo/doid/releases/2024-05-01/doid.owl",
+          "@type": "owl:Ontology"
+        }
+      },
+
+      {
+        "@id": "this:expert-review",
+        "@type": "sepio:0000149",
+        "dct:description": "Clinical specialist review confirming the classification of diabetes mellitus as an endocrine system disorder",
+        "sepio:0000398": { "@id": "eco:0000218" },
+        "prov:wasAssociatedWith": {
+          "@id": "orcid:0000-0002-1234-5678",
+          "schema:name": "Dr. Jane Smith",
+          "schema:affiliation": "Massachusetts General Hospital, Endocrinology"
+        },
+        "prov:atTime": { "@type": "xsd:date", "@value": "2024-03-15" }
+      },
+
+      {
+        "@id": "this:literature-evidence-1",
+        "@type": "sepio:0000149",
+        "dct:description": "Published literature evidence supporting classification",
+        "sepio:0000398": { "@id": "eco:0000006" },
+        "cito:citesAsEvidence": {
+          "@id": "pmid:123",
+          "@type": "schema:ScholarlyArticle",
+          "schema:name": "Classification of Diabetes as an Endocrine Disorder"
+        },
+        "pav:quotedText": "Diabetes mellitus represents a heterogeneous group of metabolic disorders fundamentally rooted in endocrine dysfunction, specifically involving the pancreatic islet cells and their insulin-producing capacity.",
+        "sepio:0000395": "Results, Section 3.2, paragraph 1"
+      },
+
+      {
+        "@id": "this:literature-evidence-2",
+        "@type": "sepio:0000149",
+        "dct:description": "Published literature evidence supporting classification",
+        "sepio:0000398": { "@id": "eco:0000006" },
+        "cito:citesAsEvidence": {
+          "@id": "pmid:99",
+          "@type": "schema:ScholarlyArticle",
+          "schema:name": "Pathophysiology of Metabolic Endocrinopathies"
+        },
+        "pav:quotedText": "The classification of diabetes under endocrine disorders reflects its primary etiology: disruption of hormone signaling pathways originating from specialized endocrine tissues.",
+        "sepio:0000395": "Discussion, page 847, column 2"
+      }
+    ]
+  },
+
+  "np:hasPublicationInfo": {
+    "@id": "this:pubinfo",
+    "@graph": {
+      "@id": "http://purl.org/np/RA1234567890",
+      "dct:description": "Nanopublication documenting evidence supporting the classification of diabetes mellitus as an endocrine system disorder in Mondo",
+      "dct:created": { "@type": "xsd:dateTime", "@value": "2024-06-15T10:30:00Z" },
+      "dct:creator": { "@id": "orcid:0000-0001-5208-3432" },
+      "dct:license": { "@id": "https://creativecommons.org/licenses/by/4.0/" },
+      "pav:createdWith": { "@id": "https://github.com/fair-workflows/nanopub" }
+    }
+  }
+}

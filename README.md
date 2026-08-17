@@ -35,75 +35,93 @@ uv pip install -e ".[dev]"
 ### Running the Application
 
 ```bash
-# Run the Streamlit app
-uv run streamlit run src/curation_app/app.py
+uv run sieve run           # launch the Streamlit review UI
+uv run sieve ingest -I inbox/examples/
+uv run sieve validate -I inbox/examples/
+uv run sieve export -I inbox/examples/ -O rdf -o accepted.ttl
 ```
 
-### Ingesting Data
+### Data model
 
-Place YAML files in the `inbox/` directory and use the Ingest page in the UI to import them.
-
-Example YAML format:
+sieve uses the SEPIO-aligned **SIEVE** model (canonical in `schema/sieve.yaml`,
+`id: https://w3id.org/sieve`). A packet is an `EvidencePacket` bundling a
+`SieveStatement` with explicit `EvidenceLine`s, each holding typed evidence items.
+See `inbox/examples/asthma_subclass.sepio.yaml` for a complete example and
+`SPEC.md` for the full model.
 
 ```yaml
-id: mondo-diabetes-001
-assertion:
-  subject_id: MONDO:0005015
-  subject_label: diabetes mellitus
-  predicate: rdfs:subClassOf
-  object_id: MONDO:0005151
-  object_label: endocrine system disorder
-
-evidence_items:
-  - evidence_type: LITERATURE
-    publication_id: PMID:12345678
-    quoted_text: "Supporting text from literature..."
+id: sieve:pkt_example
+status: UNREVIEWED
+statement:
+  id: stmt_1
+  type: SieveStatement
+  subject: MONDO:0005015
+  predicate: {code: rdfs:subClassOf, label: subClassOf}
+  object: MONDO:0005151
+has_evidence_lines:
+  - id: line_1
+    type: SieveEvidenceLine
+    direction_of_evidence_provided: supports
+    score_of_evidence_provided: 0.9
+    has_evidence_items:
+      - id: ev_1
+        type: SieveDocument
+        pmid: "12345678"
+        quote: "Supporting text from literature…"
+        rating: ACCEPTED
 ```
 
 ### Running Tests
 
 ```bash
-uv run pytest tests/ -v
+just test        # pytest + mypy + ruff
 ```
 
 ## Project Structure
 
 ```
 sieve/
-├── pyproject.toml
-├── README.md
 ├── schema/
-│   └── curation_model.yaml       # LinkML schema
-├── src/
-│   └── curation_app/
-│       ├── __init__.py
-│       ├── models.py             # Pydantic models
-│       ├── db.py                 # DuckDB repository
-│       ├── ingest.py             # YAML file ingestion
-│       ├── export.py             # RDF export
-│       └── app.py                # Streamlit UI
-├── data/
-│   ├── curation.duckdb           # Database (created at runtime)
-│   └── exports/                  # Exported RDF files
-├── inbox/                        # Input YAML files
-│   └── examples/                 # Example files for testing
+│   ├── minimal.yaml              # the minimal evidence microschema (Track 1)
+│   ├── sepio_classes.yaml        # SEPIO base
+│   └── sieve.yaml                # canonical SIEVE model (imports both)
+├── transform/                    # linkml-map: dismech → minimal → sieve
+├── monarch_evidence/             # Monarch evidence modelling: SPEC + corpus + analysis
+├── src/sieve/
+│   ├── datamodel/                # gen-pydantic models + polymorphic loaders
+│   ├── scoring.py                # Net Evidence Ratio over EvidenceLines
+│   ├── store.py                  # PacketStore (DuckDB)
+│   ├── packet_ingest.py          # YAML → validate → store
+│   ├── packet_export.py          # EvidencePacket → RDF / YAML
+│   ├── cli.py                    # Typer CLI
+│   ├── app.py                    # Streamlit UI
+│   └── auth.py                   # ORCID OAuth
+├── inbox/examples/               # example packets
 └── tests/
-    └── test_ingest.py
 ```
 
-## Evidence Types
+## Evidence item types
 
-- **CONCORDANCE**: Cross-ontology agreement
-- **LITERATURE**: Published literature support
-- **EXPERT_REVIEW**: Domain expert validation
-- **COMPUTATIONAL**: Algorithmic/computed evidence
+`ConcordanceItem`, `SieveDocument`, `SieveDataItem`, `SieveStudyResult`,
+`ComputationalResult`, `AgentContribution` — all SEPIO `InformationEntity`
+subclasses, each carrying a steward `rating` and `eco_code` via the
+`CuratedEvidence` mixin.
+
+## Monarch evidence modelling
+
+`monarch_evidence/` holds the design work behind the two schemas: a
+[specification](monarch_evidence/SPEC.md) of the two-track plan (the minimal microschema every
+Monarch resource can adopt, and this repo's fuller SIEVE profile), a
+[corpus](monarch_evidence/examples/README.md) of nine real records from DisMech, MeDIC and
+mondo-ai rendered in both profiles, and an
+[analysis](monarch_evidence/analysis/requirements-matrix.md) of which requirements are met where.
 
 ## Curation Workflow
 
-1. **Ingest**: Import YAML files containing assertions with evidence
-2. **Review**: View assertions in the review queue with supporting evidence
-3. **Decide**: Accept, reject, or defer each assertion
-4. **Export**: Export accepted assertions as RDF/Turtle
+1. **Ingest**: import YAML `EvidencePacket`s
+2. **Review**: view a packet's statement and evidence lines in the queue
+3. **Decide**: rate individual evidence items; accept / reject / flag the packet
+4. **Export**: export accepted packets as RDF `owl:Axiom` annotations
 
 ## License
 

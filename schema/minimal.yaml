@@ -1,0 +1,217 @@
+id: https://w3id.org/sepio/minimal
+name: sepio-minimal
+title: Minimal Evidence Microschema
+description: |-
+  A small, standalone, importable LinkML evidence model — the "minimal microschema".
+
+  It captures the common shape of evidence that supports or disputes a claim:
+  an EvidenceLine grouping one or more EvidenceItems, each item being a text span
+  (the "A" shape) drawn from a Document. It is deliberately lean so that any
+  downstream project can import and reuse it, and it is SEPIO-aligned by
+  class_uri / slot_uri (not by importing SEPIO), so instances are semantically
+  SEPIO evidence without pulling in the full SEPIO model.
+
+  Status: PROVISIONAL. The schema id and the enum `meaning:` IRIs are pending
+  confirmation with the SEPIO project (see issues/issue_sepio_minimal_microschema.md,
+  blockers B1 and B2 in the design spec).
+license: MIT
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  minimal: https://w3id.org/sepio/minimal/
+  sepio: https://w3id.org/sepio/
+  ECO: http://purl.obolibrary.org/obo/ECO_
+  IAO: http://purl.obolibrary.org/obo/IAO_
+  PMID: http://www.ncbi.nlm.nih.gov/pubmed/
+  dcterms: http://purl.org/dc/terms/
+
+default_prefix: minimal
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+
+  EvidencedClaim:
+    class_uri: sepio:Statement
+    mixins:
+      - HasEvidenceLines
+    tree_root: true
+    description: >-
+      A claim together with the evidence lines that bear on it — the canonical
+      top-level of the minimal model. Hosts with their own container (a curation
+      packet, a disease record) can instead graft the HasEvidenceLines mixin onto
+      that container and skip this class.
+    attributes:
+      id:
+        range: uriorcurie
+        description: Optional stable identifier for the claim record.
+      statement_text:
+        slot_uri: sepio:statement_text
+        description: A natural-language expression of the claim.
+
+  EvidenceLine:
+    class_uri: sepio:EvidenceLine
+    description: >-
+      One line of reasoning by which a set of evidence items bears on a claim,
+      with a single direction and (optionally) a single evidence source.
+      Group co-directional items from the same source into one line; split into
+      separate lines only when the reasoning genuinely differs.
+    attributes:
+      id:
+        range: uriorcurie
+        description: Optional identifier; evidence lines are often anonymous nested objects.
+      direction_of_evidence_provided:
+        slot_uri: sepio:direction_of_evidence_provided
+        range: Direction
+        description: >-
+          Whether the line supports, disputes, or is neutral toward the claim.
+          This is polarity ONLY — how strongly it does so is
+          `strength_of_evidence_provided`.
+      strength_of_evidence_provided:
+        slot_uri: sepio:strength_of_evidence_provided
+        range: Strength
+        description: >-
+          How strongly the line bears on the claim, in the stated direction
+          (e.g. partial/indirect support is WEAK). Orthogonal to direction.
+      evidence_source:
+        range: EvidenceSource
+        description: >-
+          The coarse kind of study/observation behind this line (the "what kind of
+          evidence" axis). Maps onto an ECO branch; item-level ECO codes refine it.
+      has_evidence_items:
+        slot_uri: sepio:has_evidence_items
+        range: TextSpan
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          The discrete pieces of information interpreted as evidence. Range is the
+          concrete TextSpan (the "A" shape); the future TextMiningResult ("C") is_a
+          TextSpan, so it fits here too.
+      description:
+        slot_uri: dcterms:description
+        description: Free-text rationale for how these items bear on the claim.
+
+  EvidenceItem:
+    class_uri: sepio:InformationEntity
+    abstract: true
+    description: A discrete piece of information interpreted as evidence.
+    attributes:
+      id:
+        range: uriorcurie
+        description: Optional identifier; evidence items are often anonymous nested objects.
+      reported_in:
+        slot_uri: sepio:reported_in
+        range: Document
+        inlined: true
+        description: The document the evidence item was drawn from.
+      description:
+        slot_uri: dcterms:description
+
+  TextSpan:
+    is_a: EvidenceItem
+    class_uri: sepio:DataItem
+    description: >-
+      The "A" shape: a verbatim span of text interpreted as evidence, plus the
+      document it came from. The always-valid, minimal evidence item.
+    attributes:
+      value:
+        slot_uri: sepio:value
+        required: true
+        description: The verbatim text span.
+
+  Document:
+    class_uri: sepio:Document
+    description: A publication or other document an evidence item is reported in.
+    attributes:
+      id:
+        identifier: true
+        range: uriorcurie
+        description: Document identifier (e.g. a PMID CURIE).
+      title:
+        slot_uri: dcterms:title
+      document_type:
+        range: DocumentType
+        description: >-
+          The kind of document. A compact form of a SEPIO Document.subtype Coding:
+          the enum value's `meaning:` IRI is the code, its text the label.
+
+  HasEvidenceLines:
+    mixin: true
+    description: >-
+      Grafts an `has_evidence_lines` slot onto a host's own container class
+      (a disease record, an assertion, a curation packet), so the host structures
+      its evidence with this microschema without the kernel imposing a container.
+    attributes:
+      has_evidence_lines:
+        slot_uri: sepio:has_evidence_lines
+        range: EvidenceLine
+        multivalued: true
+        inlined_as_list: true
+
+enums:
+
+  Direction:
+    description: >-
+      Polarity of an evidence line toward a claim — direction ONLY. Strength lives
+      on `strength_of_evidence_provided`; do not fold "partial" into direction, and
+      do not fold operational/QC signals (a source that turned out to carry no
+      relevant evidence, or an extracted claim found to be factually wrong) in here
+      — those are curation signals that lead to reviewing/dropping the claim, not
+      evidence that persists in released data.
+    enum_uri: sepio:Direction
+    permissible_values:
+      SUPPORTS:
+        description: The evidence supports the claim.
+      REFUTES:
+        description: The evidence disputes or contradicts the claim.
+      NEUTRAL:
+        description: The evidence bears on the claim but is inconclusive either way.
+
+  Strength:
+    description: >-
+      How strongly a line supports/disputes the claim, in its stated direction.
+      A qualitative scale; item-level or numeric scores can refine it later.
+    permissible_values:
+      STRONG:
+        description: Strong, direct support/dispute.
+      MODERATE:
+        description: Moderate support/dispute.
+      WEAK:
+        description: Weak, partial, or indirect support/dispute.
+
+  EvidenceSource:
+    description: >-
+      The coarse kind of study/observation producing a line of evidence.
+      Each value maps onto an ECO branch via `meaning:` (PROVISIONAL — the exact
+      ECO CURIEs are pending confirmation, spec blocker B2).
+    permissible_values:
+      HUMAN_CLINICAL:
+        description: Human clinical observations such as patients, cohorts, case reports, trials, and epidemiology.
+      MODEL_ORGANISM:
+        description: In vivo animal or model-organism evidence.
+      IN_VITRO:
+        description: In vitro or ex vivo assays.
+      COMPUTATIONAL:
+        description: In silico, modelling, or machine-learning studies.
+      EXPERT_CONSENSUS:
+        description: Expert consensus without primary data.
+      OTHER:
+        description: Evidence not fitting the above.
+
+  DocumentType:
+    description: >-
+      The kind of document. Each value carries a publication-type `meaning:` IRI
+      (PROVISIONAL — pending confirmation, spec blocker B2).
+    permissible_values:
+      PRIMARY_LITERATURE:
+        description: A primary research publication.
+      REVIEW:
+        description: A review article.
+      PREPRINT:
+        description: A non-peer-reviewed preprint.
+      DATABASE_RECORD:
+        description: A record in a curated database.
+      OTHER:
+        description: A document not fitting the above.
