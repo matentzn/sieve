@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Monarch Evidence — specification</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,700&family=Karla:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    /* ===== THEME: warm scholarly paper ===== */
+    --bg:#f6f2ea;
+    --bg2:#efe8dc;
+    --panel:#fffdf8;
+    --ink:#1d1a15;
+    --muted:#575146;
+    --faint:#8d8474;
+    --line:rgba(29,26,21,.13);
+    --line2:rgba(29,26,21,.24);
+
+    --accent:#a84126;
+    --accent2:#8f6408;
+    --accent3:#1a6055;
+    --accent4:#5d3f74;
+    --grad:linear-gradient(115deg,var(--accent),var(--accent4));
+
+    --serif:"Newsreader",Georgia,serif;
+    --sans:"Karla",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  /* theme cont. — code blocks recoloured warm-dark to sit on paper */
+  .code{background:linear-gradient(180deg,#272219,#1d1a14)!important;border-color:rgba(0,0,0,.28)!important;color:#ece5d7!important}
+  .code .bar{background:rgba(255,255,255,.04)!important;border-bottom-color:rgba(255,255,255,.09)!important}
+  .code .k{color:#e9a273} .code .s{color:#a9c98c} .code .n{color:#e6c96f} .code .cm{color:#8e8474}
+  .code .hl{background:rgba(233,162,115,.22)} .code .hlg{background:rgba(169,201,140,.2)}
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+  .atmos{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .atmos::before{content:"";position:absolute;inset:0;background:
+    radial-gradient(900px 600px at 82% 8%, color-mix(in srgb,var(--accent) 12%, transparent), transparent 60%),
+    radial-gradient(800px 700px at 10% 92%, color-mix(in srgb,var(--accent3) 10%, transparent), transparent 60%)}
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.03;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .gridlines{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.45;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:72px 72px;mask:radial-gradient(circle at 50% 50%,#000 30%,transparent 85%);-webkit-mask:radial-gradient(circle at 50% 50%,#000 30%,transparent 85%)}
+
+  #deck{position:relative;z-index:2;height:100vh;width:100vw}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:clamp(28px,5.5vw,96px);opacity:0;visibility:hidden;transform:translateY(22px) scale(.992);transition:opacity .5s ease,transform .6s cubic-bezier(.2,.7,.2,1);overflow:hidden}
+  .slide.active{opacity:1;visibility:visible;transform:none}
+  .slide.past{transform:translateY(-22px) scale(.992)}
+  .wrap{width:min(1180px,100%);margin:0 auto;max-height:100%}
+
+  .slide.active .stag{animation:rise .62s cubic-bezier(.2,.7,.2,1) both}
+  .slide.active .stag:nth-child(1){animation-delay:.05s}
+  .slide.active .stag:nth-child(2){animation-delay:.11s}
+  .slide.active .stag:nth-child(3){animation-delay:.17s}
+  .slide.active .stag:nth-child(4){animation-delay:.23s}
+  .slide.active .stag:nth-child(5){animation-delay:.29s}
+  .slide.active .stag:nth-child(6){animation-delay:.35s}
+  .slide.active .stag:nth-child(7){animation-delay:.41s}
+  .slide.active .stag:nth-child(8){animation-delay:.47s}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+  h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.12;letter-spacing:-.008em}
+  .kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:1.15rem;font-weight:500}
+  h1.title{font-size:clamp(2.2rem,5.4vw,4.4rem);font-weight:700;line-height:1.08;letter-spacing:-.02em;padding-bottom:.06em}
+  h2{font-size:clamp(1.5rem,3.3vw,2.6rem);max-width:24ch}
+  h3{font-size:clamp(1.05rem,2vw,1.45rem)}
+  p{color:var(--muted);font-size:clamp(1rem,1.35vw,1.14rem);line-height:1.6;max-width:66ch}
+  p.lead{color:var(--ink);font-weight:300;font-size:clamp(1.05rem,1.7vw,1.35rem);max-width:58ch}
+  strong{color:var(--ink);font-weight:600}
+  em{font-style:italic;color:color-mix(in srgb,var(--ink) 88%, var(--accent))}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.05em}
+  .accent-ink{color:var(--accent)}
+  .headrule{height:2px;width:64px;background:var(--accent);opacity:.5;margin:1.1rem 0 0;border:0}
+
+  .eyebrow-row{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+  .rule{height:1px;background:linear-gradient(90deg,var(--line2),transparent);margin:1.5rem 0;border:0}
+  ul.clean{list-style:none;display:flex;flex-direction:column;gap:.7rem;margin-top:1.25rem}
+  ul.clean li{position:relative;padding-left:1.45rem;color:var(--muted);font-size:clamp(.96rem,1.3vw,1.1rem);line-height:1.5;max-width:68ch}
+  ul.clean li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  ul.clean li strong{color:var(--ink)}
+
+  .cols{display:grid;gap:clamp(1rem,2.1vw,1.9rem)}
+  .c2{grid-template-columns:1fr 1fr}
+  .c3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:820px){.c2,.c3{grid-template-columns:1fr}}
+
+  .card{background:linear-gradient(160deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:12px;padding:clamp(1rem,1.8vw,1.4rem);position:relative;overflow:hidden}
+  .card .ico{font-family:var(--mono);font-size:.66rem;letter-spacing:.15em;color:var(--faint);text-transform:uppercase}
+  .card h3{margin:.4rem 0 .5rem;font-size:clamp(1rem,1.65vw,1.25rem)}
+  .card p{font-size:.94rem;max-width:none;line-height:1.55}
+
+  .badge{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--mono);font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.32em .7em;border-radius:999px;border:1px solid currentColor;line-height:1}
+  .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .b1{color:var(--accent)} .b2{color:var(--accent2)} .b3{color:var(--accent3)} .b4{color:var(--accent4)}
+
+  .code{font-family:var(--mono);background:linear-gradient(180deg,#0c1119,#090d14);border:1px solid var(--line);border-radius:12px;font-size:clamp(.72rem,1vw,.88rem);line-height:1.62;overflow:hidden;color:#d7e0ec}
+  .code .bar{display:flex;align-items:center;gap:.5rem;padding:.5rem .9rem;border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
+  .code .bar .dot{width:9px;height:9px;border-radius:50%}
+  .code .bar .fname{font-size:.68rem;color:#9d9484;margin-left:.4rem;letter-spacing:.04em}
+  .code pre{padding:.9rem 1.1rem;overflow:auto;max-height:60vh}
+  .code pre::-webkit-scrollbar{height:8px;width:8px}
+  .code pre::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px}
+  .k{color:var(--accent)} .s{color:#9fe6a0} .n{color:#ffd479} .cm{color:var(--faint)}
+  .hl{background:color-mix(in srgb,var(--accent2) 18%, transparent);border-radius:4px;padding:0 .25em;margin:0 -.25em}
+  .hlg{background:rgba(110,231,168,.16);border-radius:4px;padding:0 .25em;margin:0 -.25em}
+
+  .stat{font-family:var(--serif);font-weight:700;font-size:clamp(2.2rem,5vw,3.6rem);line-height:1;letter-spacing:-.025em}
+  .meter{display:flex;flex-direction:column;gap:.5rem}
+  .meter .track{height:12px;border-radius:999px;background:rgba(29,26,21,.07);border:1px solid var(--line);overflow:hidden}
+  .meter .fill{height:100%;border-radius:999px;background:var(--accent)}
+  .meter .row{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:.82rem}
+
+  table{width:100%;border-collapse:collapse;font-size:clamp(.78rem,1.05vw,.93rem)}
+  th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  td{color:var(--muted);line-height:1.5} td strong{color:var(--ink)}
+  td .mono,.mono{font-family:var(--mono);color:color-mix(in srgb,var(--ink) 78%, var(--accent));font-size:.92em}
+
+  .flow{display:flex;align-items:stretch;gap:.5rem;flex-wrap:wrap}
+  .flow .node{flex:1;min-width:130px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:.9rem;text-align:center}
+  .flow .node .t{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .flow .node .m{font-weight:600;color:var(--ink);margin-top:.3rem;font-size:.98rem}
+  .flow .node.hl{border-color:var(--accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 30%, transparent)}
+  .flow .arrow{align-self:center;color:var(--faint);font-family:var(--mono)}
+
+  .pill{display:inline-block;font-family:var(--mono);font-size:.72rem;letter-spacing:.05em;color:var(--accent);border:1px solid var(--line2);border-radius:999px;padding:.3em .8em;margin:.2rem .3rem .2rem 0}
+  .two-pane{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1rem,2.3vw,2.1rem);align-items:start}
+  @media(max-width:880px){.two-pane{grid-template-columns:1fr}}
+  .footnote{font-family:var(--mono);font-size:.69rem;color:var(--faint);margin-top:1.05rem;letter-spacing:.01em;line-height:1.6;max-width:88ch}
+  .callout{border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 6%, transparent);border-radius:0 9px 9px 0;padding:.95rem 1.25rem;margin-top:1.35rem}
+  .callout p{color:var(--ink);max-width:66ch}
+  .quote{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.4rem,3.2vw,2.3rem);line-height:1.25;color:var(--ink);max-width:26ch}
+  .divider{justify-content:center;align-items:flex-start}
+
+  #progress{position:fixed;top:0;left:0;height:3px;background:var(--grad);z-index:50;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .chrome{position:fixed;z-index:40;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;color:var(--faint)}
+  #brand{top:26px;left:30px;display:flex;align-items:center;gap:.6rem}
+  #brand .dotm{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  #brand b{color:var(--ink);font-weight:600;letter-spacing:.15em}
+  #counter{bottom:24px;right:30px;color:var(--muted)}
+  #counter b{color:var(--ink)}
+  #hint{bottom:24px;left:30px}
+  #hint kbd{font-family:var(--mono);background:var(--panel);border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:.12em .45em;color:var(--ink);font-size:.68rem}
+  .nav-zone{position:fixed;top:0;bottom:0;width:16%;z-index:30;cursor:pointer}
+  #navPrev{left:0} #navNext{right:0}
+  @media(max-width:820px){#hint{display:none}}
+
+  /* ============ PAGED OUTPUT ============
+     Every slide becomes one 16:9 page. Screen view is untouched.
+     Export:  just deck-pdf                                              */
+  @media print {
+    @page { size: 1600px 900px; margin: 0; }
+    *, *::before, *::after { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    html, body { height: auto !important; overflow: visible !important; }
+    .atmos, .gridlines, .grain, #progress, .chrome, .nav-zone { display: none !important; }
+    #deck { height: auto !important; width: auto !important; counter-reset: pg; }
+    .slide {
+      position: relative !important; inset: auto !important;
+      width: 1600px !important; height: 900px !important;
+      opacity: 1 !important; visibility: visible !important;
+      transform: none !important; transition: none !important;
+      break-after: page; page-break-after: always;
+      background:
+        radial-gradient(900px 600px at 82% 8%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+        radial-gradient(800px 700px at 10% 92%, color-mix(in srgb, var(--accent3) 9%, transparent), transparent 60%),
+        var(--bg);
+    }
+    .slide:last-of-type { break-after: auto; page-break-after: auto; }
+    .slide .stag { animation: none !important; opacity: 1 !important; transform: none !important; }
+    /* the narrow-viewport breakpoint fires during print layout and collapses the grids */
+    .c2 { grid-template-columns: 1fr 1fr !important; }
+    .c3 { grid-template-columns: repeat(3,1fr) !important; }
+    .two-pane { grid-template-columns: 1fr 1fr !important; }
+    /* background-clip:text paints a stray box and clips descenders in PDF */
+    .grad { background: none !important; -webkit-background-clip: border-box !important;
+            background-clip: border-box !important; color: var(--accent) !important;
+            -webkit-text-fill-color: var(--accent) !important; }
+    .code pre { max-height: none !important; overflow: visible !important; }
+    .slide::after {
+      counter-increment: pg; content: counter(pg);
+      position: absolute; bottom: 30px; right: 38px;
+      font-family: var(--mono); font-size: .7rem; letter-spacing: .1em; color: var(--faint);
+    }
+  }
+</style>
+</head>
+<body>
+<div class="atmos"></div>
+<div class="gridlines"></div>
+<div class="grain"></div>
+<div id="progress"></div>
+
+<div class="chrome" id="brand"><span class="dotm"></span><b>MONARCH EVIDENCE</b><span>SPEC rev.2</span></div>
+<div class="chrome" id="counter"><b id="cur">01</b> / <span id="tot">00</span></div>
+<div class="chrome" id="hint"><kbd>←</kbd> <kbd>→</kbd> navigate · <kbd>F</kbd> fullscreen</div>
+<div class="nav-zone" id="navPrev"></div>
+<div class="nav-zone" id="navNext"></div>
+
+<main id="deck">
+<!-- ===================== SLIDES START ===================== -->
+
+  <!-- 1 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">Specification · draft rev. 2 · 2026-08-15</div>
+      <h1 class="title stag">Monarch <span class="grad">Evidence</span></h1>
+      <p class="lead stag" style="margin-top:1.5rem">One SEPIO-aligned foundation, two profiles, and nine real records that set what each has to support.</p>
+      <div class="eyebrow-row stag" style="margin-top:1.9rem">
+        <span class="badge b1">Track 1 · microschema</span>
+        <span class="badge b4">Track 2 · SIEVE profile</span>
+        <span class="badge b3">9-record corpus</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§1</div>
+      <h2 class="stag">Monarch models evidence in five places, five ways</h2>
+      <div class="callout stag">
+        <p>None of them answers the question every downstream consumer asks: how strongly, and in which direction, does the evidence bear on this claim, and who decided that?</p>
+      </div>
+      <div class="cols c3 stag" style="margin-top:1.5rem">
+        <div class="card"><div class="ico">DisMech</div><h3>No interpretation provenance</h3><p>An evidence vocabulary, and no record of who did the interpreting. The resource is AI-curated.</p></div>
+        <div class="card"><div class="ico">MeDIC</div><h3>No evidence model</h3><p>Provenance to a high standard. No direction slot at all: one implicit SUPPORTS.</p></div>
+        <div class="card"><div class="ico">mondo-ai</div><h3>No variation</h3><p>Already on SEPIO. Its aggregate is 1.0 across all 160,187 packets, because nothing can emit a disputes line.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">contents</div>
+      <h2 class="stag">Six sections</h2>
+      <hr class="headrule stag" />
+      <div class="cols c2 stag" style="margin-top:1.5rem">
+        <div>
+          <ul class="clean" style="margin-top:0">
+            <li><strong>Two tracks.</strong> What each profile carries, and what it leaves out.</li>
+            <li><strong>The core axis.</strong> Statement, EvidenceLine, DataItem, Document.</li>
+            <li><strong>Where the statement lives.</strong> In the host, structured, outside the evidence model.</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="clean" style="margin-top:0">
+            <li><strong>Evidence, provenance, data quality.</strong> The distinction that decides every integration.</li>
+            <li><strong>Two open questions.</strong> The shape of the base item, and where the grounding chain goes.</li>
+            <li><strong>Three requirements</strong> with no representation in either profile.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide divider">
+    <div class="wrap">
+      <div class="kicker stag">Part one</div>
+      <h1 class="title stag">Two profiles,<br /><span class="grad">one foundation</span></h1>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§1</div>
+      <h2 class="stag">The two tracks</h2>
+      <table class="stag" style="margin-top:1.3rem">
+        <tr><th></th><th>Track 1: the microschema</th><th>Track 2: SEPIO Monarch</th></tr>
+        <tr><td><strong>Audience</strong></td><td>every Monarch resource</td><td>projects that need evidence calculus</td></tr>
+        <tr><td><strong>Size</strong></td><td>5 classes, 4 enums, no dependency beyond <span class="mono">linkml:types</span></td><td>~20 classes, full SEPIO provenance</td></tr>
+        <tr><td><strong>Shape</strong></td><td>flat list of lines, each line a direction plus a few text spans</td><td>lines with contributions, synthesis, curation state, scoring</td></tr>
+        <tr><td><strong>Status</strong></td><td>drafted, provisional id and <span class="mono">meaning:</span> IRIs</td><td>implemented, in production in mondo-ai</td></tr>
+      </table>
+      <p class="stag" style="margin-top:1.2rem">Both are SEPIO Profiles of one Core Information Model, joined by an executable linkml-map transform. Track 2's classes <span class="mono">is_a</span> Track 1's, so a resource can start on Track 1 and lift later without re-modelling.</p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§1</div>
+      <h2 class="stag">Two constraints on Track 1</h2>
+      <div class="two-pane stag" style="margin-top:1.5rem">
+        <div class="card">
+          <div class="ico">constraint 1</div>
+          <h3>Simple and intuitive</h3>
+          <p>Track 1 has to be pitchable across Monarch for adoption to happen at all. Every slot must earn its place.</p>
+        </div>
+        <div class="card">
+          <div class="ico">constraint 2</div>
+          <h3>No overfitting</h3>
+          <p>No class is shaped around one pipeline's output. A slot proposed by one resource is checked against the other eight records before it enters the kernel.</p>
+        </div>
+      </div>
+      <div class="callout stag">
+        <p>DisMech already writes <span class="mono">EvidenceSource: OTHER</span> to mean "review article", because the axis was fitted to study kinds only (D1).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide divider">
+    <div class="wrap">
+      <div class="kicker stag">Part two</div>
+      <h1 class="title stag">The <span class="grad">core axis</span></h1>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3</div>
+      <h2 class="stag">Four nodes</h2>
+      <div class="flow stag" style="margin-top:1.7rem">
+        <div class="node"><div class="t">the claim</div><div class="m">Statement</div></div>
+        <div class="arrow">&gt;</div>
+        <div class="node hl"><div class="t">an argument</div><div class="m">EvidenceLine</div></div>
+        <div class="arrow">&gt;</div>
+        <div class="node"><div class="t">the span</div><div class="m">DataItem</div></div>
+        <div class="arrow">&gt;</div>
+        <div class="node"><div class="t">the source</div><div class="m">Document</div></div>
+      </div>
+      <div class="cols c2 stag" style="margin-top:1.7rem">
+        <div><p><strong>EvidenceLine</strong> is the output of an interpretation act: an agent reading items as evidence. It carries direction, strength, and the provenance of that reading.</p></div>
+        <div><p><strong>DataItem</strong> exists independently of being interpreted. It carries its own provenance (who produced it), and can be used as evidence for other claims.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3</div>
+      <h2 class="stag">Three consequences of the nesting</h2>
+      <div class="cols c3 stag" style="margin-top:1.5rem">
+        <div class="card"><div class="ico">01</div><h3>Two provenances</h3><p>The item records who created the data. The line records who read those items as supporting the claim, when, and under which guideline. Collapsing item into line loses the second, which is the axis AI curation needs.</p></div>
+        <div class="card"><div class="ico">02</div><h3>Items are reusable</h3><p>The same span can be evidence for one claim and against another. Making it an object rather than a field is what allows that.</p></div>
+        <div class="card"><div class="ico">03</div><h3>Lines may be heterogeneous</h3><p>An EvidenceLine is a line of reasoning, so grouping several kinds of item under one direction is within SEPIO. Split lines only when the reasoning differs.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3 · Q2</div>
+      <h2 class="stag">Item reuse: the objection, and the data</h2>
+      <div class="two-pane stag" style="margin-top:1.4rem">
+        <div>
+          <span class="badge b2">the objection</span>
+          <p style="margin-top:.85rem">The extra nesting costs: Python classes and validators get deeper, and data creators can misuse the freedom. In practice it is cheaper to mint a new item than to find and reuse an existing one.</p>
+        </div>
+        <div>
+          <span class="badge b1">what the corpus shows</span>
+          <p style="margin-top:.85rem">D1 has DisMech duplicating PMID:25604431 four times, with four different snippets. Every pipeline in the corpus mints fresh items. None reuses.</p>
+        </div>
+      </div>
+      <div class="callout stag">
+        <p>Interpretation provenance is what justifies the item/line split, and it is exercised by seven of the nine examples. Reuse is not doing that work.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3.1</div>
+      <h2 class="stag">EvidenceItem is a role, DataItem is a class</h2>
+      <div class="cols c2 stag" style="margin-top:1.4rem">
+        <div class="card">
+          <div class="ico">the role</div><h3>EvidenceItem</h3>
+          <p>Any information content entity can play it: a text span, a study result, a dataset, a computational result, a curator's contribution.</p>
+        </div>
+        <div class="card">
+          <div class="ico">the class</div><h3>DataItem</h3>
+          <p>A text span is a DataItem with a <span class="mono">value</span> (the quoted text) and a <span class="mono">reported_in</span> (the document).</p>
+        </div>
+      </div>
+      <p class="stag" style="margin-top:1.3rem">SEPIO subclasses further only when a use case demands it.</p>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3.2 · R23</div>
+      <h2 class="stag">The statement lives in the host</h2>
+      <p class="stag" style="margin-top:.9rem">The evidence model does not hold the claim. The host holds it already, as a triple or as a field on a record, and the microschema only hangs evidence lines onto it. Reading the axis diagram top down suggests otherwise, because it starts at Statement.</p>
+      <div class="code stag" style="margin-top:1.1rem">
+        <div class="bar"><span class="dot" style="background:var(--accent)"></span><span class="fname">both shapes validate against minimal.yaml, unchanged</span></div>
+<pre><span class="cm"># association style: the statement is a triple</span>
+<span class="k">indication</span>:
+  <span class="k">subject</span>: CHEBI:748790
+  <span class="k">predicate</span>: RO:0002606
+  <span class="k">object</span>: MONDO:0005148
+  <span class="k">has_evidence_lines</span>: [...]
+
+<span class="cm"># attribute style: the predicate is a slot on a record about the subject</span>
+<span class="k">drug</span>:
+  <span class="k">id</span>: CHEBI:748790
+  <span class="k">indication</span>: MONDO:0005148
+  <span class="k">evidence_indication</span>: [...]   <span class="cm"># sibling slot (the attribute is a scalar)</span></pre>
+      </div>
+      <p class="footnote stag">Verified 2026-08-15. The <span class="mono">HasEvidenceLines</span> mixin covers the single-attachment case. A host with three independently evidenced attributes declares three slots ranging over <span class="mono">EvidenceLine</span> (R24).</p>
+    </div>
+  </section>
+
+  <!-- 13 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3.2 · R25</div>
+      <h2 class="stag">Every statement_text in the corpus is generated</h2>
+      <div class="code stag" style="margin-top:1.2rem">
+        <div class="bar"><span class="dot" style="background:var(--accent2)"></span><span class="fname">M1, exenatide and type 2 diabetes</span></div>
+<pre><span class="k">id</span>: medic:<span class="hl">CHEBI_748790--INDICATION--MONDO_0005148</span>   <span class="cm">the triple is in the id</span>
+<span class="k">statement_text</span>: <span class="s">exenatide is indicated for type 2 diabetes mellitus</span>
+              <span class="cm">a rendering; this sentence is in no source document</span></pre>
+      </div>
+      <p class="stag" style="margin-top:1.3rem">None of the nine appears in any source document. <span class="mono">statement_text</span> is a label for humans. It sits one slot away from <span class="mono">TextSpan.value</span>, which is verbatim, and nothing in the schema marks the difference.</p>
+    </div>
+  </section>
+
+  <!-- 14 -->
+  <section class="slide divider">
+    <div class="wrap">
+      <div class="kicker stag">Part three</div>
+      <h1 class="title stag">Track 1:<br />the <span class="grad">microschema</span></h1>
+    </div>
+  </section>
+
+  <!-- 15 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.4 · surveyed 2026-08-16</div>
+      <h2 class="stag">Twenty kinds of evidence across the three repositories</h2>
+      <div class="cols c2 stag" style="margin-top:1.2rem">
+        <div>
+          <table>
+            <tr><th>#</th><th>Kind</th><th>Span?</th></tr>
+            <tr><td>1</td><td>Verbatim span from a publication</td><td>yes</td></tr>
+            <tr><td>2</td><td>Verbatim span from a regulatory document</td><td>yes</td></tr>
+            <tr><td>3</td><td>Value from a structured field or record</td><td>field value</td></tr>
+            <tr><td>4</td><td>Cross-source concordance</td><td><strong>no</strong></td></tr>
+            <tr><td>5</td><td>Study result or statistic</td><td>no</td></tr>
+            <tr><td>6</td><td>Clinical trial outcome</td><td>sometimes</td></tr>
+            <tr><td>7</td><td>Model organism observation</td><td>no</td></tr>
+            <tr><td>8</td><td>In vitro or ex vivo assay</td><td>no</td></tr>
+            <tr><td>9</td><td>Computational result</td><td>no</td></tr>
+            <tr><td>10</td><td>Text-mining or LLM extraction</td><td>yes</td></tr>
+          </table>
+        </div>
+        <div>
+          <table>
+            <tr><th>#</th><th>Kind</th><th>Span?</th></tr>
+            <tr><td>11</td><td>Entity grounding or mapping step</td><td>no</td></tr>
+            <tr><td>12</td><td>Curator or expert determination</td><td>no</td></tr>
+            <tr><td>13</td><td>Organisational or consortium decision</td><td>no</td></tr>
+            <tr><td>14</td><td>Regulatory approval as attestation</td><td>no</td></tr>
+            <tr><td>15</td><td>External assertion from another resource</td><td>no</td></tr>
+            <tr><td>16</td><td>AI synthesis over a packet</td><td>no</td></tr>
+            <tr><td>17</td><td>Expert review of existing evidence</td><td>no</td></tr>
+            <tr><td>18</td><td>Absence of evidence</td><td>n/a</td></tr>
+            <tr><td>19</td><td>Image or figure artefact</td><td>no</td></tr>
+            <tr><td>20</td><td>Pattern-derived assertion (DOSDP)</td><td>no</td></tr>
+          </table>
+        </div>
+      </div>
+      <p class="footnote stag">Volumes: 79,042 dismech snippets, 165,818 mondo-ai concordance items, ~9,700 MeDIC rows, 9 dismech images. Kinds 18 and 20 exist in no schema yet.</p>
+    </div>
+  </section>
+
+  <!-- 16 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.4</div>
+      <h2 class="stag">Two readings of that table</h2>
+      <div class="two-pane stag" style="margin-top:1.5rem">
+        <div class="card">
+          <div class="ico">reading 1</div>
+          <h3>Only four of twenty kinds have a span</h3>
+          <p>Kinds 1, 2, 3 and 10, which are also most of the volume. The other sixteen are a record, a number, a mapping, or a judgement. A kernel whose only concrete item class is a text span forces those sixteen to invent a quote. That is the N1 concordance finding, generalised.</p>
+        </div>
+        <div class="card">
+          <div class="ico">reading 2</div>
+          <h3>Four of them are not items at all</h3>
+          <p>Kinds 12, 13, 16 and 17 are interpretation acts: an agent read something and reached a verdict. Under §3 and §7.1 that is what an EvidenceLine is. Modelling them as items puts the agent on the wrong side of arrow 2.</p>
+        </div>
+      </div>
+      <div class="callout stag">
+        <p><span class="mono">has_evidence_items</span> has to range over the abstract <span class="mono">EvidenceItem</span>, not over a concrete text class.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.5</div>
+      <h2 class="stag">SEPIO conceptual classes, reused and never redefined</h2>
+      <table class="stag" style="margin-top:1.25rem">
+        <tr><th>Class</th><th>Role</th></tr>
+        <tr><td class="mono">InformationEntity</td><td>the abstract root; playing the <em>EvidenceItem role</em> means being one of these</td></tr>
+        <tr><td class="mono">DataItem</td><td>a discrete acquired datum, carries <span class="mono">value</span></td></tr>
+        <tr><td class="mono">Document</td><td>the publication or record an item is <span class="mono">reported_in</span></td></tr>
+        <tr><td class="mono">StudyResult</td><td>data items from one study about one focus</td></tr>
+        <tr><td class="mono">Statement, EvidenceLine</td><td>the claim, and the argument bearing on it</td></tr>
+        <tr><td class="mono">Contribution, Agent</td><td>who did what, and when (Track 2)</td></tr>
+      </table>
+      <p class="stag" style="margin-top:1.25rem">Monarch does not own these and should not rename them. Everything on the next slide is an extension that carries a SEPIO <span class="mono">class_uri</span>, so instances stay SEPIO-valid whatever the class is called locally.</p>
+    </div>
+  </section>
+
+  <!-- 18 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.5 · proposed</div>
+      <h2 class="stag">Monarch extension classes</h2>
+      <table class="stag" style="margin-top:1.2rem">
+        <tr><th>Class</th><th>class_uri</th><th>Covers</th><th>Shape</th></tr>
+        <tr><td><strong>TextDerivedEvidenceItem</strong></td><td class="mono">sepio:DataItem</td><td>1, 2, 3, 10</td><td><span class="mono">value</span> (required), <span class="mono">reported_in</span>, optional extraction provenance, optional ordered <span class="mono">grounding</span></td></tr>
+        <tr><td><strong>ConcordanceEvidenceItem</strong></td><td class="mono">sepio:InformationEntity</td><td>4</td><td>source subject/predicate/object, <span class="mono">mapping_justification</span>; <strong>no value</strong></td></tr>
+        <tr><td><strong>MeasurementEvidenceItem</strong></td><td class="mono">sepio:StudyResult</td><td>5, 6, 7, 8</td><td>a focus, a result, a study kind</td></tr>
+        <tr><td><strong>ComputationalEvidenceItem</strong></td><td class="mono">sepio:DataItem</td><td>9</td><td>method, parameters, software version, a score</td></tr>
+        <tr><td><strong>AttestationEvidenceItem</strong></td><td class="mono">sepio:InformationEntity</td><td>14, 15</td><td>an authority, a status, a date</td></tr>
+        <tr><td><strong>TestimonyEvidenceItem</strong></td><td class="mono">sepio:DataItem</td><td>12a</td><td><span class="mono">value</span> (what was asserted), <span class="mono">asserted_by</span>, <span class="mono">traceability</span></td></tr>
+      </table>
+      <div class="callout stag">
+        <p><strong>TextDerivedEvidenceItem replaces TextSpan.</strong> The name says what the thing is. The rename costs nothing semantically, because <span class="mono">class_uri</span> stays <span class="mono">sepio:DataItem</span>: this is a naming decision inside the profile, not a divergence from the core model. It also absorbs shape C, since the extraction slots are optional.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 19 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.5</div>
+      <h2 class="stag">Expert opinion and evidence synthesis are not the same thing</h2>
+      <div class="two-pane stag" style="margin-top:1.4rem">
+        <div class="card">
+          <div class="ico">second-order</div>
+          <h3>Evidence synthesis</h3>
+          <p>Always an evaluation of concrete pieces of evidence. Its inputs are other items or lines, it carries <span class="mono">cited_evidence</span>, and it is defeated by attacking those inputs. N3's LLM verdict is this. So is the verdict D2 needs over 3 supporting and 5 refuting items.</p>
+        </div>
+        <div class="card">
+          <div class="ico">first-order</div>
+          <h3>Expert opinion</h3>
+          <p>Need not rest on anything retrievable. A clinician of twenty years asserts "A is a treatment for B". They may not be able to say which paper taught them, and there may be no paper. It is defeated by attacking the expert, not the inputs, because there are none.</p>
+        </div>
+      </div>
+      <div class="callout stag">
+        <p><strong>The operational rule: if it cites evidence it is a synthesis, if it does not it is testimony.</strong> Checkable, and it decides which slot the number goes in. A synthesis score is computed over inputs. A testimony's weight comes from <span class="mono">TrustLevel</span> on the asserting agent (R12).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 20 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.5 · ECO IRIs checked against OLS 2026-08-17</div>
+      <h2 class="stag">ECO already draws this line, in two branches</h2>
+      <table class="stag" style="margin-top:1.2rem">
+        <tr><th></th><th>Evidence synthesis</th><th>Expert review of evidence</th><th>Expert opinion</th></tr>
+        <tr><td><strong>Inputs</strong></td><td>other items or lines</td><td>other items or lines</td><td><strong>none required</strong></td></tr>
+        <tr><td><strong>Order</strong></td><td>second</td><td>second</td><td><strong>first</strong></td></tr>
+        <tr><td><strong>Warrant</strong></td><td>the cited evidence and the method</td><td>the cited evidence and the expert</td><td>the expert's standing alone</td></tr>
+        <tr><td><strong>Defeated by</strong></td><td>attacking the inputs</td><td>attacking the inputs</td><td>attacking the expert</td></tr>
+        <tr><td><strong>ECO branch</strong></td><td colspan="2">inferential: <span class="mono">ECO:0000205</span> curator inference, <span class="mono">ECO:0000001</span> inference from background scientific knowledge</td><td>documented statement: <span class="mono">ECO:0006151</span> to <span class="mono">ECO:0000204</span> author statement</td></tr>
+        <tr><td><strong>Model as</strong></td><td class="mono">EvidenceSynthesis</td><td>EvidenceLine + <span class="mono">interpreted_by</span></td><td>EvidenceLine over a <span class="mono">TestimonyEvidenceItem</span></td></tr>
+      </table>
+      <p class="stag" style="margin-top:1.15rem"><span class="mono">ECO:0000034</span>, author statement without traceable support, is exactly the twenty-years-of-practice case. It has been an annotation code since the GO NAS/TAS days, so treating it as evidence with a declared weight is established practice.</p>
+    </div>
+  </section>
+
+  <!-- 21 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.5 · Q11 closed</div>
+      <h2 class="stag">The testimony is itself the item</h2>
+      <p class="stag" style="margin-top:.9rem">An earlier draft worried that expert review with nothing underneath produces a line with zero items. The premise was wrong. An assertion is a real information artefact: it has a value (what was said), an author, and sometimes a document (a guideline, a meeting record, a personal communication).</p>
+      <div class="code stag" style="margin-top:1.1rem">
+        <div class="bar"><span class="dot" style="background:var(--accent3)"></span><span class="fname">TestimonyEvidenceItem, class_uri sepio:DataItem</span></div>
+<pre><span class="k">has_evidence_lines</span>:
+  - <span class="k">direction_of_evidence_provided</span>: SUPPORTS
+    <span class="k">strength_of_evidence_provided</span>: MODERATE   <span class="cm">from TrustLevel on the agent, not from a citation</span>
+    <span class="k">has_evidence_items</span>:
+      - <span class="k">value</span>: <span class="s">"A is a treatment for B"</span>
+        <span class="k">asserted_by</span>: orcid:0000-0002-...
+        <span class="k">traceability</span>: <span class="hl">UNTRACEABLE</span>          <span class="cm">ECO:0000034</span></pre>
+      </div>
+      <p class="stag" style="margin-top:1.15rem">Every line keeps at least one item, and the kernel needs no zero-item special case.</p>
+    </div>
+  </section>
+
+  <!-- 20 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.6</div>
+      <h2 class="stag">Shared enums: the kernel</h2>
+      <table class="stag" style="margin-top:1.2rem">
+        <tr><th>Enum</th><th>Track</th><th>Values</th></tr>
+        <tr><td class="mono">Direction</td><td>T1</td><td><span class="pill">SUPPORTS</span><span class="pill">REFUTES</span><span class="pill">NEUTRAL</span></td></tr>
+        <tr><td class="mono">Strength</td><td>T1</td><td><span class="pill">STRONG</span><span class="pill">MODERATE</span><span class="pill">WEAK</span></td></tr>
+        <tr><td class="mono">EvidenceSource</td><td>T1</td><td><span class="pill">HUMAN_CLINICAL</span><span class="pill">MODEL_ORGANISM</span><span class="pill">IN_VITRO</span><span class="pill">COMPUTATIONAL</span><span class="pill">EXPERT_CONSENSUS</span><span class="pill">REGULATORY</span><span class="pill">OTHER</span></td></tr>
+        <tr><td class="mono">DocumentType</td><td>T1</td><td><span class="pill">PRIMARY_LITERATURE</span><span class="pill">REVIEW</span><span class="pill">PREPRINT</span><span class="pill">DATABASE_RECORD</span><span class="pill">REGULATORY_LABEL</span><span class="pill">GUIDELINE</span><span class="pill">OTHER</span></td></tr>
+        <tr><td class="mono">EvidenceItemType</td><td>T1</td><td><span class="pill">TEXT_DERIVED</span><span class="pill">CONCORDANCE</span><span class="pill">MEASUREMENT</span><span class="pill">COMPUTATIONAL</span><span class="pill">ATTESTATION</span><span class="pill">TESTIMONY</span></td></tr>
+        <tr><td class="mono">ConfidenceBasis</td><td>T1</td><td><span class="pill">MEASURED</span><span class="pill">DETERMINISTIC</span><span class="pill">PRIOR</span><span class="pill">SELF_REPORTED</span></td></tr>
+        <tr><td class="mono">StatementTraceability</td><td>T1</td><td><span class="pill">TRACEABLE</span><span class="pill">CLINICAL_STUDY_REFERENCED</span><span class="pill">UNTRACEABLE</span></td></tr>
+      </table>
+      <p class="footnote stag">REGULATORY, REGULATORY_LABEL and GUIDELINE are proposed and do not exist yet (Q7). ConfidenceBasis is MeDIC's, extended with SELF_REPORTED. StatementTraceability is the one enum here whose meaning: IRIs are confirmed rather than pending: ECO:0000033, ECO:0006016, ECO:0000034, all checked against OLS. That is a piece of blocker B2 closed.</p>
+    </div>
+  </section>
+
+  <!-- 21 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.6</div>
+      <h2 class="stag">Shared enums: shape C and Track 2</h2>
+      <table class="stag" style="margin-top:1.2rem">
+        <tr><th>Enum</th><th>Track</th><th>Values</th></tr>
+        <tr><td class="mono">SpanRole</td><td>C</td><td><span class="pill">SECTION_HEADER</span><span class="pill">SECTION_TEXT</span><span class="pill">LIMITATION_STATEMENT</span><span class="pill">TABLE_CELL</span><span class="pill">LIST_ITEM</span><span class="pill">STRUCTURED_FIELD</span><span class="pill">DOCUMENT_TITLE</span><span class="pill">UNKNOWN</span></td></tr>
+        <tr><td class="mono">GroundingStepCategory</td><td>C</td><td><span class="pill">EXTRACTION</span><span class="pill">TRANSLATION</span><span class="pill">GROUNDING</span><span class="pill">NORMALIZATION</span></td></tr>
+        <tr><td class="mono">TrustLevel</td><td>T2</td><td><span class="pill">community</span><span class="pill">domain_expert</span><span class="pill">curator</span><span class="pill">authority</span></td></tr>
+        <tr><td class="mono">CurationStatus</td><td>T2</td><td><span class="pill">UNREVIEWED</span><span class="pill">ACCEPTED</span><span class="pill">REJECTED</span><span class="pill">CONTROVERSIAL</span></td></tr>
+        <tr><td class="mono">ContributionType</td><td>T2</td><td><span class="pill">suggestion</span><span class="pill">review</span><span class="pill">decision</span><span class="pill">provision</span></td></tr>
+        <tr><td class="mono">ContributionChannel</td><td>T2</td><td><span class="pill">issue_tracker</span><span class="pill">personal_communication</span><span class="pill">direct_submission</span><span class="pill">public_forum</span></td></tr>
+      </table>
+      <p class="footnote stag">Not shared, and staying local: MeDIC's TransformationMethod, ExtractionFlag and GroundingQualityEnum (pipeline-specific, arrow 1), and dismech's MechanismConfidenceEnum (R17, still contested).</p>
+    </div>
+  </section>
+
+  <!-- 16 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.1</div>
+      <h2 class="stag">One DisMech enum, three concerns</h2>
+      <div class="code stag" style="margin-top:1.1rem">
+        <div class="bar"><span class="dot" style="background:var(--accent3)"></span><span class="fname">EvidenceItemSupportEnum, split onto the kernel's axes</span></div>
+<pre>SUPPORT / REFUTE   :  <span class="k">direction</span>: SUPPORTS / REFUTES        <span class="cm">polarity only</span>
+PARTIAL            :  <span class="k">direction</span>: SUPPORTS <span class="hl">+</span> <span class="k">strength</span>: WEAK   <span class="cm">partial is a strength</span>
+NO_EVIDENCE        :  <span class="cm">operational/QC signal, must not persist in released data</span>
+WRONG_STATEMENT    :  <span class="cm">operational/QC signal, must not persist in released data</span></pre>
+      </div>
+      <ul class="clean stag">
+        <li><strong>Direction carries polarity only.</strong> Strength and QC signals do not belong in it.</li>
+        <li><strong>Strength is a separate axis</strong>, refinable later by item-level scores.</li>
+        <li><strong>Evidence source and document type are different axes</strong> over one ECO vocabulary.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 17 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.2</div>
+      <h2 class="stag">Shapes A and C are one class</h2>
+      <div class="two-pane stag" style="margin-top:1.4rem">
+        <div class="card">
+          <div class="ico">shape A</div><h3>Only the required slots</h3>
+          <p><span class="mono">value</span> plus <span class="mono">reported_in: Document</span>. The always-valid minimal item. A verbatim sentence is a fact about the document, true whether or not anyone extracted it.</p>
+        </div>
+        <div class="card">
+          <div class="ico">shape C</div><h3>The extraction slots filled in</h3>
+          <p>Extraction score, span role, method, and the ordered grounding chain. Every one is optional, so an instance carrying only <span class="mono">value</span> and <span class="mono">reported_in</span> validates identically to an A.</p>
+        </div>
+      </div>
+      <div class="callout stag"><p>Both are <span class="mono">TextDerivedEvidenceItem</span> (§4.5). C is implemented in mondo-ai as <span class="mono">TextMiningResult</span> and not yet in <span class="mono">minimal.yaml</span>. It is where the grounding chain lands (§7.3).</p></div>
+    </div>
+  </section>
+
+  <!-- 18 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§4.3</div>
+      <h2 class="stag">What Track 1 omits</h2>
+      <div class="stag" style="margin-top:1.1rem">
+        <span class="pill">no Agent</span><span class="pill">no Contribution</span><span class="pill">no curation status</span><span class="pill">no synthesis</span><span class="pill">no scoring</span><span class="pill">no item identity beyond an optional id</span>
+      </div>
+      <p class="stag" style="margin-top:1.3rem">Keeping these out is what makes Track 1 pitchable. A resource that needs any of them is on Track 2 for that part of its model.</p>
+      <div class="callout stag">
+        <p><strong>Open tension (Q3).</strong> Interpretation provenance, meaning who read this span as supporting the claim and with which model, is what makes AI-curated evidence trustworthy, and it sits on the Track 2 side of the line. DisMech is AI-curated and records none of it. If Track 1 stays agent-free, every AI-curated resource reaches into Track 2 immediately, which weakens the case for starting simple.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 19 -->
+  <section class="slide divider">
+    <div class="wrap">
+      <div class="kicker stag">Part four</div>
+      <h1 class="title stag">Evidence,<br />provenance,<br /><span class="grad">quality</span></h1>
+    </div>
+  </section>
+
+  <!-- 20 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7</div>
+      <h2 class="stag">Three concepts, not two</h2>
+      <table class="stag" style="margin-top:1.3rem">
+        <tr><th></th><th>Question it answers</th><th>Territory</th></tr>
+        <tr><td><strong>Provenance</strong></td><td>Where did this record come from, and how was it produced?</td><td>W3C PROV; MeDIC's transformation chain</td></tr>
+        <tr><td><strong>Evidence</strong></td><td>What are the reasons to believe or disbelieve the claim?</td><td>SEPIO; has polarity and weight</td></tr>
+        <tr><td><strong>Data quality</strong></td><td>How faithfully does this record represent its source?</td><td>the derivative of provenance</td></tr>
+      </table>
+      <p class="stag" style="margin-top:1.3rem">A resource can be excellent at one and have none of another. MeDIC has best-in-class provenance and no evidence model. DisMech has a rich evidence vocabulary and almost no interpretation provenance. These are different gaps and need different work.</p>
+    </div>
+  </section>
+
+  <!-- 21 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7</div>
+      <h2 class="stag">Classifying any field, in three questions</h2>
+      <div class="cols c3 stag" style="margin-top:1.6rem">
+        <div class="card"><div class="ico">question 1</div><h3>Does it survive if the claim turns out to be false?</h3><p style="margin-top:.7rem"><span class="badge b2">provenance</span></p></div>
+        <div class="card"><div class="ico">question 2</div><h3>Would it change if a different pipeline produced an identical record?</h3><p style="margin-top:.7rem"><span class="badge b2">provenance or data quality</span><br /><span style="font-size:.9em">never evidence</span></p></div>
+        <div class="card"><div class="ico">question 3</div><h3>Would an expert who trusts your pipeline completely still want to see it?</h3><p style="margin-top:.7rem"><span class="badge b1">evidence</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 22 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7</div>
+      <h2 class="stag">Every confidence MeDIC computes is a data-quality number</h2>
+      <div class="two-pane stag" style="margin-top:1.5rem">
+        <div>
+          <div class="stat accent-ink">0.855</div>
+          <p style="margin-top:.8rem">on the gemifloxacin record means "we are 85.5% confident we linked the right CHEBI id".</p>
+          <p style="margin-top:.7rem">It does not mean there is an 85.5% chance the claim is true.</p>
+        </div>
+        <div class="card">
+          <div class="ico">the silent conversion</div>
+          <h3>Mapped onto <span class="mono">score_of_evidence_provided</span></h3>
+          <p>"unsure of the identifier" becomes "weak evidence for the treatment". This is the most dangerous integration error available here.</p>
+        </div>
+      </div>
+      <div class="callout stag"><p><strong>Chain confidence is a gate on the line, never the line's score.</strong></p></div>
+    </div>
+  </section>
+
+  <!-- 23 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7.1</div>
+      <h2 class="stag">Evidence and provenance attach to the nodes. Quality attaches to the arrows.</h2>
+      <div class="code stag" style="margin-top:1.1rem">
+<pre><span class="k">Statement</span>            <span class="cm">evidence is ABOUT this, and only this</span>
+    ^
+    |  <span class="hl">ARROW 2, interpretation</span>: "does this item bear on that claim, and how?"
+    |     quality    = was the reading correct?          <span class="cm">N3, R11, R12</span>
+    |     provenance = who read it, when, under which model
+    |
+<span class="k">EvidenceLine</span>         <span class="cm">evidence LIVES here: direction + strength</span>
+    ^
+    |  has_evidence_items
+    |
+<span class="k">DataItem</span> (span)      <span class="cm">provenance = which agent/tool/version produced this item</span>
+    ^
+    |  <span class="hlg">ARROW 1, extraction</span>: "does this span faithfully represent that document?"
+    |     quality    = scope narrowing, grounding fidelity, chain    <span class="cm">M2, M3</span>
+    |
+<span class="k">Document</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 24 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7.1 · Q10</div>
+      <h2 class="stag">Two qualities, and a terminology clash</h2>
+      <table class="stag" style="margin-top:1.2rem">
+        <tr><th></th><th>Arrow 1: extraction fidelity</th><th>Arrow 2: interpretation correctness</th></tr>
+        <tr><td><strong>Question</strong></td><td>did we faithfully get this span out of that document?</td><td>was reading this span as bearing on the claim correct?</td></tr>
+        <tr><td><strong>Corpus</strong></td><td>M2 (scope narrowing), M3 (chain, 0.855)</td><td>N3 (LLM self-reported 0.95), N2</td></tr>
+        <tr><td><strong>Governed by</strong></td><td>provenance and the pipeline</td><td>R11 interpretation provenance, R12 agent trust</td></tr>
+        <tr><td><strong>MeDIC has</strong></td><td>best in class</td><td>no interpretation step exists</td></tr>
+        <tr><td><strong>DisMech has</strong></td><td>validated exact snippets</td><td>none, despite being AI-curated</td></tr>
+      </table>
+      <p class="stag" style="margin-top:1.15rem">MeDIC's definition of data quality is arrow 1. The definition in <span class="mono">requirements.md</span> is arrow 2. Both are needed, and the spec named only one.</p>
+    </div>
+  </section>
+
+  <!-- 25 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7.1</div>
+      <h2 class="stag">Neither quality number may become a line score</h2>
+      <div class="two-pane stag" style="margin-top:1.5rem">
+        <div class="card"><div class="ico">arrow 1</div><h3>Chain confidence is a gate on the line, never the line's score.</h3></div>
+        <div class="card"><div class="ico">arrow 2</div><h3>What belongs on the line is the organisation's declared, dated, revisable trust in the interpreter.</h3></div>
+      </div>
+      <div class="callout stag">
+        <p>N3 has this the wrong way round. An LLM's self-reported <span class="mono">0.95</span> is stored as a <span class="mono">Score</span>, in the same slot type as a computed Net Evidence Ratio, and no consumer can tell them apart.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 26 -->
+  <section class="slide divider">
+    <div class="wrap">
+      <div class="kicker stag">Part five</div>
+      <h1 class="title stag">Two <span class="grad">open questions</span></h1>
+      <p class="lead stag" style="margin-top:1.3rem">Both concern where extraction machinery belongs.</p>
+    </div>
+  </section>
+
+  <!-- 27 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7.2 · Q8</div>
+      <h2 class="stag">Should the base evidence item be an extraction result?</h2>
+      <div class="two-pane stag" style="margin-top:1.3rem">
+        <div>
+          <span class="badge b3">the case for</span>
+          <ul class="clean" style="margin-top:.8rem">
+            <li>Puts arrow-1 provenance on every item by construction.</li>
+            <li>Unifies human and machine curation: a curator quoting a paper is an extractor with a human agent.</li>
+          </ul>
+        </div>
+        <div>
+          <span class="badge b1">the case against</span>
+          <ul class="clean" style="margin-top:.8rem">
+            <li><strong>It overfits.</strong> N1's concordance extracts nothing: three ontologies independently carry the string. N2's consortium decision is not an extraction either.</li>
+            <li><strong>It taxes the simple case.</strong> The adoption pitch becomes "your quote is a DataExtractionResult".</li>
+            <li><strong>The middle level is unoccupied.</strong> In all nine examples the span and the document are adjacent.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footnote stag">The relayed proposal appears to collapse <span class="mono">DataItem</span> into <span class="mono">Document</span>. Clarify what the intermediate level holds before arguing the case.</p>
+    </div>
+  </section>
+
+  <!-- 28 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7.3</div>
+      <h2 class="stag">SEPIO has three hooks for the grounding chain</h2>
+      <table class="stag" style="margin-top:1.25rem">
+        <tr><th>Hook</th><th>Gives you</th><th>Does not give you</th></tr>
+        <tr><td class="mono">derived_from</td><td>the lineage chain: each step points at its predecessor</td><td>multivalued, so a DAG rather than a sequence</td></tr>
+        <tr><td class="mono">contributions</td><td>per-step attribution: contributor, activity_type, date</td><td>an unordered bag, and no number</td></tr>
+        <tr><td class="mono">Entity.extensions</td><td>the official escape hatch, present on every entity</td><td><span class="mono">value</span> inherits <span class="mono">default_range: string</span></td></tr>
+      </table>
+      <p class="stag" style="margin-top:1.25rem">A pure <span class="mono">derived_from</span> recursion expressing the gemifloxacin chain validates against <span class="mono">sepio_classes.yaml</span> unmodified. The mechanism is real.</p>
+    </div>
+  </section>
+
+  <!-- 29 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7.3</div>
+      <h2 class="stag">Same four steps, measured</h2>
+      <table class="stag" style="margin-top:1.15rem">
+        <tr><th></th><th>Pure SEPIO derived_from</th><th>Profile extension on shape C</th></tr>
+        <tr><td><strong>Lines</strong></td><td>39</td><td><strong>7</strong></td></tr>
+        <tr><td><strong>confidence type</strong></td><td class="mono">str</td><td class="mono">float</td></tr>
+        <tr><td><strong>Ordering</strong></td><td>implicit, walk the chain</td><td>explicit list</td></tr>
+        <tr><td><strong>Contiguity check</strong></td><td>not expressible</td><td>mechanically checkable</td></tr>
+        <tr><td><strong>Chain dropped</strong></td><td>n/a</td><td>still a valid TextSpan</td></tr>
+      </table>
+      <div class="callout stag">
+        <p>No numeric slot exists anywhere in SEPIO's provenance vocabulary. The only <span class="mono">float</span> in the stack is sieve's <span class="mono">Score</span>, an evidence-strength object, which is the one slot §7.1 forbids arrow-1 numbers from entering.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 30 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§7.3 · R26</div>
+      <h2 class="stag">One optional ordered slot on shape C</h2>
+      <div class="code stag" style="margin-top:1.1rem">
+        <div class="bar"><span class="dot" style="background:var(--accent4)"></span><span class="fname">grounding: arrow-1 quality only</span></div>
+<pre><span class="k">grounding</span>:
+  - <span class="k">category</span>: TRANSLATION      <span class="cm">EXTRACTION | TRANSLATION | GROUNDING | NORMALIZATION</span>
+    <span class="k">input_value</span>: Гемифлоксацин
+    <span class="k">output_value</span>: Gemifloxacin
+    <span class="k">confidence</span>: <span class="n">0.95</span>
+    <span class="k">confidence_basis</span>: <span class="hl">PRIOR</span>    <span class="cm">MEASURED | DETERMINISTIC | PRIOR | SELF_REPORTED</span>
+    <span class="k">performed_by</span>: wikidata:Q116709136
+    <span class="k">flags</span>: [unreviewed_machine]</pre>
+      </div>
+      <p class="stag" style="margin-top:1.2rem">SEPIO models attribution and lineage, and delegates transformation quality to PROV and DQV. Requiring C for machine-produced items gives extraction provenance a home and leaves concordance items alone, which also settles most of Q8.</p>
+    </div>
+  </section>
+
+  <!-- 31 -->
+  <section class="slide divider">
+    <div class="wrap">
+      <div class="kicker stag">Part six</div>
+      <h1 class="title stag">What the <span class="grad">corpus</span> shows</h1>
+    </div>
+  </section>
+
+  <!-- 32 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">the corpus</div>
+      <h2 class="stag">Nine real records, three resources</h2>
+      <div class="cols c3 stag" style="margin-top:1.45rem">
+        <div class="card"><div class="ico">DisMech · D1 D2 D3</div><h3>Literature snippets</h3><p>Multi-granularity attachment; a contested claim with 3 supporting and 5 refuting items; an argument that a mouse model is inadmissible.</p></div>
+        <div class="card"><div class="ico">MeDIC · M1 M2 M3</div><h3>Regulatory attestation</h3><p>Corroboration without independence; a REFUTES-shaped span with no slot to hold it; a four-step transformation chain.</p></div>
+        <div class="card"><div class="ico">mondo-ai · N1 N2 N3</div><h3>Concordance and AI</h3><p>Line scores that are source constants; provenance counted as evidence; an LLM verdict that cannot be disputed.</p></div>
+      </div>
+      <p class="stag" style="margin-top:1.35rem">The corpus was widened beyond DisMech deliberately: DisMech alone would have produced flat literature-snippet lists and missed regulatory attestation, transformation provenance, cross-ontology concordance and agent trust. Every <span class="mono">as_is</span> block is real data or real code.</p>
+    </div>
+  </section>
+
+  <!-- 33 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§8.1</div>
+      <h2 class="stag">Three ways a naive tally goes wrong</h2>
+      <div class="cols c3 stag" style="margin-top:1.45rem">
+        <div class="card"><div class="ico">R14 · supersession</div><h3>Counting superseded evidence</h3><p>DisMech records AMX0035 with one SUPPORT item (phase-2 CENTAUR) and two REFUTE items (phase-3 PHOENIX, and the 2024 withdrawal). A tally reads 1:2. The phase-3 result supersedes the phase-2 result, and the withdrawal is a consequence rather than a third vote.</p></div>
+        <div class="card"><div class="ico">R15 · defeaters</div><h3>Counting admissibility as counter-evidence</h3><p>An argument that evidence does not bear on the claim is a different kind of thing from an argument that the claim is false.</p></div>
+        <div class="card"><div class="ico">R20 · independence</div><h3>Counting republications as corroboration</h3><p>MeDIC's noisy-OR reads six documents as six independent authorities and reaches 0.999998. The effective count is four. MeDIC's own reliability tier for the same pair is MEDIUM.</p></div>
+      </div>
+      <p class="stag" style="margin-top:1.3rem">All three are needed to compute an aggregate that is not misleading. All three are SEPIO questions rather than local ones.</p>
+    </div>
+  </section>
+
+  <!-- 34 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">D3 · R15</div>
+      <h2 class="stag">The undercutting defeater</h2>
+      <p class="stag" style="margin-top:.9rem">The <span class="mono">Rnf170</span>-null mouse develops an ADSA-like sensory phenotype, which reads as strong <span class="mono">MODEL_ORGANISM</span> support for a loss-of-function mechanism.</p>
+      <div class="callout stag">
+        <p>Heterozygous human null carriers are unaffected, and homozygotes get a different disease. The null mouse corresponds to the recessive condition, not the dominant one, so the mouse evidence is inadmissible for this claim.</p>
+      </div>
+      <div class="two-pane stag" style="margin-top:1.4rem">
+        <div><span class="badge b2">what a naive NER does</span><p style="margin-top:.7rem">Counts it as one more REFUTES line about the mechanism.</p></div>
+        <div><span class="badge b1">its actual effect</span><p style="margin-top:.7rem">Removes a SUPPORTS line from the tally.</p></div>
+      </div>
+      <p class="footnote stag">Direction is only meaningful relative to a named target. The same span is REFUTE against the ADSA mechanism claim and supports the discussion's own conclusion, which is why direction lives on the line and not on the item.</p>
+    </div>
+  </section>
+
+  <!-- 35 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§8 · what the corpus establishes</div>
+      <h2 class="stag">Four findings</h2>
+      <ul class="clean stag">
+        <li><strong>Direction is the biggest single win available.</strong> MeDIC has none, and mondo-ai's cannot vary. Both compute aggregates that are mathematically incapable of moving.</li>
+        <li><strong>The three-way split is not academic.</strong> M1, M2, M3 and N2 each contain at least one number that would be badly misread if mapped to the wrong concept.</li>
+        <li><strong>The normalised representation earns its keep at D3 and N3, not at D1.</strong> The argument for separate items and lines is that interpretation is a separate act with its own agent, date, method and defeasibility.</li>
+        <li><strong>Three requirements have no representation anywhere:</strong> supersession, defeaters, source independence.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 36 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§9</div>
+      <h2 class="stag">The adoption path</h2>
+      <table class="stag" style="margin-top:1.25rem">
+        <tr><th>Resource</th><th>Next step</th><th>Cost</th></tr>
+        <tr><td><strong>DisMech</strong></td><td>adopt Track 1 via the existing transform; split <span class="mono">supports</span>; drop the QC values from released data</td><td>days</td></tr>
+        <tr><td><strong>MeDIC</strong></td><td>annotate, then unify its two evidence vocabularies, then add direction, strength and synthesis</td><td>hours to 2 weeks</td></tr>
+        <tr><td><strong>mondo-ai</strong></td><td>re-point its import at the snake_case kernel; contribute <span class="mono">TextMiningResult</span> back</td><td>days</td></tr>
+        <tr><td><strong>sieve</strong></td><td>close blockers B1 to B4; land shape C and the evidence-source axis</td><td>weeks</td></tr>
+      </table>
+      <div class="callout stag">
+        <p><strong>Hard constraint.</strong> MeDIC is a deterministic build system and sieve is a stateful workflow system. Curation decisions have to be inputs to the MeDIC build: a verdict that lives only in sieve's DuckDB is silently reverted by the next rebuild.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 37 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">summary</div>
+      <h2 class="stag">Where this leaves the two tracks</h2>
+      <div class="cols c2 stag" style="margin-top:1.35rem">
+        <div>
+          <ul class="clean" style="margin-top:0">
+            <li>Track 1 is drafted and validates. R23, R24 and R25 are met today; what is missing is guidance.</li>
+            <li>The item/line split is justified by interpretation provenance, not by reuse.</li>
+            <li>The statement stays in the host, structured, and <span class="mono">statement_text</span> is a label.</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="clean" style="margin-top:0">
+            <li>Quality attaches to two arrows and belongs in neither evidence-strength slot.</li>
+            <li>The base item stays <span class="mono">TextSpan</span>; the grounding chain goes on shape C.</li>
+            <li>Supersession, defeaters and source independence go to SEPIO as questions.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footnote stag">Blockers B1 (kernel id) and B2 (real ECO and publication-type IRIs) gate broad adoption. Q8 needs one clarification from Matt before it can be closed.</p>
+    </div>
+  </section>
+
+<!-- ====================== SLIDES END ====================== -->
+</main>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let i = 0;
+  const progress = document.getElementById('progress');
+  const cur = document.getElementById('cur');
+  document.getElementById('tot').textContent = String(total).padStart(2,'0');
+
+  function render(){
+    slides.forEach((s,n)=>{ s.classList.toggle('active', n===i); s.classList.toggle('past', n<i); });
+    progress.style.width = (i/(total-1)*100)+'%';
+    cur.textContent = String(i+1).padStart(2,'0');
+    location.hash = i+1;
+  }
+  function go(n){ i = Math.max(0, Math.min(total-1, n)); render(); }
+  function next(){ go(i+1); } function prev(){ go(i-1); }
+
+  document.addEventListener('keydown', e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+    else if(e.key==='Home'){ go(0); } else if(e.key==='End'){ go(total-1); }
+    else if(e.key==='f'||e.key==='F'){ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  });
+  document.getElementById('navNext').addEventListener('click', next);
+  document.getElementById('navPrev').addEventListener('click', prev);
+  let tx=0;
+  document.addEventListener('touchstart',e=>tx=e.changedTouches[0].clientX,{passive:true});
+  document.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>55){ dx<0?next():prev(); } },{passive:true});
+  const start = parseInt(location.hash.replace('#',''));
+  if(start>=1 && start<=total) i=start-1;
+  render();
+</script>
+</body>
+</html>

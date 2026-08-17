@@ -1,0 +1,252 @@
+id: D1
+title: Evidence attached at three granularities, with one paper reused four times
+source:
+  repo: dismech
+  path: kb/disorders/ATTR_Amyloidosis.yaml
+  entity: Hereditary Transthyretin Amyloidosis (MONDO — TTR amyloidosis)
+challenges: [R2, R3, R7, R8, R11, R17, R19, Q2]
+
+summary: >-
+  A single DisMech disease record attaches the same flat EvidenceItem list at three
+  different levels: to a mechanistic hypothesis group, to a pathophysiology node, and to a
+  causal edge between two nodes. PMID:25604431 is used four separate times with four
+  different snippets and four different explanations — the same document supporting four
+  distinct claims. Two competing hypotheses coexist with different status
+  (CANONICAL vs EMERGING), and edges are tagged with the hypothesis group they belong to.
+
+# ---------------------------------------------------------------------------
+# AS-IS — verbatim from the DisMech record (trimmed; snippets shortened with …)
+# ---------------------------------------------------------------------------
+as_is:
+
+  # Level 1 — evidence on a HYPOTHESIS GROUP
+  mechanistic_hypotheses:
+    - hypothesis_group_id: canonical_variant_ttr_amyloidogenesis
+      hypothesis_label: Canonical Variant-TTR Amyloidogenesis Model
+      status: CANONICAL
+      description: >-
+        A pathogenic TTR variant destabilizes the circulating transthyretin tetramer.
+        Tetramer dissociation releases monomers that misfold, oligomerize, and assemble into
+        extracellular amyloid fibrils; progressive tissue accumulation then produces
+        organ-specific dysfunction.
+      evidence:
+        - reference: PMID:25604431
+          reference_title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+          supports: SUPPORT
+          evidence_source: OTHER
+          snippet: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
+          explanation: This directly states the canonical variant-to-tetramer-to-fibril sequence.
+        - reference: PMID:29962408
+          reference_title: Inhibition of the Amyloidogenesis of Transthyretin by Natural Products and Synthetic Compounds.
+          supports: SUPPORT
+          evidence_source: OTHER
+          snippet: "The mutations destabilize the tetramer and/or monomer of TTR, and thus the stabilization of TTR is a key strategy for the treatment of TTR-related amyloidosis."
+          explanation: The review independently supports TTR destabilization and its therapeutic tractability.
+
+    - hypothesis_group_id: val30met_glutathione_signature
+      hypothesis_label: Val30Met Glutathione and Inflammatory Metabolomic Signature
+      status: EMERGING
+      description: >-
+        A cross-sectional metabolomics study associates symptomatic TTR-Val30Met disease with
+        impaired glutathione homeostasis and inflammatory activation. Directionality and
+        generalizability beyond this genotype remain unresolved.
+      evidence:
+        - reference: PMID:42436580
+          reference_title: Disrupted glutathione homeostasis in the pathogenesis of TTR-V30M amyloidosis.
+          supports: SUPPORT
+          evidence_source: HUMAN_CLINICAL
+          snippet: "These findings identify disrupted GSH homeostasis and inflammatory activation as metabolic features associated with symptomatic TTR-V30M amyloidosis in vivo…"
+          explanation: >-
+            The study reports an association with manifest Val30Met disease without
+            establishing the causal direction.
+
+  # Level 2 — evidence on a PATHOPHYSIOLOGY NODE
+  pathophysiology:
+    - name: TTR Tetramer Destabilization, Misfolding, and Oligomerization
+      role: amplifier
+      biological_processes:
+        - preferred_term: protein homotetramerization
+          term: {id: "GO:0051289", label: protein homotetramerization}
+          modifier: DECREASED
+      evidence:
+        - reference: PMID:25604431
+          reference_title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+          supports: SUPPORT
+          evidence_source: OTHER
+          snippet: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
+          explanation: The review supplies the complete tetramer-dissociation and monomer-misfolding sequence.
+
+      # Level 3 — evidence on a CAUSAL EDGE, tagged with a hypothesis group
+      downstream:
+        - target: TTR Amyloid Fibril Formation and Extracellular Deposition
+          causal_link_type: DIRECT
+          description: Misfolded TTR monomers assemble into insoluble amyloid fibrils.
+          hypothesis_groups: [canonical_variant_ttr_amyloidogenesis]
+          evidence:
+            - reference: PMID:25604431
+              reference_title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+              supports: SUPPORT
+              evidence_source: OTHER
+              snippet: "to then misfold and aggregate into amyloid fibrils"
+              explanation: The source directly links monomer misfolding to amyloid fibril aggregation.
+
+# ---------------------------------------------------------------------------
+# TRACK 1 — the minimal microschema
+# ---------------------------------------------------------------------------
+# Each host object grafts `HasEvidenceLines` onto its own container. The kernel imposes no
+# container of its own, so the DisMech shape (hypothesis / node / edge) survives untouched.
+minimal:
+
+  - _host: mechanistic_hypotheses[canonical_variant_ttr_amyloidogenesis]
+    statement_text: >-
+      Variant TTR destabilizes the tetramer, releasing monomers that misfold and assemble
+      into extracellular amyloid fibrils.
+    has_evidence_lines:
+      - direction_of_evidence_provided: SUPPORTS
+        strength_of_evidence_provided: STRONG
+        evidence_source: OTHER          # review article — see gaps, this is a DocumentType, not a study kind
+        description: This directly states the canonical variant-to-tetramer-to-fibril sequence.
+        has_evidence_items:
+          - value: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
+            reported_in:
+              id: PMID:25604431
+              title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+              document_type: REVIEW
+      - direction_of_evidence_provided: SUPPORTS
+        strength_of_evidence_provided: MODERATE
+        evidence_source: OTHER
+        description: The review independently supports TTR destabilization and its therapeutic tractability.
+        has_evidence_items:
+          - value: "The mutations destabilize the tetramer and/or monomer of TTR, and thus the stabilization of TTR is a key strategy for the treatment of TTR-related amyloidosis."
+            reported_in:
+              id: PMID:29962408
+              title: Inhibition of the Amyloidogenesis of Transthyretin by Natural Products and Synthetic Compounds.
+              document_type: REVIEW
+
+  - _host: mechanistic_hypotheses[val30met_glutathione_signature]
+    statement_text: >-
+      Impaired glutathione homeostasis and inflammatory activation are part of the
+      pathogenesis of TTR-Val30Met amyloidosis.
+    has_evidence_lines:
+      - direction_of_evidence_provided: SUPPORTS
+        strength_of_evidence_provided: WEAK      # association only; direction of causality unresolved
+        evidence_source: HUMAN_CLINICAL
+        description: Reports an association with manifest Val30Met disease without establishing causal direction.
+        has_evidence_items:
+          - value: "These findings identify disrupted GSH homeostasis and inflammatory activation as metabolic features associated with symptomatic TTR-V30M amyloidosis in vivo…"
+            reported_in:
+              id: PMID:42436580
+              title: Disrupted glutathione homeostasis in the pathogenesis of TTR-V30M amyloidosis.
+              document_type: PRIMARY_LITERATURE
+
+  - _host: pathophysiology[TTR Tetramer Destabilization, Misfolding, and Oligomerization]
+    statement_text: Destabilized TTR tetramers dissociate into aggregation-prone misfolded monomers.
+    has_evidence_lines:
+      - direction_of_evidence_provided: SUPPORTS
+        strength_of_evidence_provided: STRONG
+        evidence_source: OTHER
+        description: The review supplies the complete tetramer-dissociation and monomer-misfolding sequence.
+        has_evidence_items:
+          - value: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
+            reported_in: {id: "PMID:25604431", document_type: REVIEW}
+
+  - _host: pathophysiology[…].downstream[TTR Amyloid Fibril Formation and Extracellular Deposition]
+    statement_text: >-
+      TTR Tetramer Destabilization DIRECTLY causes TTR Amyloid Fibril Formation and
+      Extracellular Deposition.
+    has_evidence_lines:
+      - direction_of_evidence_provided: SUPPORTS
+        strength_of_evidence_provided: STRONG
+        evidence_source: OTHER
+        description: The source directly links monomer misfolding to amyloid fibril aggregation.
+        has_evidence_items:
+          - value: "to then misfold and aggregate into amyloid fibrils"
+            reported_in: {id: "PMID:25604431", document_type: REVIEW}
+
+# ---------------------------------------------------------------------------
+# TRACK 2 — SEPIO Monarch / SIEVE
+# ---------------------------------------------------------------------------
+sepio_monarch:
+  # The four spans are four DataItems reported_in ONE Document. In Track 2 the document is a
+  # shared object with its own identity, and each span carries its own provenance. The
+  # hypothesis group becomes a first-class grouping over lines.
+  documents:
+    - id: PMID:25604431
+      type: SieveDocument
+      title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+      subtype: {code: review, label: Review article, system: "http://purl.org/spar/fabio/"}
+
+  hypothesis_groups:
+    - id: dismech:canonical_variant_ttr_amyloidogenesis
+      label: Canonical Variant-TTR Amyloidogenesis Model
+      status: CANONICAL
+    - id: dismech:val30met_glutathione_signature
+      label: Val30Met Glutathione and Inflammatory Metabolomic Signature
+      status: EMERGING
+
+  packets:
+    - id: sieve:pkt_attr_tetramer_destabilization
+      status: UNREVIEWED
+      statement:
+        id: stmt_attr_tetramer_destabilization
+        type: SieveStatement
+        subject: MONDO:0007100           # familial amyloid neuropathy — the disease_term DisMech uses
+        predicate: {code: has_pathophysiology, label: has pathophysiology, system: "https://w3id.org/dismech/"}
+        object: dismech:node_ttr_tetramer_destabilization
+        statement_text: Destabilized TTR tetramers dissociate into aggregation-prone misfolded monomers.
+        strength: ESTABLISHED            # R17 — statement-level confidence tier
+      has_evidence_lines:
+        - id: line_attr_25604431_tetramer
+          type: SieveEvidenceLine
+          direction_of_evidence_provided: supports
+          strength_of_evidence_provided: strong
+          evidence_source: EXPERT_CONSENSUS   # a narrative review; see gaps
+          hypothesis_group: dismech:canonical_variant_ttr_amyloidogenesis
+          description: The review supplies the complete tetramer-dissociation and monomer-misfolding sequence.
+          has_evidence_items:
+            - id: span_25604431_a
+              type: TextMiningResult          # "C" shape — extracted by an agent
+              value: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
+              reported_in: PMID:25604431
+              document_section: Abstract
+              extraction_method: dismech-curation-agent
+              eco_code: ECO:0000305                # verified via OLS
+              eco_label: curator inference used in manual assertion
+          # R11 — the provenance of the INTERPRETATION, which DisMech records nowhere today
+          contributions:
+            - type: Contribution
+              contributor: {id: "dismech:agent/claude-opus", type: Agent, subtype: software}
+              contribution_type: interpretation
+              date: '2026-07-18'
+              specified_by: dismech:skill/dismech-references@<commit>
+      evidence_synthesis:
+        summary: >-
+          Two independent reviews state the tetramer-destabilization mechanism directly; no
+          disputing evidence recorded.
+        score: {value: 1.0, description: Net Evidence Ratio (NER)}
+        direction: supports
+
+# ---------------------------------------------------------------------------
+gaps:
+  reuse_vs_duplication: >-
+    PMID:25604431 appears four times in one file with four different snippets. Under Track 1
+    these are four independent TextSpans that happen to share a Document id — which is fine
+    and arguably correct (they ARE different data items). But nothing dedupes the Document,
+    and nothing records that the four spans were extracted in one act by one agent. This is
+    the concrete form of Sierra's objection: reuse is theoretically available and practically
+    unused. See SPEC Q2.
+  evidence_source_misuse: >-
+    DisMech tags all four review-derived items `evidence_source: OTHER`. `OTHER` is doing the
+    work of "this is a review article", which is a DocumentType, not a study kind. The two
+    axes are being conflated in the data even where the schema separates them. Any ECO
+    binding (B2) has to survive this.
+  hypothesis_grouping: >-
+    `hypothesis_groups` on a causal edge is a genuine modelling feature with no counterpart in
+    either profile (R19). It is not evidence grouping — it is claim grouping: "these edges
+    belong to the same competing model of the disease". Track 2 needs somewhere to put it;
+    Track 1 should probably not try.
+  granularity_rule: >-
+    Mechanically transforming gives one line per DisMech item. Here that is correct for the
+    hypothesis group (different documents, different strength) but the four PMID:25604431
+    spans support four DIFFERENT statements, so they cannot be merged anyway. A pipeline
+    needs the agreed rule (group by direction + strength + source + document) written down.

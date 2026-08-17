@@ -1,0 +1,215 @@
+id: N2
+title: Provenance turned into evidence — "a curator decided this" as an evidence line with a trust level
+source:
+  repo: mondo-ai
+  path: src/mondo_ai/extraction/mondo_extractor.py (create_consortium_evidence_line / create_expert_evidence_line / create_candidate_literature_evidence_line) + tests/test_mondo_extractor.py
+  entity: "MONDO:0005015 (diabetes mellitus) — an annotated synonym axiom with oboInOwl:source values"
+challenges: [R10, R11, R12, R13, R18, Q3]
+provenance_note: >-
+  Reconstructed from the extractor code and its tests, using the ORCID and PMID shapes the code
+  parses. `MondoExtractor` is exercised only by tests and is NOT yet wired into `PipelineRunner`,
+  so no packet of this shape exists in the production store. The scores and trust levels below
+  are exactly the constants in the code.
+
+summary: >-
+  The most interesting — and most contestable — thing mondo-ai does. Mondo axiom annotations
+  carry `oboInOwl:source` strings; the extractor regexes ORCIDs and PMIDs out of them and turns
+  each into an EVIDENCE LINE. Membership of a term in the Mondo release becomes an
+  `AgentContribution` from the consortium with `trust_level: authority` and score 0.6; an ORCID
+  in the source string becomes a curator contribution with `trust_level: curator` and score 0.8;
+  a PMID becomes a `SieveDocument` marked "candidate — not yet verified" with score 0.4. Under
+  the §7 test, the first two are *provenance* — they survive whether or not the synonym is
+  correct — yet here they are load-bearing evidence with numeric weight. Whether that is a
+  category error or the whole point is the sharpest open question in the corpus.
+
+# ---------------------------------------------------------------------------
+as_is:
+  # what Mondo actually publishes
+  source_axiom: |
+    [Term]
+    id: MONDO:0005015
+    name: diabetes mellitus
+    synonym: "DM" EXACT [ORCID:0000-0001-5208-3432, PMID:12345678]
+
+  # what MondoExtractor makes of it
+  extracted_provenance:
+    orcids: ['0000-0001-5208-3432']
+    pmids: ['12345678']
+    raw_sources: ["ORCID:0000-0001-5208-3432", "PMID:12345678"]
+
+  packet:
+    id: pkt_mondo_0005015_dm
+    statement:
+      id: stmt_mondo_0005015_dm
+      type: SieveStatement
+      subject: MONDO:0005015
+      subjectLabel: diabetes mellitus
+      predicate: {code: "oio:hasExactSynonym", label: exact synonym}
+      object: DM
+      statementText: "diabetes mellitus has exact synonym 'DM'"
+    status: UNREVIEWED
+    hasEvidenceLines:
+
+      # (1) organisational decision — the term is IN the Mondo release
+      - id: el_consortium_00042
+        type: SieveEvidenceLine
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: moderate
+        scoreOfEvidenceProvided: 0.6
+        hasEvidenceItems:
+          - id: ev_consortium_00042
+            type: AgentContribution
+            evidenceItemType: AgentContribution
+            contributor: {id: "mondo:consortium", type: Agent, name: Mondo Disease Ontology Consortium, subtype: organization}
+            trustLevel: authority
+            contributionType: decision
+            content: Term included in Mondo Disease Ontology
+            reference: http://purl.obolibrary.org/obo/mondo/releases/2026-08-01/mondo.owl
+            description: "Organizational decision: MONDO:0005015 included in Mondo"
+
+      # (2) expert determination — an ORCID appeared in the axiom's source
+      - id: el_expert_00317
+        type: SieveEvidenceLine
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: strong
+        scoreOfEvidenceProvided: 0.8
+        hasEvidenceItems:
+          - id: ev_expert_00317
+            type: AgentContribution
+            evidenceItemType: AgentContribution
+            contributor: {id: "ORCID:0000-0001-5208-3432", type: Agent, subtype: person}
+            trustLevel: curator
+            contributionType: decision
+            content: Expert curator determination for synonym
+            description: "Curator ORCID:0000-0001-5208-3432 approved this synonym"
+
+      # (3) candidate literature — a PMID appeared in the axiom's source, unverified
+      - id: el_lit_12345678_00042
+        type: SieveEvidenceLine
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: weak
+        scoreOfEvidenceProvided: 0.4
+        hasEvidenceItems:
+          - id: ev_lit_12345678_00042
+            type: SieveDocument
+            pmid: '12345678'
+            subtype: {code: candidate_reference, label: Candidate Literature Reference, system: "mondo:evidence_status"}
+            urls: [https://pubmed.ncbi.nlm.nih.gov/12345678/]
+            description: "Candidate reference PMID:12345678 (cited in source, not yet verified)"
+
+# ---------------------------------------------------------------------------
+# TRACK 1 — what honestly survives
+# Only (3), and only after someone reads the paper. (1) and (2) are provenance: they say who
+# put the synonym in the ontology, not why anyone should believe it. Under the kernel they have
+# no expression at all — which is exactly the pressure described in SPEC §4.3 / Q3.
+# ---------------------------------------------------------------------------
+minimal:
+  id: mondo-ai:pkt_mondo_0005015_dm
+  statement_text: "diabetes mellitus has exact synonym 'DM'"
+  has_evidence_lines:
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: WEAK
+      evidence_source: OTHER
+      description: >-
+        Candidate reference cited in the Mondo axiom's oboInOwl:source; the abstract has not
+        been checked for the synonym, so this is a pointer, not yet a verified evidence item.
+      has_evidence_items:
+        - value: "<not yet extracted — no verbatim span exists>"     # <- the honest state
+          reported_in: {id: "PMID:12345678", document_type: PRIMARY_LITERATURE}
+  _lost:
+    - "the consortium decision (provenance, no kernel expression)"
+    - "the ORCID curator determination (provenance, no kernel expression)"
+    - "trust levels, contribution types, and the 0.6 / 0.8 / 0.4 weights"
+  _note: >-
+    `TextSpan.value` is REQUIRED, so an unverified PMID pointer cannot be represented at all
+    without inventing a quote. Either the kernel needs a citation-only item shape, or such
+    pointers must not enter the evidence model until a span is extracted. The second is
+    cleaner and is what I would argue for.
+
+# ---------------------------------------------------------------------------
+# TRACK 2 — the same content, re-sorted along the evidence/provenance boundary
+# ---------------------------------------------------------------------------
+sepio_monarch:
+  id: sieve:pkt_mondo_0005015_dm
+  status: UNREVIEWED
+  statement:
+    type: SieveStatement
+    subject: MONDO:0005015
+    predicate: {code: "oio:hasExactSynonym", label: exact synonym}
+    object: DM
+
+  # PROVENANCE of the statement record — who put it there, when, on whose authority.
+  # This is where (1) and (2) belong: SEPIO Contributions on the InformationEntity.
+  contributions:
+    - type: Contribution
+      contributor: {id: "mondo:consortium", type: Agent, name: Mondo Disease Ontology Consortium, subtype: organization}
+      contribution_type: decision
+      date: '2026-08-01'
+      reference: http://purl.obolibrary.org/obo/mondo/releases/2026-08-01/mondo.owl
+    - type: Contribution
+      contributor: {id: "ORCID:0000-0001-5208-3432", type: Agent, subtype: person}
+      contribution_type: decision
+      channel: direct_submission
+
+  # EVIDENCE — only the literature pointer, honestly downgraded until verified.
+  has_evidence_lines:
+    - id: line_lit_12345678
+      type: SieveEvidenceLine
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: weak
+      score_of_evidence_provided: 0.4
+      evidence_source: OTHER
+      has_evidence_items:
+        - id: ev_lit_12345678
+          type: SieveDocument
+          pmid: '12345678'
+          subtype: {code: candidate_reference, label: Candidate Literature Reference}
+          rating: UNREVIEWED
+
+  # TRUST — declared, revisable, and attached to the AGENT, not baked into a line score.
+  # This is where "ORG trusts Opus 65% and Sonnet 56%" lives (SPEC §5, vision).
+  agent_trust_declarations:
+    - agent: mondo:consortium
+      trust_level: authority
+      declared_by: mondo-ai pipeline config
+      note: An organisational decision is not independent evidence for the claim it records.
+    - agent: ORCID:0000-0001-5208-3432
+      trust_level: curator
+
+  evidence_synthesis:
+    summary: >-
+      One unverified literature pointer. The consortium and curator records are provenance, not
+      evidence; if they are counted as evidence the packet scores 1.0 with nobody having read
+      anything.
+    score: {value: 0.4, description: Net Evidence Ratio (NER) over evidence lines only}
+    direction: supports
+
+# ---------------------------------------------------------------------------
+gaps:
+  is_a_curator_decision_evidence: >-
+    THE question this example poses. Apply the §7 test: does "the Mondo consortium included this
+    term" survive if the synonym turns out to be wrong? Yes — the decision still happened. So it
+    is provenance. Would a domain expert who trusts the pipeline completely still want to see
+    it? Also yes — "an expert curator with this ORCID signed off" IS a reason to believe. The
+    test gives conflicting answers, which means the test is incomplete: *testimony* is a real
+    evidence kind (ECO has terms for author statements), and an expert determination is
+    testimony. The defensible position is that (2) is testimonial evidence and (1) is
+    provenance — but mondo-ai currently treats them identically, as `AgentContribution`s
+    differing only in a weight.
+  circularity: >-
+    If "the term is in Mondo" is evidence for "the term should be in Mondo", the packet argues
+    for itself. At score 0.6 on a 0-1 NER, that alone gets a packet most of the way to the
+    ACCEPT threshold of 0.7 before any literature is read. This is a genuine defect, not a
+    modelling nicety.
+  scores_are_priors_not_measurements: >-
+    0.6 / 0.8 / 0.4 are hard-coded in Python. Nothing in the packet says they are constants
+    rather than assessments. MeDIC's `confidence_basis: PRIOR` discipline (M3) would fix this
+    at zero cost and should be adopted for `score_of_evidence_provided`.
+  no_span_no_evidence: >-
+    A PMID with no extracted quote is a promise of evidence, not evidence. The `subtype:
+    candidate_reference` marker is the right instinct; a `verification_status` on the item (or
+    simply not admitting it until enrichment runs) would be cleaner than a weight of 0.4.
+  track1_pressure_Q3: >-
+    Every AI-curated Monarch resource needs to record who interpreted what. If Track 1 has no
+    Agent, DisMech and mondo-ai must reach into Track 2 on day one, which undercuts "start
+    simple". One optional `interpreted_by` slot on `EvidenceLine` would cover the common case.

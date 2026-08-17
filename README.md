@@ -82,8 +82,11 @@ just test        # pytest + mypy + ruff
 ```
 sieve/
 ├── schema/
+│   ├── minimal.yaml              # the minimal evidence microschema (Track 1)
 │   ├── sepio_classes.yaml        # SEPIO base
-│   └── sieve.yaml                # canonical SIEVE model (imports SEPIO base)
+│   └── sieve.yaml                # canonical SIEVE model (imports both)
+├── transform/                    # linkml-map: dismech → minimal → sieve
+├── monarch_evidence/             # Monarch evidence modelling: SPEC + corpus + analysis
 ├── src/sieve/
 │   ├── datamodel/                # gen-pydantic models + polymorphic loaders
 │   ├── scoring.py                # Net Evidence Ratio over EvidenceLines
@@ -103,6 +106,15 @@ sieve/
 `ComputationalResult`, `AgentContribution` — all SEPIO `InformationEntity`
 subclasses, each carrying a steward `rating` and `eco_code` via the
 `CuratedEvidence` mixin.
+
+## Monarch evidence modelling
+
+`monarch_evidence/` holds the design work behind the two schemas: a
+[specification](monarch_evidence/SPEC.md) of the two-track plan (the minimal microschema every
+Monarch resource can adopt, and this repo's fuller SIEVE profile), a
+[corpus](monarch_evidence/examples/README.md) of nine real records from DisMech, MeDIC and
+mondo-ai rendered in both profiles, and an
+[analysis](monarch_evidence/analysis/requirements-matrix.md) of which requirements are met where.
 
 ## Curation Workflow
 

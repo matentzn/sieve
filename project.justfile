@@ -32,6 +32,20 @@ transform-all: transform-minimal-to-sieve
     @echo "Pipeline complete: DisMech -> minimal -> sieve (both outputs validated)."
 
 
+# ============== Slide deck ==============
+# The deck carries its own @media print block, so the PDF comes straight out of it.
+# One 16:9 page per slide.
+
+_chrome := "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+# Export monarch_evidence/spec-deck.html to a 37-page PDF.
+deck-pdf:
+    "{{_chrome}}" --headless --disable-gpu --no-pdf-header-footer \
+        --print-to-pdf="monarch_evidence/spec-deck.pdf" --virtual-time-budget=20000 \
+        "file://$(pwd)/monarch_evidence/spec-deck.html"
+    @python3 -c "import re;d=open('monarch_evidence/spec-deck.pdf','rb').read();print('pages:',len(re.findall(rb'/Type\s*/Page[^s]',d)))"
+
+
 # ============== Schema reference docs (linkml gen-doc) ==============
 # Generates the per-class/slot markdown reference the "Schema Reference" nav section
 # serves. Output (docs/elements/) is gitignored and regenerated on build/deploy.

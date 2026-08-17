@@ -1,0 +1,239 @@
+id: D2
+title: A genuinely contested claim — 3 supporting vs 5 refuting items, and one paper carrying three distinct arguments
+source:
+  repo: dismech
+  path: kb/disorders/Familial_Nonmedullary_Thyroid_Carcinoma.yaml
+  entity: "pathophysiology[HABP2 G534E Loss of Tumor-Suppressor Function] + mechanistic_hypotheses[habp2_g534e_susceptibility]"
+challenges: [R1, R2, R5, R6, R8, R9, R14, R17, R19]
+
+summary: >-
+  The HABP2 p.G534E replication controversy, curated in full. A 2015 NEJM report proposed the
+  variant as an FNMTC susceptibility allele; at least four independent studies then contradicted
+  it on three separate grounds. DisMech keeps both sides in one flat list of eight EvidenceItems
+  — three SUPPORT, five REFUTE — with no way to say that the refutations collectively win, and
+  no way to say that they came LATER. The verdict survives only as (a) prose in the node
+  description, (b) `mechanism_confidence: HYPOTHETICAL`, and (c) `status: DEPRECATED` on the
+  hypothesis group. Crucially, PMID:26745718 supplies THREE distinct refuting arguments
+  (segregation failure, population frequency, tissue expression) — three lines of reasoning
+  from one document.
+
+# ---------------------------------------------------------------------------
+as_is:
+  pathophysiology_node:
+    name: HABP2 G534E Loss of Tumor-Suppressor Function
+    description: >-
+      CONTESTED - retained as a modelled but refuted branch, not part of the canonical FNMTC
+      mechanism. […] Multiple independent replication studies then contradicted causality on
+      three separate grounds: failure of cosegregation within carrier families, population
+      carrier frequencies of 7.6-9.3% that are incompatible with a highly penetrant dominant
+      allele, and absence of HABP2 expression in thyroid tissue. This node exists so that the
+      DEPRECATED habp2_g534e_susceptibility hypothesis group is wired to real causal edges and
+      the controversy stays auditable rather than being silently deleted.
+    biological_scale: MOLECULAR
+    role: Disputed Branch
+    mechanism_confidence: HYPOTHETICAL
+    genes:
+      - preferred_term: HABP2
+        term: {id: "hgnc:4798", label: HABP2}
+    evidence:
+      - reference: PMID:26222560
+        reference_title: Germline HABP2 Mutation Causing Familial Nonmedullary Thyroid Cancer.
+        supports: SUPPORT
+        evidence_source: IN_VITRO
+        snippet: "Since we did not find alterations in the other HABP2 allele in the tumor tissue and our functional studies suggested that HABP2 has a tumor-suppressive effect, we cotransfected equal amounts of the wild-type and G534E mutant constructs into NIH-3T3 cells."
+        explanation: The original functional claim — a dominant-negative effect on a tumor-suppressive HABP2 function, demonstrated in fibroblasts rather than in thyroid cells.
+      - reference: PMID:26222560
+        reference_title: Germline HABP2 Mutation Causing Familial Nonmedullary Thyroid Cancer.
+        supports: SUPPORT
+        evidence_source: HUMAN_CLINICAL
+        snippet: "analysis of TCGA data in 423 patients with papillary thyroid cancer showed that 4.7% carried the HABP2 G534E variant, as compared with 0.7% of persons with unknown disease status in multiethnic population databases (P<0.001)."
+        explanation: The case-control frequency argument offered in the original report.
+      - reference: PMID:26832773
+        reference_title: HABP2 G534E Mutation in Familial Nonmedullary Thyroid Cancer.
+        supports: SUPPORT
+        evidence_source: HUMAN_CLINICAL
+        snippet: "These results are consistent with HABP2 G534E being a susceptibility gene in a subgroup of FNMTC…"
+        explanation: The principal independent report favouring a susceptibility role.
+      - reference: PMID:26745718
+        reference_title: HABP2 G534E Variant in Papillary Thyroid Carcinoma.
+        supports: REFUTE
+        evidence_source: HUMAN_CLINICAL
+        snippet: "The variant did not segregate with PTC in one large and 6 smaller families in which it occurred."
+        explanation: Segregation failure across seven families — the core genetic argument against causality.
+      - reference: PMID:26745718
+        reference_title: HABP2 G534E Variant in Papillary Thyroid Carcinoma.
+        supports: REFUTE
+        evidence_source: HUMAN_CLINICAL
+        snippet: "The variant was found to be present in 6.1% familial cases, 8.0% sporadic cases (2 individuals were homozygous for the variant) and 8.7% controls."
+        explanation: Case and control frequencies are indistinguishable, contradicting the enrichment reported in the original study.
+      - reference: PMID:26745718
+        reference_title: HABP2 G534E Variant in Papillary Thyroid Carcinoma.
+        supports: REFUTE
+        evidence_source: HUMAN_CLINICAL
+        snippet: "the expression of HABP2 was highest in the liver, much lower in 3 other tested tissues (breast, kidney, brain) but not found in thyroid."
+        explanation: HABP2 is not expressed in thyroid, a strong biological argument against any thyroid-autonomous tumour-suppressor role.
+      - reference: PMID:26906432
+        reference_title: HABP2 Gene Mutations Do Not Cause Familial or Sporadic Non-Medullary Thyroid Cancer in a Highly Inbred Middle Eastern Population.
+        supports: REFUTE
+        evidence_source: HUMAN_CLINICAL
+        snippet: "None of the familial NMTC carried HABP2 mutations. Of 509 sporadic NMTC, only one case (0.2%) harbored the G534E variant."
+        explanation: Complete failure to replicate in familial cases and in 509 sporadic cancers.
+      - reference: PMID:33025555
+        reference_title: "Familial non-medullary thyroid cancer: a critical review."
+        supports: REFUTE
+        evidence_source: HUMAN_CLINICAL
+        snippet: "All these studies failed in detecting the p.G534E mutation in FNMTC suggesting that Gara et al. identified a private variation"
+        explanation: Review-level synthesis reaching the private-variant conclusion.
+    downstream:
+      - target: Multifocal Follicular Cell Transformation
+        causal_link_type: UNKNOWN
+        description: Proposed but unreplicated route from HABP2 loss of function to malignant transformation.
+        hypothesis_groups: [habp2_g534e_susceptibility]
+
+  hypothesis_group:
+    hypothesis_group_id: habp2_g534e_susceptibility
+    hypothesis_label: HABP2 p.G534E as an FNMTC susceptibility allele
+    status: DEPRECATED
+
+# ---------------------------------------------------------------------------
+# TRACK 1 — the minimal microschema
+# Note the grouping rule at work: 8 items become 6 lines. The two PMID:26222560 items merge
+# (same direction, same document) ONLY if they share a source — they do not (IN_VITRO vs
+# HUMAN_CLINICAL), so they stay separate. The three PMID:26745718 items share direction,
+# strength, source AND document but are three genuinely different arguments, so they stay
+# three lines under the "split when the reasoning differs" clause.
+# ---------------------------------------------------------------------------
+minimal:
+  id: dismech:fnmtc/habp2_g534e_lof
+  statement_text: >-
+    Germline HABP2 p.G534E causes loss of a tumor-suppressor function and predisposes to
+    familial non-medullary thyroid carcinoma.
+  has_evidence_lines:
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: WEAK          # dominant-negative shown in fibroblasts, not thyroid
+      evidence_source: IN_VITRO
+      description: The original functional claim, demonstrated in NIH-3T3 fibroblasts rather than thyroid cells.
+      has_evidence_items:
+        - value: "…our functional studies suggested that HABP2 has a tumor-suppressive effect, we cotransfected equal amounts of the wild-type and G534E mutant constructs into NIH-3T3 cells."
+          reported_in: {id: "PMID:26222560", title: Germline HABP2 Mutation Causing Familial Nonmedullary Thyroid Cancer., document_type: PRIMARY_LITERATURE}
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: MODERATE
+      evidence_source: HUMAN_CLINICAL
+      description: The case-control frequency argument offered in the original report.
+      has_evidence_items:
+        - value: "4.7% carried the HABP2 G534E variant, as compared with 0.7% of persons with unknown disease status in multiethnic population databases (P<0.001)."
+          reported_in: {id: "PMID:26222560", document_type: PRIMARY_LITERATURE}
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: MODERATE
+      evidence_source: HUMAN_CLINICAL
+      description: The principal independent report favouring a susceptibility role in a subgroup.
+      has_evidence_items:
+        - value: "These results are consistent with HABP2 G534E being a susceptibility gene in a subgroup of FNMTC…"
+          reported_in: {id: "PMID:26832773", document_type: PRIMARY_LITERATURE}
+
+    - direction_of_evidence_provided: REFUTES
+      strength_of_evidence_provided: STRONG
+      evidence_source: HUMAN_CLINICAL
+      description: "Argument 1 of 3 from this paper — segregation failure across seven families."
+      has_evidence_items:
+        - value: "The variant did not segregate with PTC in one large and 6 smaller families in which it occurred."
+          reported_in: {id: "PMID:26745718", title: HABP2 G534E Variant in Papillary Thyroid Carcinoma., document_type: PRIMARY_LITERATURE}
+    - direction_of_evidence_provided: REFUTES
+      strength_of_evidence_provided: STRONG
+      evidence_source: HUMAN_CLINICAL
+      description: "Argument 2 of 3 — case and control carrier frequencies are indistinguishable."
+      has_evidence_items:
+        - value: "present in 6.1% familial cases, 8.0% sporadic cases … and 8.7% controls."
+          reported_in: {id: "PMID:26745718", document_type: PRIMARY_LITERATURE}
+    - direction_of_evidence_provided: REFUTES
+      strength_of_evidence_provided: STRONG
+      evidence_source: HUMAN_CLINICAL
+      description: "Argument 3 of 3 — HABP2 is not expressed in thyroid at all."
+      has_evidence_items:
+        - value: "the expression of HABP2 was highest in the liver … but not found in thyroid."
+          reported_in: {id: "PMID:26745718", document_type: PRIMARY_LITERATURE}
+    - direction_of_evidence_provided: REFUTES
+      strength_of_evidence_provided: STRONG
+      evidence_source: HUMAN_CLINICAL
+      description: Complete failure to replicate in familial cases and in 509 sporadic cancers.
+      has_evidence_items:
+        - value: "None of the familial NMTC carried HABP2 mutations. Of 509 sporadic NMTC, only one case (0.2%) harbored the G534E variant."
+          reported_in: {id: "PMID:26906432", document_type: PRIMARY_LITERATURE}
+    - direction_of_evidence_provided: REFUTES
+      strength_of_evidence_provided: MODERATE
+      evidence_source: EXPERT_CONSENSUS
+      description: Review-level synthesis reaching the private-variant conclusion.
+      has_evidence_items:
+        - value: "All these studies failed in detecting the p.G534E mutation in FNMTC suggesting that Gara et al. identified a private variation"
+          reported_in: {id: "PMID:33025555", title: "Familial non-medullary thyroid cancer: a critical review.", document_type: REVIEW}
+
+# ---------------------------------------------------------------------------
+sepio_monarch:
+  id: sieve:pkt_fnmtc_habp2_g534e
+  status: REJECTED
+  statement:
+    id: stmt_fnmtc_habp2_g534e
+    type: SieveStatement
+    subject: MONDO:0017896            # familial nonmedullary thyroid carcinoma
+    predicate: {code: has_genetic_basis, label: has genetic basis, system: "https://w3id.org/dismech/"}
+    object: "HGNC:4798 p.Gly534Glu"
+    statement_text: >-
+      Germline HABP2 p.G534E predisposes to familial non-medullary thyroid carcinoma.
+    strength: HYPOTHETICAL             # R17 — DisMech's mechanism_confidence
+  hypothesis_group:
+    id: dismech:habp2_g534e_susceptibility
+    status: DEPRECATED
+
+  # the six lines as above, plus:
+  has_evidence_lines: "… as in `minimal`, each additionally carrying: …"
+  line_extensions:
+    date_authored: '2015-08-13'        # R14 — the ORIGINAL claim, 2015
+    superseded_by: [line_26745718_segregation, line_26906432_nonreplication]   # <- PROPOSED, does not exist
+    contributions:
+      - type: Contribution
+        contributor: {id: "dismech:agent/claude-opus", type: Agent, subtype: software}
+        contribution_type: interpretation
+        specified_by: dismech:skill/dismech-references@<commit>
+
+  evidence_synthesis:
+    summary: >-
+      Three supporting lines, all traceable to the 2015 originating report or a single
+      independent kindred series; five refuting lines from four independent groups, on three
+      logically independent grounds (segregation, population frequency, tissue expression),
+      all published AFTER the original claim. The weight of replication is against a causal
+      role; contemporary reviews treat G534E as a common polymorphism.
+    score: {value: -0.45, description: Net Evidence Ratio (NER), weights: "STRONG=1.0 MODERATE=0.6 WEAK=0.3"}
+    direction: disputes
+    cited_evidence: [line_26745718_segregation, line_26745718_frequency, line_26745718_expression, line_26906432_nonreplication]
+    generated_by:
+      type: CurationActivity
+      contributor: {id: "dismech:agent/claude-opus", type: Agent}
+      date: '2026-07-18'
+  decisions:
+    - decision_type: REJECT
+      curator: ORCID:0000-0002-7356-1779
+      rationale: Retained as a modelled but refuted branch so the controversy stays auditable.
+      certainty: high
+
+# ---------------------------------------------------------------------------
+gaps:
+  no_aggregation: >-
+    In DisMech the verdict "the refutations win" exists only as prose. A consumer reading the
+    YAML programmatically sees 3 SUPPORT and 5 REFUTE and has no defensible way to combine
+    them. This is exactly what `EvidenceSynthesis` (R9) is for, and it is the clearest
+    single argument for Track 2 in the whole corpus.
+  one_document_three_arguments: >-
+    PMID:26745718 yields three logically independent refutations. Under the naive "one line
+    per snippet" rule they become three lines by accident; under the agreed grouping rule
+    (group by direction+strength+source+document) they would WRONGLY merge into one, because
+    the rule has no term for "different reasoning". The rule needs the escape clause made
+    explicit and testable, or extraction pipelines will merge genuinely distinct arguments.
+  temporality: >-
+    Every refutation postdates the original claim, and the 2020 review is a synthesis OF the
+    refutations, not an eighth independent vote. Counting it as one more REFUTES line
+    double-counts. Neither profile can express supersession (R14) or "this line summarises
+    those lines". `superseded_by` above is a proposal, not an existing slot.
+  hypothesis_status_vs_statement_strength: >-
+    Three different fields carry the same verdict at three levels — `mechanism_confidence:
+    HYPOTHETICAL` on the node, `status: DEPRECATED` on the hypothesis group, and (in Track 2)
+    `status: REJECTED` on the packet. Which is authoritative, and are the other two derived?

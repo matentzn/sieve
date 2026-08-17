@@ -151,3 +151,7 @@ transform/build/
 # Generated LinkML schema reference (regenerated on build/deploy)
 docs/elements/*
 !docs/elements/.gitkeep
+/issues
+monarch_evidence/spec-deck.pdf
+/docs/superpowers/plans
+/docs/superpowers/specs

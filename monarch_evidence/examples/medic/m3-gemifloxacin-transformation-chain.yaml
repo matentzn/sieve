@@ -1,0 +1,199 @@
+id: M3
+title: A four-step transformation chain — ordered, contiguous, replayable, and not evidence at all
+source:
+  repo: medic
+  path: products/drug_list.yaml
+  entity: "Drug CHEBI:101853 (gemifloxacin), Russian GRLS record"
+challenges: [R10, R13, R21, H5]
+
+summary: >-
+  The purest specimen of MeDIC's distinctive contribution and of the evidence/provenance
+  boundary. A Russian regulatory string `Гемифлоксацин` becomes `CHEBI:101853` through four
+  named steps — EXTRACTION, TRANSLATION (DeepL via babelon), GROUNDING, NORMALIZATION — each
+  recording input and output, tool, tool version, agent, method, quality, flags, and a
+  confidence with an explicit BASIS. The chain is monotone, mechanical, replayable offline from
+  git-tracked SSSOM/Babelon decision stores, and byte-identical on rerun. Its aggregate
+  confidence is 0.855. That number says NOTHING about whether gemifloxacin is approved in
+  Russia; it says how sure MeDIC is that it linked the right ChEBI id. SEPIO has no counterpart
+  for this structure, and it must not be flattened into a bag of evidence items.
+
+# ---------------------------------------------------------------------------
+as_is:
+  identity:
+    entity_type: drug
+    id: MEDICNE:18eb4063-9c1c-5ae2-8868-620d124d2c16     # uuid5(entity_type, normalize(literal))
+    mention_source: RUSSIA
+    original_literal: Гемифлоксацин
+    source_language: ru
+    resolution:
+      confidence: 0.855                                   # product-ish decay along the chain
+      input_value: Гемифлоксацин
+      output_value: CHEBI:101853
+      pipeline:
+        - category: EXTRACTION
+          method: STRUCTURED_FIELD
+          tool: medic-ingest-russia
+          tool_version: 1.0.0
+          input_value: Гемифлоксацин
+          output_value: Гемифлоксацин
+          quality: verbatim
+          confidence: 1.0
+          confidence_basis: DETERMINISTIC        # a verbatim read of a structured field cannot be wrong
+          flags: []
+        - category: TRANSLATION
+          method: API
+          tool: babelon
+          tool_version: 0.3.6
+          agent: {agent_id: "wikidata:Q116709136", agent_name: DeepL, agent_type: AI_AGENT}
+          # note: no agent_version — DeepL publishes no engine version, and inventing one
+          # would be worse than the honest gap
+          input_value: Гемифлоксацин
+          output_value: Gemifloxacin
+          source_language: ru
+          target_language: en-us
+          quality: close
+          translator_expertise: ALGORITHM
+          status: CANDIDATE                      # awaiting human review
+          confidence: 0.95
+          confidence_basis: PRIOR                # NOT measured — a calibrated per-method constant
+          flags: [unreviewed_machine]
+        - category: GROUNDING
+          method: LEXICAL_MATCH
+          tool: medic-lexical-grounder
+          tool_version: '1'
+          input_value: Gemifloxacin              # == previous output_value (invariant I-8)
+          output_value: CHEBI:101853
+          output_label: gemifloxacin
+          source_vocabulary: CHEBI
+          quality: lexical_exact_normalized
+          confidence: 0.9
+          confidence_basis: MEASURED
+          flags: []
+        - category: NORMALIZATION
+          method: DETERMINISTIC_RULE
+          tool: medic-normalizer
+          tool_version: '1'
+          input_value: CHEBI:101853
+          output_value: CHEBI:101853
+          quality: identity
+          target_namespace: CHEBI
+          confidence: 1.0
+          confidence_basis: DETERMINISTIC
+      resolved_id: CHEBI:101853
+      resolved_label: gemifloxacin
+  reliability: MEDIUM                            # because of unreviewed_machine on the translation
+  approvals:
+    - authority: MOH_RUSSIA
+      source: GRLS
+      source_role: PRIMARY
+      status: APPROVED
+      approval_date: '20110812'
+      application_number: ЛС-000940
+      regulatory_document_url: https://grls.rosminzdrav.ru/Default.aspx
+  evidence:
+    - source_type: REGULATORY
+      jurisdiction: RUSSIA
+      approval_status: APPROVED
+      confidence: HIGH
+      reference: https://grls.rosminzdrav.ru/Default.aspx
+      explanation: Russian Ministry of Health registered drug (approved 20110812)
+
+# ---------------------------------------------------------------------------
+# TRACK 1 — the minimal microschema
+# Almost none of the above appears. That is CORRECT: the chain is provenance, not evidence.
+# What survives is one line: the Russian MoH registered this drug.
+# ---------------------------------------------------------------------------
+minimal:
+  id: medic:CHEBI_101853--APPROVED_IN--RUSSIA
+  statement_text: gemifloxacin is an approved medicinal product in the Russian Federation
+  has_evidence_lines:
+    - direction_of_evidence_provided: SUPPORTS
+      strength_of_evidence_provided: STRONG        # PRIMARY source_role + evidence.confidence HIGH
+      evidence_source: REGULATORY                  # PROPOSED value (SPEC Q7)
+      description: Russian Ministry of Health state register of medicines, registration ЛС-000940.
+      has_evidence_items:
+        - value: "Гемифлоксацин · ЛС-000940 · дата регистрации 12.08.2011"
+          reported_in:
+            id: GRLS:ЛС-000940
+            title: Государственный реестр лекарственных средств (GRLS) record
+            document_type: DATABASE_RECORD
+  _dropped_deliberately:
+    - "the four-step chain (provenance)"
+    - "0.855 (data quality)"
+    - "MEDICNE mention id (data quality / joinability)"
+    - "unreviewed_machine flag (data quality)"
+
+# ---------------------------------------------------------------------------
+# TRACK 2 — the chain rides along INSIDE the item, as one ordered object
+# ---------------------------------------------------------------------------
+sepio_monarch:
+  id: sieve:pkt_medic_gemifloxacin_ru
+  status: UNREVIEWED
+  statement:
+    type: SieveStatement
+    subject: CHEBI:101853
+    subject_label: gemifloxacin
+    predicate: {code: has_regulatory_approval, label: has regulatory approval, system: "https://w3id.org/monarch-initiative/medic/"}
+    object: MOH_RUSSIA
+  has_evidence_lines:
+    - id: line_grls_ls000940
+      type: SieveEvidenceLine
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: strong
+      evidence_source: REGULATORY
+      has_evidence_items:
+        - id: item_grls_ls000940
+          type: ConcordanceItem            # a grounding decision IS an SSSOM row — see gaps
+          source_name: GRLS
+          source_subject: "GRLS:ЛС-000940"
+          source_subject_label: Гемифлоксацин
+          mapping_justification: "semapv:LexicalMatching"
+          mapping_set: mappings/drug_grounding.sssom.tsv
+          value: "Гемифлоксацин"
+          reported_in: GRLS:ЛС-000940
+          eco_code: <TODO — no ECO term for "regulatory approval" was found; see SPEC Q7>
+          # ▼ the chain, preserved as an ORDERED, CONTIGUOUS structure inside one item.
+          #   Flattening it into sibling has_evidence_items would destroy invariant I-8.
+          transformation_chain:
+            mention_id: MEDICNE:18eb4063-9c1c-5ae2-8868-620d124d2c16
+            confidence: 0.855
+            steps:
+              - {category: EXTRACTION, method: STRUCTURED_FIELD, confidence: 1.0, basis: DETERMINISTIC}
+              - {category: TRANSLATION, method: API, tool: "babelon/0.3.6", agent: DeepL, confidence: 0.95, basis: PRIOR, flags: [unreviewed_machine], status: CANDIDATE}
+              - {category: GROUNDING, method: LEXICAL_MATCH, confidence: 0.9, basis: MEASURED}
+              - {category: NORMALIZATION, method: DETERMINISTIC_RULE, confidence: 1.0, basis: DETERMINISTIC}
+          data_quality_gate: MEDIUM        # gates/flags the line; NEVER becomes its score
+      contributions:
+        # provenance of the ITEM (R10) — who produced the data
+        - {type: Contribution, contributor: {id: "medic:ingest/russia", type: Agent, subtype: software}, contribution_type: provision, date: '2026-08-13'}
+  evidence_synthesis:
+    summary: One primary regulatory registration; no disputing evidence.
+    score: {value: 1.0, description: Net Evidence Ratio (NER)}
+    direction: supports
+
+# ---------------------------------------------------------------------------
+gaps:
+  set_vs_sequence_R21: >-
+    MeDIC's chain is a SEQUENCE with an equality constraint between adjacent elements
+    (`pipeline[n].output_value == pipeline[n+1].input_value`). A SEPIO evidence line's
+    `has_evidence_items` is a BAG — unordered, no adjacency constraint. This is the single
+    deepest structural incompatibility between the two models. The only safe mapping keeps the
+    chain intact inside ONE item (as above); decomposing it into siblings discards the
+    contiguity guarantee the whole provenance model exists to provide (medic hazard H5).
+  chain_decomposes_across_two_item_types: >-
+    If you did decompose it, EXTRACTION/TRANSLATION map to `TextMiningResult` while
+    GROUNDING/NORMALIZATION map to `ConcordanceItem` — two different SEPIO item classes with no
+    home for the sequencing between them. That is the concrete cost of set-vs-sequence.
+  translation_has_no_sepio_counterpart: >-
+    There is no SEPIO class or slot for "this string was machine-translated from Russian".
+    Babelon-shaped translation provenance is a genuine gap; MeDIC should propose it upward
+    alongside the offsets and the REGULATORY vocabulary.
+  confidence_basis_is_a_good_idea_worth_stealing: >-
+    `confidence_basis: MEASURED | DETERMINISTIC | PRIOR` — being forced to say whether a number
+    was measured, is trivially 1.0, or is an assumed constant — is a discipline SEPIO does not
+    have and arguably should, for `score_of_evidence_provided` too. An AI interpreter's
+    self-reported 0.9 is a PRIOR dressed as a MEASURED.
+  mention_identity: >-
+    `MEDICNE:` uuid5-per-surface-form gives every mention a stable, offline-computable id and is
+    what makes MeDIC's SSSOM joins work. The kernel has no notion of a stable id for a mention.
+    Worth proposing upward.

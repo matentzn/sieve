@@ -77,12 +77,15 @@ skip = [
 ]
 
 # Reminder: words have to be lowercased for the ignore-words-list
-ignore-words-list = "linke"
+# als = amyotrophic lateral sclerosis, not a misspelling of "also"
+ignore-words-list = "linke,als"
 quiet-level = 3
 
 # Ref.: https://github.com/crate-ci/typos (spell checker)
 [tool.typos.default.extend-words]
 linke = "linke"
+# ALS = amyotrophic lateral sclerosis, not a misspelling of "also"
+ALS = "ALS"
 [tool.typos.files]
 extend-exclude = [
   "LICENSE",
