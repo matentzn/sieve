@@ -15,14 +15,23 @@
 
 ## 1. Purpose
 
-Monarch produces evidence in at least five places (DisMech, MeDIC, mondo-ai/sieve, the Monarch
-KG, Mondo itself) and models it five different ways. None of them can currently express the
-one thing every downstream consumer asks for: *how strongly, and in which direction, does the
-evidence bear on this claim, and who decided that?*
+Monarch produces evidence in at least five places and models it five different ways. Naming
+them, because "five ways" is not informative on its own:
+
+| Place | How it models evidence | What it cannot say | Surveyed |
+|---|---|---|---|
+| **DisMech** | a flat `evidence:` list on 56 classes; one `supports` enum conflating direction, strength and QC | who did the interpreting, despite being AI-curated | yes, D1 to D3 |
+| **MeDIC** | transformation chains and source assertions, provenance to a high standard | direction: there is no slot, only an implicit SUPPORTS | yes, M1 to M3 |
+| **mondo-ai / sieve** | SEPIO packets with lines, items and synthesis | anything but agreement, so the aggregate is 1.0 across all 160,187 packets | yes, N1 to N3 |
+| **Mondo** | a bare list of source CURIEs: 67,085 bracketed synonym sources and 165,813 `{source=...}` xref axiom annotations in `mondo-edit.obo` (counted 2026-08-17) | direction, strength, agent, date; none of them exist | counted, not in the corpus |
+| **Monarch KG** | Biolink associations; the `begets` and nearest-source pattern | **not surveyed** | no, out of scope per §2 |
+
+None of the five can currently express the one thing every downstream consumer asks for: *how
+strongly, and in which direction, does the evidence bear on this claim, and who decided that?*
 
 This spec defines **one semantic foundation with two profiles**:
 
-| | Track 1 — the microschema | Track 2 — SEPIO Monarch |
+| | Track 1: the microschema | Track 2: SEPIO Monarch |
 |---|---|---|
 | Name | `sepio-minimal` (`https://w3id.org/sepio/minimal`, PROVISIONAL) | the SIEVE profile (`https://w3id.org/sieve`) |
 | Audience | *every* Monarch resource | projects that need evidence calculus |
@@ -40,10 +49,10 @@ representations are both first-class, and map to each other.
 adopted across Monarch it has to be *simple and intuitive*. Optimise Track 1 for adoption
 first; every slot must earn its place.
 
-**Second constraint — no overfitting.** No class in either profile may be shaped around one
+**Second constraint, no overfitting.** No class in either profile may be shaped around one
 pipeline's output. The corpus exists to enforce this: a slot proposed by a single resource has
 to be checked against the other eight records before it enters the kernel. The failure mode is
-concrete — `EvidenceSource: OTHER` is already doing duty as "review article" in DisMech (D1)
+concrete: `EvidenceSource: OTHER` is already doing duty as "review article" in DisMech (D1)
 because the axis was fitted to study kinds alone.
 
 ## 2. Scope
@@ -66,18 +75,28 @@ Statement          "Cystic fibrosis has_pathophysiology CFTR dysfunction"
    │                the claim being made
    │ has_evidence_lines
    ▼
-EvidenceLine       "this span strongly supports the claim"
+EvidenceLine       "this item strongly supports the claim"
    │                an ARGUMENT — the result of an agent interpreting items as evidence.
    │                Carries direction, strength, and the provenance of the INTERPRETATION.
    │ has_evidence_items
    ▼
-DataItem           the span of text itself
+EvidenceItem       the thing interpreted as evidence
    │                exists independently of being interpreted; carries its OWN provenance
    │                (who produced it), and may be reused as evidence for other claims.
-   │ reported_in
+   │                A DataItem when it has a `value` (a text span is the common case);
+   │                see §4.5 for the kinds that are not DataItems.
+   │ reported_in    (when the item came from a document at all)
    ▼
-Document           the publication the span came from
+Document           the publication or record the item was reported in
 ```
+
+**`EvidenceItem` here is the role, not a class** (§3.1). The node is drawn abstract on purpose:
+§4.4 shows that only four of twenty evidence kinds are a text span, and §4.5 concludes that
+`has_evidence_items` has to range over the abstract role rather than a concrete text class.
+Earlier drafts of this diagram called the node a `DataItem` and glossed it as *the span of text
+itself*, which is true of the majority case and false of concordance, measurement, attestation
+and testimony. For the same reason arrow 1 in §7.1 is *acquisition*, not *extraction*:
+extraction is what it is for text-derived items only.
 
 Three things follow, and they are the whole reason the nesting exists (Matt Brush, Slack
 2026-08; scratchpad):
@@ -157,6 +176,95 @@ Two things the corpus makes plain:
   expressible. **[inferred]** the cheapest fix is one optional `about: uriorcurie` on
   `EvidencedClaim`, pointing at the host statement; the structured triple then lives where it
   already lives, in the host.
+
+### 3.3 Conformance is not convergence
+
+Sierra Moxon built [nine valid SEPIO encodings](https://gist.github.com/sierra-moxon/8513375c4ee89c53794cba67bbef340c)
+of one claim (metformin indicated for type 2 diabetes) with identical evidence. All nine pass
+`linkml-validate`, and nothing in the data says which convention was used. Four axes of choice:
+
+1. `hasEvidenceFromSources`, `hasEvidence`, or `hasEvidenceLines`.
+2. One pooled line, or one line per item.
+3. Where pipeline steps go: nested evidence, component items, result rows, or contributions.
+4. Where confidence attaches. Six slots accept it.
+
+She also found the validator blind spot: when a slot's range is `InformationEntity`, LinkML emits
+a JSON Schema `anyOf`, so an object matching the permissive parent passes even with required
+child fields missing. `designates_type: true` on `Entity.type` fixes it. Independently hit in
+§7.3 on 2026-08-16, where polymorphic inlining under `derived_from` validated for the same
+wrong reason. Two people finding it separately is a good sign it is worth fixing.
+
+**Her three questions, answered with what is measurable here.**
+
+**Can the same statement and evidence produce different validated output?** Yes, and this repo
+is already an instance. The `dismech_to_minimal` transform silently picks one convention, one
+item becomes one line, in a single `expr`. That choice is her file 04, it is not written down
+anywhere as a choice, and it is the reason 38 of 39 lines in the corpus have exactly one item.
+
+**Does it matter?** Yes, and it is measurable. D2 has eight evidence items on one claim, three
+supporting and five refuting. Net Evidence Ratio over the same eight items, under four
+defensible conventions (computed 2026-08-17):
+
+| Convention | Lines | NER |
+|---|---|---|
+| One line per item (her file 04, what sieve does today) | 8 | **−0.250** |
+| Pool by direction (her file 03) | 2 | **0.000** |
+| Group by direction and document | 5 | **−0.200** |
+| The Q1 rule: direction + strength + source + document | 6 | **0.000** |
+
+Same claim, same evidence, four numbers, two of them on opposite sides of zero. A consumer
+applying a threshold at 0 gets "refuted on balance" or "perfectly balanced" depending only on
+how the producer grouped. So yes: an agent reading one rendering rather than another would draw
+a different conclusion about direction and strength, without any curated judgement having
+changed.
+
+Worse, the Q1 rule applied mechanically merges the three REFUTES lines from PMID:26745718 into
+one, and the corpus notes at D2 say that is wrong, because they are three logically distinct
+arguments. **Our own stated grouping rule destroys real structure on our own worked example.**
+Q1 is not a documentation gap, it is an unsolved problem.
+
+**Does a linkml-map transform help?** In one direction. Per-item to pooled is mechanical
+aggregation. Pooled to per-item is not, because per-item directions were never authored and
+cannot be invented. This is the same asymmetry as flat to nested: a transform moves shape, not
+judgement. So a transform can normalise a producer's output *downward* to a coarser convention,
+which is useful for consumers, and cannot repair a producer that chose too coarse a convention
+in the first place. Declaring the convention costs one annotation. Recovering it later costs a
+re-curation.
+
+**What follows.** A profile that does not pin its convention has not narrowed SEPIO in the way
+that matters. The pinning has to be machine-checkable, not prose in a spec, or producers will
+diverge exactly as ClinGen's older dialect has (`evidenceLine` vs `hasEvidenceLines`, no
+`DataItem` objects, strength in free-text comments).
+
+### 3.4 The minimum useful record, and whether there is too much evidence
+
+Sierra's other question: what is the *minimum* SEPIO-conformant output that captures the
+evidence, given that an agent can produce an unbounded amount of trace, and that few humans will
+read it.
+
+The minimum that carries this corpus is already measured. Track 1 is five classes, and nine of
+the fourteen `minimal:` blocks validate against it untouched; the five failures are two proposed
+enum values, not missing structure (§4.4 and the corpus test). So the floor is roughly:
+a statement, a direction, and one item with a `value` and a `reported_in`.
+
+The volume question is new to this spec and it is a real one:
+
+- mondo-ai holds **165,818 evidence items across 160,187 packets, and every packet is
+  UNREVIEWED**. Nobody has read any of it. That is the empirical answer to "will humans digest
+  agent output" as things stand.
+- MeDIC's four-step transformation chain is larger than the claim it supports, and under §7 none
+  of it is evidence.
+- The corpus already notes that R18 has never been exercised, so the claim that trust
+  accumulates across many weak interpretations is untested against data.
+
+The two-track design is, unintentionally, an answer to this: **Track 1 is the reading surface
+and Track 2 is the trace.** If that is the intent it should be stated, because it changes what
+Track 1 is for. It stops being only an adoption ramp and becomes the thing a human or an agent
+reads when it does not want the full record. That reframing is cheap and it makes the "start
+simple, lift later" story stronger, since lifting no longer means the simple view goes away.
+
+What is genuinely not answered: whether more trace is better, worse or merely more expensive.
+Nobody has measured an agent's verdict quality against trace depth. See Q14.
 
 ## 4. Track 1 — the minimal microschema
 
@@ -361,6 +469,7 @@ The vocabulary both tracks agree on. `T1` ships in the microschema, `T2` in the 
 | `EvidenceItemType` | T1 | `TEXT_DERIVED`, `CONCORDANCE`, `MEASUREMENT`, `COMPUTATIONAL`, `ATTESTATION`, `TESTIMONY` |
 | `ConfidenceBasis` | T1 | `MEASURED`, `DETERMINISTIC`, `PRIOR`, `SELF_REPORTED` |
 | `StatementTraceability` | T1 | `TRACEABLE` (`ECO:0000033`), `CLINICAL_STUDY_REFERENCED` (`ECO:0006016`), `UNTRACEABLE` (`ECO:0000034`) |
+| `GroupingConvention` | T1 | `ONE_LINE_PER_ITEM`, `POOLED_BY_DIRECTION`, `BY_DIRECTION_AND_DOCUMENT`, `BY_REASONING` (§3.3, R27) |
 | `SpanRole` | C | `SECTION_HEADER`, `SECTION_TEXT`, `LIMITATION_STATEMENT`, `TABLE_CELL`, `LIST_ITEM`, `STRUCTURED_FIELD`, `DOCUMENT_TITLE`, `UNKNOWN` |
 | `GroundingStepCategory` | C | `EXTRACTION`, `TRANSLATION`, `GROUNDING`, `NORMALIZATION` |
 | `TrustLevel` | T2 | `community`, `domain_expert`, `curator`, `authority` |
@@ -482,9 +591,9 @@ EvidenceLine         evidence LIVES here: direction + strength, relative to a na
     ▲
     │  has_evidence_items
     │
-DataItem (span)      provenance here = which agent/tool/version produced this item
+EvidenceItem         provenance here = which agent/tool/version produced this item
     ▲
-    │  ARROW 1 — extraction:  "does this span faithfully represent that document?"
+    │  ARROW 1 — acquisition:  "does this item faithfully represent its source?"
     │     quality here    = scope narrowing, grounding fidelity, chain    M2, M3
     │
 Document
@@ -500,9 +609,9 @@ Read off it:
   questions.
 - **There are two qualities**, on the two arrows, and *they are different numbers*:
 
-| | Arrow 1 — extraction fidelity | Arrow 2 — interpretation correctness |
+| | Arrow 1 — acquisition fidelity | Arrow 2 — interpretation correctness |
 |---|---|---|
-| Question | did we faithfully get this span/id out of that document? | was reading this span as bearing on the claim correct? |
+| Question | did we faithfully get this item out of its source? | was reading this item as bearing on the claim correct? |
 | Corpus | M2 (scope narrowing), M3 (four-step chain, 0.855) | N3 (LLM self-reported 0.95), N2 |
 | Governed by | provenance / the pipeline | R11 interpretation provenance + R12 declared agent trust |
 | MeDIC has | ✓✓ best in class | ✗ no interpretation step exists |
@@ -546,7 +655,7 @@ what is *always* true; the specialisation carries the optional extra.
 2. **It taxes the simple case** — the §1 gatekeeper constraint. The adoption pitch becomes
    "your quote is a DataExtractionResult". A verbatim sentence is a fact about the document; it
    is true whether or not anyone extracted it.
-3. **The middle level is unoccupied.** In all nine examples the span and the document are
+3. **The middle level is unoccupied.** Wherever the corpus has a span at all, the span and the document are
    adjacent. What the intermediate `DataItem` would hold is unclear — and as relayed, "a data
    item (a paper)" reads as collapsing `DataItem` into `Document`, which the current model keeps
    apart (`TextSpan` *is* the `sepio:DataItem`; `Document` is what it is `reported_in`). **This
@@ -678,6 +787,8 @@ traceability matrix is in [`analysis/requirements-matrix.md`](analysis/requireme
 | **R24** | one host class may carry several independently evidenced slots, not just one | T1 | *[anticipated]* |
 | **R25** | `statement_text` is a generated human-readable rendering, never a verbatim span | T1 | all nine |
 | **R26** | entity-level extraction/grounding chains are ordered, live on the item, and are arrow-1 quality — never evidence strength | T2 | M2, M3, N1 |
+| **R27** | a record declares the grouping convention it was produced under, machine-checkably | T1 | Sierra's nine encodings, D2 |
+| **R28** | the actionable core is separable from the trace, so a reader can take a view proportionate to its need | T1+T2 | N1, M3 |
 
 **R23, R24 and R25 are met by the kernel today** and were verified against `minimal.yaml` on
 2026-08-15 (§3.2). What is missing is guidance, not schema — with one exception, D1's `_host`,
@@ -784,6 +895,15 @@ New, from the corpus:
   agreeing; an individual clinician asserting from experience is not that. Either add a value, or
   rule that `EvidenceItemType: TESTIMONY` plus `StatementTraceability` already carries it and the
   source axis stays as it is.
+- **Q13 — does the convention get declared, or constrained?** §3.3, R27. Either every record
+  carries a `GroupingConvention`, or the profile forbids all but one and CI enforces it. The
+  second is stronger and costs producers more. Sierra's recommendation list leans that way
+  (`maximum_cardinality: 1`, `designates_type: true`, cap nesting depth in CI).
+- **Q14 — is more trace better, worse, or only more expensive?** §3.4. Nobody has measured an
+  agent's verdict quality against trace depth, and mondo-ai's 165,818 items are all UNREVIEWED,
+  so there is no human baseline either. This is an experiment, not a modelling decision, and it
+  should be run before Track 2 is scaled up.
+
 
 ## 11. Non-goals
 

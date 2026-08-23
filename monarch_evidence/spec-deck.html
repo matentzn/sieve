@@ -226,14 +226,17 @@
   <section class="slide">
     <div class="wrap">
       <div class="kicker stag">§1</div>
-      <h2 class="stag">Monarch models evidence in five places, five ways</h2>
+      <h2 class="stag">Five places produce evidence, and model it five ways</h2>
+      <table class="stag" style="margin-top:1.2rem">
+        <tr><th>Place</th><th>How it models evidence</th><th>What it cannot say</th><th>In the corpus</th></tr>
+        <tr><td><strong>DisMech</strong></td><td>a flat <span class="mono">evidence:</span> list on 56 classes; one <span class="mono">supports</span> enum</td><td>who did the interpreting, despite being AI-curated</td><td>D1 D2 D3</td></tr>
+        <tr><td><strong>MeDIC</strong></td><td>transformation chains and source assertions, provenance to a high standard</td><td>direction: there is no slot, only an implicit SUPPORTS</td><td>M1 M2 M3</td></tr>
+        <tr><td><strong>mondo-ai / sieve</strong></td><td>SEPIO packets with lines, items and synthesis</td><td>anything but agreement, so the aggregate is 1.0 across 160,187 packets</td><td>N1 N2 N3</td></tr>
+        <tr><td><strong>Mondo</strong></td><td>a bare list of source CURIEs: 67,085 bracketed synonym sources, 165,813 <span class="mono">{source=...}</span> xref annotations</td><td>direction, strength, agent or date, none of which exist</td><td>not covered</td></tr>
+        <tr><td><strong>Monarch KG</strong></td><td>Biolink associations, the <span class="mono">begets</span> and nearest-source pattern</td><td>not surveyed here</td><td>out of scope (§2)</td></tr>
+      </table>
       <div class="callout stag">
-        <p>None of them answers the question every downstream consumer asks: how strongly, and in which direction, does the evidence bear on this claim, and who decided that?</p>
-      </div>
-      <div class="cols c3 stag" style="margin-top:1.5rem">
-        <div class="card"><div class="ico">DisMech</div><h3>No interpretation provenance</h3><p>An evidence vocabulary, and no record of who did the interpreting. The resource is AI-curated.</p></div>
-        <div class="card"><div class="ico">MeDIC</div><h3>No evidence model</h3><p>Provenance to a high standard. No direction slot at all: one implicit SUPPORTS.</p></div>
-        <div class="card"><div class="ico">mondo-ai</div><h3>No variation</h3><p>Already on SEPIO. Its aggregate is 1.0 across all 160,187 packets, because nothing can emit a disputes line.</p></div>
+        <p>None of the five answers the question every downstream consumer asks: how strongly, and in which direction, does the evidence bear on this claim, and who decided that?</p>
       </div>
     </div>
   </section>
@@ -328,14 +331,15 @@
         <div class="arrow">&gt;</div>
         <div class="node hl"><div class="t">an argument</div><div class="m">EvidenceLine</div></div>
         <div class="arrow">&gt;</div>
-        <div class="node"><div class="t">the span</div><div class="m">DataItem</div></div>
+        <div class="node"><div class="t">the item</div><div class="m">EvidenceItem</div></div>
         <div class="arrow">&gt;</div>
         <div class="node"><div class="t">the source</div><div class="m">Document</div></div>
       </div>
       <div class="cols c2 stag" style="margin-top:1.7rem">
         <div><p><strong>EvidenceLine</strong> is the output of an interpretation act: an agent reading items as evidence. It carries direction, strength, and the provenance of that reading.</p></div>
-        <div><p><strong>DataItem</strong> exists independently of being interpreted. It carries its own provenance (who produced it), and can be used as evidence for other claims.</p></div>
+        <div><p><strong>EvidenceItem</strong> exists independently of being interpreted. It carries its own provenance (who produced it), and can be used as evidence for other claims.</p></div>
       </div>
+      <p class="footnote stag">The third node is drawn abstract on purpose. A text span is the common case and is a <span class="mono">DataItem</span> with a <span class="mono">value</span>, but only four of the twenty evidence kinds in §4.4 have a span, and <span class="mono">reported_in</span> only applies when the item came from a document at all.</p>
     </div>
   </section>
 
@@ -369,6 +373,161 @@
       </div>
       <div class="callout stag">
         <p>Interpretation provenance is what justifies the item/line split, and it is exercised by seven of the nine examples. Reuse is not doing that work.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- flat vs nested, 1 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3 · the flat alternative</div>
+      <h2 class="stag">Every element as a line of size one</h2>
+      <p class="stag" style="margin-top:.9rem">One flat object per evidence element, carrying direction and strength, the item content, and two separate provenance blocks: who produced the data, and who made the judgement.</p>
+      <div class="two-pane stag" style="margin-top:1.3rem">
+        <div>
+          <span class="badge b3">for flat</span>
+          <ul class="clean" style="margin-top:.8rem">
+            <li><strong>Both provenances still survive.</strong> The stated reason for nesting is that item provenance and interpretation provenance are different things. A flat object with <span class="mono">data_provenance</span> and <span class="mono">judged_by</span> carries both. Nesting was never what made the second one possible.</li>
+            <li><strong>Not reusing costs nothing.</strong> Document identity is carried by the CURIE, so PMID:25604431 appearing four times is four references to one identifier, not four copies of a document. The spans genuinely differ. There is nothing there to reuse.</li>
+            <li><strong>One class instead of three</strong>, against the §1 adoption constraint.</li>
+            <li><strong>DisMech's 79,042 records are already this shape</strong>, and the transform round-trips them byte-identically.</li>
+          </ul>
+        </div>
+        <div>
+          <span class="badge b1">against flat</span>
+          <ul class="clean" style="margin-top:.8rem">
+            <li><strong>The flattening is one-way.</strong> Nested to flat is a mechanical transform. Flat to nested is a curation act: a person has to decide which elements form one argument. At 79,042 records that decision is not recoverable later.</li>
+            <li><strong>The score counts items, not arguments.</strong> With no object grouping elements into an argument, any Net Evidence Ratio is driven by extraction verbosity. A paper that yielded four snippets outvotes one that yielded a single sentence.</li>
+            <li><strong>An argument built from two items has no identity.</strong> Supersession (R14) and defeaters (R15) target an argument. In flat form there is nothing to point at, so both degrade to pointing at a set of elements with no guarantee they are one argument.</li>
+            <li><strong>The judgement is copied onto every element.</strong> Revising one argument resting on three items means editing three records, and nothing stops them disagreeing about direction.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footnote stag">SEPIO conformance is deliberately not on this list. Whether a flat object can carry a truthful class_uri is the question under discussion, not an argument for settling it.</p>
+    </div>
+  </section>
+
+  <!-- flat vs nested, 2 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3 · measured across the corpus</div>
+      <h2 class="stag">Thirty-eight of thirty-nine lines already hold exactly one item</h2>
+      <div class="cols c3 stag" style="margin-top:1.4rem">
+        <div class="card"><div class="ico">Track 1 renderings</div><div class="stat">31 / 31</div><p style="margin-top:.5rem">lines with exactly one item</p></div>
+        <div class="card"><div class="ico">Track 2 renderings</div><div class="stat">6 / 7</div><p style="margin-top:.5rem">lines with exactly one item</p></div>
+        <div class="card"><div class="ico">mondo-ai store</div><div class="stat">1.03</div><p style="margin-top:.5rem">items per packet, across 160,187 packets</p></div>
+      </div>
+      <p class="stag" style="margin-top:1.3rem">So the flat model loses nothing observable in almost the whole corpus. The exception is one line, and it happens to be the strongest single argument in the corpus: <strong>D3, the undercutting defeater</strong>.</p>
+      <div class="code stag" style="margin-top:1rem">
+        <div class="bar"><span class="dot" style="background:var(--accent)"></span><span class="fname">line_adsa_undercut: two spans, two papers, one argument</span></div>
+<pre><span class="k">direction</span>: disputes   <span class="k">strength</span>: strong
+<span class="k">has_evidence_items</span>:
+  - <span class="s">"heterozygous carriers of nonsense variants in RNF170 were later shown to be unaffected"</span>   <span class="cm">PMID:32943585</span>
+  - <span class="s">"RNF170 variants were previously identified in ... autosomal recessive spastic paraplegia-85"</span>  <span class="cm">PMID:39177409</span></pre>
+      </div>
+      <p class="footnote stag">Neither span makes the argument alone. Flattened, this becomes two "disputes, strong" elements, and a tally counts two votes where there is one argument.</p>
+    </div>
+  </section>
+
+  <!-- flat vs nested, 3 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3 · the way out</div>
+      <h2 class="stag">Flat to author, nested to exchange</h2>
+      <p class="stag" style="margin-top:.9rem">The choice is not forced. A resource can author flat, one element per judgement, and export nested, because the mapping between them is already written and already tested.</p>
+      <div class="flow stag" style="margin-top:1.5rem">
+        <div class="node"><div class="t">authoring</div><div class="m">flat element</div></div>
+        <div class="arrow">&gt;</div>
+        <div class="node hl"><div class="t">linkml-map</div><div class="m">dismech_to_minimal</div></div>
+        <div class="arrow">&gt;</div>
+        <div class="node"><div class="t">interchange</div><div class="m">line + item</div></div>
+      </div>
+      <div class="callout stag">
+        <p>This is what the DisMech transform already does: one flat evidence element becomes one EvidenceLine holding one item, and it round-trips byte-identically on 1,615 of 1,639 disease files. Note what it cannot do. It emits 79,042 lines of size one and never groups two items into one argument, because that information was never authored. The transform moves shape, not judgement.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- conformance, 1 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3.3 · Sierra Moxon's nine encodings</div>
+      <h2 class="stag">Conformance is not convergence</h2>
+      <p class="stag" style="margin-top:.9rem">One claim, metformin indicated for type 2 diabetes, with identical evidence, encoded nine structurally different ways. All nine pass <span class="mono">linkml-validate</span>, and nothing in the data says which convention was used.</p>
+      <div class="cols c2 stag" style="margin-top:1.3rem">
+        <div>
+          <span class="badge b2">four axes of choice</span>
+          <ul class="clean" style="margin-top:.8rem">
+            <li><span class="mono">hasEvidenceFromSources</span>, <span class="mono">hasEvidence</span>, or <span class="mono">hasEvidenceLines</span></li>
+            <li>one pooled line, or one line per item</li>
+            <li>where pipeline steps go: nested evidence, component items, result rows, or contributions</li>
+            <li>where confidence attaches: six slots accept it</li>
+          </ul>
+        </div>
+        <div>
+          <span class="badge b1">and the validator has a blind spot</span>
+          <p style="margin-top:.85rem">When a slot's range is <span class="mono">InformationEntity</span>, LinkML emits a JSON Schema <span class="mono">anyOf</span>, so an object matching the permissive parent passes even with required child fields missing. <span class="mono">designates_type: true</span> fixes it.</p>
+          <p style="margin-top:.7rem">Hit independently in §7.3 on 2026-08-16, where polymorphic inlining under <span class="mono">derived_from</span> validated for the same wrong reason.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- conformance, 2 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3.3 · does it matter, measured on D2</div>
+      <h2 class="stag">Same evidence, four conventions, four answers</h2>
+      <p class="stag" style="margin-top:.9rem">D2 has eight evidence items on one claim: three supporting, five refuting. Net Evidence Ratio over those same eight items, under four defensible groupings.</p>
+      <table class="stag" style="margin-top:1.1rem">
+        <tr><th>Convention</th><th>Lines</th><th>NER</th></tr>
+        <tr><td>One line per item (what sieve does today)</td><td>8</td><td><strong>&minus;0.250</strong></td></tr>
+        <tr><td>Pool by direction</td><td>2</td><td><strong>0.000</strong></td></tr>
+        <tr><td>Group by direction and document</td><td>5</td><td><strong>&minus;0.200</strong></td></tr>
+        <tr><td>The Q1 rule: direction + strength + source + document</td><td>6</td><td><strong>0.000</strong></td></tr>
+      </table>
+      <div class="callout stag">
+        <p>Two of the four sit on opposite sides of zero. A consumer with a threshold at 0 reads "refuted on balance" or "perfectly balanced" depending only on how the producer grouped, with no curated judgement having changed. That is the answer to "does this even matter".</p>
+      </div>
+      <p class="footnote stag">Worse: the Q1 rule merges the three REFUTES lines from PMID:26745718 into one, and the corpus notes at D2 say that is wrong, because they are three logically distinct arguments. Our own grouping rule destroys real structure on our own worked example.</p>
+    </div>
+  </section>
+
+  <!-- conformance, 3 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3.3 · Q13</div>
+      <h2 class="stag">A transform normalises in one direction only</h2>
+      <div class="two-pane stag" style="margin-top:1.4rem">
+        <div class="card">
+          <div class="ico">works</div>
+          <h3>Per-item to pooled</h3>
+          <p>Mechanical aggregation. Useful for a consumer that wants a coarser view than the producer chose.</p>
+        </div>
+        <div class="card">
+          <div class="ico">does not work</div>
+          <h3>Pooled to per-item</h3>
+          <p>Per-item directions were never authored and cannot be invented. Same asymmetry as flat to nested: a transform moves shape, not judgement.</p>
+        </div>
+      </div>
+      <div class="callout stag">
+        <p>So a transform cannot repair a producer that chose too coarse a convention. <strong>Declaring the convention costs one annotation. Recovering it later costs a re-curation.</strong> This repo already picks one silently: <span class="mono">dismech_to_minimal</span> turns one item into one line, in a single <span class="mono">expr</span>, and that is why 38 of 39 corpus lines have exactly one item.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- conformance, 4 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3.4 · Q14</div>
+      <h2 class="stag">Is there such a thing as too much evidence?</h2>
+      <div class="cols c3 stag" style="margin-top:1.4rem">
+        <div class="card"><div class="ico">the floor</div><h3>What the minimum record is</h3><p>A statement, a direction, and one item with a <span class="mono">value</span> and a <span class="mono">reported_in</span>. Nine of fourteen corpus blocks validate against Track 1 untouched, and the five failures are two proposed enum values, not missing structure.</p></div>
+        <div class="card"><div class="ico">the ceiling</div><h3>What nobody reads</h3><p>mondo-ai holds 165,818 evidence items across 160,187 packets, and every packet is UNREVIEWED. MeDIC's four-step chain is larger than the claim it supports, and under §7 none of it is evidence.</p></div>
+        <div class="card"><div class="ico">unmeasured</div><h3>Whether more is better</h3><p>Nobody has measured an agent's verdict quality against trace depth, and there is no human baseline either. This is an experiment, not a modelling decision.</p></div>
+      </div>
+      <div class="callout stag">
+        <p>The two-track split is already an answer, and the spec should say so: <strong>Track 1 is the reading surface, Track 2 is the trace.</strong> That makes Track 1 more than an adoption ramp, and it means lifting to Track 2 no longer removes the simple view.</p>
       </div>
     </div>
   </section>
@@ -429,6 +588,59 @@
               <span class="cm">a rendering; this sentence is in no source document</span></pre>
       </div>
       <p class="stag" style="margin-top:1.3rem">None of the nine appears in any source document. <span class="mono">statement_text</span> is a label for humans. It sits one slot away from <span class="mono">TextSpan.value</span>, which is verbatim, and nothing in the schema marks the difference.</p>
+    </div>
+  </section>
+
+  <!-- evidence calculation, 1 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§3.2 · evidence calculation</div>
+      <h2 class="stag">Where can the final judgement even go?</h2>
+      <p class="stag" style="margin-top:.9rem">"How strong is the evidence for this statement, in this release" is a different object from the lines. Whether there is anywhere to put it depends on which of the three statement forms the host uses.</p>
+      <table class="stag" style="margin-top:1.15rem">
+        <tr><th>Form</th><th>Shape</th><th>Is the statement an object?</th><th>Where a judgement can go</th></tr>
+        <tr><td><strong>Association</strong></td><td class="mono">indication: {drug, disease, relationship, evidence}</td><td>yes, reified</td><td>a slot on the association</td></tr>
+        <tr><td><strong>Attribute</strong></td><td class="mono">drug.indication: [{disease, evidence}]</td><td>yes, the list item</td><td>a slot on the list item</td></tr>
+        <tr><td><strong>Sibling slot</strong></td><td class="mono">drug.indication: Y:B + drug.evidence_indication: [...]</td><td><strong>no</strong>, a bare scalar</td><td><strong>nowhere</strong></td></tr>
+      </table>
+      <div class="callout stag">
+        <p>The third form has no object to carry a per-statement judgement. A parallel <span class="mono">confidence_indication</span> slot works only while <span class="mono">indication</span> is single-valued; make it a list and the score can only be tied to its statement by list position. Either reify, or accept that this form supports evidence but not an aggregate over it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- evidence calculation, 2 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§5 · R9, R17 · open</div>
+      <h2 class="stag">Authored, derived, or built?</h2>
+      <div class="cols c2 stag" style="margin-top:1.2rem">
+        <div class="card"><div class="ico">option A</div><h3>Authored on the statement</h3><p>What DisMech does today with <span class="mono">MechanismConfidenceEnum</span>: ESTABLISHED, PROVISIONAL, HYPOTHETICAL. Readable and survives export. Nothing recomputes it, so it drifts from the evidence, and D2 records the verdict in three places that already disagree.</p></div>
+        <div class="card"><div class="ico">option B</div><h3>On a synthesis object</h3><p>Track 2 <span class="mono">EvidenceSynthesis</span>: a summary, a score, a named method, cited lines. Inspectable and attributable. Today it is single-valued, so two interpreters who disagree cannot both be recorded (N3).</p></div>
+        <div class="card"><div class="ico">option C</div><h3>Derived at read time</h3><p>Never stored, so it cannot go stale. Every consumer reimplements the policy, and a human overriding the computation has nowhere to be recorded.</p></div>
+        <div class="card"><div class="ico">option D</div><h3>Materialised per release</h3><p>Computed at build time, stamped into the export with the policy version that produced it, never authored. Matches "for this statement release", and regeneration keeps it honest.</p></div>
+      </div>
+      <div class="callout stag">
+        <p>The MeDIC constraint decides part of this: <strong>a computed score is an output and can be regenerated freely, a human verdict is an input and has to be stored and version-controlled.</strong> They are two objects. Conflating them is how a curator's decision gets silently reverted by the next build.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- evidence calculation, 3 -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="kicker stag">§8.1 · the honest caveat</div>
+      <h2 class="stag">No aggregate is defensible yet</h2>
+      <p class="stag" style="margin-top:.9rem">Choosing a home for the number is the easy half. The arithmetic that fills it is not sound today, and the spec already names why.</p>
+      <ul class="clean stag">
+        <li><strong>R14 supersession.</strong> A superseded result is still counted as a vote. AMX0035 reads 1:2 when the phase-3 trial supersedes the phase-2.</li>
+        <li><strong>R15 defeaters.</strong> An admissibility argument is counted as counter-evidence, when its actual effect is to remove a supporting line.</li>
+        <li><strong>R20 independence.</strong> Republications of one authority are counted as independent corroboration. MeDIC reaches 0.999998 for a pair whose own reliability tier is MEDIUM.</li>
+        <li><strong>Line granularity.</strong> Slides 11 to 13: with lines of size one the ratio counts items, so the number moves with extraction verbosity.</li>
+      </ul>
+      <div class="callout stag">
+        <p>Any number released before these are settled should carry the policy version that produced it and be labelled provisional. The slot is a schema question. Whether the value means anything is not.</p>
+      </div>
     </div>
   </section>
 
@@ -689,7 +901,7 @@ WRONG_STATEMENT    :  <span class="cm">operational/QC signal, must not persist i
       </div>
       <p class="stag" style="margin-top:1.3rem">Keeping these out is what makes Track 1 pitchable. A resource that needs any of them is on Track 2 for that part of its model.</p>
       <div class="callout stag">
-        <p><strong>Open tension (Q3).</strong> Interpretation provenance, meaning who read this span as supporting the claim and with which model, is what makes AI-curated evidence trustworthy, and it sits on the Track 2 side of the line. DisMech is AI-curated and records none of it. If Track 1 stays agent-free, every AI-curated resource reaches into Track 2 immediately, which weakens the case for starting simple.</p>
+        <p><strong>Open tension (Q3).</strong> Interpretation provenance, meaning who read this item as supporting the claim and with which model, is what makes AI-curated evidence trustworthy, and it sits on the Track 2 side of the line. DisMech is AI-curated and records none of it. If Track 1 stays agent-free, every AI-curated resource reaches into Track 2 immediately, which weakens the case for starting simple.</p>
       </div>
     </div>
   </section>
@@ -767,9 +979,9 @@ WRONG_STATEMENT    :  <span class="cm">operational/QC signal, must not persist i
     ^
     |  has_evidence_items
     |
-<span class="k">DataItem</span> (span)      <span class="cm">provenance = which agent/tool/version produced this item</span>
+<span class="k">EvidenceItem</span>         <span class="cm">provenance = which agent/tool/version produced this item</span>
     ^
-    |  <span class="hlg">ARROW 1, extraction</span>: "does this span faithfully represent that document?"
+    |  <span class="hlg">ARROW 1, acquisition</span>: "does this item faithfully represent its source?"
     |     quality    = scope narrowing, grounding fidelity, chain    <span class="cm">M2, M3</span>
     |
 <span class="k">Document</span></pre>
@@ -783,8 +995,8 @@ WRONG_STATEMENT    :  <span class="cm">operational/QC signal, must not persist i
       <div class="kicker stag">§7.1 · Q10</div>
       <h2 class="stag">Two qualities, and a terminology clash</h2>
       <table class="stag" style="margin-top:1.2rem">
-        <tr><th></th><th>Arrow 1: extraction fidelity</th><th>Arrow 2: interpretation correctness</th></tr>
-        <tr><td><strong>Question</strong></td><td>did we faithfully get this span out of that document?</td><td>was reading this span as bearing on the claim correct?</td></tr>
+        <tr><th></th><th>Arrow 1: acquisition fidelity</th><th>Arrow 2: interpretation correctness</th></tr>
+        <tr><td><strong>Question</strong></td><td>did we faithfully get this item out of its source?</td><td>was reading this item as bearing on the claim correct?</td></tr>
         <tr><td><strong>Corpus</strong></td><td>M2 (scope narrowing), M3 (chain, 0.855)</td><td>N3 (LLM self-reported 0.95), N2</td></tr>
         <tr><td><strong>Governed by</strong></td><td>provenance and the pipeline</td><td>R11 interpretation provenance, R12 agent trust</td></tr>
         <tr><td><strong>MeDIC has</strong></td><td>best in class</td><td>no interpretation step exists</td></tr>
@@ -836,7 +1048,7 @@ WRONG_STATEMENT    :  <span class="cm">operational/QC signal, must not persist i
           <ul class="clean" style="margin-top:.8rem">
             <li><strong>It overfits.</strong> N1's concordance extracts nothing: three ontologies independently carry the string. N2's consortium decision is not an extraction either.</li>
             <li><strong>It taxes the simple case.</strong> The adoption pitch becomes "your quote is a DataExtractionResult".</li>
-            <li><strong>The middle level is unoccupied.</strong> In all nine examples the span and the document are adjacent.</li>
+            <li><strong>The middle level is unoccupied.</strong> Wherever the corpus has a span at all, it sits directly on the document.</li>
           </ul>
         </div>
       </div>

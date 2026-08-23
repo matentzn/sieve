@@ -43,9 +43,12 @@ as_is:
           description: "Synonym from OMIM: 'LECD'"
           sourceName: OMIM
           sourceId: omim
+          subject_normalization: EXACT_MATCH_LOW_CONFIDENCE
           sourceSubject: OMIM:620763
+          objectValue: LECD
           sourceSubjectLabel: corneal dystrophy, lisch epithelial
-          mappingJustification: "skos:exactMatch"
+          mappingPredicate: "skos:exactMatch"
+          ## SHOULD BE REPLACED BY THE NER -> EXTRACTION SYSTEM we used in MEDIC
     - id: el_ordo_29022
       type: SieveEvidenceLine
       directionOfEvidenceProvided: supports
@@ -60,7 +63,7 @@ as_is:
           sourceId: ordo
           sourceSubject: Orphanet:98955
           sourceSubjectLabel: Lisch epithelial corneal dystrophy
-          mappingJustification: "skos:exactMatch"
+          mappingPredicate: "skos:exactMatch"
     - id: el_doid_59964
       type: SieveEvidenceLine
       directionOfEvidenceProvided: supports
