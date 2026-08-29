@@ -56,6 +56,9 @@ below point there. Items marked **unmet** are not expressible in either profile 
 - **B5. Three different numbers, never merged**: grounding fidelity (did we get the right ids?),
   interpretation correctness (did we read this as bearing on the claim correctly?), and evidence
   strength (how much does it move the claim?) (§7.1).
+- **B6. Declare the interpretation scope** — how much of the document was read before the line
+  was drawn (snippet, sentence, paragraph, abstract, full paper), and which text it was read
+  from (*proposed, `issues/issue_interpretation_scope.md`*).
 
 ## C. Evaluating evidence for and against
 
@@ -77,6 +80,8 @@ below point there. Items marked **unmet** are not expressible in either profile 
   is no denominator (§4.4 kind 18, **unmet**).
 - **C10. Competing hypotheses** — lines groupable under alternative, possibly deprecated,
   hypotheses (R19).
+- **C11. A record declares the grouping convention it was produced under**, machine-checkably —
+  otherwise C4 is unenforceable across pipelines (R27).
 
 ## D. Evidence strength scoring
 
@@ -115,3 +120,37 @@ below point there. Items marked **unmet** are not expressible in either profile 
   and the richer one (§6).
 - **F4. Simple enough to be adopted.** Every slot in the microschema earns its place; the nesting
   must be invisible to a Track 1 adopter (§1).
+- **F5. The actionable core is separable from the trace**, so a reader can take a view
+  proportionate to their need — a clinician and a debugging developer want different depths
+  (R28).
+
+## DisMech — the defects to fix, in order
+
+Each row is independently fixable and lands a requirement above. Ordered cheapest-first; 1–4 are
+schema splits that need no new curation, 5–8 add a slot, 9–12 need a decision before code.
+Counts are from the linked issues (130,693 evidence items across `kb/`).
+
+| # | Defect today | Fix | Issues | Req |
+|---|---|---|---|---|
+| 1 | **`supports` conflates direction, strength and QC** in one enum — SUPPORT 91.1%, PARTIAL 8.1%, REFUTE 0.4%, plus two QC values | split into `direction` (SUPPORTS/REFUTES/NEUTRAL) and `strength`; `PARTIAL` → SUPPORTS + WEAK | #5000, #7439 | C1, C2 |
+| 2 | **QC verdicts sit in the evidence slot** — `NO_EVIDENCE` (448) and `WRONG_STATEMENT` (1) say the curation failed, not what the source shows | move to a QC slot, drop from released data | *none direct*; cf. #4525 | E5 |
+| 3 | **No strength axis at all** — an n=1 case report and a 138,000-person Mendelian randomization are both `HUMAN_CLINICAL` + `SUPPORT` | study design + sample size, or a level tier (GRADE / Oxford CEBM) | #9421, #9833, #9827, #9785, #9710 | C2, D1 |
+| 4 | **`evidence_source` conflates the system studied with the document kind** — `OTHER` is 16.1% and doubles as "review article" | split out `document_type`; decide the GeneReviews and mixed-source conventions | #7439, #3635, #6997 | C2, F2 |
+| 5 | **No source standing** — `ReferenceTagEnum` has exactly one permitted value, so a *retired* GeneReviews chapter reads as current | a standing axis: retracted / retired / superseded / preprint | #9840 | C6 |
+| 6 | **Snippet text-source unrecorded** — a quote from PDF-extracted text (ligatures, broken words) is indistinguishable from a clean abstract quote; DOI snippets (5,047, 6.7%) skip validation entirely | record which cached text the snippet came from; unskip DOI in the validator | #9711, #7514 | B1, B5 |
+| 7 | **Interpretation scope unrecorded** — nothing says how much of the paper was read before the line was drawn | scope slot on the evidence line | #9711 | B6 |
+| 8 | **Interpretation provenance exists but does not reach the evidence** — `history/` holds 4,568 disorder session records, 4,207 with an `ai_agent` actor naming model and tool, plus the reasoning in prose; but its finest grain is `sections:` (phenotypes, treatments…), `EvidenceItem` still has its seven original slots, and no session id appears anywhere in `kb/` | carry the session id down to the line or item, so a snippet resolves to the reading that produced it | *none open* | E1, E2 |
+| 9 | **Two snippets from one paper: one argument or two?** — sibling items with no grouping | evidence lines, plus a declared grouping convention | #7439 | C4, C11 |
+| 10 | **Contested claims are unresolved and unrendered** — 11 nodes carry both SUPPORT and REFUTE; the renderer shows a flat list and no verdict | a synthesis object over the lines, and rendering for it | #4694 | C3, D2 |
+| 11 | **Single-source claims read as corroborated** — gene–disease links resting on Orphanet alone | corroboration expectation; distinguish independent sources from republications | #5035 | C8 |
+| 12 | **Frequency bands float free** — 715 ambiguous bands with no machine-readable link to the item that grounds them | attach evidence at the band, not just the phenotype | #9390 | A4, A5 |
+
+Smaller and already specified: publication year exposed to renderers without being read as an
+observation date (#7517, → C6). Still a scope question rather than a defect: where purely
+computational evidence belongs (#9794, → F1).
+
+**#7439 (open) proposes the pilot that carries 1, 4 and 9** — an additive `EvidenceLine` / `DataItem` /
+`Document` layer beside native `evidence:`, with `direction_of_evidence_provided` split from
+`strength_of_evidence_provided`, `DocumentTypeEnum`, and evidence items grouped under a line.
+PR #7445 (merged) already exports the native model to SEPIO statements in KGX, so the mapping
+exists in code; what it cannot invent is the information rows 1–8 say is missing.
