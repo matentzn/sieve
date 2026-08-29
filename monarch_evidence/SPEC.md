@@ -20,7 +20,7 @@ them, because "five ways" is not informative on its own:
 
 | Place | How it models evidence | What it cannot say | Surveyed |
 |---|---|---|---|
-| **DisMech** | a flat `evidence:` list on 56 classes; one `supports` enum conflating direction, strength and QC | who did the interpreting, despite being AI-curated | yes, D1 to D3 |
+| **DisMech** | a flat `evidence:` list on 56 classes; one `supports` enum conflating direction, strength and QC; interpretation provenance in a parallel `history/` store | which reading produced *this* evidence item — the history store stops at entry sections | yes, D1 to D3 |
 | **MeDIC** | transformation chains and source assertions, provenance to a high standard | direction: there is no slot, only an implicit SUPPORTS | yes, M1 to M3 |
 | **mondo-ai / sieve** | SEPIO packets with lines, items and synthesis | anything but agreement, so the aggregate is 1.0 across all 160,187 packets | yes, N1 to N3 |
 | **Mondo** | a bare list of source CURIEs: 67,085 bracketed synonym sources and 165,813 `{source=...}` xref axiom annotations in `mondo-edit.obo` (counted 2026-08-17) | direction, strength, agent, date; none of them exist | counted, not in the corpus |
@@ -324,9 +324,13 @@ model. Keeping them out is what makes Track 1 pitchable.
 
 **Open tension** (§10, Q3): the corpus shows that *interpretation provenance* — who read this
 span as supporting the claim, and with which model — is exactly what makes AI-curated evidence
-trustworthy, and it is on the Track 2 side of the line. DisMech is AI-curated and today records
-none of it. If Track 1 stays agent-free, every AI-curated resource has to reach into Track 2
-immediately, which weakens the "start simple" story.
+trustworthy, and it is on the Track 2 side of the line. DisMech records it, but *beside* the KB
+rather than in it: `history/` holds 4,568 append-only session records for disorders, 4,207 with an
+`ai_agent` actor naming model and tool, and the reasoning in prose. The finest grain is
+`sections:`, `EvidenceItem` carries no agent, and no session id appears in `kb/`, so the provenance
+cannot be resolved from an evidence item. If Track 1 stays agent-free, every AI-curated resource
+has to reach into Track 2 immediately, which weakens the "start simple" story — though DisMech's
+split suggests a third option: a Track 1 pointer to a provenance record held elsewhere.
 
 ### 4.4 Every kind of evidence in the three repositories
 
@@ -615,7 +619,7 @@ Read off it:
 | Corpus | M2 (scope narrowing), M3 (four-step chain, 0.855) | N3 (LLM self-reported 0.95), N2 |
 | Governed by | provenance / the pipeline | R11 interpretation provenance + R12 declared agent trust |
 | MeDIC has | ✓✓ best in class | ✗ no interpretation step exists |
-| DisMech has | ✓ (validated exact snippets) | ✗ despite being AI-curated |
+| DisMech has | ✓ (validated exact snippets) | partial — `history/` records the reading and the model, but nothing joins it to an evidence item |
 
 This is where a terminology divergence needs settling. MeDIC's §3 — which the table above adopts
 wholesale — defines data quality as *"how faithfully does this record represent its source"*,
@@ -825,7 +829,7 @@ derived from the lines.
 
 | Resource | Today | Next step | Cost |
 |---|---|---|---|
-| **DisMech** | flat `EvidenceItem` list; `supports` enum conflates 3 concerns; no agent/interpretation provenance despite being AI-curated | adopt Track 1 via the existing `dismech_to_minimal` transform; split `supports`; drop `NO_EVIDENCE`/`WRONG_STATEMENT` from released data | days |
+| **DisMech** | flat `EvidenceItem` list; `supports` enum conflates 3 concerns; interpretation provenance is rich but lives in `history/`, unjoined to any evidence item | adopt Track 1 via the existing `dismech_to_minimal` transform; split `supports`; drop `NO_EVIDENCE`/`WRONG_STATEMENT` from released data | days |
 | **MeDIC** | best-in-class provenance, **no** evidence model: no direction, one implicit SUPPORTS | Stage 0 annotate (`class_uri`/`slot_uri`), Stage 1 unify its two evidence-kind vocabularies onto the kernel's two axes, Stage 2 add `direction` + `strength` + `Document` + synthesis | Stage 0 hours, Stage 1 days, Stage 2 1–2 weeks |
 | **mondo-ai** | already on SIEVE/SEPIO; camelCase copy of the model | re-point its import at sieve's snake_case kernel; contribute its `TextMiningResult` back into `minimal.yaml` | days |
 | **sieve** | owns both schemas | close blockers B1–B4; land phase 3 (C) and phase 4 (evidence-source axis) | weeks |
@@ -864,8 +868,11 @@ New, from the corpus:
   actually relying on.
 - **Q3 — how much agent provenance belongs in Track 1?** See §4.3. Options: (a) keep Track 1
   agent-free and accept that AI-curated resources reach into Track 2; (b) add a single optional
-  `interpreted_by` slot on `EvidenceLine`; (c) add a minimal `Agent` class. **[inferred]** — the
-  notes do not settle this; my instinct is (b), because it costs one slot and unblocks DisMech.
+  `interpreted_by` slot on `EvidenceLine`; (c) add a minimal `Agent` class; (d) a `uriorcurie`
+  pointer to a provenance record held outside the evidence model, which is the shape DisMech's
+  `history/` store already has. **[inferred]** — the notes do not settle this; my instinct is (b),
+  but (d) costs the same one slot, keeps agents entirely out of Track 1, and matches what the one
+  AI-curated resource in the corpus actually built.
 - **Q4 — R14 supersession.** Model as a relation between lines (`supersedes`), as a property of
   the item (study phase / date), or leave to synthesis prose? Needs a SEPIO answer.
 - **Q5 — R15 defeaters.** Is an EvidenceLine targeting another EvidenceLine legal in SEPIO, and
