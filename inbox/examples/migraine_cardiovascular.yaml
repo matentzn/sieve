@@ -31,7 +31,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-06-10
+          date: "2024-06-10"
           methodType: EXPERT_JUDGEMENT
           readCoverage: SECTIONS
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -49,7 +49,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-06-10
+          date: "2024-06-10"
           methodType: EXPERT_JUDGEMENT
           readCoverage: ABSTRACT_ONLY
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -67,7 +67,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-06-10
+          date: "2024-06-10"
           methodType: EXPERT_JUDGEMENT
           readCoverage: STRUCTURED_RECORD
           rationale: >-
@@ -82,7 +82,7 @@ statement:
           type: InterpretationActivity
           contributor: orcid:0000-0003-9876-5432
           role: INTERPRETER
-          date: 2024-06-08
+          date: "2024-06-08"
           methodType: EXPERT_JUDGEMENT
           context: ["https://github.com/monarch-initiative/mondo/issues/9012"]
     - id: sieve:el/migraine-ai-research
@@ -105,7 +105,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/claude-deep-analysis
           role: INTERPRETER
-          date: 2024-06-10
+          date: "2024-06-10"
           methodType: LLM_JUDGEMENT
           specifiedBy: [sieve:method/legacy-deep-research]
           rationale: Strong consensus in 82 sources that migraine is a primary neurological disorder.
@@ -114,7 +114,7 @@ statement:
       type: AssertionDecision
       contributor: orcid:0000-0001-5678-9012
       role: CURATOR
-      date: 2024-01-15
+      date: "2024-01-15"
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
       signedPacketVersion: "2024-01-15"
@@ -126,7 +126,7 @@ externalRecords:
     resource: sieve:resource/icd11
     recordMetadata:
       retrievedFrom: sieve:resource/icd11
-      retrievalDate: 2024-06-10
+      retrievalDate: "2024-06-10"
 textPassages:
   - id: sieve:tp/pmid-8456789-1
     type: TextPassage
@@ -142,7 +142,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-06-10
+        date: "2024-06-10"
   - id: sieve:tp/pmid-31578890-1
     type: TextPassage
     statementText: >-
@@ -158,7 +158,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-06-10
+        date: "2024-06-10"
 publications:
   - id: PMID:8456789
     type: Publication

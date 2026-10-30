@@ -31,7 +31,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-07-05
+          date: "2024-07-05"
           methodType: EXPERT_JUDGEMENT
           readCoverage: SECTIONS
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -50,7 +50,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-07-05
+          date: "2024-07-05"
           methodType: EXPERT_JUDGEMENT
           readCoverage: SECTIONS
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -68,7 +68,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-07-05
+          date: "2024-07-05"
           methodType: EXPERT_JUDGEMENT
           readCoverage: STRUCTURED_RECORD
           rationale: >-
@@ -85,7 +85,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-07-05
+          date: "2024-07-05"
           methodType: EXPERT_JUDGEMENT
           readCoverage: FULL_TEXT
           accessStatus: OPEN_ACCESS
@@ -99,7 +99,7 @@ statement:
           type: InterpretationActivity
           contributor: orcid:0000-0003-2345-6789
           role: INTERPRETER
-          date: 2024-07-01
+          date: "2024-07-01"
           methodType: EXPERT_JUDGEMENT
           context: ["https://github.com/monarch-initiative/mondo/issues/11456"]
     - id: sieve:el/cfs-patient-advocacy
@@ -113,7 +113,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-07-05
+          date: "2024-07-05"
           methodType: EXPERT_JUDGEMENT
           readCoverage: FULL_TEXT
           accessStatus: OPEN_ACCESS
@@ -139,7 +139,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/claude-deep-analysis
           role: INTERPRETER
-          date: 2024-07-05
+          date: "2024-07-05"
           methodType: LLM_JUDGEMENT
           specifiedBy: [sieve:method/legacy-deep-research]
           rationale: Strong evidence in 203 sources against psychiatric classification.
@@ -148,7 +148,7 @@ statement:
       type: AssertionDecision
       contributor: orcid:0000-0002-5678-9012
       role: CURATOR
-      date: 2020-03-15
+      date: "2020-03-15"
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
       signedPacketVersion: "2020-03-15"
@@ -160,7 +160,7 @@ externalRecords:
     resource: sieve:resource/icd11
     recordMetadata:
       retrievedFrom: sieve:resource/icd11
-      retrievalDate: 2024-07-05
+      retrievalDate: "2024-07-05"
 textPassages:
   - id: sieve:tp/pmid-8872637-1
     type: TextPassage
@@ -175,7 +175,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-07-05
+        date: "2024-07-05"
   - id: sieve:tp/pmid-32853382-1
     type: TextPassage
     statementText: >-
@@ -191,7 +191,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-07-05
+        date: "2024-07-05"
 publications:
   - id: PMID:8872637
     type: Publication

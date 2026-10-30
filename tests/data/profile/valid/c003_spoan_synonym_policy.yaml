@@ -22,7 +22,7 @@ statement:
       sourceLabel: SPOAN syndrome
       sourceRelease: sieve:release/omim-2019-04-30
       performedBy: [sieve:agent/concordance-pipeline]
-      date: 2019-05-02
+      date: "2019-05-02"
   hasEvidenceLines:
     - id: sieve:el/spoan-omim
       type: SieveEvidenceLine
@@ -33,14 +33,14 @@ statement:
       computedByRule: sieve:rule/synonym-v1.1
       confidence: 1.0
       confidenceBasis: DETERMINISTIC
-      dateAttached: 2019-05-02
-      lastConfirmed: 2026-10-01
+      dateAttached: "2019-05-02"
+      lastConfirmed: "2026-10-01"
       lastConfirmedAgainst: sieve:release/omim-2026-10-01
       contributions:
         - id: sieve:act/spoan-omim
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
-          date: 2026-10-20
+          date: "2026-10-20"
           methodType: COMPUTED_CONCORDANCE
           specifiedBy: [sieve:method/concordance-workflow]
           readCoverage: STRUCTURED_RECORD
@@ -48,7 +48,7 @@ statement:
     - id: sieve:dec/spoan-policy
       type: AssertionDecision
       contributor: sieve:agent/policy-runner
-      date: 2026-10-20
+      date: "2026-10-20"
       outcome: ACCEPTED
       route: DELEGATED_POLICY
       policy: sieve:policy/synonym-v2
@@ -91,4 +91,4 @@ externalRecords:
     recordMetadata:
       retrievedFrom: infores:omim
       sourceRelease: sieve:release/omim-2026-10-01
-      retrievalDate: 2026-10-02
+      retrievalDate: "2026-10-02"

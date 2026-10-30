@@ -29,7 +29,7 @@ statement:
         - id: sieve:act/cf-omim
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
-          date: 2026-10-12
+          date: "2026-10-12"
           methodType: RULE_BASED_STRENGTH
           specifiedBy: [sieve:method/concordance-workflow]
           readCoverage: STRUCTURED_RECORD
@@ -47,7 +47,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/mondo-ai-extractor
           agentTrustAtTime: 0.7
-          date: 2026-10-10
+          date: "2026-10-10"
           methodType: LLM_JUDGEMENT
           specifiedBy: [sieve:method/evidence-extraction-prompt]
           readCoverage: FULL_TEXT
@@ -60,7 +60,7 @@ statement:
         - id: sieve:lsc/cf-passage-accept
           type: LineStatusChange
           contributor: orcid:0000-0001-5208-3432
-          date: 2026-10-12
+          date: "2026-10-12"
           action: ACCEPTED_UNCHANGED
   assertionDecisions:
     - id: sieve:dec/cf-panel
@@ -71,7 +71,7 @@ statement:
         - orcid:0000-0002-4142-7153
         - orcid:0000-0001-5208-3432
       agentTrustAtTime: 1.0
-      date: 2026-10-12
+      date: "2026-10-12"
       outcome: ACCEPTED
       route: CONSENSUS_SIGN_OFF
       inclusionScore: 0.97
@@ -101,7 +101,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/mondo-ai-extractor
         role: EXTRACTOR
-        date: 2026-10-10
+        date: "2026-10-10"
         specifiedBy: [sieve:method/evidence-extraction-prompt]
         runId: mondo-ai-evidence-2026-10-10-r7
     groundings:
@@ -138,7 +138,7 @@ externalRecords:
     recordMetadata:
       retrievedFrom: infores:omim
       sourceRelease: sieve:release/omim-2026-10-01
-      retrievalDate: 2026-10-02
+      retrievalDate: "2026-10-02"
 publications:
   - id: PMID:20301428
     type: Publication

@@ -10,7 +10,7 @@ resources:
     curiePrefixes: [OMIM]
     defaultRole: PRIMARY
     qualityRatings:
-      - {level: 0.9, category: high, validFrom: 2026-01-01}
+      - {level: 0.9, category: high, validFrom: "2026-01-01"}
   - id: infores:disease-ontology
     type: InformationResource
     label: Disease Ontology
@@ -18,7 +18,7 @@ resources:
     defaultRole: PRIMARY
     derivesContentFrom: [infores:omim]
     qualityRatings:
-      - {level: 0.8, category: high, validFrom: 2026-01-01}
+      - {level: 0.8, category: high, validFrom: "2026-01-01"}
   - id: infores:medgen
     type: InformationResource
     label: MedGen
@@ -26,7 +26,7 @@ resources:
     defaultRole: AGGREGATOR
     derivesContentFrom: [infores:omim]
     qualityRatings:
-      - {level: 0.6, category: moderate, validFrom: 2026-01-01}
+      - {level: 0.6, category: moderate, validFrom: "2026-01-01"}
   - id: infores:icd10cm
     type: InformationResource
     label: ICD-10-CM
@@ -47,15 +47,15 @@ agents:
     type: SieveAgent
     subtype: person
     roles:
-      - {value: core curator, validFrom: 2018-01-01}
+      - {value: core curator, validFrom: "2018-01-01"}
     trustLevels:
-      - {value: curator, level: 0.8, validFrom: 2018-01-01}
+      - {value: curator, level: 0.8, validFrom: "2018-01-01"}
   - id: sieve:agent/clingen-panel-example
     type: SieveAgent
     subtype: organization
     name: ClinGen expert panel (illustrative)
     trustLevels:
-      - {value: authority, level: 1.0, validFrom: 2020-01-01, domain: gene-disease}
+      - {value: authority, level: 1.0, validFrom: "2020-01-01", domain: gene-disease}
   - id: sieve:agent/mondo-ai-extractor
     type: SieveAgent
     subtype: software
@@ -63,7 +63,7 @@ agents:
     softwareVersion: 0.9.2
     modelName: example-llm-2026-06
     trustLevels:
-      - {value: ai-agent, level: 0.7, validFrom: 2026-06-01}
+      - {value: ai-agent, level: 0.7, validFrom: "2026-06-01"}
   - id: sieve:agent/concordance-pipeline
     type: SieveAgent
     subtype: software
@@ -106,7 +106,7 @@ policies:
     type: DecisionPolicy
     version: "2"
     approvedBy: orcid:0000-0001-5208-3432
-    approvalDate: 2026-10-01
+    approvalDate: "2026-10-01"
     scopeClaimTypes: [SynonymStatement]
     scopeChannels: [SOURCE_INGEST]
     acceptanceThreshold: 0.8
@@ -115,7 +115,7 @@ batches:
   - id: sieve:batch/mappings-2026-10-25
     type: BatchSignOff
     performedBy: [orcid:0000-0001-5208-3432]
-    date: 2026-10-25
+    date: "2026-10-25"
     filterQuery: "claimType = MappingStatement AND S >= 0.9 AND hasSupportingLineFrom = infores:omim AND rule = sieve:rule/mapping-v1.0"
     resultSet: ["sieve:pkt/MONDO_0008608-exact-ICD10CM_Q90@2026-10-25"]
     reviewBands: ["0.95-1.00 NONE", "0.90-0.95 EYEBALLED"]

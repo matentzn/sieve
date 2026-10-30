@@ -29,7 +29,7 @@ statement:
         - id: sieve:act/q90-lexical
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
-          date: 2026-10-24
+          date: "2026-10-24"
           methodType: RULE_BASED_STRENGTH
           specifiedBy: [sieve:method/mondo-mapping-guide]
     - id: sieve:el/q90-record
@@ -43,7 +43,7 @@ statement:
         - id: sieve:act/q90-record
           type: InterpretationActivity
           contributor: orcid:0000-0001-5208-3432
-          date: 2026-10-25
+          date: "2026-10-25"
           methodType: EXPERT_JUDGEMENT
           specifiedBy: [sieve:method/mondo-mapping-guide]
           readCoverage: STRUCTURED_RECORD
@@ -51,7 +51,7 @@ statement:
     - id: sieve:dec/q90-batch
       type: AssertionDecision
       contributor: orcid:0000-0001-5208-3432
-      date: 2026-10-25
+      date: "2026-10-25"
       outcome: ACCEPTED
       route: BATCH_SIGN_OFF
       batch: sieve:batch/mappings-2026-10-25
@@ -69,7 +69,7 @@ externalRecords:
     recordMetadata:
       retrievedFrom: infores:icd10cm
       sourceRelease: sieve:release/icd10cm-2026
-      retrievalDate: 2026-10-01
+      retrievalDate: "2026-10-01"
       sourceLabel: Down syndrome
 computationalScores:
   - id: sieve:score/q90-lexical

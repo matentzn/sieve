@@ -33,7 +33,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-05-18
+          date: "2024-05-18"
           methodType: EXPERT_JUDGEMENT
           readCoverage: SECTIONS
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -52,7 +52,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-05-18
+          date: "2024-05-18"
           methodType: EXPERT_JUDGEMENT
           readCoverage: SECTIONS
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -70,7 +70,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-05-18
+          date: "2024-05-18"
           methodType: EXPERT_JUDGEMENT
           readCoverage: STRUCTURED_RECORD
           rationale: >-
@@ -86,7 +86,7 @@ statement:
           type: InterpretationActivity
           contributor: orcid:0000-0002-8765-4321
           role: INTERPRETER
-          date: 2024-05-15
+          date: "2024-05-15"
           methodType: EXPERT_JUDGEMENT
           context: ["https://github.com/monarch-initiative/mondo/issues/10234"]
     - id: sieve:el/obesity-expert-genetics
@@ -99,7 +99,7 @@ statement:
           type: InterpretationActivity
           contributor: orcid:0000-0001-9876-5432
           role: INTERPRETER
-          date: 2024-05-16
+          date: "2024-05-16"
           methodType: EXPERT_JUDGEMENT
           context: ["https://github.com/monarch-initiative/mondo/issues/10234"]
     - id: sieve:el/obesity-ai-analysis
@@ -124,7 +124,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/gpt-4-deep-research
           role: INTERPRETER
-          date: 2024-05-18
+          date: "2024-05-18"
           methodType: LLM_JUDGEMENT
           specifiedBy: [sieve:method/legacy-deep-research]
           rationale: Classifying general obesity as a genetic disease is not supported by 156 reviewed sources.
@@ -133,7 +133,7 @@ statement:
       type: AssertionDecision
       contributor: orcid:0000-0003-4567-8901
       role: CURATOR
-      date: 2023-11-20
+      date: "2023-11-20"
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
       signedPacketVersion: "2023-11-20"
@@ -146,7 +146,7 @@ externalRecords:
     resource: infores:icd10cm
     recordMetadata:
       retrievedFrom: infores:icd10cm
-      retrievalDate: 2024-05-18
+      retrievalDate: "2024-05-18"
 textPassages:
   - id: sieve:tp/pmid-30677029-1
     type: TextPassage
@@ -161,7 +161,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-05-18
+        date: "2024-05-18"
   - id: sieve:tp/pmid-28402261-1
     type: TextPassage
     statementText: >-
@@ -178,7 +178,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-05-18
+        date: "2024-05-18"
 publications:
   - id: PMID:30677029
     type: Publication

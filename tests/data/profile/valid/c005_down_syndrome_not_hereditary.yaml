@@ -30,15 +30,15 @@ statement:
       confidence: 1.0
       confidenceBasis: DETERMINISTIC
       independenceCluster: infores:omim
-      dateAttached: 2022-05-03
-      lastConfirmed: 2026-10-01
+      dateAttached: "2022-05-03"
+      lastConfirmed: "2026-10-01"
       lastConfirmedAgainst: sieve:release/doid-2026-09-01
       contributions:
         - id: sieve:act/ds-doid-concordance
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
           role: INTERPRETER
-          date: 2026-10-20
+          date: "2026-10-20"
           methodType: COMPUTED_CONCORDANCE
           specifiedBy: [sieve:method/concordance-workflow]
           readCoverage: STRUCTURED_RECORD
@@ -57,7 +57,7 @@ statement:
           role: CURATOR
           agentRoleAtTime: core curator
           agentTrustAtTime: 0.8
-          date: 2022-05-03
+          date: "2022-05-03"
           methodType: EXPERT_JUDGEMENT
           readCoverage: STRUCTURED_RECORD
           rationale: Trisomy 21 arises de novo in almost all cases; it is genetic but not hereditary.
@@ -67,14 +67,14 @@ statement:
       contributor: orcid:0000-0001-5208-3432
       agentRoleAtTime: core curator
       agentTrustAtTime: 0.8
-      date: 2022-05-03
+      date: "2022-05-03"
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
       signedPacketVersion: "2022-05-03"
     - id: sieve:dec/ds-excl-2026
       type: AssertionDecision
       contributor: orcid:0000-0001-5208-3432
-      date: 2026-10-20
+      date: "2026-10-20"
       outcome: CONTROVERSIAL
       route: INDIVIDUAL_SIGN_OFF
       inclusionScore: 0.46
@@ -95,7 +95,7 @@ concordantAssertions:
       - id: sieve:chain/doid-14250
         type: ResolutionChain
         entitySlot: subject
-        date: 2026-10-20
+        date: "2026-10-20"
         chainConfidence: 1.0
         steps:
           - id: sieve:step/doid-14250-1
@@ -119,5 +119,5 @@ externalRecords:
     recordMetadata:
       retrievedFrom: infores:disease-ontology
       sourceRelease: sieve:release/doid-2026-09-01
-      retrievalDate: 2026-09-15
+      retrievalDate: "2026-09-15"
       sourceLabel: Down syndrome

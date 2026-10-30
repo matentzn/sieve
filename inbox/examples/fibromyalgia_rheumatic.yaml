@@ -33,7 +33,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-04-22
+          date: "2024-04-22"
           methodType: EXPERT_JUDGEMENT
           readCoverage: SECTIONS
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -51,14 +51,14 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/legacy-concordance-import
           role: INTERPRETER
-          date: 2024-04-22
+          date: "2024-04-22"
           methodType: COMPUTED_CONCORDANCE
           readCoverage: STRUCTURED_RECORD
   contributions:
     - id: sieve:contrib/fm-expert-uncertain
       type: SieveContribution
       contributor: orcid:0000-0001-2345-6789
-      date: 2024-04-20
+      date: "2024-04-20"
       description: >-
         Rheumatologist notes classification is controversial (legacy direction
         UNCERTAIN, strength 0.5).
@@ -68,7 +68,7 @@ statement:
       type: AssertionDecision
       contributor: orcid:0000-0002-3456-7890
       role: CURATOR
-      date: 2022-08-10
+      date: "2022-08-10"
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
       signedPacketVersion: "2022-08-10"
@@ -99,7 +99,7 @@ externalRecords:
     resource: sieve:resource/snomedct
     recordMetadata:
       retrievedFrom: sieve:resource/snomedct
-      retrievalDate: 2024-04-22
+      retrievalDate: "2024-04-22"
 textPassages:
   - id: sieve:tp/pmid-2306288-1
     type: TextPassage
@@ -114,7 +114,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-04-22
+        date: "2024-04-22"
   - id: sieve:tp/pmid-28389214-1
     type: TextPassage
     description: >-
@@ -135,7 +135,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-04-22
+        date: "2024-04-22"
 publications:
   - id: PMID:2306288
     type: Publication

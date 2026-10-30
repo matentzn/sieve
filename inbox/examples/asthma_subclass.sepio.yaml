@@ -27,14 +27,14 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/legacy-concordance-import
           role: INTERPRETER
-          date: 2024-01-20
+          date: "2024-01-20"
           methodType: COMPUTED_CONCORDANCE
           readCoverage: STRUCTURED_RECORD
       statusChanges:
         - id: sieve:lsc/asthma-icd10cm-accept
           type: LineStatusChange
           contributor: orcid:0000-0002-6601-2165
-          date: 2024-01-20
+          date: "2024-01-20"
           action: ACCEPTED_UNCHANGED
     - id: sieve:el/asthma-doid
       type: SieveEvidenceLine
@@ -47,7 +47,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/legacy-concordance-import
           role: INTERPRETER
-          date: 2024-01-20
+          date: "2024-01-20"
           methodType: COMPUTED_CONCORDANCE
           readCoverage: STRUCTURED_RECORD
     - id: sieve:el/asthma-gina
@@ -61,7 +61,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-01-20
+          date: "2024-01-20"
           methodType: EXPERT_JUDGEMENT
           readCoverage: SECTIONS
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -69,7 +69,7 @@ statement:
         - id: sieve:lsc/asthma-gina-accept
           type: LineStatusChange
           contributor: orcid:0000-0002-6601-2165
-          date: 2024-01-20
+          date: "2024-01-20"
           action: ACCEPTED_UNCHANGED
     - id: sieve:el/asthma-patho
       type: SieveEvidenceLine
@@ -82,7 +82,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-01-20
+          date: "2024-01-20"
           methodType: EXPERT_JUDGEMENT
           readCoverage: ABSTRACT_ONLY
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -90,7 +90,7 @@ statement:
         - id: sieve:lsc/asthma-patho-accept
           type: LineStatusChange
           contributor: orcid:0000-0002-6601-2165
-          date: 2024-01-20
+          date: "2024-01-20"
           action: ACCEPTED_UNCHANGED
     - id: sieve:el/asthma-expert-review
       type: SieveEvidenceLine
@@ -103,7 +103,7 @@ statement:
           contributor: orcid:0000-0003-4567-8901
           role: INTERPRETER
           agentRoleAtTime: domain_expert
-          date: 2024-01-20
+          date: "2024-01-20"
           methodType: EXPERT_JUDGEMENT
           context: ["https://github.com/monarch-initiative/mondo/issues/7890"]
           rationale: >-
@@ -113,7 +113,7 @@ statement:
         - id: sieve:lsc/asthma-expert-review-accept
           type: LineStatusChange
           contributor: orcid:0000-0002-6601-2165
-          date: 2024-01-20
+          date: "2024-01-20"
           action: ACCEPTED_UNCHANGED
     - id: sieve:el/asthma-ai-research
       type: SieveEvidenceLine
@@ -130,21 +130,21 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/chatgpt-deep-research
           role: INTERPRETER
-          date: 2024-01-20
+          date: "2024-01-20"
           methodType: LLM_JUDGEMENT
           specifiedBy: [sieve:method/legacy-deep-research]
       statusChanges:
         - id: sieve:lsc/asthma-ai-research-accept
           type: LineStatusChange
           contributor: orcid:0000-0002-6601-2165
-          date: 2024-01-20
+          date: "2024-01-20"
           action: ACCEPTED_UNCHANGED
   assertionDecisions:
     - id: sieve:dec/asthma-2024-01-20
       type: AssertionDecision
       contributor: orcid:0000-0002-6601-2165
       role: CURATOR
-      date: 2024-01-20
+      date: "2024-01-20"
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
       signedPacketVersion: "2024-01-20"
@@ -198,14 +198,14 @@ externalRecords:
     resource: infores:icd10cm
     recordMetadata:
       retrievedFrom: infores:icd10cm
-      retrievalDate: 2024-01-20
+      retrievalDate: "2024-01-20"
   - id: DOID:2841
     type: ExternalRecord
     label: asthma
     resource: infores:disease-ontology
     recordMetadata:
       retrievedFrom: infores:disease-ontology
-      retrievalDate: 2024-01-20
+      retrievalDate: "2024-01-20"
 textPassages:
   - id: sieve:tp/pmid-28884740-1
     type: TextPassage
@@ -221,7 +221,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-01-20
+        date: "2024-01-20"
   - id: sieve:tp/pmid-31542051-1
     type: TextPassage
     statementText: >-
@@ -236,7 +236,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-01-20
+        date: "2024-01-20"
 guidelines:
   - id: PMID:28884740
     type: GuidelineDocument

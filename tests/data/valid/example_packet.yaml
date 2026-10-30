@@ -25,7 +25,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2026-10-30
+          date: "2026-10-30"
           methodType: EXPERT_JUDGEMENT
           readCoverage: ABSTRACT_ONLY
           accessStatus: OPEN_ACCESS
@@ -36,7 +36,7 @@ externalRecords:
     resource: infores:disease-ontology
     recordMetadata:
       retrievedFrom: infores:disease-ontology
-      retrievalDate: 2026-10-30
+      retrievalDate: "2026-10-30"
 textPassages:
   - id: sieve:tp/asthma_0001
     type: TextPassage
@@ -48,7 +48,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2026-10-30
+        date: "2026-10-30"
 publications:
   - id: PMID:12345678
     type: Publication

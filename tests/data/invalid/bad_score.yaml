@@ -20,7 +20,7 @@ statement:
         - id: sieve:act/bad_0001
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
-          date: 2026-10-30
+          date: "2026-10-30"
           methodType: EXPERT_JUDGEMENT
           readCoverage: STRUCTURED_RECORD
 externalRecords:
@@ -30,4 +30,4 @@ externalRecords:
     resource: infores:disease-ontology
     recordMetadata:
       retrievedFrom: infores:disease-ontology
-      retrievalDate: 2026-10-30
+      retrievalDate: "2026-10-30"

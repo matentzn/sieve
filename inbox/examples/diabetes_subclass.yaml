@@ -30,7 +30,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/legacy-concordance-import
           role: INTERPRETER
-          date: 2024-03-15
+          date: "2024-03-15"
           methodType: COMPUTED_CONCORDANCE
           readCoverage: STRUCTURED_RECORD
     - id: sieve:el/dm-literature-1
@@ -44,7 +44,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-03-15
+          date: "2024-03-15"
           methodType: EXPERT_JUDGEMENT
           readCoverage: SECTIONS
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -63,7 +63,7 @@ statement:
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
-          date: 2024-03-15
+          date: "2024-03-15"
           methodType: EXPERT_JUDGEMENT
           readCoverage: SECTIONS
           accessStatus: NOT_RECORDED  # not recorded in the legacy data
@@ -80,7 +80,7 @@ statement:
           type: InterpretationActivity
           contributor: orcid:0000-0002-1234-5678
           role: INTERPRETER
-          date: 2024-03-15
+          date: "2024-03-15"
           methodType: EXPERT_JUDGEMENT
           context: ["https://github.com/monarch-initiative/mondo/issues/5432"]
   assertionDecisions:
@@ -88,7 +88,7 @@ statement:
       type: AssertionDecision
       contributor: orcid:0000-0002-9553-7227
       role: CURATOR
-      date: 2019-03-22
+      date: "2019-03-22"
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
       signedPacketVersion: "2019-03-22"
@@ -107,7 +107,7 @@ externalRecords:
     resource: infores:icd10cm
     recordMetadata:
       retrievedFrom: infores:icd10cm
-      retrievalDate: 2024-03-15
+      retrievalDate: "2024-03-15"
 textPassages:
   - id: sieve:tp/pmid-12345678-1
     type: TextPassage
@@ -123,7 +123,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-03-15
+        date: "2024-03-15"
   - id: sieve:tp/pmid-29876543-1
     type: TextPassage
     statementText: >-
@@ -138,7 +138,7 @@ textPassages:
         type: SieveContribution
         contributor: sieve:agent/unrecorded-legacy-interpreter
         role: EXTRACTOR
-        date: 2024-03-15
+        date: "2024-03-15"
 publications:
   - id: PMID:12345678
     type: Publication
