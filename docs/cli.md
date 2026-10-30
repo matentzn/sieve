@@ -1,49 +1,79 @@
 # CLI Reference
 
-SIEVE provides a command-line interface for common operations. All commands are accessed through the `sieve` command.
+!!! warning "The `sieve` CLI targets the pre-profile model"
+    `sieve run`, `ingest`, `export` and `validate` still target the pre-profile model.
+    `ingest`, `export` and `validate` fail at import against the current schema. They
+    are being migrated (`issues/issue_migrate_app_to_profile.md`). Until then, validate
+    packets with `linkml-validate` and `sieve.profile_checks`, and maintain the
+    generated artefacts with the `just` recipes below.
 
 ## Installation
 
 ```bash
-# Install in development mode
-pip install -e .
-
-# Or with uv
-uv pip install -e .
+uv sync --group dev
 ```
 
-## Commands Overview
+## Working commands
+
+| Command | What it does |
+|---------|--------------|
+| `uv run linkml-validate -s schema/sieve.yaml -C EvidencePacket <file>` | Validate a packet against the profile (structure, enums, ranges, class rules) |
+| `uv run linkml-validate -s schema/sieve.yaml -C SieveRegistry <file>` | Validate a registry of resources, agents, rules and policies |
+| `just gen-pydantic` | Regenerate `src/sieve/datamodel/sieve_models.py` from the schema |
+| `just gen-traceability` | Regenerate `docs/requirements-traceability.md` |
+| `just extract-requirements [workbook]` | Re-extract `requirements/mondo_requirements.tsv` from the Mondo requirements workbook |
+| `just gen-docs` | Regenerate the schema reference in `docs/elements/` |
+| `just serve-docs` | Regenerate the schema reference and serve the docs locally |
+
+### linkml-validate
 
 ```bash
-sieve --help
+uv run linkml-validate -s schema/sieve.yaml -C EvidencePacket packet.yaml
+```
+
+Prints `No issues found` or one `[ERROR]` line per problem, and exits 1 on errors.
+It checks required fields, ranges, enums (`Direction`, `ReviewState`,
+`AssertionRoute`, ...), numeric bounds (line `scoreOfEvidenceProvided` in [0, 1],
+inclusion score in [-1, 1]) and the class rules (policy and provider routes only
+accept and name their policy; batch decisions name batch and review depth; a
+confidence needs a basis). The validator is closed, so unknown fields are errors.
+
+Quote dates in YAML (`date: "2026-10-20"`). Unquoted dates are parsed into date
+objects and rejected as "not of type 'string'". Predicate bindings and the
+claim-evidence matrix are not checked here; run `sieve.profile_checks.check_packet`
+for those (see [Workflows](workflows.md#2-validate)).
+
+### just extract-requirements
+
+```bash
+just extract-requirements                                   # ../sepio-linkml/docs/requirements-collection/projects/mondo/...
+just extract-requirements /path/to/Mondo_Requirements_Collection_Forms.xlsx
+```
+
+Writes one row per requirement (category rows skipped) to
+`requirements/mondo_requirements.tsv`. `tests/test_traceability.py` compares the TSV
+with the workbook when the workbook is checked out.
+
+---
+
+## Pre-profile commands
+
+The rest of this page describes the `sieve` commands as implemented.
+
+```bash
+uv run sieve --help
 ```
 
 | Command | Description |
 |---------|-------------|
-| `sieve run` | Launch the web interface |
+| `sieve run` | Launch the Streamlit web interface |
 | `sieve ingest` | Load YAML evidence packets into the database |
 | `sieve export` | Export evidence packets to RDF or YAML |
 | `sieve validate` | Validate packets against the LinkML schema |
 
----
+### sieve run
 
-## sieve run
-
-Launch the Streamlit web application for interactive curation.
-
-```bash
-sieve run
-```
-
-This command starts the Streamlit server and opens the web interface in your browser. The application provides:
-
-- Dashboard with curation statistics
-- Record browsing and filtering
-- Evidence review interface
-- Decision making controls
-- Export functionality
-
-**Environment Variables:**
+Starts the Streamlit app (dashboard, review queue, ingest and export views).
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -54,60 +84,25 @@ This command starts the Streamlit server and opens the web interface in your bro
 | `ORCID_SANDBOX` | Use ORCID sandbox | `true` |
 | `CURATORS_FILE` | Path to curators.yaml | `curators.yaml` |
 
----
-
-## sieve ingest
-
-Load YAML evidence packets into the DuckDB database.
+### sieve ingest
 
 ```bash
-sieve ingest [OPTIONS]
+sieve ingest [-I <dir>] [--db <path>]
 ```
-
-**Options:**
 
 | Option | Short | Description | Default |
 |--------|-------|-------------|---------|
 | `--input-dir` | `-I` | Input directory containing YAML files | `inbox/` |
 | `--db` | - | Path to DuckDB database file | `data/sieve.duckdb` |
 
-**Examples:**
+Recursively finds `.yaml` / `.yml` files, validates and upserts each packet into
+DuckDB, computes the Net Evidence Ratio, and reports `Ingested N of M packets`.
+
+### sieve export
 
 ```bash
-# Ingest from default inbox directory
-sieve ingest
-
-# Ingest from specific directory
-sieve ingest -I /path/to/packets/
-
-# Use custom database path
-sieve ingest -I inbox/ --db custom.duckdb
+sieve export (-i <file> | -I <dir>) [-o <out>] [-O <format>]
 ```
-
-**Output:**
-
-```
-Ingested 15 of 18 packets
-```
-
-**Behavior:**
-
-- Recursively finds all `.yaml` and `.yml` files in the directory
-- Parses and validates each file as an `EvidencePacket`, then upserts it into DuckDB
-- Computes the Net Evidence Ratio and promotes filter columns (subject/predicate/object, status, steward)
-- Reports how many packets were ingested out of the total files found
-
----
-
-## sieve export
-
-Export evidence packets to various formats.
-
-```bash
-sieve export [OPTIONS]
-```
-
-**Options:**
 
 | Option | Short | Description | Default |
 |--------|-------|-------------|---------|
@@ -116,164 +111,41 @@ sieve export [OPTIONS]
 | `--output` | `-o` | Output file path | stdout |
 | `--output-format` | `-O` | Output format | `rdf` |
 
-**Output Formats:**
+| Format | Description |
+|--------|-------------|
+| `rdf`, `turtle`, `ttl` | RDF Turtle |
+| `xml`, `rdfxml` | RDF/XML |
+| `n3` | N3 |
+| `nt`, `ntriples` | N-Triples |
+| `yaml` | YAML (combine) |
 
-| Format | Description | File Extension |
-|--------|-------------|----------------|
-| `rdf`, `turtle`, `ttl` | RDF Turtle format | `.ttl` |
-| `xml`, `rdfxml` | RDF/XML format | `.rdf` |
-| `n3` | N3 notation | `.n3` |
-| `nt`, `ntriples` | N-Triples | `.nt` |
-| `yaml` | YAML (passthrough/combine) | `.yaml` |
+RDF export writes an `owl:Axiom` annotation per decided packet:
 
-**Examples:**
-
-```bash
-# Export single file to RDF Turtle
-sieve export -i packet.yaml -O rdf -o output.ttl
-
-# Export directory to RDF
-sieve export -I exports/accepted/ -O rdf -o accepted.ttl
-
-# Export to RDF/XML
-sieve export -i packet.yaml -O xml -o output.rdf
-
-# Export to stdout
-sieve export -i packet.yaml -O rdf
-
-# Combine multiple YAML files
-sieve export -I packets/ -O yaml -o combined.yaml
-```
-
-**RDF Export Behavior:**
-
-The RDF export creates OWL axiom annotations following OBO conventions:
-
-1. **Status Required**: Only packets with status ACCEPTED, REJECTED, or CONTROVERSIAL are exported. Packets without a status or with UNREVIEWED status generate warnings and are skipped.
-
-2. **Status-Specific Properties**:
-   - **ACCEPTED**: Adds `oboInOwl:source` with evidence steward ORCID and sources from accepted supporting evidence
-   - **REJECTED**: Adds `IAO:0000233` (term tracker item) linking to the evidence packet
-   - **CONTROVERSIAL**: Adds `rdfs:comment` with controversy note and `IAO:0000233`
-
-3. **Evidence Sources**: For ACCEPTED packets, evidence items on supporting lines that are themselves `rating: ACCEPTED` contribute additional `oboInOwl:source` values, drawn from whichever of these fields the item carries:
-   - `pmid` / `doi` (e.g. from a `SieveDocument`)
-   - `source_id` / `source_subject` (e.g. from a `ConcordanceItem`)
-
-**Example RDF Output:**
+- only packets with status `ACCEPTED`, `REJECTED` or `CONTROVERSIAL` are exported;
+  others are skipped with a warning;
+- `ACCEPTED` adds `oboInOwl:source` for the steward ORCID and for accepted items on
+  supporting lines;
+- `REJECTED` adds `IAO:0000233` (term tracker item) linking to the packet;
+- `CONTROVERSIAL` adds an `rdfs:comment` and `IAO:0000233`.
 
 ```turtle
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix oboInOwl: <http://www.geneontology.org/formats/oboInOwl#> .
-@prefix SEPIO: <http://purl.obolibrary.org/obo/SEPIO_> .
-
 _:axiom1 a owl:Axiom ;
     owl:annotatedSource <http://purl.obolibrary.org/obo/MONDO_0004979> ;
     owl:annotatedProperty rdfs:subClassOf ;
     owl:annotatedTarget <http://purl.obolibrary.org/obo/MONDO_0005275> ;
     SEPIO:0000124 <http://purl.org/np/RA9876543210> ;
-    oboInOwl:source <https://orcid.org/0000-0002-6601-2165> ;
-    oboInOwl:source "PMID:28884740" ;
-    oboInOwl:source "ICD10CM:J45" .
+    oboInOwl:source <https://orcid.org/0000-0002-6601-2165> .
 ```
 
----
-
-## sieve validate
-
-Validate evidence packets against the LinkML schema.
+### sieve validate
 
 ```bash
-sieve validate [OPTIONS]
+sieve validate (-i <file> | -I <dir>)
 ```
 
-**Options:**
-
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--input` | `-i` | Input YAML file (single packet) | - |
-| `--input-dir` | `-I` | Input directory containing YAML files | - |
-
-**Examples:**
-
-```bash
-# Validate a single file
-sieve validate -i packet.yaml
-
-# Validate all files in a directory
-sieve validate -I inbox/
-
-# Validate exported packets
-sieve validate -I exports/accepted/
-```
-
-**Output:**
-
-```
-ERROR (inbox/bad_packet.yaml): 'statement' is a required property
-
-Validated 10 file(s); 2 total error(s)
-```
-
-**Exit Codes:**
-
-| Code | Meaning |
-|------|---------|
-| 0 | All files valid |
-| 1 | One or more validation errors |
-
-**What is Validated:**
-
-Each file is validated as an `EvidencePacket` against `schema/sieve.yaml`:
-
-- Required fields present (`id`, `statement`, `status`)
-- Field types match the schema (strings, numbers, dates)
-- Enum values are valid (`CurationStatus`, `direction_of_evidence_provided`, item `type`, etc.)
-- Numeric constraints (e.g. `0.0 <= score_of_evidence_provided <= 1.0`)
-- Nested structure: `statement`, `has_evidence_lines` → `has_evidence_items` (each with a valid `type`)
-
----
-
-## Common Workflows
-
-### Initial Setup
-
-```bash
-# Create inbox directory and add evidence packets
-mkdir -p inbox/
-cp my_packets/*.yaml inbox/
-
-# Validate before ingesting
-sieve validate -I inbox/
-
-# Ingest into database
-sieve ingest -I inbox/
-
-# Launch web interface for review
-sieve run
-```
-
-### Export After Curation
-
-```bash
-# Export accepted assertions to RDF
-sieve export -I exports/accepted/ -O rdf -o accepted_axioms.ttl
-
-# Export all curated packets to combined YAML
-sieve export -I exports/ -O yaml -o all_curated.yaml
-```
-
-### CI/CD Integration
-
-```bash
-# Validate in CI pipeline (exit code indicates success/failure)
-sieve validate -I evidence_packets/
-if [ $? -ne 0 ]; then
-    echo "Validation failed"
-    exit 1
-fi
-```
+Validates each file as an `EvidencePacket` against `schema/sieve.yaml`, prints one
+line per error and a summary, and exits 1 on any error. It currently fails at import;
+use `linkml-validate` as above.
 
 ---
 
@@ -281,27 +153,12 @@ fi
 
 ### "No module named 'sieve'"
 
-Ensure the package is installed:
-```bash
-pip install -e .
-# or
-uv pip install -e .
-```
+Run `uv sync --group dev`, and run commands through `uv run`.
 
-### "Database file not found"
+### "cannot import name ... from 'sieve.datamodel.sieve_models'"
 
-The database is created automatically on first use. Ensure you have write permissions to the `data/` directory.
+The command is one of the pre-profile ones above.
 
 ### "ORCID authentication failed"
 
-Check that ORCID OAuth credentials are configured:
-```bash
-export ORCID_CLIENT_ID=your_client_id
-export ORCID_CLIENT_SECRET=your_client_secret
-```
-
-Or use development mode:
-```bash
-export SIEVE_DEV_MODE=true
-sieve run
-```
+Check `ORCID_CLIENT_ID` and `ORCID_CLIENT_SECRET`, or set `SIEVE_DEV_MODE=true`.

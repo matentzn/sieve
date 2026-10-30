@@ -1,280 +1,235 @@
 # Python API Reference
 
-SIEVE is usable as a library, not just a CLI. This page documents the public
-Python API: the Pydantic data model, the loaders, the DuckDB store, and the
-ingest / export / scoring / auth helpers.
+!!! warning "Application modules not yet migrated"
+    `sieve.datamodel`, `sieve.datamodel.codegen`, `sieve.profile_checks` and
+    `sieve.traceability` work with the current profile. `sieve.datamodel.loaders`,
+    `sieve.store`, `sieve.packet_ingest`, `sieve.packet_export` and `sieve.scoring`
+    still target the pre-profile model and fail at import or at run time. They are
+    being migrated (`issues/issue_migrate_app_to_profile.md`). Their signatures are
+    listed below as they are in the source.
 
-Every signature below is taken from the source. For what the model *fields*
-mean (statements, evidence lines, evidence items, ratings), see the
-[Data Model](data-model.md) page.
+For what the model fields mean, see the [Data Model](data-model.md).
 
-| Module | Purpose |
-|--------|---------|
-| `sieve.datamodel` | Generated Pydantic models (`EvidencePacket`, …) |
-| `sieve.datamodel.loaders` | Build packets from YAML / dicts with correct item polymorphism |
-| `sieve.store` | `PacketStore` — DuckDB persistence for packets and decisions |
-| `sieve.packet_ingest` | Validate and ingest YAML packets into a store |
-| `sieve.packet_export` | Export packets to RDF (OWL axiom annotations) and YAML |
-| `sieve.scoring` | Net Evidence Ratio over a packet's evidence lines |
-| `sieve.auth` | ORCID OAuth and curator authorization (Streamlit) |
+| Module | Purpose | Status |
+|--------|---------|--------|
+| `sieve.datamodel` | Generated Pydantic models | current |
+| `sieve.datamodel.codegen` | Generate the models from the schema | current |
+| `sieve.profile_checks` | Profile constraints beyond linkml-validate | current |
+| `sieve.traceability` | Requirement-to-schema traceability | current |
+| `sieve.datamodel.loaders` | Polymorphic packet loading | pre-profile |
+| `sieve.store` | `PacketStore`, DuckDB persistence | pre-profile |
+| `sieve.packet_ingest` | Validate and ingest YAML packets | pre-profile |
+| `sieve.packet_export` | RDF and YAML export | pre-profile |
+| `sieve.scoring` | Net Evidence Ratio | pre-profile |
+| `sieve.auth` | ORCID OAuth and curator authorisation | model-independent |
 
 ---
 
 ## sieve.datamodel
 
-The data model is generated from `schema/sieve.yaml` into
-`sieve.datamodel.sieve_models` and re-exported from `sieve.datamodel`. All
-classes are Pydantic v2 `BaseModel` subclasses.
+Pydantic v2 classes generated from `schema/sieve.yaml` into
+`sieve.datamodel.sieve_models`. The package re-exports the main ones:
 
 ```python
 from sieve.datamodel import (
-    EvidencePacket,        # top-level packet: statement + evidence lines + status
-    SieveStatement,        # subject / predicate / object being curated
-    SieveEvidenceLine,     # one argument (direction + strength), holds items
-    SieveEvidenceItem,     # base class for evidence items
-    ConcordanceItem,       # evidence: another ontology/vocabulary agrees
-    SieveDocument,         # evidence: a publication
-    SieveDataItem,         # evidence: a database record
-    SieveStudyResult,      # evidence: a study result
-    ComputationalResult,   # evidence: a computation / model output
-    AgentContribution,     # evidence: a person weighed in
-    CurationActivity,      # who curated the packet
-    CurationDecision,      # a recorded accept/reject/controversial decision
-    DecisionType,          # ACCEPT | REJECT | CONTROVERSIAL
-    EvidenceSynthesis,
-    Score,
-    Coding,                # a code + label (used for predicates)
-    Agent,
+    EvidencePacket, SieveRegistry,
+    SieveStatement,                       # abstract; the ten claim types below
+    TermExistenceStatement, DefinitionStatement, SynonymStatement,
+    SubclassStatement, NegativeSubclassStatement, MappingStatement,
+    DiseaseAttributeStatement, SubsetMembershipStatement,
+    MetaclassStatement, ValueSetMembershipStatement,
+    ExternalRecord, ConcordantAssertion, TextPassage, Publication, WebPage,
+    ComputationalScore, InformationResource,
+    SieveEvidenceLine, InterpretationActivity, AssertionDecision,
+    SieveAgent, DecisionPolicy,
 )
 ```
 
-Two enums used on packets live in `sieve.datamodel.sieve_models`:
+Everything else (`GuidelineDocument`, `OriginEvent`, `ResolutionChain`,
+`AlignmentStep`, `AggregationRule`, `BatchSignOff`, the enums, ...) is in
+`sieve.datamodel.sieve_models`. Field names are the schema's camelCase names. The
+`type` slot is a type designator, so validating a dict picks the concrete classes:
 
 ```python
-from sieve.datamodel.sieve_models import CurationStatus, DecisionType
+import yaml
+from sieve.datamodel import EvidencePacket
 
-CurationStatus.UNREVIEWED   # also ACCEPTED, REJECTED, CONTROVERSIAL
-DecisionType.ACCEPT         # also REJECT, CONTROVERSIAL
-```
-
-An `EvidencePacket` requires an `id` and a `statement`; `status` defaults to
-`UNREVIEWED` and `has_evidence_lines` defaults to an empty list:
-
-```python
-packet = EvidencePacket(
-    id="pkt_000001",
-    statement=SieveStatement(
-        id="stmt_1",
-        subject="MONDO:0004979",
-        predicate=Coding(code="rdfs:subClassOf"),
-        object="MONDO:0005275",
-    ),
-)
-packet.status                       # CurationStatus.UNREVIEWED
-packet.model_dump(exclude_none=True)
-```
-
-`CurationDecision` is the record written to the store's decision log:
-
-```python
-from datetime import datetime, timezone
-from sieve.datamodel import CurationDecision, DecisionType
-
-decision = CurationDecision(
-    id="dec_1",
-    packet_id="pkt_000001",
-    curator="orcid:0000-0001-2345-6789",
-    curator_name="Dr. Jane Smith",   # optional
-    decision=DecisionType.ACCEPT,
-    rationale="Strong concordance across sources.",  # optional
-    certainty=0.9,                   # optional, 0–1
-    decided_at=datetime.now(timezone.utc),
-)
+data = yaml.safe_load(open("tests/data/profile/valid/c007_cf_cftr_panel.yaml"))
+packet = EvidencePacket.model_validate(data)
+type(packet.statement).__name__          # "DiseaseAttributeStatement"
+packet.statement.score                   # 0.97
+packet.textPassages[0].quoteVerification # "NOT_CHECKED"
 ```
 
 ---
 
-## sieve.datamodel.loaders
-
-Evidence items are a polymorphic union; loading through the base class would
-drop subclass fields. These loaders dispatch each item to its concrete class by
-its `type` field before validating.
+## sieve.datamodel.codegen
 
 ```python
-from pathlib import Path
-from sieve.datamodel.loaders import load_packet, packet_from_dict, EVIDENCE_ITEM_TYPES
+from sieve.datamodel.codegen import generate_pydantic, fix_date_shadowing
 
-def load_packet(path: Path) -> EvidencePacket        # load from a YAML file
-def packet_from_dict(data: dict) -> EvidencePacket   # build from a raw dict
+def generate_pydantic(schema_path: str | Path) -> str   # module source for the schema
+def fix_date_shadowing(code: str) -> str                # alias the date type as _Date
 ```
 
-`EVIDENCE_ITEM_TYPES` is the `type` discriminator registry — a
-`dict[str, type[BaseModel]]` mapping an item's `type` string to its class. It
-includes both the concrete names (`"ConcordanceItem"`, `"AgentContribution"`,
-`"ComputationalResult"`, `"SieveDocument"`, `"SieveDataItem"`,
-`"SieveStudyResult"`) and the base-type aliases `"Document"`, `"DataItem"`,
-`"StudyResult"`.
+The core's `Activity.date` slot shadows the `date` type inside generated class bodies
+on Python 3.10; `fix_date_shadowing` refers to the type through `_Date` instead. Run it
+through `just gen-pydantic`, or directly:
 
-```python
-packet = load_packet(Path("inbox/examples/asthma.yaml"))
-packet = packet_from_dict({
-    "id": "pkt_000001",
-    "statement": {"subject": "MONDO:0004979",
-                  "predicate": {"code": "rdfs:subClassOf"},
-                  "object": "MONDO:0005275"},
-    "has_evidence_lines": [
-        {"direction_of_evidence_provided": "supports",
-         "has_evidence_items": [{"type": "SieveDocument", "id": "d1", "pmid": "28884740"}]},
-    ],
-})
+```bash
+uv run python -m sieve.datamodel.codegen schema/sieve.yaml src/sieve/datamodel/sieve_models.py
 ```
 
 ---
 
-## sieve.store
-
-`PacketStore` persists packets as full JSON plus a few promoted columns for
-querying, alongside a decision log. The DuckDB file defaults to
-`data/sieve.duckdb`; pass `":memory:"` for an ephemeral store.
+## sieve.profile_checks
 
 ```python
-from sieve.store import PacketStore
+from sieve.profile_checks import check_packet, Issue, predicate_value_set, permitted_evidence
 
+def check_packet(packet: dict[str, Any],
+                 obsolete_terms: set[str] | frozenset[str] = frozenset()) -> list[Issue]
+
+@dataclass(frozen=True)
+class Issue:
+    severity: Literal["ERROR", "WARNING"]
+    code: str            # e.g. "PREDICATE_BINDING", "EVIDENCE_NOT_PERMITTED"
+    message: str
+    requirement: str     # the requirement ID the check enforces
+
+def predicate_value_set(sv: SchemaView, claim_type: str) -> set[str]
+def permitted_evidence(sv: SchemaView, claim_type: str) -> set[str]
+```
+
+`check_packet` takes a packet as a plain dict (as loaded from YAML or JSON) and returns
+an empty list when it passes. `obsolete_terms` lists Mondo terms known to be obsolete;
+subject obsolescence is read from term status, not stored on mappings.
+
+| Code | Severity | Requirement |
+|---|---|---|
+| `PREDICATE_BINDING` | ERROR | predicate not in the claim type's value set (C00N) |
+| `NEGATION` | ERROR | `NegativeSubclassStatement` without `negated: true`, or a negated `SubclassStatement` (C005) |
+| `PREFERRED_NOT_EXACT` | ERROR | `preferred` on a mapping that is not `skos:exactMatch` (C006) |
+| `DANGLING_REFERENCE` | ERROR | a line references an item not in the packet (EINT.REQUIRED) |
+| `EVIDENCE_NOT_PERMITTED` | ERROR | item class not in the claim-evidence matrix (MATRIX.C00N) |
+| `READ_COVERAGE` | ERROR | document-based line without `readCoverage` / `accessStatus` (PROV.SA.EXECUTION) |
+| `METHOD_REQUIRED` | ERROR | AI or rule-based line without `specifiedBy`, or rule-based line without `computedByRule` (PROV.INTERP.METHODS) |
+| `SUPERSEDED_NOT_INVALIDATED` | ERROR | a superseded line is still VALID (EINT.FLAT_COLLAPSE) |
+| `CHAIN_CONTIGUITY` | ERROR | a resolution step does not read the previous step's output (PROV.SA.EXECUTION) |
+| `BLIND_APPROVAL_EVIDENCE` | ERROR | a `reviewDepth: NONE` decision contributes an evidence line |
+| `OBSOLETE_TO_OBSOLETE`, `DEFINITION_WITHOUT_SOURCE`, `CONCORDANCE_DIRECTION`, `READ_COVERAGE_NOT_RECORDED` | WARNING | states that need a person |
+
+```python
+import yaml
+from sieve.profile_checks import check_packet
+
+packet = yaml.safe_load(open("tests/data/profile/valid/c005_down_syndrome_not_hereditary.yaml"))
+check_packet(packet)                     # []
+packet["statement"]["predicate"]["code"] = "skos:exactMatch"
+check_packet(packet)
+# [Issue(severity='ERROR', code='PREDICATE_BINDING',
+#        message="skos:exactMatch is not a NegativeSubclassStatement predicate (['owl:equivalentClass', 'rdfs:subClassOf'])",
+#        requirement='C005')]
+```
+
+---
+
+## sieve.traceability
+
+```python
+from sieve.traceability import (
+    SCHEMA, CORE_SCHEMA, REQUIREMENTS_TSV, TRACEABILITY_YAML,   # paths
+    load_requirements,     # () -> dict[str, dict[str, str]]  rows keyed by requirement ID
+    load_traceability,     # () -> dict  {"modules": ..., "requirements": ...}
+    schema_elements,       # (sv) -> list[(path, element)]  Class, Class.slot, Enum, Enum.value
+    collect_annotations,   # (sv, key="requirements") -> dict[str, list[str]]
+    render_markdown,       # (sv=None) -> str  the docs/requirements-traceability.md page
+)
+```
+
+```python
+from linkml_runtime.utils.schemaview import SchemaView
+from sieve.traceability import SCHEMA, collect_annotations, load_traceability
+
+sv = SchemaView(str(SCHEMA))
+collect_annotations(sv)["C005"]
+# ['SieveStatement.negated', 'NegativeSubclassStatement', 'NegativeSubclassStatement.negated',
+#  'ClaimType.NegativeSubclassStatement', 'SubclassPredicate']
+load_traceability()["requirements"]["C005"]["disposition"]   # 'modelled'
+collect_annotations(sv, key="decisions")["D-063"]            # elements behind decision D-063
+```
+
+`just gen-traceability` writes `render_markdown()` to
+`docs/requirements-traceability.md`.
+
+---
+
+## sieve.datamodel.loaders (pre-profile)
+
+```python
+def load_packet(path: Path) -> EvidencePacket
+def packet_from_dict(data: dict[str, Any]) -> EvidencePacket
+EVIDENCE_ITEM_TYPES: dict[str, type[BaseModel]]
+```
+
+Dispatched inlined evidence items to their concrete class by `type` before validating.
+It imports classes that no longer exist; `EvidencePacket.model_validate` replaces it.
+
+## sieve.store (pre-profile)
+
+```python
 class PacketStore:
-    def __init__(self, db_path: str = "data/sieve.duckdb")
-
-    def insert_packet(self, packet: EvidencePacket) -> str
+    def __init__(self, db_path: str = "data/sieve.duckdb")   # ":memory:" for tests
+    def insert_packet(self, packet: EvidencePacket) -> str   # upsert; stores the NER
     def get_packet(self, packet_id: str) -> EvidencePacket | None
     def list_packets(self, status: str | None = None) -> list[dict]
-    def get_stats(self) -> dict[str, int]
+    def get_stats(self) -> dict[str, int]                    # {status: count}
     def update_status(self, packet_id: str, status: str) -> None
     def set_item_rating(self, packet_id: str, item_id: str, rating: str) -> None
-    def get_decisions(self, packet_id: str) -> list[dict]
+    def get_decisions(self, packet_id: str) -> list[dict]    # newest first
     def record_decision(self, decision: CurationDecision) -> str
     def close(self) -> None
 ```
 
-Notes on behavior (from the source):
-
-- `insert_packet` upserts by packet `id` (INSERT OR REPLACE) and returns the id.
-  It computes and stores the Net Evidence Ratio into the `evidence_score`
-  column.
-- `get_packet` returns `None` if the id is unknown.
-- `list_packets` returns dicts with keys `id`, `subject_id`, `predicate`,
-  `object_id`, `status`, `evidence_score`.
-- `get_stats` returns a `{status: count}` map.
-- `update_status` and `set_item_rating` are no-ops if the packet id is unknown.
-- `get_decisions` returns rows newest-first with keys `id`, `packet_id`,
-  `curator`, `curator_name`, `decision`, `rationale`, `certainty`, `decided_at`.
+## sieve.packet_ingest (pre-profile)
 
 ```python
-store = PacketStore(":memory:")
-store.insert_packet(packet)
-store.list_packets(status="UNREVIEWED")
-store.get_stats()                      # e.g. {"UNREVIEWED": 1}
-store.update_status("pkt_000001", "ACCEPTED")
-store.set_item_rating("pkt_000001", "d1", "ACCEPTED")
-store.record_decision(decision)
-store.get_decisions("pkt_000001")
-store.close()
+def validate_packet_dict(data: dict[str, Any]) -> list           # [] means valid
+def ingest_packet_file(path: Path, store: PacketStore) -> str
+def ingest_packet_directory(path: Path, store: PacketStore) -> dict[str, Any]
+    # {"files": int, "success": int, "errors": int, "error_details": [...]}
 ```
 
----
-
-## sieve.packet_ingest
-
-Validate packet dicts against the LinkML schema and load YAML packets into a
-`PacketStore`.
+## sieve.packet_export (pre-profile)
 
 ```python
-from pathlib import Path
-from sieve.packet_ingest import (
-    validate_packet_dict,     # (data: dict) -> list   ([] means valid)
-    ingest_packet_file,       # (path: Path, store: PacketStore) -> str
-    ingest_packet_directory,  # (path: Path, store: PacketStore) -> dict
-)
+def packet_to_yaml(packet: EvidencePacket) -> str
+def export_packets_to_yaml(packets: list[EvidencePacket], output_path: Path) -> None
+def packet_to_rdf(packet: EvidencePacket, graph: Graph | None = None) -> Graph
+def export_packets_to_rdf(packets, output_path=None, format="turtle") -> str
+def expand_curie(curie: str | None, converter: curies.Converter) -> URIRef | None
+def get_obo_converter() -> curies.Converter
 ```
 
-- `validate_packet_dict` returns a list of LinkML validation results; an empty
-  list means the dict is valid against the `EvidencePacket` class.
-- `ingest_packet_file` loads one YAML packet and inserts it, returning its id.
-- `ingest_packet_directory` walks `**/*.yaml` and `**/*.yml`, ingesting each and
-  collecting per-file errors. It returns
-  `{"files": int, "success": int, "errors": int, "error_details": [...]}`.
+`packet_to_rdf` emitted an `owl:Axiom` for packets with status `ACCEPTED`, `REJECTED` or
+`CONTROVERSIAL` and skipped the rest with a warning.
+
+## sieve.scoring (pre-profile)
 
 ```python
-store = PacketStore(":memory:")
-results = validate_packet_dict(packet.model_dump(mode="json", exclude_none=True))
-if not results:
-    stats = ingest_packet_directory(Path("inbox/examples/"), store)
-    print(f"{stats['success']}/{stats['files']} ingested")
-```
-
----
-
-## sieve.packet_export
-
-Serialize packets to YAML, and turn ACCEPTED / REJECTED / CONTROVERSIAL packets
-into OWL axiom annotations (RDF). Serialization uses `serialize_as_any` so
-polymorphic evidence items keep their subclass fields.
-
-```python
-from pathlib import Path
-from rdflib import Graph
-from sieve.packet_export import (
-    packet_to_yaml,          # (packet: EvidencePacket) -> str
-    export_packets_to_yaml,  # (packets: list[EvidencePacket], output_path: Path) -> None
-    packet_to_rdf,           # (packet: EvidencePacket, graph: Graph | None = None) -> Graph
-    export_packets_to_rdf,   # (packets, output_path=None, format="turtle") -> str
-    expand_curie,            # (curie: str | None, converter) -> URIRef | None
-    get_obo_converter,       # () -> curies.Converter
-)
-```
-
-- `packet_to_rdf` only emits triples for packets whose status is one of
-  `ACCEPTED`, `REJECTED`, `CONTROVERSIAL`; others are skipped with a warning and
-  an (unchanged) graph is returned. Pass an existing `graph` to accumulate.
-- `export_packets_to_rdf` builds one graph over all packets, serializes it in
-  `format` (any rdflib format, e.g. `"turtle"`, `"xml"`, `"nt"`), optionally
-  writes it to `output_path`, and returns the serialized string.
-
-```python
-graph = packet_to_rdf(packet)                     # empty unless packet is decided
-turtle = export_packets_to_rdf([packet], Path("axioms.ttl"), format="turtle")
-
-export_packets_to_yaml([packet], Path("out/packets.yaml"))
-yaml_text = packet_to_yaml(packet)
-```
-
----
-
-## sieve.scoring
-
-The **Net Evidence Ratio** (NER) reduces a packet's evidence lines to a single
-number in `[-1, +1]`. Each line is weighted by its explicit
-`score_of_evidence_provided`, else mapped from `strength_of_evidence_provided`
-(`strong`=1.0, `moderate`=0.6, `weak`=0.3), else 1.0.
-
-```python
-from sieve.scoring import net_evidence_ratio, line_score
-
 def net_evidence_ratio(packet: EvidencePacket) -> float   # (S+ - S-) / (S+ + S- + S0)
-def line_score(line) -> float                             # weight of a single line
+def line_score(line) -> float     # score, else strong=1.0 / moderate=0.6 / weak=0.3, else 1.0
 ```
 
-```python
-ner = net_evidence_ratio(packet)   # +1 all supporting, -1 all disputing, 0 if empty
-```
-
-See the [primer](primer.md#from-evidence-to-a-score) for a worked example.
+To be replaced by the inclusion score S of the claim type's `AggregationRule` (see
+[Data Model](data-model.md#the-inclusion-score)).
 
 ---
 
 ## sieve.auth
 
-ORCID OAuth login and curator authorization for the Streamlit review UI. The
-UI-rendering helpers depend on Streamlit session state; the checks below are the
-parts useful outside a running app.
+ORCID OAuth login and curator authorisation for the Streamlit review UI. It does not
+use the data model.
 
 ```python
 from sieve.auth import (
@@ -293,7 +248,7 @@ from sieve.auth import (
 )
 ```
 
-Authorized curators are read from `curators.yaml` (path overridable via the
+Authorised curators are read from `curators.yaml` (path overridable via the
 `CURATORS_FILE` env var), cached for 60 seconds:
 
 ```yaml
@@ -301,16 +256,7 @@ curators:
   - orcid: "0000-0001-2345-6789"
     name: "Dr. Jane Smith"
     role: admin
-  - orcid: "0000-0002-3456-7890"
-    name: "Dr. John Doe"
-    role: curator
-```
-
-```python
-if is_authorized_curator("0000-0001-2345-6789"):
-    role = get_curator_role("0000-0001-2345-6789")   # "admin"
 ```
 
 Streamlit-bound helpers (`get_current_user`, `set_current_user`, `logout`,
-`handle_oauth_callback`, `render_login_ui`) are used by the app and require an
-active Streamlit session.
+`handle_oauth_callback`, `render_login_ui`) require an active Streamlit session.

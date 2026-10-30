@@ -3,17 +3,19 @@
 This page introduces the **minimal evidence microschema** — a small, standalone
 model for "evidence that supports or disputes a claim" that any Monarch project can
 import and reuse — and shows it working on a real record: a DisMech pathophysiology
-assertion for Fanconi Anemia is transformed into the minimal model, then lifted into
-the full [sieve](index.md) model. Every step below is executable:
+assertion for Fanconi Anemia is transformed into the minimal model.
 
 ```bash
-just transform-all      # DisMech -> minimal -> sieve, both outputs validated
+just transform-dismech   # DisMech -> minimal, output validated against schema/minimal.yaml
 ```
 
 !!! note "Status"
     The minimal model is **provisional** pending coordination with the SEPIO project
     (schema `id` and the enum-to-ontology `meaning:` IRIs are not yet final). See the
     design spec `specs/2026-07-31-minimal-microschema-and-sieve-alignment-design.md`.
+    That spec's alignment with the full SIEVE model no longer holds: SIEVE has since
+    been rebuilt as a camelCase profile of the SEPIO core, and the two schemas are not
+    connected (see [Relation to the SIEVE profile](#relation-to-the-sieve-profile)).
 
 ## Why a *minimal* model
 
@@ -58,13 +60,14 @@ metadata (score, offsets, method) — so the minimal "A" shape stays valid while
 ```mermaid
 flowchart LR
     DM[DisMech record<br/>Fanconi Anemia] -->|"dismech_to_minimal<br/>(linkml-map)"| MIN[minimal<br/>EvidencedClaim]
-    MIN -->|"minimal_to_sieve<br/>(linkml-map)"| SV[sieve<br/>EvidencePacket]
+    MIN -->|"minimal_to_sieve<br/>(linkml-map, pre-profile)"| SV[sieve<br/>EvidencePacket]
     MIN -. validates .-> MS[(schema/minimal.yaml)]
-    SV -. validates .-> SS[(schema/sieve.yaml)]
+    SV -. "fails: pre-profile shape" .-> SS[(schema/sieve.yaml)]
 ```
 
 Both hops are [linkml-map](https://linkml.io/linkml-map/) transformation specs in
-`transform/`. The source shape is a vendored snapshot of DisMech's model
+`transform/`. Only the first works today; the second still targets the pre-profile
+SIEVE model. The source shape is a vendored snapshot of DisMech's model
 (`transform/dismech_source.yaml`) so the pipeline runs without the DisMech repo
 checked out.
 
@@ -140,41 +143,34 @@ This output validates against `schema/minimal.yaml`.
     line with several `has_evidence_items` — an `EvidenceLine` is a line of reasoning,
     not a sentence.
 
-## Lifting into sieve
+## Relation to the SIEVE profile
 
-The full sieve model is a superset. The second transform
-(`transform/minimal_to_sieve.transform.yaml`) lifts the minimal claim into a sieve
-`EvidencePacket`: each `EvidenceLine` becomes a `SieveEvidenceLine`, and each
-`TextSpan` becomes a `SieveDocument` evidence item — the snippet becomes its `quote`,
-and the `Document` becomes its `pmid` + `title`:
+The minimal model is currently **not connected** to SIEVE. The SIEVE profile
+(`schema/sieve.yaml`) imports the canonical SEPIO core unchanged and uses its camelCase
+names. `schema/minimal.yaml` is unchanged: snake_case, standalone, and aligned with SEPIO
+only through `class_uri` / `slot_uri`. A minimal instance is therefore not a valid SIEVE
+packet, and nothing in `sieve.yaml` refers to `minimal.yaml`.
 
-```yaml
-id: sieve:packet_fanconi_hsc_attrition
-status: UNREVIEWED
-statement:
-  id: stmt_fanconi_hsc_attrition
-  type: SieveStatement
-  statement_text: Hematopoietic Stem Cell Attrition
-has_evidence_lines:
-  - id: line_pmid38424108
-    type: SieveEvidenceLine
-    direction_of_evidence_provided: supports
-    description: Demonstrates that inflammatory signaling drives HSC pool deficits in FA ...
-    has_evidence_items:
-      - id: doc_38424108
-        type: SieveDocument
-        quote: "proteostasis deregulation itself is driven by excess sterile inflammatory activity ..."
-        pmid: "38424108"
-        title: "Deregulated protein homeostasis constrains fetal HSC pool expansion in Fanconi anemia."
-  # ... second line likewise
-```
+The second transform (`transform/minimal_to_sieve.transform.yaml`) still emits the
+pre-profile SIEVE shape (`SieveDocument` items, snake_case slots, `status`), which the
+profile rejects, so `just transform-minimal-to-sieve` and `just transform-all` fail at
+their last validation step. How the two schemas should relate again (a sub-profile of
+the core, a transform as the formal bridge, a camelCase standalone kernel, or no
+separate kernel) is open: `issues/issue_minimal_kernel_vs_profile.md`.
 
-This output validates against `schema/sieve.yaml`. The lift shows what the richer model
-adds: **every entity gets an `id` and a `type` designator**, and evidence items become
-typed sieve classes (`SieveDocument`, `ConcordanceItem`, …) carrying curation slots
-(`rating`, `eco_code`). One thing the minimal model has that sieve does not yet: the
-line-level `evidence_source` axis — that is a held extension (spec phase 4), so it is
-intentionally dropped in the lift for now.
+For orientation, the nearest counterparts in the profile (not a decided mapping):
+
+| Minimal | SIEVE profile |
+| --- | --- |
+| `EvidencedClaim` | a claim-type statement (`SubclassStatement`, `DiseaseAttributeStatement`, ...) with SPO on the statement, inside a versioned `EvidencePacket` |
+| `EvidenceLine` | `SieveEvidenceLine`, which also requires the `InterpretationActivity` that produced it |
+| `TextSpan`, inlined in the line | `TextPassage` in the packet's `textPassages`, referenced from the line by id, with its extraction provenance |
+| `Document`, inlined via `reported_in` | `Publication` in the packet's `publications`, referenced from `TextPassage.reportedIn` |
+| `Direction` (`SUPPORTS` / `REFUTES` / `NEUTRAL`) | `Direction` (`supports` / `disputes`; no neutral) |
+| `Strength` | `strengthOfEvidenceProvided` (band) and `scoreOfEvidenceProvided` (0-1) |
+| `evidence_source` (ECO branch) | no direct slot; the nearest is the item's `generationContext` |
+
+See the [Data Model](data-model.md) for the profile.
 
 ## Files
 
@@ -184,6 +180,6 @@ intentionally dropped in the lift for now.
 | `transform/dismech_source.yaml` | vendored snapshot of the DisMech evidence shape |
 | `transform/dismech_fanconi_input.yaml` | the input Fanconi assertion |
 | `transform/dismech_to_minimal.transform.yaml` | DisMech → minimal transform |
-| `transform/minimal_to_sieve.transform.yaml` | minimal → sieve transform |
+| `transform/minimal_to_sieve.transform.yaml` | minimal → sieve transform (pre-profile target, currently fails) |
 | `project.justfile` | `transform-dismech`, `transform-minimal-to-sieve`, `transform-all` |
-| `tests/test_transform_dismech.py` | runs the pipeline and validates both outputs |
+| `tests/test_transform_dismech.py` | runs the pipeline and validates both outputs (the SIEVE stage currently fails) |
