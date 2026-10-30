@@ -20,7 +20,7 @@ them, because "five ways" is not informative on its own:
 
 | Place | How it models evidence | What it cannot say | Surveyed |
 |---|---|---|---|
-| **DisMech** | a flat `evidence:` list on 56 classes; one `supports` enum conflating direction, strength and QC; interpretation provenance in a parallel `history/` store | which reading produced *this* evidence item — the history store stops at entry sections | yes, D1 to D3 |
+| **DisMech** | a flat `evidence:` list on 56 classes; since PR #10003, `supports` is direction only with a separate `directness` axis; interpretation provenance in a parallel `history/` store | strength (held to be derivable, not authorable); evidence about other evidence; which reading produced *this* item | yes, D1 to D3 |
 | **MeDIC** | transformation chains and source assertions, provenance to a high standard | direction: there is no slot, only an implicit SUPPORTS | yes, M1 to M3 |
 | **mondo-ai / sieve** | SEPIO packets with lines, items and synthesis | anything but agreement, so the aggregate is 1.0 across all 160,187 packets | yes, N1 to N3 |
 | **Mondo** | a bare list of source CURIEs: 67,085 bracketed synonym sources and 165,813 `{source=...}` xref axiom annotations in `mondo-edit.obo` (counted 2026-08-17) | direction, strength, agent, date; none of them exist | counted, not in the corpus |
@@ -266,6 +266,24 @@ simple, lift later" story stronger, since lifting no longer means the simple vie
 What is genuinely not answered: whether more trace is better, worse or merely more expensive.
 Nobody has measured an agent's verdict quality against trace depth. See Q14.
 
+One thing *is* measured, and it argues for spending the budget on the acquisition arrow rather
+than on strength grading. Published quotation-error rates are high and not improving: 16.9%
+(95% CI 14.1–20.0%) in Baethge & Jergas 2025, 14.5% across 15 studies in Mogull 2017 with roughly
+two thirds classed major — the cited reference failing to substantiate the claim at all — and a
+median of 20% across 66 studies in Wager & Middleton 2008. A model that grades how strong a study
+is, on top of a quote that is wrong one time in six, is optimising the wrong term.
+
+The failure is structured rather than random, which is what makes it modellable. Greenberg's
+citation-network analysis (*BMJ* 2009, `PMID:19622839`) traced one β-amyloid claim through 242
+papers and 675 citations, finding 220,553 citation paths that support it and a three-part
+taxonomy: **citation bias** (refuting papers go uncited), **amplification** (papers with no data
+on the point cited as though they had data), and **invention** (a hypothesis becoming a fact
+through citation alone). Each maps to a requirement here — bias to R20 independence, amplification
+to the argumentative-zone axis in §4.6, invention to traceability. Letrud & Hernes 2019
+(`PMID:31498834`) supplies the sharpest single number: of 613 articles citing three myth-*debunking*
+papers, 468 affirmed the myth. **Direction is not preserved by citation**, so corroboration
+counting is unsound in sign, not merely in weight.
+
 ## 4. Track 1 — the minimal microschema
 
 Current draft: [`../schema/minimal.yaml`](../schema/minimal.yaml). Five classes, four enums, imports only
@@ -483,12 +501,44 @@ The vocabulary both tracks agree on. `T1` ships in the microschema, `T2` in the 
 
 Provenance of the borrowed ones: `ConfidenceBasis` is MeDIC's, extended here with
 `SELF_REPORTED` so N3's number can be labelled for what it is. `SpanRole` is a condensation of
-MeDIC's twelve-value `TextSpanRoleEnum`. `TrustLevel`, `ContributionType` and
+MeDIC's twelve-value `TextSpanRoleEnum`.
+
+**`SpanRole` has the wrong kind of value and needs a companion.** Its values describe where a span
+sits *physically* — a header, a table cell, a list item. What DisMech #10262 needs, and what the
+corpus needs too, is where the span sits in the citing paper's *argument*: its own result, its
+background, or its synthesis of others' work. A chick-embryo study quoted from its introduction
+about human perinatal mortality is `SECTION_TEXT` under the current enum, which says nothing.
+Two things make this cheap rather than speculative. It maps onto an existing vocabulary — CiTO's
+`cito:obtainsBackgroundFrom` versus `cito:citesAsEvidence`, usable as `meaning:` under the same
+static-enum pattern as ECO — and it is **derivable**: NLM structured-abstract section labels are
+present in 10,196 of 35,754 PMID cache files (28.5%), and because a snippet is required to be an
+exact substring, `body.find(snippet)` against those boundaries computes the zone with no inference
+at all. A further 7,868 full-text files admit the same trick with a heading parser.
+
+That derivability is the point. §12's rule — strength stays derived, not authored — is what has
+blocked every strength proposal; this axis *passes* that test, which is why it is the one piece of
+the DisMech evidence-metadata cluster worth adopting first. Its `ConfidenceBasis` is
+`DETERMINISTIC`. `TrustLevel`, `ContributionType` and
 `ContributionChannel` are sieve's as they stand.
 
 `StatementTraceability` is the only enum here whose `meaning:` IRIs are **confirmed** rather than
-pending: all three were checked against OLS on 2026-08-17 and their ECO definitions match the
-intended sense. That is a small piece of blocker B2 closed, and it suggests the way to close the
+pending: all three were checked against OLS on 2026-08-17 and re-checked on 2026-08-31, and their
+ECO definitions match the intended sense.
+
+**Scope correction (2026-08-31).** This enum was drafted for `TestimonyEvidenceItem`, and that is
+too narrow. DisMech #10212 wants exactly this axis on ordinary text-derived items: a snippet taken
+from a review's introduction, describing work the review did not do, is a *traceable author
+statement* whether or not anyone calls it testimony. `StatementTraceability` should range over
+every text-derived item, and it needs a fourth value for the firsthand case — the cited document
+reporting its own work — which the testimony framing made unnecessary. Two consequences: the
+citation-distance axis is **not** the same as directness (inference distance), and the two must
+not be collapsed into one slot; and this is a concrete thing the profile can hand DisMech rather
+than ask of it.
+
+**Watch the ECO "used in" axis when mapping.** `ECO:0000033` / `ECO:0000034` are evidence-type
+classes; `ECO:0000269` and `ECO:0000303` are their *used in manual assertion* subclasses. #10212's
+proposed mapping mixes the two levels in one enum, which makes the values non-comparable. All
+three values here sit at the evidence-type level deliberately — keep them there. That is a small piece of blocker B2 closed, and it suggests the way to close the
 rest is to look for the branch ECO already has instead of proposing values first.
 
 One gap this exposes: `EvidenceSource` has `EXPERT_CONSENSUS`, which is a *group* reaching
@@ -829,7 +879,7 @@ derived from the lines.
 
 | Resource | Today | Next step | Cost |
 |---|---|---|---|
-| **DisMech** | flat `EvidenceItem` list; `supports` enum conflates 3 concerns; interpretation provenance is rich but lives in `history/`, unjoined to any evidence item | adopt Track 1 via the existing `dismech_to_minimal` transform; split `supports`; drop `NO_EVIDENCE`/`WRONG_STATEMENT` from released data | days |
+| **DisMech** | flat `EvidenceItem` list; direction and directness split as of PR #10003, SEPIO nesting declined; interpretation provenance is rich but lives in `history/`, unjoined to any evidence item | adopt Track 1 via the existing `dismech_to_minimal` transform; split `supports`; drop `NO_EVIDENCE`/`WRONG_STATEMENT` from released data | days |
 | **MeDIC** | best-in-class provenance, **no** evidence model: no direction, one implicit SUPPORTS | Stage 0 annotate (`class_uri`/`slot_uri`), Stage 1 unify its two evidence-kind vocabularies onto the kernel's two axes, Stage 2 add `direction` + `strength` + `Document` + synthesis | Stage 0 hours, Stage 1 days, Stage 2 1–2 weeks |
 | **mondo-ai** | already on SIEVE/SEPIO; camelCase copy of the model | re-point its import at sieve's snake_case kernel; contribute its `TextMiningResult` back into `minimal.yaml` | days |
 | **sieve** | owns both schemas | close blockers B1–B4; land phase 3 (C) and phase 4 (evidence-source axis) | weeks |

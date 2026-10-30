@@ -34,6 +34,13 @@ Two things stand out. The verification cluster is much bigger than the modelling
 is upstream of it. And #9421 and #9710 were filed independently, from two different curation
 runs, asking for the same missing axis.
 
+**Updated 2026-08-29.** The QC-contamination cluster is largely closed by PR #10003, and the
+strength cluster has since been filed a further three times (#9785, #9951, and #9833/#9827 as
+duplicates) — five independent filings of one gap, which is itself the argument for fixing it.
+@cmungall has asked for the duplication to stop and for a path forward instead; this plan is that
+path. A sixth cluster has opened that the table above does not cover: **source independence**
+(#10029), where two papers from one laboratory were graded as independent confirmation.
+
 ## Measured baseline
 
 Counted on my checkout at `f311ef9d6a` (2026-08-12), so these run below the numbers in #9421,
@@ -88,7 +95,40 @@ supports: it is pure local pain with no model change at all.
 
 ---
 
-## Step 1: split `supports` into direction and strength
+## Step 1 (SHIPPED, as direction + directness): split `supports`
+
+**Outcome, PR #10003, merged 2026-08-29, closing #7439.** The split landed on a different second
+axis than this step proposed. Reading the curators' own `explanation` prose across all 11,620
+`PARTIAL` items showed the field was never carrying strength: it carried indirect support, an
+inverted model system, one item making two claims, and simple irrelevance. So `supports` narrowed
+to direction only — `SUPPORT` / `REFUTE` / `NO_EVIDENCE` — and the new axis is `directness`
+(`DIRECT` / `INDIRECT` / `UNKNOWN`), with `PARTIAL` and `WRONG_STATEMENT` retired.
+
+**The headline: self-contradictory `supports` gradings fell from 8,285 to 353**, a 96% drop, and
+`supports` is now cleaner than `evidence_source` (715) for the first time.
+
+The reason directness beat strength is worth carrying into the shared model: directness is
+judgeable from the snippet and the claim alone, so two curators who disagree have something to
+point at. Strength needs study design, sample size and replication — none of which the item holds.
+Design decisions §12 holds that strength should be *derived*, not authored, and that is unchanged.
+
+**One migration lesson worth carrying, because it cost something.** `PARTIAL` was not only a
+dumping ground; several curators were using it to mean *reported secondhand*. Retiring it removed
+that signal without replacing it, and the explanations were not migrated — 375 files still carry
+"marked PARTIAL because…" prose describing a value the schema no longer has, four of them naming
+secondhand citation as the reason (`Immunodeficiency_61.yaml:437` reads `supports: SUPPORT` above
+an explanation that says it was marked `PARTIAL` for exactly that). The lesson is not that the
+narrowing was wrong. It is that **before collapsing an overloaded field, enumerate what it was
+carrying and give each meaning somewhere to go first** — the four meanings were enumerated, but
+only three were rehoused.
+
+The 11,620 migrated items carry `directness` **absent**, not defaulted — absent means unassessed,
+and defaulting would have manufactured 11,620 appraisals no curator made. The population is
+enumerated in `docs/reports/data/partial-evidence-directness-worklist-2026-08-29.tsv`, and the
+4,130 lines of curator prose still reading "Marked PARTIAL because…" were deliberately kept: the
+enum token is stale, the reasoning is not.
+
+*Original framing, retained because Step 2 still rests on it:*
 
 **Scenario.** From #9710: a curator marks abatacept evidence `PARTIAL` because the cited review
 recommends for the CTLA-4/LRBA/DEF6 group while the claim is about DEF6 specifically. That is a
@@ -114,7 +154,20 @@ carries roughly ten worked YAML examples of the flat shape.
 
 ---
 
-## Step 1b: get QC signals out of the evidence list
+## Step 1b (PARTLY SHIPPED): get QC signals out of the evidence list
+
+**Outcome.** `WRONG_STATEMENT` is gone — its single use in `Huntington_Disease.yaml` recorded that
+the entry's own subtype name was inaccurate, the name has since been fixed, and the correction
+moved to a `history/` record. `NO_EVIDENCE` was **kept**, and on reflection that is right: "this
+source does not bear on the claim" is an evidential statement, not a QC flag, and PR #10003 fixed
+a real exporter bug on exactly this point — `NO_EVIDENCE` was being emitted as SEPIO `neutral`,
+which asserts something different (bears on the claim, favours neither side). Such lines now carry
+no `direction_of_evidence_provided` at all.
+
+What remains of this step is the inflation problem, now 353 mis-set `supports` values rather than
+8,285 — a small enough set to gate in `check-snippet-grading`.
+
+*Original framing:*
 
 **Scenario.** From #6224, Shigellosis mechanism claims "rest on `NO_EVIDENCE` filler". An entry
 with three evidence items, two of which are `NO_EVIDENCE`, reads to any consumer as three
@@ -160,6 +213,71 @@ and I agree.
 
 **Note.** This axis does not exist in the microschema. It is a DisMech requirement first, and it
 should be fed upward rather than borrowed downward.
+
+**The live objection, and why it does not sink this step.** Design decisions §12, restated in
+#10003, holds that strength should be derived rather than authored. That is an argument against a
+curated `evidence_strength` grade — not against `study_design`, which is exactly the *input* a
+derivation needs and which the reference cache already supplies. The step survives its own
+objection provided the slot records a fact about the study, never a judgement about the claim.
+#10029 adds the same argument from the other end: `authors:` is in the cache too, so independence
+can be checked without curator judgement.
+
+**Two refinements from the thread.** `replication` is doing more work than its rank suggests — for
+a single-family Mendelian claim, "has anyone else seen this" *is* the classification, and it is
+cheap and reliable to establish at curation time (APMR1: one family, seven affected, zero
+replication in nine years, all of it recorded in prose). And the loss is not only that weak
+evidence cannot be discounted: IRIDA's best causal evidence is a randomised placebo-controlled
+Phase 1 trial that reads flat against the entry's n=1 items, so the missing metadata cannot
+**promote** the item that deserves it. @cmungall's constraint stands and narrows the scope
+usefully: much of the pathograph is not RCT-shaped, so this axis is for clinical statements, and
+gene–disease validity should be sourced from ClinGen rather than re-derived here.
+
+---
+
+## Step 2b: mark citation distance
+
+**Scenario.** From #10212, curating LTBP3: the only available source for a thoracic aortic
+aneurysm claim was a case report's *discussion* relaying two families it had read about. The
+snippet asserts the claim exactly, so there is no inference step — the reader is simply two
+documents away from the patients. The curator marked it `directness: INDIRECT` and then explained
+in prose that this was not what the slot means. Three items in one file, same misuse.
+
+**Why it outranks strength.** Published quotation-error rates are 14.5–20%, two thirds of them
+major. Relayed claims are where those errors accumulate, and unlike strength this is *mechanically
+actionable*: if an item is marked as relayed with a traceable original, a validator can ask whether
+the primary is cited in the entry, and `just fetch-reference` makes the upgrade a two-minute job —
+the #10212 example was replaced with a firsthand report almost immediately. Nothing today can find
+the others; grepping prose for the phrasing hits 47 places, which is a floor.
+
+**Change.** Not a new enum. `StatementTraceability` in the microschema (SPEC §4.6) already carries
+this, with ECO terms confirmed against OLS: `ECO:0000033` traceable, `ECO:0006016`
+clinical-study-referenced, `ECO:0000034` untraceable. It needs one addition — a firsthand value —
+and a scope widening from testimony to any text-derived item. A `primary_reference` belongs only
+on the traceable value; requiring one on untraceable items would push curators toward guessing a
+plausible primary, which is the fabrication surface the evidence-model docs exist to close.
+
+**Do the free half first.** The schema's own `DirectnessEnum` comment already says directness "is
+judgeable from the snippet and the claim alone", and citation distance fails that test — so the
+misuse is already excluded by the schema, just not anywhere a curator reads. Copying that clause
+into `CLAUDE.md` costs one edit and stops the next three entries being written wrong.
+
+**And the detector, which needs no schema at all (#10262).** The structural signal that a quote is
+relayed is already in the cache. NLM structured-abstract labels (`BACKGROUND:`, `RESULTS:`, …) are
+present in 10,196 of 35,754 PMID files, and since a snippet must be an exact substring,
+`body.find(snippet)` against the section boundaries computes the zone deterministically — no MeSH
+heuristic, no LLM, no false positives from indexing lag. A second, complementary tier uses MeSH
+(a `HUMAN_CLINICAL` item citing an animals-only paper) and catches the unstructured abstracts the
+first tier is blind to; #10262 measured 207 such items across 61 files, and rightly calls it a
+lower bound on a narrow slice rather than the size of the problem. Report at both tiers, tiered by
+precision, and gate neither.
+
+This is the step's real argument. The axis has been proposed three times independently
+(`publication_role`, `claim_provenance`, `quote_role`) and stalled each time against §12's
+derived-not-authored rule. It **passes** that rule — the zone is computed from the cache — which
+is what none of the three filings established.
+
+**Cost.** Documentation, hours. Slot, days. **Timing is unusually good:** `directness` is set on
+213 of 147,550 items, and the three misuses above are not yet on `main`.
 
 ---
 
@@ -220,7 +338,28 @@ than from a model.
 
 ---
 
-## Step 5: let several items form one argument
+## Step 5 (DECLINED upstream, for now): let several items form one argument
+
+**Outcome.** PR #10003 explicitly did not adopt SEPIO's `EvidenceLine` / `DataItem` / `Document`
+classes. The reasoning: an `EvidenceItem` already *is* an evidence line over one data item and one
+document, and `linkml-reference-validator` supports `ELLIPSIS_INSERTION`, so a single `snippet`
+can already carry a discontinuous multi-span quote — which was most of what the nesting bought.
+SEPIO alignment is carried by `exact_mappings` on the native slots instead, keeping design
+decisions §5's export-layer-only rule intact and sidestepping the vocabulary collision with #7612.
+
+The cost is named honestly in the PR, and it is the strongest argument for revisiting:
+`glymphatic_dysfunction.yaml` holds a REFUTE (an independent lab found no AQP4 effect) followed by
+a rebuttal attributing that negative to anaesthetic regimen and tracer route. The second item is
+aimed at the first, and a flat list records both against the node as parallel primary
+observations. That is an undercutting defeater in DisMech's own data, and it is the case to bring
+back rather than the grouping argument below.
+
+One more empirical finding from the merge, which cuts against item reuse generally: entries that
+define an evidence list once with a YAML anchor and reuse it by alias cannot carry a
+claim-relative `directness` on the shared object, because directness is claim-relative and the
+object is not. Reuse and per-claim annotation are in tension.
+
+*Original framing:*
 
 **Scenario.** From #9710: the DEF6 entry rests on seven patients from three kindreds across two
 papers. The index paper and the two reviews that summarise it look identical in the YAML, but
@@ -252,25 +391,43 @@ A record that does not say how it was grouped cannot be aggregated safely by a c
 
 ---
 
-## Step 6: record who did the interpreting
+## Step 6: connect the interpreter record we already keep to the evidence
 
-**Scenario.** DisMech is AI-curated and records nothing about the interpreter. #7835 documents a
-new failure mode: fabricated *verification notes* that justify a wrong call, which is an agent
-producing a plausible interpretation with no accountable author. #6211 tracks Falcon deep
-research provenance stubs. When a claim is later found wrong, there is no way to ask which agent,
-model or prompt version produced the reading, and therefore no way to find the other claims it
-touched.
+**Scenario.** This step is mostly built. `history/` is an append-only session store with its own
+schema (`src/dismech/schema/history.yaml`): 4,568 records for disorders, 4,207 of them carrying an
+`ai_agent` actor with model and agent tool named — claude-opus-5 on 1,536, claude-opus-4-8 on 855,
+claude-sonnet-5 on 817, gpt-5 on 439 — plus timestamps, PR and issue links, and the interpretation
+reasoning in prose, including suggestions declined and why. Against the wider corpus that is
+unusually good: MeDIC has no interpretation step at all, and mondo-ai records it only on synthesis.
 
-**Change.** `interpreted_by` on the group from Step 5 (or on the item until Step 5 lands):
-agent, date, model or prompt version.
+What is missing is one link. The store's finest grain is `sections:` (phenotypes, treatments,
+genetic), `EvidenceItem` still carries its seven original slots, and no session id appears in
+`kb/`, so the join runs one way. We can ask what happened to an entry; we cannot ask which reading
+produced a given snippet. #7835 is why that matters — fabricated *verification notes* justifying a
+wrong call, an interpretation with no accountable author — and #6211 tracks the Falcon deep
+research provenance stubs.
 
-**Migration.** New records only. Backfill from git history where the curating agent is
-recoverable.
+**Change.** Carry the session id down to the group from Step 5 (or to the item until Step 5
+lands). The agent, model and date are already recorded; this points at them rather than repeating
+them.
 
-**Test.** Given a retracted paper or a discredited agent run, list every claim that depends on
-it. That query is impossible today.
+**Migration.** A pointer slot on new records. Backfill is unusually tractable for a retrofit,
+because the history records already carry timestamps and PR links: an entry's items can be
+attributed to the session that last touched their section without reading a single diff.
 
-**Cost.** Days for the schema. **Unlocks:** targeted recuration instead of KB-wide sweeps.
+**Test.** Given a discredited agent run, list every claim that depends on it. Today that resolves
+to the entry and section; after this step it resolves to the evidence item.
+
+**Cost.** Small — one slot and a backfill script, not a new provenance model. **Unlocks:**
+targeted recuration instead of KB-wide sweeps, and the model spread above becomes queryable as a
+covariate on claim quality.
+
+**Caveat on what the store is worth.** `just validate-history` checks a record's *shape*, never
+its `details` prose against the entry it describes. A false claim about what was curated is
+therefore permanent, schema-valid and CI-passing — worse than a stale comment, because history is
+append-only. Before leaning on this store as provenance, it needs the same treatment
+`check-source-defect-claims` gave caches: an assertion about an artifact, checked against the
+artifact.
 
 ---
 
@@ -326,13 +483,14 @@ the step Chris's objection lands on, and he is right that it must not drive the 
 
 ```
 Step 0  verification holds          days      no schema change
-Step 1  direction + strength        days      mechanical migration
-Step 1b QC signals out              hours     446 items
+Step 1  direction + directness      SHIPPED   #10003, 11,620 items migrated
+Step 1b QC signals out              PARTLY    WRONG_STATEMENT gone; NO_EVIDENCE kept
 Step 2  study design + n            days      partly auto-backfilled
+Step 2b citation distance + zone    hours     docs, then a report-only detector
 Step 3  document type               days      partly auto-backfilled
 Step 4  claim to evidence link      days      no migration
-Step 5  grouping                    weeks     no migration
-Step 6  interpretation provenance   days      new records only
+Step 5  grouping                    DECLINED  revisit via evidence-about-evidence
+Step 6  join history to evidence     days      backfillable from history/
 Step 7  contested attribution       weeks     design first
 Step 8  interchange annotation      hours     optional, zero data change
 ```
