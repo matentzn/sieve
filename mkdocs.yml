@@ -42,6 +42,7 @@ nav:
     - Data Model: data-model.md
     - Architecture: architecture.md
     - Schema Reference: elements/index.md
+    - Requirements Traceability: requirements-traceability.md
   - User Guide:
     - CLI Reference: cli.md
     - Workflows: workflows.md

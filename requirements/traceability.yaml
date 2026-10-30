@@ -1,0 +1,669 @@
+# Requirement -> SEPIO design module -> disposition, for the SIEVE profile.
+#
+# Source of the requirement rows: mondo_requirements.tsv (extracted from the Mondo
+# requirements workbook by scripts/extract_requirements.py). Decision IDs (D-NNN)
+# refer to the Mondo decision log in sepio-linkml
+# (docs/requirements-collection/projects/mondo/decision-log.md).
+#
+# This file says WHERE a requirement lives and WHY. The schema elements that
+# realise a requirement are NOT listed here: they carry the requirement ID in their
+# own `annotations.requirements` (schema/sieve.yaml), so the mapping cannot drift
+# away from the model. tests/test_traceability.py enforces both directions:
+#   - every requirement in the TSV has an entry here;
+#   - disposition `modelled` / `negative_constraint` <=> at least one schema
+#     element is annotated with it;
+#   - every annotated ID exists in the TSV;
+#   - every module listed here exists and its core classes exist in sepio_core.yaml.
+#
+# Dispositions:
+#   modelled      realised by profile elements (incl. core slots reused via slot_usage)
+#   not_desired   F2 = N; deliberately absent from the profile
+#   negative_constraint
+#                 F2 = N, and the "no" is itself a design decision that schema
+#                 elements embody (e.g. "do not collapse lines into items" is why
+#                 lines are separate, immutable objects); annotated like `modelled`
+#   out_of_scope  desired, but served by an artefact other than this schema
+#                 (Mondo's term-centric model, the release pipeline)
+
+modules:
+  statement:
+    title: Statement (claim semantics)
+    description: >-
+      What is claimed: SPO(Q) on the Statement, claim-type profiles, negation, and the
+      Statement-level assessment (direction / strength / score in SEPIO's
+      "proposition assessment mode").
+    core_classes: [Statement, Proposition, Qualifier]
+  evidence-item:
+    title: Evidence Item
+    description: >-
+      The information interpreted as evidence: external records, prior claims,
+      documents, computed scores; and the information resources they come from.
+    core_classes: [InformationEntity, Document, DataItem, DataSet, StudyResult]
+  evidence-line:
+    title: Evidence Line (interpretation)
+    description: >-
+      How evidence bears on a claim: evidence lines with direction, strength and
+      score, their validity, and the shortcut links (hasEvidence,
+      hasEvidenceFromSources).
+    core_classes: [EvidenceLine]
+  provenance:
+    title: Provenance (activities, contributions, agents, methods)
+    description: >-
+      Who did what, when, how: interpretation acts, assertion decisions, alignment
+      and retrieval activities, agents with role and trust, rules and policies.
+    core_classes: [Activity, Contribution, Agent, Method]
+  record-metadata:
+    title: Record Metadata (encoding and retrieval of concrete records)
+    description: >-
+      Provenance of a concrete record rather than its content: where a record was
+      read from, which release, when; how an artefact was serialised.
+    core_classes: [RecordMetadata]
+  utility:
+    title: Utilities
+    description: Reusable datatypes (codings, extensions, qualifiers).
+    core_classes: [Coding, Extension, Qualifier]
+
+requirements:
+
+  # --------------------------------------------------------------- CT: claim types
+  C001:
+    module: statement
+    disposition: modelled
+    decisions: [D-030, D-039, D-009]
+    rationale: >-
+      TermExistenceStatement. Origin ("cloned from X") is kept apart from evidence
+      ("exactly matches X") via SieveStatement.origin (D-030). Obsolescence reason and
+      replacement are named qualifiers. Subject obsolescence is not stored on mappings;
+      it is read from the term's own existence claim (D-009).
+  C002:
+    module: statement
+    disposition: modelled
+    decisions: [D-031, D-020, D-029]
+    rationale: >-
+      DefinitionStatement. Definition dbxrefs are origin with derivation type
+      INSPIRED_BY, not evidence (D-031). Pattern provenance is derived at build time and
+      has no slot (D-020). A definition with no evidence is a WARNING (D-029).
+  C003:
+    module: statement
+    disposition: modelled
+    decisions: [D-031, D-034, D-035]
+    rationale: >-
+      SynonymStatement; scope is the predicate. Synonym support is evidence with
+      last-confirmed dates (D-031). Community endorsement is a contribution with role
+      ENDORSER (D-034, provisional). Synonym types are term metadata and are not
+      modelled (D-035).
+  C004:
+    module: statement
+    disposition: modelled
+    decisions: [D-004, D-018, D-025, D-037]
+    rationale: >-
+      SubclassStatement. Reasoning status is deliberately absent (computed, D-018);
+      evidence attaches to entailed axioms like any other. Logical definitions are
+      one statement per intersection_of element with predicate owl:equivalentClass.
+      A full class-expression object is not modelled.
+  C005:
+    module: statement
+    disposition: modelled
+    decisions: [D-032, D-033]
+    rationale: >-
+      NegativeSubclassStatement: a SubclassStatement with negated = true (D-032).
+      External records that assert the positive subclass enter as evidence lines with
+      direction = disputes (D-033).
+  C006:
+    module: statement
+    disposition: modelled
+    decisions: [D-006, D-008, D-010, D-011, D-012, D-014, D-017, D-024]
+    rationale: >-
+      MappingStatement; the predicate comes from the precision code (D-006, D-014).
+      Qualifiers: objectObsoleteInSourceVersion (D-010), preferred and validDirection
+      (D-012). Obsolete-to-obsolete mappings and uncoded mappings are WARNING-severity
+      checks (D-011, D-017). Provider authority is an assertion route (D-017, D-064).
+  C007:
+    module: statement
+    disposition: modelled
+    decisions: [D-039, D-020]
+    rationale: >-
+      DiseaseAttributeStatement with the Mondo relation set as its predicate value
+      set. The "definitional + pattern-mandated" test (D-039) is computed against the
+      pattern files (D-020), so it gets no stored slot.
+  C008:
+    module: statement
+    disposition: modelled
+    decisions: [D-002, D-035]
+    rationale: >-
+      SubsetMembershipStatement. Provider and stakeholder are contribution roles
+      (D-002). Status-flag subsets are out of scope (D-035).
+  C009:
+    module: statement
+    disposition: modelled
+    decisions: [D-040]
+    rationale: >-
+      MetaclassStatement (candidate, D-040). Object bound to the kind-of-class
+      vocabulary (grouping / disorder / subtype / susceptibility).
+  C010:
+    module: statement
+    disposition: modelled
+    decisions: [D-013, D-040]
+    rationale: >-
+      ValueSetMembershipStatement (candidate). Its own predicate
+      sieve:memberOfRecordScope, distinct from SKOS. The interim skos:relatedMatch
+      export is an encoding rule (PROV.ENCODING.METHODS), not a claim predicate.
+
+  # ------------------------------------------------- CRS: claim representation
+  CS.PARENT_SLOT_VALUE:
+    module: statement
+    disposition: out_of_scope
+    decisions: [D-041]
+    rationale: >-
+      The plain term-centric consumption form (OBO/JSON without provenance) belongs to
+      Mondo's own model and release, not to this statement profile.
+  CS.NESTED_OBJECT:
+    module: statement
+    disposition: out_of_scope
+    decisions: [D-041, D-042]
+    rationale: >-
+      Primary authoring form (view A) = Mondo's term-centric LinkML model. This profile
+      is view B. Requirement placed on view A: it must carry everything view B needs
+      (origin, contributions, evidence lines with direction and dates, review state,
+      negation). The two are linked by a LinkML-Map transformation (D-042).
+  CS.REIFIED_OBJECT:
+    module: statement
+    disposition: modelled
+    decisions: [D-041, D-018]
+    rationale: >-
+      This profile IS view B: identified Statement objects (SieveStatement.id is an
+      identifier), packaged one per EvidencePacket.
+  CS.DIRECT_EDGE:
+    module: statement
+    disposition: out_of_scope
+    decisions: [D-041, D-065]
+    rationale: >-
+      Release view (OWL / SKOS / SSSOM edges) produced by the release pipeline. Only its
+      meaning-changing export rules are tracked here (PROV.ENCODING.METHODS).
+  CS.OTHER:
+    module: statement
+    disposition: not_desired
+    rationale: No other structure.
+
+  # ------------------------------------------------- RCS: reified claim semantics
+  RCS.FREE_TEXT:
+    module: statement
+    disposition: modelled
+    rationale: Core Statement.statementText, optional (M).
+  RCS.STRUCTURED_STATEMENT:
+    module: statement
+    disposition: modelled
+    decisions: [D-042]
+    rationale: >-
+      SPO directly on SieveStatement (core subject / predicate / object). subject and
+      object are required; predicate is a Coding bound to a value set per claim type.
+  RCS.STRUCTURED_PROPOSITION:
+    module: statement
+    disposition: negative_constraint
+    decisions: [D-042]
+    rationale: >-
+      No Proposition objects. The core Statement.proposition and
+      EvidenceLine.targetProposition slots are inherited but documented as unused.
+      Concordance and dispute are matched by SPO + negation.
+  RCS.QUALIFIERS:
+    module: statement
+    disposition: modelled
+    decisions: [D-010, D-012, D-013, D-032]
+    rationale: >-
+      Named qualifier slots specialise the core generic `qualifier`, as the core
+      recommends: objectObsoleteInSourceVersion, preferred, validDirection (mappings);
+      obsolescenceReason and scheduledObsoletionDate (existence). Negation is the
+      profile's Statement-level `negated` slot. In the core, negated lives only on
+      Proposition, which this profile does not use.
+
+  # ------------------------------------------------- EIT: evidence item types
+  EI.DATA.EXPERIMENTAL_OBSERVATIONAL: {module: evidence-item, disposition: not_desired, rationale: Mondo holds no experimental data.}
+  EI.DATA.CLINICAL: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.DATA.STATISTICAL_METRIC: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.DATA.COMPUTATIONAL_PREDICTION:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-021, D-043]
+    rationale: >-
+      ComputationalScore (is_a DataItem): value, method (core specifiedBy), software
+      version, parameters. M: whether these stay in mondo-ai is open (D-043).
+  EI.COMPOSITE.DATA_TABLE: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.COMPOSITE.DATASET: {module: evidence-item, disposition: not_desired, rationale: Not used as evidence. DataSet is still the core parent of SourceRelease and EvidencePacket.}
+  EI.COMPOSITE.FIGURE: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.COMPOSITE.EXTERNAL_RECORD:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-010, D-025, D-030, D-055]
+    rationale: >-
+      ExternalRecord (is_a InformationEntity): resource (explicit, D-055),
+      recordMetadata (release + read date), label at reading time, obsolete-in-source
+      flag (D-010). Origin vs corroboration is decided by where the record is referenced
+      (origin vs evidence line), not by the record itself (D-030).
+  EI.COMPOSITE.STUDY_RESULT: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.PRIOR_CLAIM.DIRECT_TEXT:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-057, D-050]
+    rationale: >-
+      TextPassage (is_a Statement): verbatim quote in statementText, reportedIn
+      document, location, quote verification. A record created in the Mondo ecosystem,
+      so creation contributions are required (D-057).
+  EI.PRIOR_CLAIM.DIRECT_STRUCTURED:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-004, D-005, D-033, D-061]
+    rationale: >-
+      ConcordantAssertion (is_a Statement): the source's own SPO in its own terms,
+      reportedIn its ExternalRecord, plus one ResolutionChain per grounded entity
+      (D-061). Source relation qualifiers are deliberately absent (D-005). Direction
+      lives on the evidence line, not the item (D-033).
+  EI.PRIOR_CLAIM.SUPPORTING_TEXT: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.PRIOR_CLAIM.SUPPORTING_STRUCTURED: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.DOCUMENT.SCIENTIFIC_PUBLICATION:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-037, D-031]
+    rationale: >-
+      Publication (is_a Document): core pmid / doi / title, plus isbn and publication
+      types. Supporting evidence on logical axioms (D-037); on definitions the same
+      document is the origin (INSPIRED_BY, D-031).
+  EI.DOCUMENT.REGULATORY: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.DOCUMENT.GUIDELINE:
+    module: evidence-item
+    disposition: modelled
+    rationale: GuidelineDocument (is_a Document). M.
+  EI.IMAGE.PHOTOGRAPH: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.IMAGE.MEDICAL: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.IMAGE.SCIENTIFIC_INSTRUMENT: {module: evidence-item, disposition: not_desired, rationale: Not used.}
+  EI.CUSTOM.001:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-036, D-037]
+    rationale: >-
+      WebPage (is_a Document) with required urls; date accessed via recordMetadata.
+      GitHub issue/PR URLs are NOT web-page evidence: they are decision context
+      (D-036).
+
+  # ------------------------------------------------- EINT: evidence interpretation
+  EINT.REQUIRED:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-044, D-045]
+    rationale: >-
+      Two levels of judgement: SieveEvidenceLine (per evidence, with an
+      InterpretationActivity) and AssertionDecision (over all lines) (D-045).
+  EINT.DIRECTION:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-033, D-051]
+    rationale: >-
+      directionOfEvidenceProvided narrowed to supports | disputes. Neutral is dropped
+      because no requirement asks for it. Human dissent is a disputing line (D-051).
+  EINT.CATEGORICAL_STRENGTH:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-047, D-054]
+    rationale: >-
+      Core strengthOfEvidenceProvided kept as a string. Its vocabulary is declared by
+      the claim type's AggregationRule (strengthBands), not fixed globally (D-054).
+  EINT.NUMERICAL_STRENGTH:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-047, D-054, D-063]
+    rationale: >-
+      scoreOfEvidenceProvided constrained to [0, 1], the shared normalised scale
+      (D-054). Direction carries the sign. Every scored line names its rule
+      (computedByRule).
+  EINT.GRANULARITY:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-046]
+    rationale: >-
+      Parked (D-046). hasEvidenceItems stays multivalued with no maximum, so both
+      one-item lines and grouped lines are valid until the team decides.
+  EINT.GROUPING:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-046, D-063]
+    rationale: >-
+      Dependence is representable: source-from-source (InformationResource.derivesContentFrom),
+      same study (Publication.reportsStudy), derived item (core derivedFrom), collective
+      acts (SieveContribution.participants). Lines also carry independenceCluster, the
+      cluster the aggregation rule assigned them to (D-063).
+  EINT.CONTRADICTION:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-053, D-054]
+    rationale: >-
+      DecisionOutcome CONTROVERSIAL keeps a claim despite disputing lines. REJECTED
+      claims stay on record, because an EvidencePacket is never deleted (D-053).
+  EINT.STACKING:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-046]
+    rationale: >-
+      Core-native: an EvidenceLine is an InformationEntity, so it can be an evidence
+      item of a higher-order line. The profile allows line ids in hasEvidenceItems.
+  EINT.DISTINCT_MODELS:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-054]
+    rationale: >-
+      AggregationRule (is_a SieveMethod), one versioned rule per claim type, normalised
+      to 0-1, with its strength bands and confidence floor.
+  EINT.FLAT_COLLAPSE:
+    module: evidence-line
+    disposition: negative_constraint
+    decisions: [D-045, D-052]
+    rationale: >-
+      Lines and items are separate objects. Lines are immutable: validity (VALID /
+      INVALIDATED) and statusChanges record invalidation and supersession. They are
+      never edited in place.
+  EINT.DIRECT_EVIDENCE:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-041, D-037]
+    rationale: >-
+      Core Statement.hasEvidence, narrowed to references to evidence items in the
+      packet. Kept for lightweight consumption alongside lines.
+  EINT.SOURCE_ONLY:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-025, D-037]
+    rationale: >-
+      Core Statement.hasEvidenceFromSources, narrowed to InformationResource references
+      (MONDO:DOID-style attribution, D-025). EvidenceLine.evidenceItemSources serves the
+      same purpose on lines.
+
+  # ------------------------------------------------- PROV: evidence item provenance
+  PROV.EI.AGENT:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-055]
+    rationale: >-
+      Resource level only: ExternalRecord.resource / UpstreamItem.resource references an
+      InformationResource in the registry. No upstream curators (D-055).
+  PROV.EI.METHOD_TYPES: {module: provenance, disposition: not_desired, decisions: [D-056, D-057], rationale: "Upstream items: N (provisional). For records created in the Mondo ecosystem the method is recorded via PROV.EI.EXECUTION."}
+  PROV.EI.METHODS: {module: provenance, disposition: not_desired, decisions: [D-056], rationale: Upstream items only; provisional.}
+  PROV.EI.RESOURCES: {module: provenance, disposition: not_desired, decisions: [D-056], rationale: "Upstream detail; species is a C007 claim (in_taxon)."}
+  PROV.EI.EXECUTION:
+    module: provenance
+    disposition: modelled
+    decisions: [D-057, D-050, D-059]
+    rationale: >-
+      Created records only (TextPassage): required creation contributions (who, when,
+      method via specifiedBy), source document version, textLocation, quote
+      verification.
+  PROV.EI.DATE:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-056, D-058]
+    rationale: >-
+      Core InformationEntity.dateAuthored = when the upstream item was produced (paper
+      publication date, record revision date). Distinct from the read date
+      (RetrievalMetadata.retrievalDate).
+  PROV.EI.LOCATION: {module: provenance, disposition: not_desired, decisions: [D-050], rationale: Collapses into PROV.EI.AGENT; created records are located by run id.}
+  PROV.EI.RETRIEVAL_SOURCE:
+    module: record-metadata
+    disposition: modelled
+    decisions: [D-055, D-058]
+    rationale: >-
+      RetrievalMetadata (is_a RecordMetadata) on evidence items: resource, release,
+      date read, label at reading time.
+  PROV.EI.QUALITY:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-060]
+    rationale: >-
+      Per resource: InformationResource.qualityRatings, dated (validFrom) so a re-rating
+      never rewrites past scores. Per item: core InformationEntity.informationQuality
+      (e.g. retracted).
+  PROV.EI.GENERATION_CONTEXT:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-056, D-058]
+    rationale: >-
+      UpstreamItem.generationContext (Coding, multivalued): PubMed publication types,
+      Orphanet validation status, OMIM mapping keys. An unexposed basis is recorded
+      explicitly as unknown, never left blank.
+
+  # ------------------------------------------------- PROV: semantic alignment
+  PROV.SA.AGENT:
+    module: provenance
+    disposition: modelled
+    decisions: [D-050, D-051, D-061]
+    rationale: >-
+      Core Activity.performedBy on AlignmentStep (software agent with version). Human
+      alignment is implicit in the human interpretation (D-051).
+  PROV.SA.METHOD_TYPES:
+    module: provenance
+    disposition: modelled
+    rationale: >-
+      AlignmentStep.category (TransformationCategory) and method (TransformationMethod),
+      MeDIC vocabularies (provisional).
+  PROV.SA.METHODS:
+    module: provenance
+    disposition: modelled
+    decisions: [D-061]
+    rationale: >-
+      Core Activity.specifiedBy (workflow / rule set, versioned) on AlignmentStep and
+      ResolutionChain, plus appliedRules (name + certainty) per step.
+  PROV.SA.EXECUTION:
+    module: provenance
+    disposition: modelled
+    decisions: [D-061]
+    rationale: >-
+      ResolutionChain of ordered AlignmentSteps, each with inputValue / outputValue
+      (contiguity is a profile check), span anchoring (TextLocation, spanRole) and
+      triggerCue. The frozen mapping is recorded as mappingSet + mappingSetVersion.
+  PROV.SA.DATE:
+    module: provenance
+    disposition: modelled
+    decisions: [D-061]
+    rationale: >-
+      Core Activity.date on both the chain (run) and each step.
+  PROV.SA.CONFIDENCE_CATEGORY:
+    module: provenance
+    disposition: modelled
+    decisions: [D-062]
+    rationale: >-
+      AlignmentStep.qualityCategory (AlignmentQuality, the MeDIC categories). Data quality:
+      it gates or flags, never feeds strength (D-062).
+  PROV.SA.CONFIDENCE_SCORE:
+    module: provenance
+    disposition: modelled
+    decisions: [D-062, D-063]
+    rationale: >-
+      AlignmentStep.confidence [0,1] with a required confidenceBasis whenever a
+      confidence is given (class rule). chainConfidence is the product of the steps.
+      Line-level confidence + basis sit on SieveEvidenceLine for the D-063 floor.
+  PROV.SA.REVIEW:
+    module: provenance
+    disposition: modelled
+    decisions: [D-052, D-061]
+    rationale: >-
+      AlignmentStep.reviewStatus (MACHINE ... CONFIRMED / REJECTED) with reviewedBy and
+      reviewDate. Kept apart from claim review (AssertionDecision).
+
+  # ------------------------------------------------- PROV: interpretation
+  PROV.INTERP.AGENT:
+    module: provenance
+    disposition: modelled
+    decisions: [D-046, D-049, D-050, D-051, D-052]
+    rationale: >-
+      InterpretationActivity (is_a SieveContribution): contributor, with role and trust
+      AS OF the act (agentRoleAtTime, agentTrustAtTime). participants for collective
+      acts. A software agent carries model and workflow versions (SieveAgent).
+  PROV.INTERP.METHOD_TYPES:
+    module: provenance
+    disposition: modelled
+    rationale: >-
+      InterpretationActivity.methodType: the five-value starting vocabulary
+      (InterpretationMethod).
+  PROV.INTERP.METHODS:
+    module: provenance
+    disposition: modelled
+    decisions: [D-048, D-050, D-054]
+    rationale: >-
+      Core Contribution.specifiedBy (guideline / workflow / prompt version). Rule-based
+      lines name their AggregationRule (SieveEvidenceLine.computedByRule). Required for
+      AI and rule-based lines (profile check).
+  PROV.INTERP.DATE:
+    module: provenance
+    disposition: modelled
+    decisions: [D-049, D-051, D-060]
+    rationale: >-
+      Core Activity.date on InterpretationActivity, required. It anchors the "as of"
+      semantics of the role and trust snapshots.
+  PROV.INTERP.LOCATION:
+    module: provenance
+    disposition: modelled
+    decisions: [D-036, D-051]
+    rationale: >-
+      Optional SieveContribution.context (issue / PR / meeting) and perspective.
+
+  # ------------------------------------------------- PROV: assertion
+  PROV.ASSERTION.AGENT:
+    module: provenance
+    disposition: modelled
+    decisions: [D-002, D-004, D-046, D-048, D-064]
+    rationale: >-
+      AssertionDecision.contributor (signer, or the automated system under a policy).
+      The policy carries its human approver (DecisionPolicy.approvedBy). Collective
+      sign-off uses participants.
+  PROV.ASSERTION.METHOD_TYPES:
+    module: provenance
+    disposition: modelled
+    decisions: [D-017, D-046, D-048, D-064, D-066]
+    rationale: >-
+      AssertionDecision.route (AssertionRoute: individual, consensus, delegated policy,
+      provider authority, batch). Class rule: an automated route can never produce
+      REJECTED (D-064).
+  PROV.ASSERTION.METHODS:
+    module: provenance
+    disposition: modelled
+    decisions: [D-051, D-054, D-063, D-064, D-066]
+    rationale: >-
+      AssertionDecision.aggregationRule, signedPacketVersion, policy, batch.
+      DecisionPolicy and BatchSignOff are first-class versioned artefacts in the registry.
+  PROV.ASSERTION.DATE:
+    module: provenance
+    disposition: modelled
+    decisions: [D-064]
+    rationale: >-
+      Core Activity.date, required on AssertionDecision. SieveStatement.assertionDecisions
+      is a list: the decision history, not only the latest decision.
+  PROV.ASSERTION.LOCATION:
+    module: provenance
+    disposition: modelled
+    decisions: [D-036, D-046, D-064]
+    rationale: >-
+      SieveContribution.context (issue / PR / meeting) and runId (automated run).
+      Axiom-level GitHub sources migrate here, not into evidence.
+  PROV.ASSERTION.CONFIDENCE_CATEGORY:
+    module: statement
+    disposition: modelled
+    decisions: [D-062, D-063]
+    rationale: >-
+      Core Statement.strength = the derived band of S, and AssertionDecision.scoreBand
+      at decision time. No signer-asserted confidence exists in the profile.
+  PROV.ASSERTION.CONFIDENCE_SCORE:
+    module: statement
+    disposition: modelled
+    decisions: [D-063, D-064]
+    rationale: >-
+      Core Statement.score = inclusion score S in [-1, 1]; AssertionDecision.inclusionScore
+      + thresholdPassed record S per decision. AI self-confidence is NOT here (line
+      confidence, D-062).
+
+  # ------------------------------------------------- PROV: encoding
+  PROV.ENCODING.AGENT:
+    module: record-metadata
+    disposition: modelled
+    decisions: [D-065]
+    rationale: Artefact level only. Core recordMetadata on EvidencePacketCollection. Never per claim.
+  PROV.ENCODING.METHOD_TYPES:
+    module: record-metadata
+    disposition: modelled
+    decisions: [D-065]
+    rationale: Artefact level only. Core supportingMethodTypes on EvidencePacketCollection.
+  PROV.ENCODING.METHODS:
+    module: record-metadata
+    disposition: modelled
+    decisions: [D-065, D-012, D-013]
+    rationale: >-
+      EvidencePacketCollection.encodingSpecifications (required, versioned Methods):
+      the meaning-changing export / LinkML-Map rule sets the artefact was produced with.
+  PROV.ENCODING.DATE:
+    module: record-metadata
+    disposition: modelled
+    decisions: [D-065]
+    rationale: Core DataSet.releaseDate on EvidencePacketCollection.
+  PROV.ENCODING.SYSTEM:
+    module: record-metadata
+    disposition: modelled
+    decisions: [D-065]
+    rationale: Core recordMetadata.recordIdentifier on EvidencePacketCollection (artefact location).
+  PROV.ENCODING.VERSION:
+    module: record-metadata
+    disposition: modelled
+    decisions: [D-065, D-051]
+    rationale: Core DataSet.version on EvidencePacketCollection and on each EvidencePacket.
+
+  # ------------------------------------------------- PROV: retrieval
+  PROV.RETRIEVAL.AGENT:
+    module: provenance
+    disposition: modelled
+    decisions: [D-030, D-063]
+    rationale: >-
+      OriginEvent (is_a Activity): core performedBy = the pipeline that carried the
+      claim over. SieveStatement.proposingChannel feeds the claim prior (D-063).
+  PROV.RETRIEVAL.SOURCE_SYSTEM:
+    module: record-metadata
+    disposition: modelled
+    decisions: [D-030, D-031, D-067]
+    rationale: >-
+      OriginEvent.sourceRelease for the origin. RetrievalMetadata.sourceRelease for
+      corroborating items.
+  PROV.RETRIEVAL.SOURCE_ROLE:
+    module: evidence-item
+    disposition: modelled
+    decisions: [D-063, D-067]
+    rationale: >-
+      InformationResource.defaultRole (PRIMARY / AGGREGATOR), overridable per item via
+      UpstreamItem.resourceRoleOverride. Drives independence clustering.
+  PROV.RETRIEVAL.TARGET_SYSTEM: {module: record-metadata, disposition: not_desired, decisions: [D-067], rationale: Always Mondo; downstream systems record their own.}
+  PROV.RETRIEVAL.TARGET_ROLE:
+    module: provenance
+    disposition: modelled
+    decisions: [D-067, D-064]
+    rationale: >-
+      Derivable, not stored: route PROVIDER_AUTHORITY marks content that Mondo passes on
+      as an aggregator.
+  PROV.RETRIEVAL.DATE:
+    module: evidence-line
+    disposition: modelled
+    decisions: [D-030, D-031, D-067]
+    rationale: >-
+      Two dates per origin or line: OriginEvent date = first attached;
+      SieveEvidenceLine.dateAttached and lastConfirmed (+ lastConfirmedAgainst release)
+      make lapsed support detectable.
+  PROV.RETRIEVAL.ORIGINAL_NAMES_IDS:
+    module: record-metadata
+    disposition: modelled
+    decisions: [D-010, D-067]
+    rationale: >-
+      Source id + source label + release at attachment time: OriginEvent.sourceItem /
+      sourceLabel / sourceRelease, and RetrievalMetadata.sourceLabel on items.
+
+  # ------------------------------------------------- CEM: claim-evidence matrix
+  MATRIX.C001: {module: evidence-item, disposition: modelled, decisions: [D-068], rationale: "Permitted evidence-item classes declared on TermExistenceStatement (permitted_evidence annotation), enforced by sieve.profile_checks (EVIDENCE_NOT_PERMITTED)."}
+  MATRIX.C002: {module: evidence-item, disposition: modelled, decisions: [D-068, D-031], rationale: "Publications and web pages only; definition dbxrefs are origin."}
+  MATRIX.C003: {module: evidence-item, disposition: modelled, decisions: [D-068], rationale: Permitted evidence declared on SynonymStatement.}
+  MATRIX.C004: {module: evidence-item, disposition: modelled, decisions: [D-068], rationale: Permitted evidence declared on SubclassStatement.}
+  MATRIX.C005: {module: evidence-item, disposition: modelled, decisions: [D-068, D-033], rationale: "Records and structured prior claims enter as disputing lines; profile check WARNs on a supporting concordance line."}
+  MATRIX.C006: {module: evidence-item, disposition: modelled, decisions: [D-068], rationale: Permitted evidence declared on MappingStatement.}
+  MATRIX.C007: {module: evidence-item, disposition: modelled, decisions: [D-068], rationale: Permitted evidence declared on DiseaseAttributeStatement.}
+  MATRIX.C008: {module: evidence-item, disposition: modelled, decisions: [D-068], rationale: Permitted evidence declared on SubsetMembershipStatement.}
+  MATRIX.C009: {module: evidence-item, disposition: modelled, decisions: [D-068], rationale: Permitted evidence declared on MetaclassStatement.}
+  MATRIX.C010: {module: evidence-item, disposition: modelled, decisions: [D-068], rationale: Permitted evidence declared on ValueSetMembershipStatement.}

@@ -54,9 +54,17 @@ mypy:
 format:
 	uv run ruff check .
 
-# Regenerate the Pydantic datamodel from the canonical SIEVE schema
+# Regenerate the Pydantic datamodel from the SIEVE profile (with the Py3.10 date fix)
 gen-pydantic:
-  uv run gen-pydantic schema/sieve.yaml > src/sieve/datamodel/sieve_models.py
+  uv run python -m sieve.datamodel.codegen schema/sieve.yaml src/sieve/datamodel/sieve_models.py
+
+# Re-extract the requirements TSV from the Mondo requirements workbook
+extract-requirements workbook="../sepio-linkml/docs/requirements-collection/projects/mondo/Mondo_Requirements_Collection_Forms.xlsx":
+  uv run python scripts/extract_requirements.py {{workbook}}
+
+# Regenerate docs/requirements-traceability.md
+gen-traceability:
+  uv run python scripts/render_traceability.py
 
 # ============== Hidden internal recipes ==============
 
