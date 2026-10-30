@@ -1,0 +1,148 @@
+# C007: MONDO:0009061 'cystic fibrosis' has material basis in germline mutation in
+# HGNC:1884 CFTR. An AI agent extracted a passage from PMID:20301428 (illustrative
+# text, quote not checked); OMIM is a concordant structured claim; an expert panel
+# signed off as ONE collective act with three participants (D-046).
+id: sieve:pkt/MONDO_0009061-gene-HGNC_1884
+type: EvidencePacket
+version: "2026-10-12"
+statement:
+  id: sieve:st/MONDO_0009061-gene-HGNC_1884
+  type: DiseaseAttributeStatement
+  subject: MONDO:0009061
+  predicate: {code: RO:0004003, label: has material basis in germline mutation in}
+  object: HGNC:1884
+  reviewState: VERIFIED
+  proposingChannel: CURATOR
+  score: 0.97
+  strength: definitive
+  direction: supports
+  hasEvidenceLines:
+    - id: sieve:el/cf-omim
+      type: SieveEvidenceLine
+      hasEvidenceItems: [sieve:ca/omim-219700-cftr]
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: moderate
+      scoreOfEvidenceProvided: 0.5
+      computedByRule: sieve:rule/gene-disease-v1.3
+      independenceCluster: infores:omim
+      contributions:
+        - id: sieve:act/cf-omim
+          type: InterpretationActivity
+          contributor: sieve:agent/concordance-pipeline
+          date: 2026-10-12
+          methodType: RULE_BASED_STRENGTH
+          specifiedBy: [sieve:method/concordance-workflow]
+          readCoverage: STRUCTURED_RECORD
+    - id: sieve:el/cf-passage
+      type: SieveEvidenceLine
+      hasEvidenceItems: [sieve:tp/pmid-20301428-1]
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.8
+      computedByRule: sieve:rule/gene-disease-v1.3
+      confidence: 0.85
+      confidenceBasis: PRIOR
+      contributions:
+        - id: sieve:act/cf-passage
+          type: InterpretationActivity
+          contributor: sieve:agent/mondo-ai-extractor
+          agentTrustAtTime: 0.7
+          date: 2026-10-10
+          methodType: LLM_JUDGEMENT
+          specifiedBy: [sieve:method/evidence-extraction-prompt]
+          readCoverage: FULL_TEXT
+          accessStatus: OPEN_ACCESS
+          identifierVerified: VERIFIED
+          groundingChecked: VERIFIED
+          soughtDisputingEvidence: true
+          reasoningTrace: https://example.org/traces/cf-passage-2026-10-10
+      statusChanges:
+        - id: sieve:lsc/cf-passage-accept
+          type: LineStatusChange
+          contributor: orcid:0000-0001-5208-3432
+          date: 2026-10-12
+          action: ACCEPTED_UNCHANGED
+  assertionDecisions:
+    - id: sieve:dec/cf-panel
+      type: AssertionDecision
+      contributor: sieve:agent/clingen-panel-example
+      participants:
+        - orcid:0000-0001-9310-0163
+        - orcid:0000-0002-4142-7153
+        - orcid:0000-0001-5208-3432
+      agentTrustAtTime: 1.0
+      date: 2026-10-12
+      outcome: ACCEPTED
+      route: CONSENSUS_SIGN_OFF
+      inclusionScore: 0.97
+      scoreBand: definitive
+      aggregationRule: sieve:rule/gene-disease-v1.3
+      signedPacketVersion: "2026-10-12"
+      perspective: clinical diagnostic
+      context: ["https://example.org/panel-calls/2026-10-12"]
+concordantAssertions:
+  - id: sieve:ca/omim-219700-cftr
+    type: ConcordantAssertion
+    subject: OMIM:219700
+    predicate: {code: RO:0004003}
+    object: OMIM:602421
+    reportedIn: [OMIM:219700]
+    resource: infores:omim
+textPassages:
+  - id: sieve:tp/pmid-20301428-1
+    type: TextPassage
+    statementText: "Illustrative passage: cystic fibrosis is caused by pathogenic variants in CFTR."
+    reportedIn: [PMID:20301428]
+    documentVersion: "2025-01"
+    textLocation: {section: Molecular Genetics, charStart: 1200, charEnd: 1278}
+    quoteVerification: NOT_CHECKED
+    contributions:
+      - id: sieve:act/tp-extraction
+        type: SieveContribution
+        contributor: sieve:agent/mondo-ai-extractor
+        role: EXTRACTOR
+        date: 2026-10-10
+        specifiedBy: [sieve:method/evidence-extraction-prompt]
+        runId: mondo-ai-evidence-2026-10-10-r7
+    groundings:
+      - id: sieve:chain/tp-cftr
+        type: ResolutionChain
+        entitySlot: object
+        steps:
+          - id: sieve:step/tp-cftr-1
+            type: AlignmentStep
+            category: EXTRACTION
+            method: LLM
+            inputValue: "CFTR"
+            outputValue: "CFTR"
+            qualityCategory: extraction_verbatim
+            textSpan: {charStart: 1260, charEnd: 1264}
+            spanRole: SECTION_TEXT
+            confidence: 0.85
+            confidenceBasis: PRIOR
+            performedBy: [sieve:agent/mondo-ai-extractor]
+          - id: sieve:step/tp-cftr-2
+            type: AlignmentStep
+            category: GROUNDING
+            method: LEXICAL_MATCH
+            inputValue: "CFTR"
+            outputValue: HGNC:1884
+            qualityCategory: grounding_lexical_exact
+            confidence: 0.99
+            confidenceBasis: MEASURED
+externalRecords:
+  - id: OMIM:219700
+    type: ExternalRecord
+    label: CYSTIC FIBROSIS; CF
+    resource: infores:omim
+    recordMetadata:
+      retrievedFrom: infores:omim
+      sourceRelease: sieve:release/omim-2026-10-01
+      retrievalDate: 2026-10-02
+publications:
+  - id: PMID:20301428
+    type: Publication
+    pmid: "20301428"
+    resource: infores:pubmed
+    generationContext:
+      - {code: "PT:review", label: Review}

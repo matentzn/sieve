@@ -1,0 +1,123 @@
+# C005: MONDO:0008608 'Down syndrome' excluded_subClassOf MONDO:0003847 'hereditary disease'.
+# DOID asserts the positive subclass, which DISPUTES Mondo's negative claim (D-033);
+# the curator's judgement supports it. Accepted 2022, re-confirmed 2026 after the
+# disputing line was recomputed (PROV.ASSERTION.DATE example in the workbook).
+id: sieve:pkt/MONDO_0008608-excl-MONDO_0003847
+type: EvidencePacket
+version: "2026-10-20"
+previousVersion: "2022-05-03"
+statement:
+  id: sieve:st/MONDO_0008608-excl-MONDO_0003847
+  type: NegativeSubclassStatement
+  subject: MONDO:0008608
+  predicate: {code: rdfs:subClassOf, label: subClassOf}
+  object: MONDO:0003847
+  negated: true
+  statementText: Down syndrome is not a subclass of hereditary disease.
+  reviewState: VERIFIED
+  proposingChannel: CURATOR
+  score: 0.46
+  strength: moderate
+  direction: supports
+  hasEvidenceLines:
+    - id: sieve:el/ds-doid-dispute
+      type: SieveEvidenceLine
+      hasEvidenceItems: [sieve:ca/doid-14250-isa-630]
+      directionOfEvidenceProvided: disputes
+      strengthOfEvidenceProvided: moderate
+      scoreOfEvidenceProvided: 0.5
+      computedByRule: sieve:rule/negative-subclass-v1.0
+      confidence: 1.0
+      confidenceBasis: DETERMINISTIC
+      independenceCluster: infores:omim
+      dateAttached: 2022-05-03
+      lastConfirmed: 2026-10-01
+      lastConfirmedAgainst: sieve:release/doid-2026-09-01
+      contributions:
+        - id: sieve:act/ds-doid-concordance
+          type: InterpretationActivity
+          contributor: sieve:agent/concordance-pipeline
+          role: INTERPRETER
+          date: 2026-10-20
+          methodType: COMPUTED_CONCORDANCE
+          specifiedBy: [sieve:method/concordance-workflow]
+          readCoverage: STRUCTURED_RECORD
+          runId: concordance-2026-10-20-r1
+    - id: sieve:el/ds-curator-judgement
+      type: SieveEvidenceLine
+      hasEvidenceItems: [DOID:14250]
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.8
+      computedByRule: sieve:rule/negative-subclass-v1.0
+      contributions:
+        - id: sieve:act/ds-curator-judgement
+          type: InterpretationActivity
+          contributor: orcid:0000-0001-5208-3432
+          role: CURATOR
+          agentRoleAtTime: core curator
+          agentTrustAtTime: 0.8
+          date: 2022-05-03
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: STRUCTURED_RECORD
+          rationale: Trisomy 21 arises de novo in almost all cases; it is genetic but not hereditary.
+  assertionDecisions:
+    - id: sieve:dec/ds-excl-2022
+      type: AssertionDecision
+      contributor: orcid:0000-0001-5208-3432
+      agentRoleAtTime: core curator
+      agentTrustAtTime: 0.8
+      date: 2022-05-03
+      outcome: ACCEPTED
+      route: INDIVIDUAL_SIGN_OFF
+      signedPacketVersion: "2022-05-03"
+    - id: sieve:dec/ds-excl-2026
+      type: AssertionDecision
+      contributor: orcid:0000-0001-5208-3432
+      date: 2026-10-20
+      outcome: CONTROVERSIAL
+      route: INDIVIDUAL_SIGN_OFF
+      inclusionScore: 0.46
+      scoreBand: moderate
+      aggregationRule: sieve:rule/negative-subclass-v1.0
+      signedPacketVersion: "2026-10-20"
+      context: ["https://github.com/monarch-initiative/mondo/issues/6004"]
+      rationale: Kept despite DOID's positive subclass.
+concordantAssertions:
+  - id: sieve:ca/doid-14250-isa-630
+    type: ConcordantAssertion
+    subject: DOID:14250
+    predicate: {code: rdfs:subClassOf}
+    object: DOID:630
+    reportedIn: [DOID:14250]
+    resource: infores:disease-ontology
+    groundings:
+      - id: sieve:chain/doid-14250
+        type: ResolutionChain
+        entitySlot: subject
+        date: 2026-10-20
+        chainConfidence: 1.0
+        steps:
+          - id: sieve:step/doid-14250-1
+            type: AlignmentStep
+            category: GROUNDING
+            method: STRUCTURED_FIELD
+            inputValue: DOID:14250
+            outputValue: MONDO:0008608
+            predicate: skos:exactMatch
+            mappingSet: http://purl.obolibrary.org/obo/mondo/mappings/mondo.sssom.tsv
+            mappingSetVersion: "2026-10-01"
+            qualityCategory: grounding_curated
+            confidence: 1.0
+            confidenceBasis: DETERMINISTIC
+            reviewStatus: CONFIRMED
+externalRecords:
+  - id: DOID:14250
+    type: ExternalRecord
+    label: Down syndrome
+    resource: infores:disease-ontology
+    recordMetadata:
+      retrievedFrom: infores:disease-ontology
+      sourceRelease: sieve:release/doid-2026-09-01
+      retrievalDate: 2026-09-15
+      sourceLabel: Down syndrome

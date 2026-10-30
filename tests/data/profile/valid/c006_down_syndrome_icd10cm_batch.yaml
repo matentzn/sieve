@@ -1,0 +1,80 @@
+# C006: MONDO:0008608 'Down syndrome' skos:exactMatch ICD10CM:Q90, approved in a
+# batch sign-off (D-066) after eyeballing; lexical score + OMIM-derived concordance.
+id: sieve:pkt/MONDO_0008608-exact-ICD10CM_Q90
+type: EvidencePacket
+version: "2026-10-25"
+statement:
+  id: sieve:st/MONDO_0008608-exact-ICD10CM_Q90
+  type: MappingStatement
+  subject: MONDO:0008608
+  predicate: {code: skos:exactMatch}
+  object: ICD10CM:Q90
+  preferred: true
+  validDirection: BOTH
+  reviewState: VERIFIED
+  proposingChannel: LEXICAL_PIPELINE
+  score: 0.93
+  strength: strong
+  direction: supports
+  hasEvidenceFromSources: [infores:icd10cm]
+  hasEvidenceLines:
+    - id: sieve:el/q90-lexical
+      type: SieveEvidenceLine
+      hasEvidenceItems: [sieve:score/q90-lexical]
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: weak
+      scoreOfEvidenceProvided: 0.3
+      computedByRule: sieve:rule/mapping-v1.0
+      contributions:
+        - id: sieve:act/q90-lexical
+          type: InterpretationActivity
+          contributor: sieve:agent/concordance-pipeline
+          date: 2026-10-24
+          methodType: RULE_BASED_STRENGTH
+          specifiedBy: [sieve:method/mondo-mapping-guide]
+    - id: sieve:el/q90-record
+      type: SieveEvidenceLine
+      hasEvidenceItems: [ICD10CM:Q90]
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.8
+      computedByRule: sieve:rule/mapping-v1.0
+      contributions:
+        - id: sieve:act/q90-record
+          type: InterpretationActivity
+          contributor: orcid:0000-0001-5208-3432
+          date: 2026-10-25
+          methodType: EXPERT_JUDGEMENT
+          specifiedBy: [sieve:method/mondo-mapping-guide]
+          readCoverage: STRUCTURED_RECORD
+  assertionDecisions:
+    - id: sieve:dec/q90-batch
+      type: AssertionDecision
+      contributor: orcid:0000-0001-5208-3432
+      date: 2026-10-25
+      outcome: ACCEPTED
+      route: BATCH_SIGN_OFF
+      batch: sieve:batch/mappings-2026-10-25
+      reviewDepth: EYEBALLED
+      inclusionScore: 0.93
+      scoreBand: strong
+      aggregationRule: sieve:rule/mapping-v1.0
+      signedPacketVersion: "2026-10-25"
+externalRecords:
+  - id: ICD10CM:Q90
+    type: ExternalRecord
+    label: Down syndrome
+    resource: infores:icd10cm
+    obsoleteInSource: false
+    recordMetadata:
+      retrievedFrom: infores:icd10cm
+      sourceRelease: sieve:release/icd10cm-2026
+      retrievalDate: 2026-10-01
+      sourceLabel: Down syndrome
+computationalScores:
+  - id: sieve:score/q90-lexical
+    type: ComputationalScore
+    value: "0.97"
+    specifiedBy: [sieve:method/lexmatch]
+    softwareVersion: oak-0.6
+    parameters: "normalize=true"

@@ -1,0 +1,94 @@
+# C003: MONDO:0012297 has exact synonym 'SPOAN syndrome', auto-accepted under
+# synonym-policy v2 at S = 0.86 (workbook PROV.ASSERTION.METHODS example).
+id: sieve:pkt/MONDO_0012297-syn-SPOAN
+type: EvidencePacket
+version: "2026-10-20"
+statement:
+  id: sieve:st/MONDO_0012297-syn-SPOAN
+  type: SynonymStatement
+  subject: MONDO:0012297
+  predicate: {code: oboInOwl:hasExactSynonym}
+  object: SPOAN syndrome
+  reviewState: NOT_VERIFIED
+  proposingChannel: SOURCE_INGEST
+  score: 0.86
+  strength: strong
+  direction: supports
+  origin:
+    - id: sieve:origin/spoan-omim
+      type: OriginEvent
+      derivationType: COPIED_FROM
+      sourceItem: OMIM:609541
+      sourceLabel: SPOAN syndrome
+      sourceRelease: sieve:release/omim-2019-04-30
+      performedBy: [sieve:agent/concordance-pipeline]
+      date: 2019-05-02
+  hasEvidenceLines:
+    - id: sieve:el/spoan-omim
+      type: SieveEvidenceLine
+      hasEvidenceItems: [sieve:ca/omim-609541-syn]
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.9
+      computedByRule: sieve:rule/synonym-v1.1
+      confidence: 1.0
+      confidenceBasis: DETERMINISTIC
+      dateAttached: 2019-05-02
+      lastConfirmed: 2026-10-01
+      lastConfirmedAgainst: sieve:release/omim-2026-10-01
+      contributions:
+        - id: sieve:act/spoan-omim
+          type: InterpretationActivity
+          contributor: sieve:agent/concordance-pipeline
+          date: 2026-10-20
+          methodType: COMPUTED_CONCORDANCE
+          specifiedBy: [sieve:method/concordance-workflow]
+          readCoverage: STRUCTURED_RECORD
+  assertionDecisions:
+    - id: sieve:dec/spoan-policy
+      type: AssertionDecision
+      contributor: sieve:agent/policy-runner
+      date: 2026-10-20
+      outcome: ACCEPTED
+      route: DELEGATED_POLICY
+      policy: sieve:policy/synonym-v2
+      inclusionScore: 0.86
+      scoreBand: strong
+      thresholdPassed: 0.8
+      aggregationRule: sieve:rule/synonym-v1.1
+      signedPacketVersion: "2026-10-20"
+      runId: mondo-ai-synonym-batch-2026-10-20-r3
+concordantAssertions:
+  - id: sieve:ca/omim-609541-syn
+    type: ConcordantAssertion
+    subject: OMIM:609541
+    predicate: {code: oboInOwl:hasExactSynonym}
+    object: SPOAN syndrome
+    reportedIn: [OMIM:609541]
+    resource: infores:omim
+    groundings:
+      - id: sieve:chain/omim-609541
+        type: ResolutionChain
+        entitySlot: subject
+        steps:
+          - id: sieve:step/omim-609541-1
+            type: AlignmentStep
+            category: GROUNDING
+            method: SOURCE_ASSERTED
+            inputValue: OMIM:609541
+            outputValue: MONDO:0012297
+            predicate: skos:exactMatch
+            mappingSetVersion: "2026-10-01"
+            qualityCategory: grounding_curated
+            confidence: 1.0
+            confidenceBasis: DETERMINISTIC
+externalRecords:
+  - id: OMIM:609541
+    type: ExternalRecord
+    resource: infores:omim
+    generationContext:
+      - {code: "sieve:basis_unknown"}
+    recordMetadata:
+      retrievedFrom: infores:omim
+      sourceRelease: sieve:release/omim-2026-10-01
+      retrievalDate: 2026-10-02

@@ -1,0 +1,122 @@
+# Shared reference data for the profile example packets (SieveRegistry).
+# Identifiers of rules, policies, pipelines and the panel are illustrative.
+id: sieve:registry/example
+type: SieveRegistry
+version: "2026-10-29"
+resources:
+  - id: infores:omim
+    type: InformationResource
+    label: OMIM
+    curiePrefixes: [OMIM]
+    defaultRole: PRIMARY
+    qualityRatings:
+      - {level: 0.9, category: high, validFrom: 2026-01-01}
+  - id: infores:disease-ontology
+    type: InformationResource
+    label: Disease Ontology
+    curiePrefixes: [DOID]
+    defaultRole: PRIMARY
+    derivesContentFrom: [infores:omim]
+    qualityRatings:
+      - {level: 0.8, category: high, validFrom: 2026-01-01}
+  - id: infores:medgen
+    type: InformationResource
+    label: MedGen
+    curiePrefixes: [MEDGEN, UMLS]
+    defaultRole: AGGREGATOR
+    derivesContentFrom: [infores:omim]
+    qualityRatings:
+      - {level: 0.6, category: moderate, validFrom: 2026-01-01}
+  - id: infores:icd10cm
+    type: InformationResource
+    label: ICD-10-CM
+    curiePrefixes: [ICD10CM]
+    defaultRole: PRIMARY
+  - id: infores:pubmed
+    type: InformationResource
+    label: PubMed
+    curiePrefixes: [PMID]
+    defaultRole: PRIMARY
+releases:
+  - {id: sieve:release/doid-2026-09-01, type: SourceRelease, ofResource: infores:disease-ontology, version: "2026-09-01", releaseDate: "2026-09-01"}
+  - {id: sieve:release/omim-2019-04-30, type: SourceRelease, ofResource: infores:omim, version: "2019-04-30"}
+  - {id: sieve:release/omim-2026-10-01, type: SourceRelease, ofResource: infores:omim, version: "2026-10-01", releaseDate: "2026-10-01"}
+  - {id: sieve:release/icd10cm-2026, type: SourceRelease, ofResource: infores:icd10cm, version: "2026"}
+agents:
+  - id: orcid:0000-0001-5208-3432
+    type: SieveAgent
+    subtype: person
+    roles:
+      - {value: core curator, validFrom: 2018-01-01}
+    trustLevels:
+      - {value: curator, level: 0.8, validFrom: 2018-01-01}
+  - id: sieve:agent/clingen-panel-example
+    type: SieveAgent
+    subtype: organization
+    name: ClinGen expert panel (illustrative)
+    trustLevels:
+      - {value: authority, level: 1.0, validFrom: 2020-01-01, domain: gene-disease}
+  - id: sieve:agent/mondo-ai-extractor
+    type: SieveAgent
+    subtype: software
+    name: mondo-ai evidence agent
+    softwareVersion: 0.9.2
+    modelName: example-llm-2026-06
+    trustLevels:
+      - {value: ai-agent, level: 0.7, validFrom: 2026-06-01}
+  - id: sieve:agent/concordance-pipeline
+    type: SieveAgent
+    subtype: software
+    name: SPO concordance pipeline
+    softwareVersion: 1.4.0
+  - id: sieve:agent/policy-runner
+    type: SieveAgent
+    subtype: software
+    name: mondo-ai policy runner
+    softwareVersion: 0.3.0
+methods:
+  - {id: sieve:method/concordance-workflow, type: SieveMethod, version: "1.4"}
+  - {id: sieve:method/evidence-extraction-prompt, type: SieveMethod, version: "2026-09"}
+  - {id: sieve:method/mondo-mapping-guide, type: SieveMethod, version: "2026-03"}
+  - {id: sieve:method/statement-view-map, type: SieveMethod, label: LinkML-Map mondo_to_sepio.yaml, version: "0.3"}
+aggregationRules:
+  - id: sieve:rule/synonym-v1.1
+    type: AggregationRule
+    version: "1.1"
+    claimType: SynonymStatement
+    strengthBands: ["strong >= 0.8", "moderate >= 0.4", "weak < 0.4"]
+    confidenceFloor: 0.3
+  - id: sieve:rule/gene-disease-v1.3
+    type: AggregationRule
+    version: "1.3"
+    claimType: DiseaseAttributeStatement
+    strengthBands: ["definitive >= 0.9", "strong >= 0.7", "moderate >= 0.4", "limited < 0.4"]
+  - id: sieve:rule/negative-subclass-v1.0
+    type: AggregationRule
+    version: "1.0"
+    claimType: NegativeSubclassStatement
+    strengthBands: ["strong >= 0.8", "moderate >= 0.4", "weak < 0.4"]
+  - id: sieve:rule/mapping-v1.0
+    type: AggregationRule
+    version: "1.0"
+    claimType: MappingStatement
+    strengthBands: ["strong >= 0.8", "moderate >= 0.4", "weak < 0.4"]
+policies:
+  - id: sieve:policy/synonym-v2
+    type: DecisionPolicy
+    version: "2"
+    approvedBy: orcid:0000-0001-5208-3432
+    approvalDate: 2026-10-01
+    scopeClaimTypes: [SynonymStatement]
+    scopeChannels: [SOURCE_INGEST]
+    acceptanceThreshold: 0.8
+    usesRules: [sieve:rule/synonym-v1.1]
+batches:
+  - id: sieve:batch/mappings-2026-10-25
+    type: BatchSignOff
+    performedBy: [orcid:0000-0001-5208-3432]
+    date: 2026-10-25
+    filterQuery: "claimType = MappingStatement AND S >= 0.9 AND hasSupportingLineFrom = infores:omim AND rule = sieve:rule/mapping-v1.0"
+    resultSet: ["sieve:pkt/MONDO_0008608-exact-ICD10CM_Q90@2026-10-25"]
+    reviewBands: ["0.95-1.00 NONE", "0.90-0.95 EYEBALLED"]
+    spotCheckErrors: 0
