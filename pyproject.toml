@@ -39,6 +39,7 @@ dev = [
     "mknotebooks>= 0.8.0",
     "pytest>=7.0.0",
     "linkml-map>=0.4.0",
+    "openpyxl>=3.1.5",
 ]
 
 [project.scripts]
