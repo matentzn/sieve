@@ -1,33 +1,50 @@
 ---
 id: https://w3id.org/sieve
 name: sieve
-title: Sieve - Evidence Packets for Assertion Curation
+title: SIEVE - a SEPIO profile for evidence-based curation of Mondo claims
 description: |-
-  A model for evidence-based curation of semantic assertions
-  (ontology axioms, knowledge graph triples, etc.).
+  SIEVE is a profile of the SEPIO core information model (schema/sepio_core.yaml,
+  imported unchanged). Every class here specialises a SEPIO core class. Every
+  inherited slot keeps or narrows its core range. Nothing in the core is redefined.
 
-  Core concept: An EvidencePacket bundles a statement with evidence
-  supporting or disputing it, plus curation workflow status.
+  The profile is driven by the Mondo requirements collection
+  (requirements/mondo_requirements.tsv). Each class, slot, enum and permissible value
+  that realises a requirement carries it in `annotations.requirements`
+  (space-separated requirement IDs) and, where a modelling decision lies behind it,
+  in `annotations.decisions` (Mondo decision-log IDs). requirements/traceability.yaml
+  assigns every requirement to a SEPIO design module and a disposition.
+  tests/test_traceability.py keeps both sides consistent.
 
-  Evidence model aligned with SEPIO (Scientific Evidence and Provenance
-  Information Ontology).
+  Shape of the data: one EvidencePacket per claim. It holds one claim-type
+  Statement (view B of D-041: identified, reified statement objects), the evidence
+  items its lines refer to, and a version. Rules, policies, agents and information
+  resources are shared reference data held in a SieveRegistry.
 
+  Profile conventions: names follow the core's camelCase. Narrowed core slots are
+  declared via slot_usage. Value sets for Coding-typed core slots are declared as
+  `bindings` and enforced by sieve.profile_checks, because linkml-validate does not
+  enforce bindings.
 license: Apache Software License 2.0
 see_also:
-  - https://github.com/monarch-initiative/sieve
-  - https://sepio-framework.github.io/sepio-linkml
+  - https://github.com/matentzn/sieve
+  - https://github.com/sepio-framework/sepio-linkml
 
 prefixes:
   sieve: https://w3id.org/sieve/
-  sepio: https://w3id.org/sepio/
   linkml: https://w3id.org/linkml/
+  sepio-model: https://example.org/sepio-model/
+  rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
   rdfs: http://www.w3.org/2000/01/rdf-schema#
   owl: http://www.w3.org/2002/07/owl#
-  obo: http://purl.obolibrary.org/obo/
-  eco: http://purl.obolibrary.org/obo/ECO_
+  skos: http://www.w3.org/2004/02/skos/core#
+  oboInOwl: http://www.geneontology.org/formats/oboInOwl#
+  mondoRel: http://purl.obolibrary.org/obo/mondo#
   MONDO: http://purl.obolibrary.org/obo/MONDO_
-  DOID: http://purl.obolibrary.org/obo/DOID_
-  PMID: http://www.ncbi.nlm.nih.gov/pubmed/
+  IAO: http://purl.obolibrary.org/obo/IAO_
+  OMO: http://purl.obolibrary.org/obo/OMO_
+  RO: http://purl.obolibrary.org/obo/RO_
+  semapv: https://w3id.org/semapv/vocab/
+  infores: https://w3id.org/infores/
   orcid: https://orcid.org/
 
 default_prefix: sieve
@@ -35,419 +52,1981 @@ default_range: string
 
 imports:
   - linkml:types
-  - sepio_classes
-
+  - sepio_core
 
 classes:
 
   # ===========================================================================
-  # Core Classes
+  # Containers
   # ===========================================================================
 
   EvidencePacket:
-    description: >-
-      A bundle containing a statement (assertion) along with evidence lines
-      supporting or disputing it, and curation workflow status.
+    is_a: DataSet
     tree_root: true
+    description: >-
+      One claim, the evidence it rests on, and a version. A packet is the unit a
+      human signs off: every AssertionDecision names the packet version it was given
+      on. Packets are never deleted. A rejected claim stays on record with its
+      evidence and decisions.
+    annotations:
+      requirements: CS.REIFIED_OBJECT EINT.CONTRADICTION PROV.ENCODING.VERSION
+      decisions: D-041 D-051 D-053
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      version:
+        required: true
+        description: >-
+          Version of this packet snapshot. A change to its lines, items or score
+          creates a new version, so a sign-off on an older version can be told apart.
+        annotations:
+          requirements: PROV.ENCODING.VERSION
+          decisions: D-051
+    attributes:
+      statement:
+        range: SieveStatement
+        inlined: true
+        required: true
+        description: The claim this packet is about.
+      previousVersion:
+        range: string
+        description: The packet version this snapshot supersedes.
+        annotations:
+          decisions: D-051
+      externalRecords:
+        range: ExternalRecord
+        multivalued: true
+        inlined_as_list: true
+        description: External database / terminology records referenced as evidence or origin.
+      concordantAssertions:
+        range: ConcordantAssertion
+        multivalued: true
+        inlined_as_list: true
+        description: Structured prior claims made by other sources.
+      textPassages:
+        range: TextPassage
+        multivalued: true
+        inlined_as_list: true
+        description: Text passages extracted from documents (records created in the Mondo ecosystem).
+      publications:
+        range: Publication
+        multivalued: true
+        inlined_as_list: true
+        description: Scientific publications referenced as evidence or origin.
+      webPages:
+        range: WebPage
+        multivalued: true
+        inlined_as_list: true
+        description: Non-scholarly web pages referenced as evidence or origin.
+      guidelines:
+        range: GuidelineDocument
+        multivalued: true
+        inlined_as_list: true
+        description: Guideline / consensus documents referenced as evidence.
+      computationalScores:
+        range: ComputationalScore
+        multivalued: true
+        inlined_as_list: true
+        description: Computed scores (lexical match, Boomer, AI scores) referenced as evidence.
+
+  EvidencePacketCollection:
+    is_a: DataSet
+    description: >-
+      A released artefact holding many packets, e.g. a statement-view dump.
+      Encoding provenance is recorded here at artefact level and never per claim
+      (D-065).
+    annotations:
+      requirements: PROV.ENCODING.AGENT PROV.ENCODING.METHOD_TYPES PROV.ENCODING.METHODS PROV.ENCODING.DATE PROV.ENCODING.SYSTEM PROV.ENCODING.VERSION
+      decisions: D-065
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      recordMetadata:
+        description: >-
+          Artefact-level encoding provenance: recordIdentifier = where the artefact
+          lives; contributions = the pipeline that serialised it.
+        annotations:
+          requirements: PROV.ENCODING.AGENT PROV.ENCODING.SYSTEM
+      supportingMethodTypes:
+        description: Kinds of encoding used (LinkML-Map, SSSOM export, OWL serialisation).
+        annotations:
+          requirements: PROV.ENCODING.METHOD_TYPES
+      releaseDate:
+        annotations:
+          requirements: PROV.ENCODING.DATE
+      version:
+        annotations:
+          requirements: PROV.ENCODING.VERSION
+    attributes:
+      packets:
+        range: EvidencePacket
+        multivalued: true
+        inlined_as_list: true
+      encodingSpecifications:
+        range: SieveMethod
+        multivalued: true
+        required: true
+        description: >-
+          The meaning-changing transforms this artefact was produced with (SKOS/SSSOM
+          export rules, the LinkML-Map statement view), each a versioned Method. "Why is
+          this an exactMatch?" resolves to "claim X, translated by rule set R vN".
+        annotations:
+          requirements: PROV.ENCODING.METHODS
+          decisions: D-065 D-012 D-013 D-042
+
+  SieveRegistry:
+    is_a: DataSet
+    description: >-
+      Shared reference data, maintained once and referenced by id from packets:
+      information resources (with quality and role), agents (with role and trust),
+      rules, policies and batch sign-offs.
+    annotations:
+      decisions: D-049 D-054 D-055 D-060 D-064 D-066
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+    attributes:
+      resources:
+        range: InformationResource
+        multivalued: true
+        inlined_as_list: true
+      releases:
+        range: SourceRelease
+        multivalued: true
+        inlined_as_list: true
+      agents:
+        range: SieveAgent
+        multivalued: true
+        inlined_as_list: true
+      methods:
+        range: SieveMethod
+        multivalued: true
+        inlined_as_list: true
+        description: Guidelines, workflows, export rule sets.
+      aggregationRules:
+        range: AggregationRule
+        multivalued: true
+        inlined_as_list: true
+      policies:
+        range: DecisionPolicy
+        multivalued: true
+        inlined_as_list: true
+      batches:
+        range: BatchSignOff
+        multivalued: true
+        inlined_as_list: true
+
+  # ===========================================================================
+  # Module: statement
+  # ===========================================================================
+
+  SieveStatement:
+    is_a: Statement
+    abstract: true
+    description: >-
+      A Mondo claim as an identified SEPIO Statement. SPO sits directly on the
+      Statement. There are no Proposition objects. Each concrete subclass is one claim
+      type and binds the predicate to that type's value set. The Statement-level
+      assessment uses the core's "proposition assessment mode": score = the inclusion
+      score S, strength = its band, direction = its sign.
+    annotations:
+      requirements: CS.REIFIED_OBJECT RCS.STRUCTURED_STATEMENT EINT.REQUIRED
+      decisions: D-041 D-042 D-045
+    comments:
+      - >-
+        The core `proposition` slot is inherited but unused (RCS.STRUCTURED_PROPOSITION
+        = N, D-042). Concordance and dispute are matched on subject / predicate / object
+        + negated.
+    slot_usage:
+      id:
+        identifier: true
+        description: Stable statement identifier, so evidence can attach to entailed axioms too (D-018).
+        annotations:
+          requirements: CS.REIFIED_OBJECT
+          decisions: D-018
+      type:
+        designates_type: true
+      proposition:
+        description: >-
+          Not used by this profile. SPO sits on the Statement, and concordance and
+          dispute are matched on SPO + negated.
+        annotations:
+          requirements: RCS.STRUCTURED_PROPOSITION
+          decisions: D-042
+      subject:
+        range: uriorcurie
+        required: true
+        description: The Mondo term the claim is about.
+        annotations:
+          requirements: RCS.STRUCTURED_STATEMENT
+      predicate:
+        required: true
+        annotations:
+          requirements: RCS.STRUCTURED_STATEMENT
+          decisions: D-006 D-042
+      object:
+        required: true
+        annotations:
+          requirements: RCS.STRUCTURED_STATEMENT
+      statementText:
+        description: Optional human-readable rendering of the claim (e.g. generated for review).
+        annotations:
+          requirements: RCS.FREE_TEXT
+      direction:
+        range: Direction
+        description: Sign of the inclusion score S (supports = S > 0, disputes = S < 0).
+        annotations:
+          requirements: PROV.ASSERTION.CONFIDENCE_SCORE
+          decisions: D-063
+      score:
+        minimum_value: -1
+        maximum_value: 1
+        description: >-
+          The current inclusion score S in [-1, 1], computed by the claim type's
+          AggregationRule (S = tanh(L/2)). Not a signer-asserted confidence.
+        annotations:
+          requirements: PROV.ASSERTION.CONFIDENCE_SCORE EINT.NUMERICAL_STRENGTH
+          decisions: D-047 D-048 D-063
+      strength:
+        description: >-
+          The band of S (e.g. strong / moderate / weak), as declared by the rule that
+          computed S. Derived, versioned with the rule, never asserted freehand.
+        annotations:
+          requirements: PROV.ASSERTION.CONFIDENCE_CATEGORY EINT.CATEGORICAL_STRENGTH
+          decisions: D-062 D-063
+      hasEvidenceLines:
+        range: SieveEvidenceLine
+        inlined_as_list: true
+        description: The evidence lines interpreting evidence for or against this claim.
+        annotations:
+          requirements: EINT.REQUIRED
+          decisions: D-045
+      hasEvidence:
+        range: EvidenceItem
+        inlined: false
+        description: >-
+          Direct claim-to-item links with no interpretation (lightweight consumption).
+          The values are ids of items in the packet.
+        annotations:
+          requirements: EINT.DIRECT_EVIDENCE
+          decisions: D-037 D-041
+      hasEvidenceFromSources:
+        range: InformationResource
+        inlined: false
+        description: >-
+          Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).
+        annotations:
+          requirements: EINT.SOURCE_ONLY
+          decisions: D-025
+      contributions:
+        range: SieveContribution
+        inlined_as_list: true
+        description: >-
+          Non-asserting roles agents play on the claim: provider, stakeholder,
+          endorser. Who asserted it is the contributor of an AssertionDecision.
+        annotations:
+          requirements: PROV.ASSERTION.AGENT C003 C008
+          decisions: D-002 D-004 D-034
+    attributes:
+      negated:
+        range: boolean
+        ifabsent: "false"
+        description: >-
+          Negative polarity: the claim is that subject-predicate-object does NOT hold.
+          Profile-level specialisation of the core Proposition.negated, needed because
+          this profile carries SPO on the Statement.
+        annotations:
+          requirements: RCS.QUALIFIERS C005
+          decisions: D-032
+      reviewState:
+        range: ReviewState
+        required: true
+        ifabsent: string(NOT_VERIFIED)
+        description: Where the claim is in the curation workflow (distinct from the decision outcome).
+        annotations:
+          requirements: C006
+          decisions: D-011 D-017 D-024 D-053
+      assertionDecisions:
+        range: AssertionDecision
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          The decision history: every sign-off, policy-based acceptance, batch
+          approval or rejection, oldest first. Claims are re-evaluated when rules,
+          policies or evidence change, so this is a list, not a single value.
+        annotations:
+          requirements: EINT.REQUIRED PROV.ASSERTION.DATE EINT.CONTRADICTION
+          decisions: D-045 D-053 D-064
+      origin:
+        range: OriginEvent
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Provenance of origin: where the claim (or term) was copied, cloned or
+          adapted from, and when. Kept apart from evidence, which is corroboration.
+        annotations:
+          requirements: C001 C002 PROV.RETRIEVAL.AGENT PROV.RETRIEVAL.SOURCE_SYSTEM PROV.RETRIEVAL.DATE
+          decisions: D-030 D-031
+      proposingChannel:
+        range: ProposingChannel
+        description: >-
+          The channel that proposed the claim. Together with the claim type it selects
+          the claim prior L0 of the inclusion score.
+        annotations:
+          requirements: PROV.RETRIEVAL.AGENT
+          decisions: D-063
+
+  TermExistenceStatement:
+    is_a: SieveStatement
+    description: >-
+      C001: the term exists as a Mondo disease concept, is obsolete, is replaced by,
+      or should be considered instead of another term. The most critical claim type
+      for Mondo: its origin ("cloned from X") must be distinguishable from any
+      exact-match evidence.
+    annotations:
+      requirements: C001 MATRIX.C001
+      decisions: D-030 D-039
+      permitted_evidence: ExternalRecord ConcordantAssertion Publication GuidelineDocument
+    slot_usage:
+      predicate:
+        bindings:
+          - range: TermExistencePredicate
+            binds_value_of: code
+            obligation_level: REQUIRED
+        annotations:
+          requirements: C001
+      object:
+        description: >-
+          rdf:type -> MONDO:0000001; owl:deprecated -> "true"; replaced by / consider ->
+          the replacement term CURIE.
+    attributes:
+      obsolescenceReason:
+        range: uriorcurie
+        description: Reason for obsoletion (OMO term, e.g. OMO:0001000 out of scope).
+        annotations:
+          requirements: C001 RCS.QUALIFIERS
+      scheduledObsoletionDate:
+        range: date
+        description: Announced date of a scheduled obsoletion.
+        annotations:
+          requirements: C001 RCS.QUALIFIERS
+
+  DefinitionStatement:
+    is_a: SieveStatement
+    description: >-
+      C002: the term has this textual definition. Definition dbxrefs are origin with
+      derivation type INSPIRED_BY, not evidence. A live term's definition with no
+      evidence and no origin is valid but a WARNING (curation backlog).
+    annotations:
+      requirements: C002 MATRIX.C002
+      decisions: D-020 D-029 D-031
+      permitted_evidence: Publication WebPage
+    slot_usage:
+      predicate:
+        bindings:
+          - range: DefinitionPredicate
+            binds_value_of: code
+            obligation_level: REQUIRED
+        annotations:
+          requirements: C002
+      object:
+        description: The definition text.
+
+  SynonymStatement:
+    is_a: SieveStatement
+    description: >-
+      C003: the term has this synonym; scope (exact / related / narrow / broad) is the
+      predicate. Support is time-sensitive: a source that drops the name stops
+      supporting it, which is why lines carry lastConfirmed. Synonym types
+      (abbreviation, deprecated, ...) are ordinary term metadata and not modelled.
+    annotations:
+      requirements: C003 MATRIX.C003
+      decisions: D-031 D-034 D-035
+      permitted_evidence: ExternalRecord ConcordantAssertion TextPassage Publication WebPage ComputationalScore
+    slot_usage:
+      predicate:
+        bindings:
+          - range: SynonymPredicate
+            binds_value_of: code
+            obligation_level: REQUIRED
+        annotations:
+          requirements: C003
+      object:
+        description: The synonym text.
+
+  SubclassStatement:
+    is_a: SieveStatement
+    description: >-
+      C004: subclass placement (is_a), or one element of a logical definition
+      (owl:equivalentClass, one statement per intersection_of element). Reasoning
+      status (redundant / entailed) is computed and deliberately not stored. Evidence
+      attaches to entailed axioms like any other.
+    annotations:
+      requirements: C004 MATRIX.C004
+      decisions: D-004 D-018 D-025 D-037
+      permitted_evidence: ExternalRecord ConcordantAssertion TextPassage Publication WebPage GuidelineDocument
+    slot_usage:
+      predicate:
+        bindings:
+          - range: SubclassPredicate
+            binds_value_of: code
+            obligation_level: REQUIRED
+        annotations:
+          requirements: C004
+      object:
+        range: uriorcurie
+
+  NegativeSubclassStatement:
+    is_a: SubclassStatement
+    description: >-
+      C005 (excluded_subClassOf): a claim in its own right that the subject is NOT a
+      subclass of the object, with negated = true. External sources asserting the
+      positive subclass are evidence lines with direction = disputes.
+    annotations:
+      requirements: C005 MATRIX.C005
+      decisions: D-032 D-033
+      permitted_evidence: ExternalRecord ConcordantAssertion Publication
+    slot_usage:
+      negated:
+        required: true
+        description: Must be true (checked by sieve.profile_checks).
+        annotations:
+          requirements: C005
+          decisions: D-032
+
+  MappingStatement:
+    is_a: SieveStatement
+    description: >-
+      C006: a cross-reference with a SKOS predicate taken from the curated precision
+      code. Subject obsolescence is not stored: it is read from the subject term's
+      existence claim. Uncoded mappings and obsolete-to-obsolete mappings are WARNING
+      states that need human review.
+    annotations:
+      requirements: C006 MATRIX.C006
+      decisions: D-006 D-008 D-009 D-011 D-014 D-017
+      permitted_evidence: ExternalRecord ConcordantAssertion ComputationalScore
+    slot_usage:
+      predicate:
+        bindings:
+          - range: MappingPredicate
+            binds_value_of: code
+            obligation_level: REQUIRED
+        annotations:
+          requirements: C006
+          decisions: D-006 D-008 D-014
+      object:
+        range: uriorcurie
+        description: The external term.
+    attributes:
+      objectObsoleteInSourceVersion:
+        range: string
+        description: >-
+          The source release in which the object term is obsolete. Kept for legacy-ID
+          resolution (formerly MONDO:equivalentObsolete).
+        annotations:
+          requirements: C006 RCS.QUALIFIERS
+          decisions: D-010
+      preferred:
+        range: boolean
+        description: >-
+          Preferred among this term's exact matches into the same source (formerly
+          MONDO:preferredExternal). Only valid on skos:exactMatch (profile check: the
+          condition reads inside the predicate Coding, which LinkML rules cannot).
+        annotations:
+          requirements: C006 RCS.QUALIFIERS
+          decisions: D-012
+      validDirection:
+        range: MappingDirection
+        ifabsent: string(BOTH)
+        description: >-
+          The direction(s) in which the mapping may be used for translation. A
+          non-preferred sibling is EXTERNAL_TO_MONDO only: every external duplicate
+          resolves to Mondo, but Mondo translates only to the preferred term.
+        annotations:
+          requirements: C006 RCS.QUALIFIERS
+          decisions: D-012
+
+  DiseaseAttributeStatement:
+    is_a: SieveStatement
+    description: >-
+      C007: a definitional disease attribute (gene basis, characteristic, feature,
+      location, infectious agent, taxon, predisposition). An attribute is in scope
+      only if it is definitional AND mandated by the term's design pattern. That test
+      is computed against the pattern files, so it is not stored. Failing attributes
+      are DisMech candidates.
+    annotations:
+      requirements: C007 MATRIX.C007
+      decisions: D-039 D-020
+      permitted_evidence: ExternalRecord ConcordantAssertion TextPassage Publication WebPage GuidelineDocument
+    slot_usage:
+      predicate:
+        bindings:
+          - range: DiseaseAttributePredicate
+            binds_value_of: code
+            obligation_level: REQUIRED
+        annotations:
+          requirements: C007
+      object:
+        range: uriorcurie
+
+  SubsetMembershipStatement:
+    is_a: SieveStatement
+    description: >-
+      C008: the term is in a Mondo subset. Usually asserted by a provider (GARD,
+      NORD, Orphanet) or declared by a stakeholder (Open Targets, ClinGen); both are
+      contribution roles. Status-flag subsets are term metadata and not modelled.
+    annotations:
+      requirements: C008 MATRIX.C008
+      decisions: D-002 D-035
+      permitted_evidence: ExternalRecord ConcordantAssertion
+    slot_usage:
+      predicate:
+        bindings:
+          - range: SubsetPredicate
+            binds_value_of: code
+            obligation_level: REQUIRED
+        annotations:
+          requirements: C008
+      object:
+        range: uriorcurie
+        description: The subset (e.g. MONDO:gard_rare).
+
+  MetaclassStatement:
+    is_a: SieveStatement
+    description: >-
+      C009 (candidate): the kind of class this term is (grouping, disorder, subtype,
+      susceptibility), as a claim with its own evidence and asserter.
+    annotations:
+      requirements: C009 MATRIX.C009
+      decisions: D-040
+      permitted_evidence: ExternalRecord ConcordantAssertion
+    slot_usage:
+      predicate:
+        bindings:
+          - range: MetaclassPredicate
+            binds_value_of: code
+            obligation_level: REQUIRED
+        annotations:
+          requirements: C009
+      object:
+        range: DiseaseKind
+        annotations:
+          requirements: C009
+
+  ValueSetMembershipStatement:
+    is_a: SieveStatement
+    description: >-
+      C010 (candidate): the term is a member of what an external record covers (e.g.
+      an OMIM included title). This is a membership relation, not a SKOS mapping. The
+      interim skos:relatedMatch rendering is an export rule, not this claim's predicate.
+    annotations:
+      requirements: C010 MATRIX.C010
+      decisions: D-013 D-040
+      permitted_evidence: ExternalRecord ConcordantAssertion
+    slot_usage:
+      predicate:
+        bindings:
+          - range: ValueSetPredicate
+            binds_value_of: code
+            obligation_level: REQUIRED
+        annotations:
+          requirements: C010
+      object:
+        range: uriorcurie
+        description: The external record acting as a set (e.g. OMIM:174800).
+
+  # ===========================================================================
+  # Module: evidence-item
+  # ===========================================================================
+
+  EvidenceItem:
+    mixin: true
+    description: >-
+      Marker mixin for everything an evidence line (or hasEvidence) may point at:
+      each evidence-item class, and SieveEvidenceLine itself (higher-order lines).
+      References are by id. The items live in the packet's typed lists.
+    annotations:
+      requirements: EINT.STACKING
     attributes:
       id:
         identifier: true
-        range: uriorcurie
-        description: Unique identifier for this evidence packet.
-
-      statement:
-        range: SieveStatement
         required: true
-        inlined: true
-        description: The statement/assertion being curated.
 
-      status:
-        range: CurationStatus
-        required: true
-        ifabsent: string(UNREVIEWED)
-        description: Current curation workflow status.
-
-      has_evidence_lines:
-        range: SieveEvidenceLine
+  UpstreamItem:
+    mixin: true
+    description: >-
+      An evidence item produced outside the Mondo ecosystem (a paper, an OMIM
+      record). Mondo records which resource it belongs to, when it was produced, when
+      and from which release it was read, and what kind of study or basis it reports.
+      It does not record how upstream produced it.
+    annotations:
+      requirements: PROV.EI.AGENT PROV.EI.GENERATION_CONTEXT PROV.RETRIEVAL.SOURCE_ROLE
+      decisions: D-055 D-056 D-057 D-058
+    attributes:
+      resource:
+        range: InformationResource
+        description: >-
+          The information resource the item belongs to, explicit rather than inferred
+          from the CURIE prefix. Resource level only, no upstream curators.
+        annotations:
+          requirements: PROV.EI.AGENT
+          decisions: D-055
+      generationContext:
+        range: Coding
         multivalued: true
         inlined_as_list: true
-        description: Evidence lines supporting or disputing the statement.
+        description: >-
+          What kind of study, observation or curation basis produced the item (PubMed
+          publication type, Orphanet validation status, OMIM mapping key). If the
+          source does not expose its basis, record the code sieve:basis_unknown. Never
+          assume a strong basis.
+        annotations:
+          requirements: PROV.EI.GENERATION_CONTEXT
+          decisions: D-056 D-058
+      resourceRoleOverride:
+        range: ResourceRole
+        description: >-
+          Overrides the resource's default primary / aggregator role for this item
+          (e.g. a usually-aggregating resource that is primary for this content).
+        annotations:
+          requirements: PROV.RETRIEVAL.SOURCE_ROLE
+          decisions: D-067
 
-      evidence_synthesis:
-        range: EvidenceSynthesis
-        inlined: true
-        description: Synthesis of the evidence with reasoning.
-
-      curated_by:
-        range: CurationActivity
-        inlined: true
-        description: The curation activity that reviewed/approved this packet.
-
-      created:
-        range: date
-        description: When this packet was created.
-
-      updated:
-        range: date
-        description: When this packet was last updated.
-
-
-  SieveStatement:
+  InformationResource:
+    is_a: InformationEntity
     description: >-
-      Sieve extension of SEPIO Statement. A subject-predicate-object assertion
-      being curated. Inherits subject, predicate (Coding), object, statement_text,
-      and evidence-linking attributes from SEPIO Statement. Adds human-readable
-      labels for subject and object. Evidence lines are kept on the EvidencePacket
-      container, not nested here.
-    is_a: Statement
+      A registry entry for a source as a whole (OMIM, Orphanet, Disease Ontology,
+      Wikipedia, GARD). It carries a dated quality rating, a default retrieval role and
+      the resources it derives content from (dependence). It is the target of
+      source-only citations.
+    annotations:
+      requirements: PROV.EI.AGENT PROV.EI.QUALITY PROV.RETRIEVAL.SOURCE_ROLE EINT.SOURCE_ONLY EINT.GROUPING
+      decisions: D-025 D-046 D-055 D-060 D-067
+    slot_usage:
+      id:
+        identifier: true
+        description: Resource identifier, preferably an infores CURIE.
+      type:
+        designates_type: true
     attributes:
-      subject_label:
+      curiePrefixes:
         range: string
-        description: Human-readable label for the subject.
+        multivalued: true
+        description: CURIE prefixes whose records belong to this resource.
+      maintainer:
+        range: SieveAgent
+        description: The organisation responsible for the resource.
+        annotations:
+          requirements: PROV.EI.AGENT
+      defaultRole:
+        range: ResourceRole
+        required: true
+        description: >-
+          Primary or aggregator by default. Echoes from aggregators of the same primary
+          source fall into one independence cluster.
+        annotations:
+          requirements: PROV.RETRIEVAL.SOURCE_ROLE
+          decisions: D-063 D-067
+      derivesContentFrom:
+        range: InformationResource
+        multivalued: true
+        description: >-
+          Resources this one takes content from (DOID from OMIM; EFO from Orphanet;
+          EFO also imports Mondo, which makes its agreement partly circular).
+        annotations:
+          requirements: EINT.GROUPING
+          decisions: D-046
+      qualityRatings:
+        range: QualityRating
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Dated quality ratings, maintained once per resource. The rating valid at
+          interpretation time applies, so re-rating never rewrites past scores.
+        annotations:
+          requirements: PROV.EI.QUALITY
+          decisions: D-060
 
-      object_label:
+  SourceRelease:
+    is_a: DataSet
+    description: >-
+      A specific release of an information resource, as ingested via a preprocessed,
+      versioned snapshot. All upstream metadata Mondo relies on (obsolescence, current
+      synonyms, dates) must be in that snapshot (D-058).
+    annotations:
+      requirements: PROV.RETRIEVAL.SOURCE_SYSTEM PROV.EI.RETRIEVAL_SOURCE
+      decisions: D-058 D-067
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      version:
+        required: true
+    attributes:
+      ofResource:
+        range: InformationResource
+        required: true
+
+  ExternalRecord:
+    is_a: InformationEntity
+    mixins:
+      - EvidenceItem
+      - UpstreamItem
+    description: >-
+      A record in an external database or terminology (DOID:0110413, OMIM:219700,
+      ICD10CM:Q90), as read from a given release. Whether it is evidence
+      (corroboration) or origin depends on where it is referenced: from an
+      evidence line, or from SieveStatement.origin.
+    annotations:
+      requirements: EI.COMPOSITE.EXTERNAL_RECORD
+      decisions: D-004 D-010 D-030 D-055
+    slot_usage:
+      id:
+        identifier: true
+        description: The record's CURIE.
+      type:
+        designates_type: true
+      label:
+        description: The record's label as read (original name), so label drift can trigger re-review.
+        annotations:
+          requirements: PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
+          decisions: D-010 D-067
+      resource:
+        required: true
+      dateAuthored:
+        description: When upstream created or last revised the record.
+        annotations:
+          requirements: PROV.EI.DATE
+      recordMetadata:
+        range: RetrievalMetadata
+        required: true
+        annotations:
+          requirements: PROV.EI.RETRIEVAL_SOURCE
+      informationQuality:
+        description: Item-level quality where it deviates from the resource rating.
+        annotations:
+          requirements: PROV.EI.QUALITY
+    attributes:
+      obsoleteInSource:
+        range: boolean
+        description: The record is obsolete in the release it was read from.
+        annotations:
+          requirements: EI.COMPOSITE.EXTERNAL_RECORD
+          decisions: D-010
+
+  ConcordantAssertion:
+    is_a: Statement
+    mixins:
+      - EvidenceItem
+      - UpstreamItem
+    description: >-
+      A prior claim another source makes about the same proposition, in that
+      source's own terms (DOID:0110413 is_a DOID:10584). It is the principal evidence
+      type for Mondo (concordance). It is matched to the Mondo claim by SPO plus
+      negation. Each grounded entity carries a resolution chain recording how the
+      source id became the Mondo id. The source's own relation qualifiers (Orphanet
+      /e, /btnt) are not recorded.
+    annotations:
+      requirements: EI.PRIOR_CLAIM.DIRECT_STRUCTURED
+      decisions: D-004 D-005 D-061
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      subject:
+        range: uriorcurie
+        required: true
+        description: Subject in the source's own identifiers.
+      object:
+        required: true
+        description: Object in the source's own identifiers (or text, for synonyms).
+      predicate:
+        required: true
+      reportedIn:
+        range: ExternalRecord
+        required: true
+        description: The external record that makes the assertion.
+      resource:
+        required: true
+      recordMetadata:
+        range: RetrievalMetadata
+        annotations:
+          requirements: PROV.EI.RETRIEVAL_SOURCE
+    attributes:
+      groundings:
+        range: ResolutionChain
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          One resolution chain per grounded entity slot (subject; object when it is an
+          id). Each chain keeps a frozen copy of the mapping it used. It does not point
+          at the live mapping claim.
+        annotations:
+          requirements: PROV.SA.EXECUTION
+          decisions: D-061
+
+  TextPassage:
+    is_a: Statement
+    mixins:
+      - EvidenceItem
+    description: >-
+      A verbatim passage extracted from a document as a prior claim. A record created
+      in the Mondo ecosystem (by an AI agent or a curator), so it carries full creation
+      provenance: who, when, from which document and version, where, by which method,
+      and whether the quote was machine-verified to occur in the source.
+    annotations:
+      requirements: EI.PRIOR_CLAIM.DIRECT_TEXT PROV.EI.EXECUTION
+      decisions: D-050 D-057
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      statementText:
+        required: true
+        description: The verbatim quote.
+        annotations:
+          requirements: EI.PRIOR_CLAIM.DIRECT_TEXT
+          decisions: D-050
+      reportedIn:
+        range: EvidenceItem
+        required: true
+        description: The document (Publication / WebPage / GuidelineDocument) the passage comes from.
+        annotations:
+          requirements: PROV.EI.EXECUTION
+      derivedFrom:
+        range: EvidenceItem
+        inlined: false
+        description: >-
+          Id of the source document, stated as dependence (the passage is not
+          independent of it).
+        annotations:
+          requirements: EINT.GROUPING
+          decisions: D-046 D-057
+      contributions:
+        range: SieveContribution
+        required: true
+        inlined_as_list: true
+        description: The extraction act(s), with agent, date and method (specifiedBy).
+        annotations:
+          requirements: PROV.EI.EXECUTION PROV.EI.DATE
+          decisions: D-057
+    attributes:
+      documentVersion:
         range: string
-        description: Human-readable label for the object.
+        description: The version of the document the passage was extracted from.
+        annotations:
+          requirements: PROV.EI.EXECUTION
+      textLocation:
+        range: TextLocation
+        inlined: true
+        description: Exact location (section, character offsets).
+        annotations:
+          requirements: PROV.EI.EXECUTION PROV.SA.EXECUTION
+          decisions: D-050 D-057
+      quoteVerification:
+        range: VerificationOutcome
+        required: true
+        description: Whether the quote was machine-verified to occur verbatim in the source.
+        annotations:
+          requirements: PROV.EI.EXECUTION
+          decisions: D-050
+      groundings:
+        range: ResolutionChain
+        multivalued: true
+        inlined_as_list: true
+        description: Grounding of the passage's mentions to Mondo / HGNC / ... ids.
+        annotations:
+          requirements: PROV.SA.EXECUTION
+          decisions: D-061
 
+  Publication:
+    is_a: Document
+    mixins:
+      - EvidenceItem
+      - UpstreamItem
+    description: >-
+      A scientific publication (PMID, DOI, ISBN). It is supporting evidence on logical
+      axioms. When a definition cites it, it is the definition's origin (INSPIRED_BY).
+    annotations:
+      requirements: EI.DOCUMENT.SCIENTIFIC_PUBLICATION
+      decisions: D-031 D-037
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      dateAuthored:
+        description: Publication date.
+        annotations:
+          requirements: PROV.EI.DATE
+          decisions: D-056
+      informationQuality:
+        description: Item-level quality, e.g. sieve:retracted.
+        annotations:
+          requirements: PROV.EI.QUALITY
+          decisions: D-060
+      recordMetadata:
+        range: RetrievalMetadata
+        annotations:
+          requirements: PROV.EI.RETRIEVAL_SOURCE
+      generationContext:
+        description: PubMed publication types (case report, cohort study, review, ...).
+        annotations:
+          requirements: PROV.EI.GENERATION_CONTEXT
+    attributes:
+      isbn:
+        range: string
+      reportsStudy:
+        range: string
+        description: >-
+          Key of the underlying study, family or cohort. Publications that share a key
+          report the same scenario and are not independent.
+        annotations:
+          requirements: EINT.GROUPING
+          decisions: D-046
+
+  WebPage:
+    is_a: Document
+    mixins:
+      - EvidenceItem
+      - UpstreamItem
+    description: >-
+      A non-scholarly web page (GARD, MedlinePlus, Wikipedia, patient
+      organisations). GitHub issue / PR URLs are not web-page evidence. They are
+      decision context (SieveContribution.context).
+    annotations:
+      requirements: EI.CUSTOM.001
+      decisions: D-036 D-037
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      urls:
+        required: true
+      recordMetadata:
+        range: RetrievalMetadata
+        description: retrievalDate = date accessed.
+        annotations:
+          requirements: PROV.EI.RETRIEVAL_SOURCE
+
+  GuidelineDocument:
+    is_a: Document
+    mixins:
+      - EvidenceItem
+      - UpstreamItem
+    description: >-
+      A guideline or consensus document (e.g. ClinGen lumping / splitting guidance).
+      ClinGen involvement as an asserting panel is an agent, not this document.
+    annotations:
+      requirements: EI.DOCUMENT.GUIDELINE
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+
+  ComputationalScore:
+    is_a: DataItem
+    mixins:
+      - EvidenceItem
+    description: >-
+      A computed score used as machine evidence: lexical match, Boomer probability,
+      AI agent score. The value is the score. The method is the core specifiedBy.
+      Hand-curated method tags such as MONDO:exact-label-match are gone: this
+      information comes from the computational system itself (D-021).
+    annotations:
+      requirements: EI.DATA.COMPUTATIONAL_PREDICTION
+      decisions: D-021 D-043
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      specifiedBy:
+        description: The method / tool that computed the score.
+    attributes:
+      softwareVersion:
+        range: string
+      parameters:
+        range: string
+        description: Method parameters (key=value or JSON).
 
   # ===========================================================================
-  # Evidence Line (extends SEPIO EvidenceLine)
+  # Module: evidence-line
   # ===========================================================================
 
   SieveEvidenceLine:
-    description: >-
-      Sieve extension of SEPIO EvidenceLine. Inherits all SEPIO EvidenceLine
-      attributes. Can contain any InformationEntity as evidence items,
-      including Sieve-specific types like ConcordanceItem.
     is_a: EvidenceLine
-
-
-  # ===========================================================================
-  # Evidence Items (extends SEPIO InformationEntity)
-  # ===========================================================================
-
-  CuratedEvidence:
-    mixin: true
-    description: >-
-      Curation-workflow slots grafted onto every Sieve evidence item: a steward's
-      per-item verdict and an explicit ECO hook. (sieve-specific; not SEPIO)
-    attributes:
-      rating:
-        range: CurationStatus
-        description: The evidence steward's verdict on this individual evidence item.
-      eco_code:
-        range: uriorcurie
-        description: Evidence & Conclusion Ontology (ECO) term for this evidence item.
-      eco_label:
-        range: string
-        description: Human-readable label of the ECO term.
-
-
-  SieveEvidenceItem:
-    description: >-
-      Base class for Sieve-specific evidence items. Extends SEPIO
-      InformationEntity.
-    is_a: InformationEntity
-    attributes:
-      evidence_item_type:
-        range: EvidenceItemType
-        description: Type of evidence item (for polymorphism).
-
-
-  SieveDataItem:
-    is_a: DataItem
     mixins:
-      - CuratedEvidence
+      - EvidenceItem
     description: >-
-      Sieve extension of SEPIO DataItem.
-
-
-  SieveDocument:
-    is_a: Document
-    mixins:
-      - CuratedEvidence
-    description: >-
-      Sieve extension of SEPIO Document. Adds quote fields.
-    attributes:
-      quote:
-        range: string
-        description: Relevant quote from the document.
-
-      quote_location:
-        range: string
-        description: Location of quote (page, section, figure).
-
-
-  SieveStudyResult:
-    is_a: StudyResult
-    mixins:
-      - CuratedEvidence
-    description: >-
-      Sieve extension of SEPIO StudyResult.
-
-
-  ConcordanceItem:
-    is_a: SieveEvidenceItem
-    mixins:
-      - CuratedEvidence
-    description: >-
-      Evidence from concordance with another knowledge source (ontology,
-      database, terminology). The concordant source contains a statement
-      that aligns with the statement being curated.
-    comments:
-      - "Use inherited 'sources' to reference the concordant knowledge source."
-      - "Use inherited 'derived_from' if linking to a formal InformationEntity."
-      - "The source_subject/Predicate/Object fields capture the concordant assertion."
-    attributes:
-      source_name:
-        range: string
-        description: >-
-          Human-readable name of the concordant source (e.g., "Disease Ontology").
-          Convenience field; formal source can be in inherited 'sources'.
-
-      source_id:
-        range: uriorcurie
-        description: Identifier of the concordant source (e.g., database ID, ontology IRI).
-
-      source_version:
-        range: string
-        description: Version/release of the concordant source.
-
-      source_subject:
-        range: uriorcurie
-        description: Subject of the concordant assertion in the source.
-
-      source_subject_label:
-        range: string
-        description: Human-readable label of the subject in the source.
-
-      source_predicate:
-        range: uriorcurie
-        description: Predicate/relationship in the concordant assertion.
-
-      source_predicate_label:
-        range: string
-        description: Human-readable label of the predicate in the source.
-
-      source_object:
-        range: uriorcurie
-        description: Object of the concordant assertion in the source.
-
-      source_object_label:
-        range: string
-        description: Human-readable label of the object in the source.
-
-      mapping_justification:
-        range: uriorcurie
-        description: >-
-          How entities were mapped between sources (e.g., semapv:LexicalMatching,
-          semapv:ManualMappingCuration). Uses SSSOM mapping justification vocabulary.
-
-      mapping_set:
-        range: uri
-        description: SSSOM mapping-set URI the concordance was drawn from.
-
-
-  ComputationalResult:
-    is_a: DataItem
-    mixins:
-      - CuratedEvidence
-    description: >-
-      Evidence from a computational method or algorithm. Extends SEPIO
-      DataItem. The computed score/result is stored in inherited 'value'.
-      Method details can be referenced via inherited 'specified_by' or
-      the convenience attributes below.
-    comments:
-      - "Use inherited 'value' for the primary result (e.g., confidence score)."
-      - "Use inherited 'subtype' (Coding) to categorize the computation type."
-      - "Use inherited 'specified_by' to reference formal method specifications."
-    attributes:
-      method_name:
-        range: string
-        description: >-
-          Human-readable name of the computational method.
-          Convenience field; formal method can be in inherited 'specified_by'.
-
-      method_id:
-        range: uriorcurie
-        description: >-
-          Identifier for the method (e.g., OBI term).
-          Convenience field; formal method can be in inherited 'specified_by'.
-
-      parameters:
-        range: string
-        description: Method parameters (as JSON string or key=value format).
-
-      software_version:
-        range: string
-        description: Version of software/tool used.
-
-
-  AgentContribution:
-    is_a: SieveEvidenceItem
-    mixins:
-      - CuratedEvidence
-    description: >-
-      Evidence from any human or organizational contribution. Captures
-      orthogonal dimensions for scoring: who contributed (trust level),
-      how they contributed (channel), and what type of contribution.
-      Replaces the narrower ExpertStatement class.
-    attributes:
-      contributor:
-        range: Agent
-        inlined: true
-        description: The agent (person or organization) who made the contribution.
-
-      trust_level:
-        range: TrustLevel
-        description: >-
-          Level of trust/authority assigned to the contributor.
-          Key dimension for evidence scoring.
-
-      channel:
-        range: ContributionChannel
-        description: >-
-          How the contribution was communicated/submitted.
-          Affects traceability and reliability scoring.
-
-      contribution_type:
-        range: ContributionType
-        description: >-
-          The nature of the contribution (suggestion, review, decision, etc.).
-          Affects evidence weight.
-
-      reference:
-        range: uriorcurie
-        description: >-
-          URL or identifier for traceability (issue tracker link,
-          email thread, submission ID, etc.).
-
-      content:
-        range: string
-        description: The actual content of the contribution (what they said/provided).
-
-      date:
-        # range string (not the `date` type): see note in sepio_classes.yaml —
-        # a `date`-named slot with range `date` breaks gen-pydantic on Python 3.10.
-        range: string
-        description: When the contribution was made (ISO 8601 string).
-
-
-  # ===========================================================================
-  # Supporting Classes
-  # ===========================================================================
-
-  # Note: Using SEPIO's Coding class (imported from sepio_classes)
-
-  CurationActivity:
-    description: >-
-      Sieve extension of SEPIO Contribution. Represents work done by an agent
-      (human curator or AI) in the curation process.
-    is_a: Contribution
-    attributes:
-      timestamp:
-        range: datetime
-        description: >-
-          When the activity was performed (datetime precision).
-          Use inherited 'date' for date-only precision.
-
-      used:
-        range: string
-        multivalued: true
-        description: >-
-          Inputs used by this activity (e.g., prompt versions, tools).
-          Simplified alternative to SEPIO Activity.input for string-typed inputs.
-
-      pull_request:
-        range: uriorcurie
-        description: GitHub pull request URL associated with this activity.
-
-      issue:
-        range: uriorcurie
-        description: GitHub issue URL associated with this activity.
-
-      created_with:
-        range: uriorcurie
-        description: Tool or software used (e.g., a Protégé URI).
-
-
-  CurationDecision:
-    description: >-
-      A curator's decision on an EvidencePacket. One row per decision, preserving
-      history (richer than a single curated_by activity). Sieve-specific.
-    attributes:
+      One evidentiary judgement: these items bear on the enclosing claim in this
+      direction with this strength. Lines are immutable. A misreading is corrected by
+      a new line that supersedes the old one, and the old line is invalidated (kept,
+      excluded from the score), never edited or deleted. The target is always the
+      enclosing Statement, so the core targetProposition is unused.
+    annotations:
+      requirements: EINT.REQUIRED EINT.FLAT_COLLAPSE
+      decisions: D-044 D-045 D-052
+    slot_usage:
       id:
         identifier: true
+      type:
+        designates_type: true
+      targetProposition:
+        description: Not used. The target is always the enclosing Statement.
+        annotations:
+          requirements: RCS.STRUCTURED_PROPOSITION
+          decisions: D-042
+      hasEvidenceItems:
+        range: EvidenceItem
+        inlined: false
+        description: >-
+          Ids of the items this line interprets: packet items, or other lines for
+          higher-order lines. No maximum: granularity is parked (D-046).
+        annotations:
+          requirements: EINT.GRANULARITY EINT.STACKING
+          decisions: D-046
+      directionOfEvidenceProvided:
+        range: Direction
+        required: true
+        annotations:
+          requirements: EINT.DIRECTION
+          decisions: D-033 D-051
+      strengthOfEvidenceProvided:
+        description: Categorical band, from the strengthBands of the line's AggregationRule.
+        annotations:
+          requirements: EINT.CATEGORICAL_STRENGTH
+          decisions: D-047 D-054
+      scoreOfEvidenceProvided:
+        minimum_value: 0
+        maximum_value: 1
+        description: >-
+          Strength s_i on the shared normalised 0-1 scale. Direction is carried by
+          directionOfEvidenceProvided, not by the sign.
+        annotations:
+          requirements: EINT.NUMERICAL_STRENGTH
+          decisions: D-047 D-054
+      evidenceItemSources:
+        description: Source-level attribution for this line (resource ids), when no item is represented.
+        annotations:
+          requirements: EINT.SOURCE_ONLY
+      contributions:
+        range: InterpretationActivity
+        required: true
+        inlined_as_list: true
+        description: >-
+          The interpretation act. Normally one; a collective act is ONE contribution
+          with participants, not N contributions.
+        annotations:
+          requirements: PROV.INTERP.AGENT EINT.REQUIRED
+          decisions: D-044 D-046
+    attributes:
+      computedByRule:
+        range: AggregationRule
+        description: >-
+          The per-claim-type rule (and version) that assigned the strength. Required
+          for rule-based lines (profile check).
+        annotations:
+          requirements: PROV.INTERP.METHODS EINT.DISTINCT_MODELS
+          decisions: D-048 D-054
+      validity:
+        range: LineValidity
+        ifabsent: string(VALID)
+        description: >-
+          Absent means VALID. INVALIDATED lines stay on record and are excluded from
+          the score.
+        annotations:
+          requirements: EINT.FLAT_COLLAPSE
+          decisions: D-052
+      statusChanges:
+        range: LineStatusChange
+        multivalued: true
+        inlined_as_list: true
+        description: Invalidations and supersessions, with who, when and why.
+        annotations:
+          requirements: EINT.FLAT_COLLAPSE
+          decisions: D-050 D-052
+      supersedes:
+        range: SieveEvidenceLine
+        multivalued: true
+        description: Lines this one corrects (they must be invalidated).
+        annotations:
+          decisions: D-052
+      confidence:
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+        description: >-
+          Data quality (SEPIO confidence): the probability that the evidence was read
+          and linked correctly, e.g. chain confidence or an AI's calibrated
+          self-confidence. It gates (below the floor) or discounts the line and never
+          rewrites its strength.
+        annotations:
+          requirements: PROV.SA.CONFIDENCE_SCORE
+          decisions: D-050 D-062 D-063
+      confidenceBasis:
+        range: ConfidenceBasis
+        description: Required whenever confidence is given.
+        annotations:
+          requirements: PROV.SA.CONFIDENCE_SCORE
+          decisions: D-062
+      dataQualityFlags:
+        range: DataQualityFlag
+        multivalued: true
+        description: Failure flags that gate the line (e.g. unverifiable quote).
+        annotations:
+          decisions: D-050 D-062 D-063
+      independenceCluster:
         range: string
-      packet_id:
-        range: uriorcurie
+        description: >-
+          The independence cluster the aggregation rule assigned the line to. Only the
+          strongest line per cluster counts.
+        annotations:
+          requirements: EINT.GROUPING
+          decisions: D-046 D-063
+      dateAttached:
+        range: date
+        description: When the evidence was first attached to the claim.
+        annotations:
+          requirements: PROV.RETRIEVAL.DATE
+          decisions: D-030 D-067
+      lastConfirmed:
+        range: date
+        description: When the evidence was last confirmed against a source release.
+        annotations:
+          requirements: PROV.RETRIEVAL.DATE
+          decisions: D-031 D-067
+      lastConfirmedAgainst:
+        range: SourceRelease
+        description: The release the evidence was last confirmed against.
+        annotations:
+          requirements: PROV.RETRIEVAL.DATE PROV.RETRIEVAL.SOURCE_SYSTEM
+          decisions: D-031
+    rules:
+      - description: A confidence value must state its basis (D-062).
+        preconditions:
+          slot_conditions:
+            confidence:
+              value_presence: PRESENT
+        postconditions:
+          slot_conditions:
+            confidenceBasis:
+              required: true
+
+  LineStatusChange:
+    is_a: Contribution
+    description: >-
+      A record that a line was invalidated, superseded, or accepted unchanged by a
+      reviewer. This also records what the human did with an AI's line.
+    annotations:
+      requirements: EINT.FLAT_COLLAPSE
+      decisions: D-050 D-052
+    slot_usage:
+      type:
+        designates_type: true
+      contributor:
+        range: SieveAgent
         required: true
-        description: Reference to the EvidencePacket.id this decision applies to.
-      curator:
-        range: uriorcurie
+      date:
         required: true
-        description: ORCID of the deciding curator.
-      curator_name:
+    attributes:
+      action:
+        range: LineAction
+        required: true
+      reason:
         range: string
-      decision:
-        range: DecisionType
+      replacementLine:
+        range: SieveEvidenceLine
+        description: The new line that corrects this one (action SUPERSEDED).
+
+  # ===========================================================================
+  # Module: provenance
+  # ===========================================================================
+
+  SieveAgent:
+    is_a: Agent
+    description: >-
+      A person (ORCID), organisation or group (e.g. a ClinGen expert panel), or
+      software agent (pipeline, LLM agent). It carries its current role and dated
+      trust levels. Contributions snapshot both as of the act.
+    annotations:
+      requirements: PROV.INTERP.AGENT PROV.ASSERTION.AGENT PROV.SA.AGENT PROV.RETRIEVAL.AGENT
+      decisions: D-004 D-026 D-049 D-050 D-052
+    slot_usage:
+      id:
+        identifier: true
+        description: ORCID for persons (handles are not accepted, D-026), infores / URL otherwise.
+      type:
+        designates_type: true
+      subtype:
+        range: AgentKind
         required: true
+    attributes:
+      roles:
+        range: LevelAssignment
+        multivalued: true
+        inlined_as_list: true
+        description: Dated role / expertise assignments, possibly per domain.
+        annotations:
+          decisions: D-049
+      trustLevels:
+        range: LevelAssignment
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Dated trust levels (humans by role and expertise, AI agents by track record of
+          accepted vs invalidated lines).
+        annotations:
+          decisions: D-049 D-052
+      softwareVersion:
+        range: string
+        description: Exact tool / pipeline version (software agents).
+        annotations:
+          requirements: PROV.SA.AGENT
+          decisions: D-050
+      modelName:
+        range: string
+        description: LLM model identifier (AI agents).
+        annotations:
+          requirements: PROV.INTERP.AGENT
+          decisions: D-050
+      members:
+        range: SieveAgent
+        multivalued: true
+        description: Members of a group agent (expert panel).
+        annotations:
+          decisions: D-046
+
+  SieveMethod:
+    is_a: Method
+    description: >-
+      A versioned, identifiable method: a guideline or SOP, an extraction or
+      alignment workflow, a prompt version, an export rule set.
+    annotations:
+      requirements: PROV.INTERP.METHODS PROV.SA.METHODS PROV.ENCODING.METHODS
+      decisions: D-050 D-051 D-065
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+    attributes:
+      version:
+        range: string
+        required: true
+
+  AggregationRule:
+    is_a: SieveMethod
+    description: >-
+      The versioned rule that turns a claim type's evidence lines into strengths and
+      the inclusion score S: per-line strengths, independence clustering, claim
+      prior, confidence floor. Its output is normalised so scores are comparable
+      across claim types. A version change triggers recomputation and re-queueing.
+    annotations:
+      requirements: EINT.DISTINCT_MODELS PROV.ASSERTION.METHODS PROV.INTERP.METHODS
+      decisions: D-048 D-054 D-063
+    attributes:
+      claimType:
+        range: ClaimType
+        required: true
+      strengthBands:
+        range: string
+        multivalued: true
+        description: Ordered categorical bands with their cut-offs, e.g. "strong >= 0.8".
+        annotations:
+          requirements: EINT.CATEGORICAL_STRENGTH PROV.ASSERTION.CONFIDENCE_CATEGORY
+          decisions: D-047 D-063
+      confidenceFloor:
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+        description: Lines with confidence below the floor are excluded outright.
+        annotations:
+          decisions: D-063
+
+  DecisionPolicy:
+    is_a: SieveMethod
+    description: >-
+      A human-authored, human-approved decision procedure that an automated system
+      applies to accept claims: scope, thresholds, rule versions. It can only accept.
+      Everything else goes to the human queue. Provider authority (GARD, NORD, NANDO
+      xrefs) is one such policy.
+    annotations:
+      requirements: PROV.ASSERTION.METHODS PROV.ASSERTION.AGENT
+      decisions: D-017 D-064
+    attributes:
+      approvedBy:
+        range: SieveAgent
+        required: true
+        annotations:
+          requirements: PROV.ASSERTION.AGENT
+      approvalDate:
+        range: date
+        required: true
+      scopeClaimTypes:
+        range: ClaimType
+        multivalued: true
+        required: true
+      scopeChannels:
+        range: ProposingChannel
+        multivalued: true
+      acceptanceThreshold:
+        range: float
+        minimum_value: -1
+        maximum_value: 1
+        description: Minimum inclusion score S for automatic acceptance.
+      usesRules:
+        range: AggregationRule
+        multivalued: true
+        description: The rule versions the policy pins.
+      revoked:
+        range: boolean
+        description: A revoked policy triggers re-evaluation of every claim it decided.
+
+  BatchSignOff:
+    is_a: Activity
+    description: >-
+      A one-off curator approval of a filtered result set, with banded review depth.
+      Distinct from a standing policy. The filter is stored so it can be re-run, and
+      the result set is frozen with packet versions, so a batch can be queried and
+      revoked as a unit.
+    annotations:
+      requirements: PROV.ASSERTION.METHOD_TYPES PROV.ASSERTION.METHODS
+      decisions: D-066
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      performedBy:
+        range: SieveAgent
+        required: true
+      date:
+        required: true
+    attributes:
+      filterQuery:
+        range: string
+        required: true
+        description: Machine-readable, re-runnable query over packet contents.
+      resultSet:
+        range: string
+        multivalued: true
+        required: true
+        description: Frozen result set as "packet-id@version" entries.
+      reviewBands:
+        range: string
+        multivalued: true
+        description: Score bands with their review depth, e.g. "0.90-0.95 EYEBALLED".
+      spotCheckErrors:
+        range: integer
+        description: Errors found in the spot-check sample (feeds calibration of S).
+
+  SieveContribution:
+    is_a: Contribution
+    description: >-
+      An agent's contribution to a claim, line or record, with the agent's role and
+      trust snapshotted as of the act. A collective act (panel, curation call) is one
+      contribution with several participants, not N independent ones.
+    annotations:
+      requirements: PROV.INTERP.AGENT PROV.ASSERTION.AGENT PROV.INTERP.LOCATION PROV.ASSERTION.LOCATION
+      decisions: D-002 D-034 D-046 D-049 D-051
+    slot_usage:
+      type:
+        designates_type: true
+      contributor:
+        range: SieveAgent
+        required: true
+      performedBy:
+        range: SieveAgent
+      specifiedBy:
+        range: SieveMethod
+        description: Guideline / SOP / workflow / prompt version followed.
+        annotations:
+          requirements: PROV.INTERP.METHODS PROV.ASSERTION.METHODS
+          decisions: D-050 D-051
+    attributes:
+      role:
+        range: AgentRole
+        description: The role played (curator, provider, stakeholder, endorser, extractor, ...).
+        annotations:
+          decisions: D-002 D-004 D-034
+      participants:
+        range: SieveAgent
+        multivalued: true
+        description: Participants of a collective act; the contributor may be the group agent.
+        annotations:
+          requirements: PROV.INTERP.AGENT PROV.ASSERTION.AGENT
+          decisions: D-046
+      agentRoleAtTime:
+        range: string
+        description: The contributor's role / expertise level as of the act.
+        annotations:
+          requirements: PROV.INTERP.AGENT PROV.ASSERTION.AGENT
+          decisions: D-049 D-051
+      agentTrustAtTime:
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+        description: The contributor's trust level as of the act. Later re-rating does not change it.
+        annotations:
+          requirements: PROV.INTERP.AGENT PROV.ASSERTION.AGENT
+          decisions: D-049 D-052
+      context:
+        range: uriorcurie
+        multivalued: true
+        description: >-
+          Where the act happened: the GitHub issue / PR, the curation call or panel
+          meeting. Axiom-level GitHub sources migrate here.
+        annotations:
+          requirements: PROV.INTERP.LOCATION PROV.ASSERTION.LOCATION
+          decisions: D-036
+      runId:
+        range: string
+        description: Identifier of the automated run that performed the act.
+        annotations:
+          requirements: PROV.ASSERTION.LOCATION PROV.EI.EXECUTION
+          decisions: D-050 D-064
+      perspective:
+        range: string
+        description: Perspective / use context of a human contributor (clinical, research, a community).
+        annotations:
+          requirements: PROV.INTERP.LOCATION
+          decisions: D-051
+
+  InterpretationActivity:
+    is_a: SieveContribution
+    description: >-
+      The act of interpreting evidence as a line: who (human with perspective, or AI
+      with model and workflow version), when, how, and what was actually read. For AI
+      acts it also records the machine checks that guard against AI failure modes.
+    annotations:
+      requirements: PROV.INTERP.AGENT PROV.INTERP.METHOD_TYPES PROV.INTERP.METHODS PROV.INTERP.DATE EINT.REQUIRED
+      decisions: D-044 D-050 D-051 D-059
+    slot_usage:
+      date:
+        required: true
+        annotations:
+          requirements: PROV.INTERP.DATE
+          decisions: D-049 D-051 D-060
+    attributes:
+      methodType:
+        range: InterpretationMethod
+        required: true
+        annotations:
+          requirements: PROV.INTERP.METHOD_TYPES
+      readCoverage:
+        range: ReadCoverage
+        description: How much of the document was looked at. Mandatory for document-based lines (profile check).
+        annotations:
+          decisions: D-050 D-059
+      accessStatus:
+        range: AccessStatus
+        description: Access status of the document. Mandatory for document-based lines (profile check).
+        annotations:
+          decisions: D-059
+      identifierVerified:
+        range: VerificationOutcome
+        description: The cited identifier resolves and is about the topic (AI acts).
+        annotations:
+          decisions: D-050
+      groundingChecked:
+        range: VerificationOutcome
+        description: The entities in the evidence map to the claim's actual terms (AI acts).
+        annotations:
+          decisions: D-050
+      soughtDisputingEvidence:
+        range: boolean
+        description: Search scope included disputing evidence (experimental).
+        annotations:
+          decisions: D-050
+      reasoningTrace:
+        range: uriorcurie
+        description: Link to an external reasoning trace. The trace itself is not stored.
+        annotations:
+          decisions: D-050
       rationale:
         range: string
-        description: Explanation for the decision (required for rejections).
+        description: Optional free-text rationale (1-2 sentences).
+        annotations:
+          decisions: D-051
+
+  AssertionDecision:
+    is_a: SieveContribution
+    description: >-
+      The overall decision that puts a claim into Mondo (or keeps it out). It is made
+      over all lines and recorded with the score, rule and packet version it was
+      given on. Every claim rests on a human decision: per claim (sign-off,
+      consensus, batch) or per policy (delegated, provider authority). Automated
+      routes can only accept.
+    annotations:
+      requirements: EINT.REQUIRED EINT.CONTRADICTION PROV.ASSERTION.AGENT PROV.ASSERTION.METHOD_TYPES PROV.ASSERTION.METHODS PROV.ASSERTION.DATE
+      decisions: D-045 D-048 D-053 D-064 D-066
+    slot_usage:
+      contributor:
+        description: The signer, or the automated system that acted under a policy.
+        annotations:
+          requirements: PROV.ASSERTION.AGENT
+      date:
+        required: true
+        annotations:
+          requirements: PROV.ASSERTION.DATE
+    attributes:
+      outcome:
+        range: DecisionOutcome
+        required: true
+        annotations:
+          requirements: EINT.CONTRADICTION
+          decisions: D-053
+      route:
+        range: AssertionRoute
+        required: true
+        annotations:
+          requirements: PROV.ASSERTION.METHOD_TYPES PROV.RETRIEVAL.TARGET_ROLE
+          decisions: D-046 D-048 D-064 D-066 D-067
+      inclusionScore:
+        range: float
+        minimum_value: -1
+        maximum_value: 1
+        description: S at decision time.
+        annotations:
+          requirements: PROV.ASSERTION.CONFIDENCE_SCORE
+          decisions: D-063
+      scoreBand:
+        range: string
+        description: Band of S at decision time, from the rule's strengthBands.
+        annotations:
+          requirements: PROV.ASSERTION.CONFIDENCE_CATEGORY
+          decisions: D-063
+      aggregationRule:
+        range: AggregationRule
+        description: The rule version that computed S.
+        annotations:
+          requirements: PROV.ASSERTION.METHODS
+          decisions: D-048 D-054
+      signedPacketVersion:
+        range: string
+        description: The packet version the decision was given on. A later version re-queues the claim.
+        annotations:
+          requirements: PROV.ASSERTION.METHODS
+          decisions: D-051
+      policy:
+        range: DecisionPolicy
+        description: The policy (and version) under which an automated decision was taken.
+        annotations:
+          requirements: PROV.ASSERTION.METHODS
+          decisions: D-064
+      thresholdPassed:
+        range: float
+        description: The policy threshold S passed.
+        annotations:
+          requirements: PROV.ASSERTION.CONFIDENCE_SCORE
+          decisions: D-064
+      batch:
+        range: BatchSignOff
+        annotations:
+          requirements: PROV.ASSERTION.METHODS
+          decisions: D-066
+      reviewDepth:
+        range: ReviewDepth
+        description: How closely this claim was looked at. A no-look approval adds no evidence.
+        annotations:
+          decisions: D-066
+      evidenceLine:
+        range: SieveEvidenceLine
+        description: >-
+          The expert line this decision contributed, if any (provisional). The line is
+          scored on the packet as signed, excluding itself.
+        annotations:
+          decisions: D-049
+      rationale:
+        range: string
+        annotations:
+          decisions: D-051 D-053
+    rules:
+      - description: Policies never auto-reject (D-064).
+        preconditions:
+          slot_conditions:
+            route:
+              equals_string: DELEGATED_POLICY
+        postconditions:
+          slot_conditions:
+            outcome:
+              equals_string: ACCEPTED
+            policy:
+              required: true
+      - description: Provider authority is a policy; it can only accept (D-017, D-064).
+        preconditions:
+          slot_conditions:
+            route:
+              equals_string: PROVIDER_AUTHORITY
+        postconditions:
+          slot_conditions:
+            outcome:
+              equals_string: ACCEPTED
+            policy:
+              required: true
+      - description: A batch decision names its batch and review depth (D-066).
+        preconditions:
+          slot_conditions:
+            route:
+              equals_string: BATCH_SIGN_OFF
+        postconditions:
+          slot_conditions:
+            batch:
+              required: true
+            reviewDepth:
+              required: true
+
+  OriginEvent:
+    is_a: Activity
+    description: >-
+      The event by which a claim (or term) entered Mondo from an upstream item: which
+      item, which release, by which pipeline, when first attached, and the source's
+      own id and label at that time. "Copied from" and "cloned from" are origin;
+      "inspired by" is the softer derivation used for definitions.
+    annotations:
+      requirements: PROV.RETRIEVAL.AGENT PROV.RETRIEVAL.SOURCE_SYSTEM PROV.RETRIEVAL.DATE PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
+      decisions: D-030 D-031 D-067
+    slot_usage:
+      type:
+        designates_type: true
+      performedBy:
+        range: SieveAgent
+        description: The pipeline (kBOOM merge, mondo-ingest slurp, provider sync, mondo-ai harvesting) or curator.
+        annotations:
+          requirements: PROV.RETRIEVAL.AGENT
+      specifiedBy:
+        range: SieveMethod
+        description: Pipeline version.
+        annotations:
+          requirements: PROV.RETRIEVAL.AGENT
+      date:
+        description: First-attached date.
+        annotations:
+          requirements: PROV.RETRIEVAL.DATE
+    attributes:
+      derivationType:
+        range: DerivationType
+        required: true
+        annotations:
+          decisions: D-030 D-031
+      sourceItem:
+        range: EvidenceItem
+        required: true
+        description: The upstream item (ExternalRecord, Publication, WebPage) the claim came from.
+        annotations:
+          requirements: PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
+      sourceLabel:
+        range: string
+        description: The source's own label at attachment time.
+        annotations:
+          requirements: PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
+      sourceRelease:
+        range: SourceRelease
+        description: The release the claim was copied from.
+        annotations:
+          requirements: PROV.RETRIEVAL.SOURCE_SYSTEM
+          decisions: D-030
+
+  ResolutionChain:
+    is_a: Activity
+    description: >-
+      How a source mention or id was resolved to the target id: an ordered,
+      contiguous chain of alignment steps (MeDIC model). It covers text-to-structure,
+      term-to-term and source ingest. Chain confidence is the product of the step
+      confidences. It is data quality, never evidence strength.
+    annotations:
+      requirements: PROV.SA.EXECUTION PROV.SA.DATE PROV.SA.METHODS
+      decisions: D-061 D-062
+    slot_usage:
+      type:
+        designates_type: true
+      date:
+        description: Timestamp of the run that computed the chain.
+        annotations:
+          requirements: PROV.SA.DATE
+      specifiedBy:
+        range: SieveMethod
+        description: The alignment workflow (and version).
+        annotations:
+          requirements: PROV.SA.METHODS
+    attributes:
+      entitySlot:
+        range: EntitySlot
+        required: true
+        description: Which entity of the assertion this chain grounds.
+      steps:
+        range: AlignmentStep
+        multivalued: true
+        required: true
+        inlined_as_list: true
+        description: Ordered steps; step n's output is step n+1's input (profile check).
+        annotations:
+          requirements: PROV.SA.EXECUTION
+      chainConfidence:
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+        annotations:
+          requirements: PROV.SA.CONFIDENCE_SCORE
+          decisions: D-062
+      runId:
+        range: string
+
+  AlignmentStep:
+    is_a: Activity
+    description: >-
+      One extraction, translation, grounding or normalisation step. It records its
+      input and output value, method, agent, rules applied, quality category,
+      confidence with basis, and review status. Reviewing a step answers "did the
+      machine read and link correctly?". That is separate from reviewing the claim.
+    annotations:
+      requirements: PROV.SA.AGENT PROV.SA.METHOD_TYPES PROV.SA.METHODS PROV.SA.EXECUTION PROV.SA.DATE PROV.SA.CONFIDENCE_CATEGORY PROV.SA.CONFIDENCE_SCORE PROV.SA.REVIEW
+      decisions: D-061 D-062
+    slot_usage:
+      type:
+        designates_type: true
+      performedBy:
+        range: SieveAgent
+        description: The agent (with version) that performed the step.
+        annotations:
+          requirements: PROV.SA.AGENT
+      specifiedBy:
+        range: SieveMethod
+        annotations:
+          requirements: PROV.SA.METHODS
+      date:
+        description: Per-step time, where steps ran at different times (e.g. a cached translation).
+        annotations:
+          requirements: PROV.SA.DATE
+    attributes:
+      category:
+        range: TransformationCategory
+        required: true
+        annotations:
+          requirements: PROV.SA.METHOD_TYPES
+      method:
+        range: TransformationMethod
+        required: true
+        annotations:
+          requirements: PROV.SA.METHOD_TYPES
+      inputValue:
+        range: string
+        required: true
+        annotations:
+          requirements: PROV.SA.EXECUTION
+      outputValue:
+        range: string
+        required: true
+        annotations:
+          requirements: PROV.SA.EXECUTION
+      predicate:
+        range: uriorcurie
+        description: Mapping predicate of a grounding / normalisation step (e.g. skos:exactMatch).
+      mappingJustification:
+        range: uriorcurie
+        description: SSSOM / semapv mapping justification.
+      mappingSet:
+        range: uri
+        description: The mapping set the step used.
+        annotations:
+          requirements: PROV.SA.EXECUTION
+          decisions: D-061
+      mappingSetVersion:
+        range: string
+        description: >-
+          Frozen version of the mapping set. A newer version triggers revision of the
+          line (invalidate + recompute).
+        annotations:
+          requirements: PROV.SA.EXECUTION PROV.SA.DATE
+          decisions: D-061
+      appliedRules:
+        range: AppliedRule
+        multivalued: true
+        inlined_as_list: true
+        annotations:
+          requirements: PROV.SA.METHODS
+      textSpan:
+        range: TextLocation
+        inlined: true
+        description: Span anchoring for text sources.
+        annotations:
+          requirements: PROV.SA.EXECUTION
+      spanRole:
+        range: string
+        description: Role of the span (MeDIC TextSpanRoleEnum, e.g. SECTION_TEXT).
+        annotations:
+          requirements: PROV.SA.EXECUTION
+      triggerCue:
+        range: string
+        description: The verbatim words that establish a relation (assertion layer).
+        annotations:
+          requirements: PROV.SA.EXECUTION
+      qualityCategory:
+        range: AlignmentQuality
+        annotations:
+          requirements: PROV.SA.CONFIDENCE_CATEGORY
+          decisions: D-062
+      confidence:
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+        annotations:
+          requirements: PROV.SA.CONFIDENCE_SCORE
+      confidenceBasis:
+        range: ConfidenceBasis
+        annotations:
+          requirements: PROV.SA.CONFIDENCE_SCORE
+      reviewStatus:
+        range: StepStatus
+        ifabsent: string(MACHINE)
+        description: Absent means MACHINE (not reviewed).
+        annotations:
+          requirements: PROV.SA.REVIEW
+      reviewedBy:
+        range: SieveAgent
+        annotations:
+          requirements: PROV.SA.REVIEW
+      reviewDate:
+        range: date
+        annotations:
+          requirements: PROV.SA.REVIEW
+    rules:
+      - description: A confidence value must state its basis (D-062).
+        preconditions:
+          slot_conditions:
+            confidence:
+              value_presence: PRESENT
+        postconditions:
+          slot_conditions:
+            confidenceBasis:
+              required: true
+
+  # ===========================================================================
+  # Module: record-metadata
+  # ===========================================================================
+
+  RetrievalMetadata:
+    is_a: RecordMetadata
+    description: >-
+      Where and when a concrete record was read: the resource, the release (or
+      version string), the date read, and the source's own label at that time.
+    annotations:
+      requirements: PROV.EI.RETRIEVAL_SOURCE PROV.RETRIEVAL.SOURCE_SYSTEM PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
+      decisions: D-055 D-058
+    slot_usage:
+      recordIdentifier:
+        description: The record id in the source (if it differs from the item id).
+    attributes:
+      retrievedFrom:
+        range: InformationResource
+        required: true
+        annotations:
+          requirements: PROV.EI.RETRIEVAL_SOURCE
+      sourceRelease:
+        range: SourceRelease
+        annotations:
+          requirements: PROV.EI.RETRIEVAL_SOURCE PROV.RETRIEVAL.SOURCE_SYSTEM
+      sourceVersion:
+        range: string
+        description: Release / version string, when no SourceRelease is registered.
+      retrievalDate:
+        range: date
+        required: true
+        description: Date read (date accessed, for web pages).
+        annotations:
+          requirements: PROV.EI.RETRIEVAL_SOURCE
+          decisions: D-055
+      sourceLabel:
+        range: string
+        annotations:
+          requirements: PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
+
+  # ===========================================================================
+  # Module: utility
+  # ===========================================================================
+
+  TextLocation:
+    is_a: Utility
+    description: Location of a span in a document.
+    annotations:
+      requirements: PROV.EI.EXECUTION PROV.SA.EXECUTION
+    attributes:
+      section:
+        range: string
+      charStart:
+        range: integer
+        minimum_value: 0
+      charEnd:
+        range: integer
+        minimum_value: 0
+
+  QualityRating:
+    is_a: Utility
+    description: A dated quality rating of a resource, as the q factor of its lines.
+    annotations:
+      requirements: PROV.EI.QUALITY
+      decisions: D-060 D-063
+    attributes:
+      level:
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+        required: true
+      category:
+        range: string
+      validFrom:
+        range: date
+        required: true
+      scope:
+        range: ClaimType
+        multivalued: true
+        description: Claim types the rating applies to (a source can be strong for synonyms, weak for gene links).
+
+  LevelAssignment:
+    is_a: Utility
+    description: A dated role, expertise or trust assignment of an agent, possibly limited to a domain.
+    annotations:
+      decisions: D-049 D-052
+    attributes:
+      value:
+        range: string
+        required: true
+        description: The role / category, or the numeric level as a string.
+      level:
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+      validFrom:
+        range: date
+        required: true
+      domain:
+        range: string
+
+  AppliedRule:
+    is_a: Utility
+    description: A named preprocessing / alignment rule applied in a step, with its own certainty.
+    annotations:
+      requirements: PROV.SA.METHODS
+    attributes:
+      name:
+        range: string
+        required: true
       certainty:
         range: float
         minimum_value: 0
         maximum_value: 1
-        description: Curator's confidence in this decision (0-1).
-      decided_at:
-        range: datetime
-        required: true
-
-
-  Score:
-    description: >-
-      A score with value and description. Extensible for
-      documenting weights, formulas, and aggregation methods.
-    attributes:
-      value:
-        range: float
-        required: true
-        description: The numeric score value.
-
-      description:
-        range: string
-        description: Explanation of how the score was computed.
-
-
-  EvidenceSynthesis:
-    description: >-
-      Synthesis of evidence with reasoning and overall assessment.
-    attributes:
-      summary:
-        range: string
-        required: true
-        description: Textual summary explaining the conclusion.
-
-      score:
-        range: Score
-        inlined: true
-        description: Aggregated score from the evidence.
-
-      direction:
-        range: EvidenceDirection
-        description: Overall direction - supports or disputes.
-
-      cited_evidence:
-        range: string
-        multivalued: true
-        description: IDs of evidence lines cited in the synthesis.
-
-      generated_by:
-        range: CurationActivity
-        inlined: true
-        description: The activity that generated this synthesis.
-
 
 # =============================================================================
 # Enums
@@ -455,122 +2034,310 @@ classes:
 
 enums:
 
-  CurationStatus:
-    description: Workflow status of the curation.
+  ClaimType:
+    description: The Mondo claim types, named by their profile class.
     permissible_values:
-      UNREVIEWED:
-        description: Not yet reviewed.
-      ACCEPTED:
-        description: Accepted as valid.
-      REJECTED:
-        description: Rejected as invalid.
-      CONTROVERSIAL:
-        description: Conflicting evidence, needs discussion.
+      TermExistenceStatement:
+        annotations: {requirements: C001}
+      DefinitionStatement:
+        annotations: {requirements: C002}
+      SynonymStatement:
+        annotations: {requirements: C003}
+      SubclassStatement:
+        annotations: {requirements: C004}
+      NegativeSubclassStatement:
+        annotations: {requirements: C005}
+      MappingStatement:
+        annotations: {requirements: C006}
+      DiseaseAttributeStatement:
+        annotations: {requirements: C007}
+      SubsetMembershipStatement:
+        annotations: {requirements: C008}
+      MetaclassStatement:
+        annotations: {requirements: C009}
+      ValueSetMembershipStatement:
+        annotations: {requirements: C010}
 
-  DecisionType:
-    description: A curator's decision on an assertion.
+  TermExistencePredicate:
+    annotations: {requirements: C001}
     permissible_values:
-      ACCEPT:
-        description: Accept the assertion.
-      REJECT:
-        description: Reject the assertion.
-      CONTROVERSIAL:
-        description: Mark as controversial for further discussion.
+      isDiseaseConcept: {meaning: rdf:type, description: "Object MONDO:0000001."}
+      isObsolete: {meaning: owl:deprecated}
+      replacedBy: {meaning: IAO:0100001}
+      consider: {meaning: oboInOwl:consider}
 
-  EvidenceDirection:
-    description: Direction of evidence support.
+  DefinitionPredicate:
+    annotations: {requirements: C002}
+    permissible_values:
+      definition: {meaning: IAO:0000115}
+
+  SynonymPredicate:
+    annotations: {requirements: C003}
+    permissible_values:
+      hasExactSynonym: {meaning: oboInOwl:hasExactSynonym}
+      hasRelatedSynonym: {meaning: oboInOwl:hasRelatedSynonym}
+      hasNarrowSynonym: {meaning: oboInOwl:hasNarrowSynonym}
+      hasBroadSynonym: {meaning: oboInOwl:hasBroadSynonym}
+
+  SubclassPredicate:
+    annotations: {requirements: C004 C005}
+    permissible_values:
+      subClassOf: {meaning: rdfs:subClassOf}
+      equivalentClass:
+        meaning: owl:equivalentClass
+        description: One element of a logical definition (one statement per intersection_of element).
+
+  MappingPredicate:
+    annotations: {requirements: C006, decisions: D-006 D-007 D-008 D-014}
+    permissible_values:
+      exactMatch: {meaning: skos:exactMatch, annotations: {decisions: D-006 D-009 D-010 D-017}}
+      broadMatch: {meaning: skos:broadMatch, description: Mondo is narrower than the source., annotations: {decisions: D-014 D-015}}
+      narrowMatch: {meaning: skos:narrowMatch, description: Mondo is broader than the source., annotations: {decisions: D-014}}
+      relatedMatch: {meaning: skos:relatedMatch, description: The target is a different kind of thing (otherHierarchy)., annotations: {decisions: D-008}}
+
+  DiseaseAttributePredicate:
+    annotations: {requirements: C007}
+    permissible_values:
+      hasMaterialBasisInGermlineMutationIn: {meaning: RO:0004003}
+      hasCharacteristic: {meaning: RO:0000053}
+      diseaseHasFeature: {meaning: RO:0004029}
+      diseaseHasLocation: {meaning: RO:0004026}
+      diseaseHasInfectiousAgent: {meaning: RO:0014001}
+      inTaxon: {meaning: RO:0002162}
+      predisposesTowards: {meaning: mondoRel:predisposes_towards}
+
+  SubsetPredicate:
+    annotations: {requirements: C008}
+    permissible_values:
+      inSubset: {meaning: oboInOwl:inSubset}
+
+  MetaclassPredicate:
+    annotations: {requirements: C009}
+    permissible_values:
+      isKindOfClass: {meaning: sieve:isKindOfClass}
+
+  DiseaseKind:
+    annotations: {requirements: C009, decisions: D-040}
+    permissible_values:
+      grouping: {meaning: sieve:grouping}
+      disorder: {meaning: sieve:disorder}
+      subtype: {meaning: sieve:subtype}
+      susceptibility: {meaning: sieve:susceptibility}
+
+  ValueSetPredicate:
+    annotations: {requirements: C010, decisions: D-013}
+    permissible_values:
+      memberOfRecordScope:
+        meaning: sieve:memberOfRecordScope
+        description: The subject is one of the concepts the object record covers (e.g. an OMIM included title).
+
+  MappingDirection:
+    annotations: {requirements: C006 RCS.QUALIFIERS, decisions: D-012}
+    permissible_values:
+      BOTH:
+      EXTERNAL_TO_MONDO: {description: Valid only for translating the external id to Mondo.}
+      MONDO_TO_EXTERNAL: {description: Valid only for translating Mondo to the external id.}
+
+  Direction:
+    annotations: {requirements: EINT.DIRECTION, decisions: D-033}
     permissible_values:
       supports:
-        description: Evidence supports the statement.
       disputes:
-        description: Evidence disputes the statement.
-      neutral:
-        description: Evidence is neutral.
 
-  EvidenceStrength:
-    description: Qualitative strength of evidence.
+  ReviewState:
+    annotations: {requirements: C006, decisions: D-011 D-017 D-024 D-029}
     permissible_values:
-      strong:
-        description: Strong evidence.
-      moderate:
-        description: Moderate evidence.
-      weak:
-        description: Weak evidence.
+      NOT_VERIFIED: {description: "Allowed in, not checked by a curator."}
+      PENDING_REVIEW: {description: Transient warning state that needs human action.}
+      VERIFIED: {description: A curator took responsibility.}
 
-  EvidenceItemType:
-    description: Type of evidence item.
+  DecisionOutcome:
+    annotations: {requirements: EINT.CONTRADICTION, decisions: D-053}
     permissible_values:
-      DataItem:
-        description: Individual data point.
-      Document:
-        description: Publication or document.
-      StudyResult:
-        description: Result from a study.
-      ConcordanceItem:
-        description: Cross-source concordance.
-      ComputationalResult:
-        description: Computational analysis result.
-      AgentContribution:
-        description: Human or organizational contribution.
+      ACCEPTED:
+      REJECTED: {description: Kept on record with its evidence; prevents re-proposal loops.}
+      CONTROVERSIAL: {description: "Kept, with disputing evidence acknowledged."}
+      DEFERRED: {description: Undecided; back in the curation queue.}
 
-  TrustLevel:
-    description: >-
-      Level of trust/authority assigned to a contributor.
-      Key dimension for evidence scoring.
+  AssertionRoute:
+    annotations: {requirements: PROV.ASSERTION.METHOD_TYPES}
     permissible_values:
-      community:
+      INDIVIDUAL_SIGN_OFF: {annotations: {decisions: D-048}}
+      CONSENSUS_SIGN_OFF: {annotations: {decisions: D-046}}
+      DELEGATED_POLICY: {annotations: {decisions: D-064}}
+      PROVIDER_AUTHORITY:
         description: >-
-          General community member with unknown credentials.
-      domain_expert:
-        description: >-
-          Trusted community member with established reputation.
-      curator:
-        description: >-
-          Official curator with domain expertise and curation training.
-      authority:
-        description: >-
-          Authoritative source (e.g., official organization, standards body).
+          Accepted on the authority of an externally managed provider, under a policy.
+          Marks content Mondo passes on as an aggregator.
+        annotations: {requirements: PROV.RETRIEVAL.TARGET_ROLE, decisions: D-017 D-064 D-067}
+      BATCH_SIGN_OFF: {annotations: {decisions: D-066}}
 
-  ContributionChannel:
-    description: >-
-      How a contribution was communicated or submitted.
-      Affects traceability and reliability scoring.
+  ReviewDepth:
+    annotations: {decisions: D-066}
     permissible_values:
-      issue_tracker:
-        description: >-
-          Public issue tracker (GitHub, GitLab, etc.).
-          High traceability.
-      personal_communication:
-        description: >-
-          Private/personal communication (email, conversation).
-          Low traceability.
-      direct_submission:
-        description: >-
-          Formal direct submission to the project.
-          Highest traceability.
-      public_forum:
-        description: >-
-          Public mailing list or forum.
-          Medium-high traceability.
+      NONE:
+      EYEBALLED:
+      SPOT_CHECKED_SAMPLED:
+      SPOT_CHECKED_NOT_SAMPLED:
+      FULL_REVIEW:
 
-  ContributionType:
-    description: >-
-      The nature/type of a contribution.
-      Affects evidence weight based on commitment level.
+  AgentKind:
+    description: The core Agent.subtype value set (person, organization, software).
     permissible_values:
-      suggestion:
-        description: >-
-          A suggestion or proposal without formal commitment.
-          Lowest weight.
-      review:
-        description: >-
-          A review or assessment of existing content.
-          Medium weight.
-      decision:
-        description: >-
-          A formal decision or determination.
-          High weight.
-      provision:
-        description: >-
-          Direct provision of content from an authoritative source.
-          Highest weight.
+      person:
+      organization:
+      software:
+
+  AgentRole:
+    annotations: {decisions: D-002 D-004 D-034}
+    permissible_values:
+      CURATOR: {description: Curator responsible for the claim.}
+      ASSERTER: {description: A named panel or provider that asserted the claim.}
+      PROVIDER: {description: Mondo retrieved the claim from this agent's data.}
+      STAKEHOLDER: {description: Declares interest in the claim but did not assert it.}
+      ENDORSER: {description: A community that endorses the claim (e.g. OMO:0002001 synonyms; provisional).}
+      EXTRACTOR: {description: Created an evidence record (e.g. extracted a passage).}
+      INTERPRETER: {description: Interpreted evidence as a line.}
+
+  InterpretationMethod:
+    annotations: {requirements: PROV.INTERP.METHOD_TYPES}
+    permissible_values:
+      EXPERT_JUDGEMENT: {annotations: {decisions: D-051}}
+      CONSENSUS_PANEL: {annotations: {decisions: D-046}}
+      LLM_JUDGEMENT: {annotations: {decisions: D-050}}
+      COMPUTED_CONCORDANCE: {annotations: {decisions: D-004 D-061}}
+      RULE_BASED_STRENGTH: {annotations: {decisions: D-054}}
+
+  ReadCoverage:
+    annotations: {decisions: D-059}
+    permissible_values:
+      TITLE_ONLY:
+      ABSTRACT_ONLY:
+      SECTIONS:
+      FULL_TEXT:
+      STRUCTURED_RECORD: {description: A database record read as a whole.}
+      NOT_RECORDED: {description: "Not recorded (legacy data only); flagged as a WARNING by profile checks."}
+
+  AccessStatus:
+    annotations: {decisions: D-059}
+    permissible_values:
+      OPEN_ACCESS:
+      PAYWALLED:
+      NOT_ACCESSIBLE:
+      NOT_RECORDED: {description: "Not recorded (legacy data only); flagged as a WARNING by profile checks."}
+
+  VerificationOutcome:
+    annotations: {decisions: D-050}
+    permissible_values:
+      VERIFIED:
+      FAILED:
+      NOT_CHECKED:
+
+  LineValidity:
+    annotations: {requirements: EINT.FLAT_COLLAPSE, decisions: D-052}
+    permissible_values:
+      VALID:
+      INVALIDATED:
+
+  LineAction:
+    annotations: {requirements: EINT.FLAT_COLLAPSE, decisions: D-050 D-052}
+    permissible_values:
+      ACCEPTED_UNCHANGED:
+      SUPERSEDED: {description: Replaced by a corrected line (the human "modified" it).}
+      INVALIDATED: {description: Not useful evidence; excluded from the score.}
+
+  DataQualityFlag:
+    annotations: {decisions: D-050 D-062 D-063}
+    permissible_values:
+      QUOTE_NOT_FOUND:
+      IDENTIFIER_UNRESOLVED:
+      MISGROUNDED:
+      SUSPECTED_HALLUCINATION:
+      STALE_MAPPING:
+
+  DerivationType:
+    annotations: {decisions: D-030 D-031}
+    permissible_values:
+      CLONED_FROM: {description: The term was created as a clone of the source record.}
+      COPIED_FROM: {description: The axiom was copied from the source.}
+      INSPIRED_BY: {description: "Text adapted from the source (definitions); not verbatim, not a confirmation."}
+
+  ResourceRole:
+    annotations: {requirements: PROV.RETRIEVAL.SOURCE_ROLE, decisions: D-067}
+    permissible_values:
+      PRIMARY:
+      AGGREGATOR:
+
+  ProposingChannel:
+    annotations: {requirements: PROV.RETRIEVAL.AGENT, decisions: D-063}
+    permissible_values:
+      CURATOR:
+      COMMUNITY_REQUEST:
+      LEXICAL_PIPELINE:
+      SOURCE_INGEST:
+      PROVIDER_SYNC:
+      AI_AGENT:
+      LEGACY_MERGE: {description: kBOOM merge.}
+
+  EntitySlot:
+    permissible_values:
+      subject:
+      predicate:
+      object:
+
+  TransformationCategory:
+    description: MeDIC TransformationCategory (provisional).
+    annotations: {requirements: PROV.SA.METHOD_TYPES}
+    permissible_values:
+      EXTRACTION:
+      TRANSLATION:
+      GROUNDING:
+      NORMALIZATION:
+
+  TransformationMethod:
+    description: MeDIC TransformationMethod (provisional).
+    annotations: {requirements: PROV.SA.METHOD_TYPES}
+    permissible_values:
+      LLM:
+      DETERMINISTIC_RULE:
+      LEXICAL_MATCH:
+      TRANSLITERATION:
+      API:
+      STRUCTURED_FIELD:
+      SOURCE_ASSERTED:
+      HUMAN:
+
+  StepStatus:
+    annotations: {requirements: PROV.SA.REVIEW}
+    permissible_values:
+      MACHINE:
+      CANDIDATE:
+      UNDER_REVIEW:
+      CONFIRMED:
+      REJECTED:
+
+  ConfidenceBasis:
+    annotations: {requirements: PROV.SA.CONFIDENCE_SCORE, decisions: D-062}
+    permissible_values:
+      MEASURED: {description: A scorer evaluated this input.}
+      DETERMINISTIC: {description: Cannot be wrong; 1.0.}
+      PRIOR: {description: Assumed constant for the pinned model / tool version.}
+
+  AlignmentQuality:
+    description: MeDIC per-step quality categories (grounding, extraction, normalisation).
+    annotations: {requirements: PROV.SA.CONFIDENCE_CATEGORY, decisions: D-062}
+    permissible_values:
+      grounding_curated:
+      grounding_lexical_exact:
+      grounding_lexical_exact_normalized:
+      grounding_lexical_exact_surgery:
+      grounding_source_asserted:
+      grounding_unresolved:
+      extraction_verbatim:
+      extraction_canonicalized:
+      extraction_synonym:
+      extraction_not_stated:
+      normalization_curated:
+      normalization_asserted_exact:
+      normalization_deprecated_replacement:
+      normalization_identity:
