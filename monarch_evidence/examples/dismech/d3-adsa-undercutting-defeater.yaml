@@ -123,90 +123,222 @@ minimal:
       is the deep reason the target has to be an object, not an implicit parent.
 
 # ---------------------------------------------------------------------------
-# TRACK 2 — SEPIO Monarch, using PROPOSED nesting (does not exist today)
+# TRACK 2 — SIEVE (SEPIO-core profile driven by the Mondo requirements)
 # ---------------------------------------------------------------------------
+# MISFIT, twice over. The claims the evidence bears on are two pathophysiology nodes of
+# MONDO:0012166 (mechanisms, not a Mondo claim type), and the discussion is a claim about
+# the ADMISSIBILITY of one of their lines, which SIEVE cannot express at all. What fits is
+# rendered as fragments: the publications, the three discussion passages, the line being
+# undercut, the one genuinely rebutting line, and the CLOSEST available rendering of the
+# undercut (a higher-order line), whose loss is spelled out in its `_lossy` note.
+# `_target` names the DisMech host each line belongs to. Agents, methods, dates and run
+# ids are illustrative (sieve:).
 sepio_monarch:
-  # 1. the line being undercut, on the original packet
-  - id: sieve:pkt_adsa_rnf170_erad
-    statement:
-      type: SieveStatement
-      subject: MONDO:0012166              # autosomal dominant sensory ataxia 1
-      predicate: {code: has_pathophysiology, label: has pathophysiology}
-      object: dismech:node_impaired_erlin_rnf170_erad
-    has_evidence_lines:
-      - id: line_adsa_null_mouse
-        type: SieveEvidenceLine
-        direction_of_evidence_provided: supports
-        strength_of_evidence_provided: strong
-        evidence_source: MODEL_ORGANISM
-        description: Rnf170-null mice develop ADSA-like proprioceptive loss and age-dependent gait abnormality.
-        has_evidence_items:
-          - {id: span_26433933_gait, type: SieveDataItem, value: "…age-dependent gait abnormalities in mice lacking the Rnf170 gene…", reported_in: PMID:26433933}
-        # ▼ PROPOSED slot — nothing like this exists in sieve.yaml or minimal.yaml today
-        admissibility_status: DISPUTED
-        disputed_by: [line_adsa_undercut]
+  misfit: >-
+    Neither claim in this record is a Mondo claim type. The lines attach to two
+    pathophysiology nodes of MONDO:0012166 ("RNF170 protein destabilization by enhanced
+    autoubiquitination", "impaired erlin1/2-RNF170-mediated IP3 receptor ERAD"). These are
+    mechanisms, not definitional disease attributes. The gene basis (RNF170) is not what
+    is in dispute here, so recasting this as a DiseaseAttributeStatement would misstate it.
+    The discussion itself claims that the Rnf170-null mouse line is INADMISSIBLE for those
+    mechanisms: an undercutting defeater whose target is an evidence line, not a statement.
+    In SIEVE a line's target is always its enclosing Statement and direction is only
+    supports | disputes, so an undercut can only be rendered as a disputing line. The
+    profile reads that as a rebuttal of the mechanism, which is exactly the conflation
+    DisMech's discussion warns against. The proposed experiments (prospective evidence)
+    and the OPEN / HUMAN_MODEL_MISMATCH discussion state have no class either.
+  fragments:
 
-  # 2. the defeater, modelled as an EvidenceLine whose TARGET is another EvidenceLine
-  - id: sieve:pkt_adsa_null_mouse_admissibility
-    status: CONTROVERSIAL
-    statement:
-      id: stmt_adsa_null_mouse_admissibility
-      type: SieveStatement
-      # the SUBJECT of this statement is itself an evidence line — the nesting SEPIO allows
-      subject: line_adsa_null_mouse
-      predicate: {code: is_valid_evidence_for, label: is valid evidence for}
-      object: dismech:node_impaired_erlin_rnf170_erad
-      statement_text: >-
-        The Rnf170-null mouse phenotype is not valid evidence for a loss-of-function mechanism
-        in ADSA, because the null genotype corresponds to the recessive human disease.
-    has_evidence_lines:
-      - id: line_adsa_undercut
+    # --- documents --------------------------------------------------------------------
+    - class: Publication
+      data:
+        id: PMID:26433933
+        type: Publication
+        pmid: "26433933"
+        title: Age-dependent gait abnormalities in mice lacking the Rnf170 gene linked to human autosomal-dominant sensory ataxia.
+        resource: infores:pubmed
+        generationContext:
+          - {code: "dismech:MODEL_ORGANISM", label: model organism (DisMech evidence_source)}
+    - class: Publication
+      data:
+        id: PMID:32943585
+        type: Publication
+        pmid: "32943585"
+        title: "Mutation in RNF170 causes sensory ataxic neuropathy with vestibular areflexia: a CANVAS mimic."
+        resource: infores:pubmed
+        generationContext:
+          - {code: "dismech:HUMAN_CLINICAL", label: human clinical (DisMech evidence_source)}
+    - class: Publication
+      data:
+        id: PMID:39177409
+        type: Publication
+        pmid: "39177409"
+        title: Canine RNF170 Single Base Deletion in a Naturally Occurring Model for Human Neuroaxonal Dystrophy.
+        resource: infores:pubmed
+        generationContext:
+          - {code: "dismech:MODEL_ORGANISM", label: model organism (DisMech evidence_source)}
+
+    # --- passages (the discussion's three items) ----------------------------------------
+    # quoteVerification is NOT_CHECKED: DisMech's validate-references compares PMID snippets
+    # against the cached abstract, but no per-item outcome is recorded.
+    - class: TextPassage
+      data:
+        id: sieve:tp/pmid-26433933-dominant-unresolved
+        type: TextPassage
+        statementText: "Although this mutant allele is known to be dominant, the functional identity thereof has not been clearly established."
+        reportedIn: [PMID:26433933]
+        textLocation: {section: Abstract}
+        quoteVerification: NOT_CHECKED
+        contributions: &d3_extract
+          - id: sieve:act/adsa-extraction
+            type: SieveContribution
+            contributor: sieve:agent/dismech-curation-agent
+            role: EXTRACTOR
+            date: 2026-07-18
+            specifiedBy: [sieve:method/dismech-references-skill]
+            runId: sieve:run/dismech-adsa-session
+    - class: TextPassage
+      data:
+        id: sieve:tp/pmid-32943585-haploinsufficiency
+        type: TextPassage
+        statementText: "despite previous evidence of reduced stability and expression level of mutant Arg199Cys RNF170 haploinsufficiency is unlikely to be the primary disease since heterozygous carriers of nonsense variants in RNF170 were later shown to be unaffected"
+        reportedIn: [PMID:32943585]
+        textLocation: {section: Abstract}
+        quoteVerification: NOT_CHECKED
+        contributions: *d3_extract
+    - class: TextPassage
+      data:
+        id: sieve:tp/pmid-39177409-spg85
+        type: TextPassage
+        statementText: "RNF170 variants were previously identified in human patients with autosomal recessive spastic paraplegia-85 (SPG85); this clinical phenotype shows similarities to the dogs described herein."
+        reportedIn: [PMID:39177409]
+        textLocation: {section: Abstract}
+        quoteVerification: NOT_CHECKED
+        contributions: *d3_extract
+
+    # --- 1. the line being undercut --------------------------------------------------
+    - class: SieveEvidenceLine
+      data:
+        _target: "pathophysiology#Impaired erlin1/2-RNF170-Mediated IP3 Receptor ERAD (and #RNF170 Protein Destabilization by Enhanced Autoubiquitination)"
+        _reconstructed: >-
+          The node-level item is not quoted in as_is; this line is reconstructed from the
+          discussion rationale and points at the publication, not at a passage.
+        id: sieve:el/adsa-null-mouse
         type: SieveEvidenceLine
-        direction_of_evidence_provided: disputes
-        strength_of_evidence_provided: strong
-        evidence_source: HUMAN_CLINICAL
-        has_evidence_items:
-          - {id: span_32943585_haploinsuff, type: SieveDataItem, value: "…heterozygous carriers of nonsense variants in RNF170 were later shown to be unaffected", reported_in: PMID:32943585}
-          - {id: span_39177409_canine, type: SieveDataItem, value: "RNF170 variants were previously identified in human patients with autosomal recessive spastic paraplegia-85 (SPG85)…", reported_in: PMID:39177409}
+        hasEvidenceItems: [PMID:26433933]
+        directionOfEvidenceProvided: supports
+        independenceCluster: sieve:cluster/pmid-26433933
         contributions:
-          - {type: Contribution, contributor: {id: "dismech:agent/claude-opus", type: Agent, subtype: software}, contribution_type: interpretation, date: '2026-07-18'}
-    decisions:
-      - {decision_type: FLAG, rationale: "Open — no p.Arg199Cys knock-in animal exists.", certainty: high}
+          - id: sieve:act/adsa-interp-null-mouse
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            runId: sieve:run/dismech-adsa-session
+            rationale: Rnf170-/- mice develop ADSA-like proprioceptive loss and age-dependent gait abnormality.
 
-    # 3. prospective evidence — experiments that WOULD produce evidence lines
-    planned_evidence:
-      - id: exp_adsa_r199c_knockin_mouse
-        label: Heterozygous Rnf170 p.Arg199Cys knock-in mouse versus null littermates
-        would_produce_line_for: dismech:node_rnf170_protein_destabilization
-        expected_direction: supports
-        specified_by: >-
-          If the heterozygous knock-in is affected while the heterozygous null is not, the
-          allele acts by a mechanism other than haploinsufficiency.
+    # --- 2. genuine rebuttal: human genetics against the loss-of-function mechanism -----
+    - class: SieveEvidenceLine
+      data:
+        _target: "pathophysiology#RNF170 Protein Destabilization by Enhanced Autoubiquitination (loss-of-function reading)"
+        id: sieve:el/adsa-haploinsufficiency-32943585
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:tp/pmid-32943585-haploinsufficiency]
+        directionOfEvidenceProvided: disputes
+        independenceCluster: sieve:cluster/pmid-32943585
+        contributions:
+          - id: sieve:act/adsa-interp-haploinsufficiency
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            runId: sieve:run/dismech-adsa-session
+            rationale: >-
+              Human genetic evidence that the loss-of-function state modelled by the null
+              mouse does not cause the dominant disease.
+
+    # --- 3. closest rendering of the undercut: a higher-order line (EINT.STACKING) -------
+    - class: SieveEvidenceLine
+      data:
+        _target: discussions[adsa_null_mouse_models_recessive_not_dominant_disease]
+        _lossy: >-
+          SIEVE lets this line NAME the null-mouse line among its items, but its target is
+          still the enclosing statement (the mechanism) and `disputes` reads as a rebuttal.
+          An aggregation rule would count it as one more disputing line, when its intended
+          effect is to remove sieve:el/adsa-null-mouse from the tally. Nothing marks the
+          referenced line as the one under attack rather than as supporting input.
+        id: sieve:el/adsa-undercut
+        type: SieveEvidenceLine
+        hasEvidenceItems:
+          - sieve:el/adsa-null-mouse
+          - sieve:tp/pmid-32943585-haploinsufficiency
+          - sieve:tp/pmid-39177409-spg85
+          - sieve:tp/pmid-26433933-dominant-unresolved
+        directionOfEvidenceProvided: disputes
+        independenceCluster: sieve:cluster/adsa-null-mouse-admissibility
+        contributions:
+          - id: sieve:act/adsa-interp-undercut
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            runId: sieve:run/dismech-adsa-session
+            rationale: >-
+              Heterozygous human null carriers are unaffected and homozygotes have SPG85, so
+              the null mouse models the recessive disease and its phenotype cannot be used as
+              evidence that ADSA is caused by loss of RNF170 function.
 
 # ---------------------------------------------------------------------------
 gaps:
+  profile_misfit: >-
+    Two whole claim kinds are outside the profile: mechanism claims (pathophysiology
+    nodes) and claims about the admissibility of an evidence line. Lost: the statements
+    the lines are about (kept only as `_target`), the discussion as an object
+    (kind HUMAN_MODEL_MISMATCH, status OPEN, prompt), the undercutting relation itself, and
+    the proposed experiments. The evidence side (publications, passages, lines,
+    interpretation acts) fits, and so does the higher-order line structure, which is lossy.
   defeaters_R15: >-
-    The core gap. "This evidence is inadmissible for this claim" is categorically different
-    from "this evidence refutes this claim", and conflating them corrupts any aggregation: a
-    naive NER would count the undercutting argument as one more REFUTES line about the
-    mechanism, when its actual effect is to REMOVE a SUPPORTS line from the tally. SEPIO's
-    Statement-about-an-EvidenceLine nesting is the obvious home; whether it is legal, and what
-    the pattern is, must be settled with Matt (SPEC Q5).
+    Still open: the core gap survives the new profile. SieveEvidenceLine can reference
+    another line (EINT.STACKING), but only as input, with direction supports | disputes
+    relative to the enclosing Statement. There is no "undercuts" direction and no line
+    target. The nearest mechanisms do not fit. LineStatusChange INVALIDATED +
+    validity INVALIDATED records a curator's verdict that a line is out, with no evidence
+    of its own, and the discussion is OPEN, so no such verdict exists. dataQualityFlags
+    cover misreading (QUOTE_NOT_FOUND, MISGROUNDED), not translational validity. A naive
+    aggregation over the fragments would therefore still count the undercut as a rebuttal.
+    Settle the pattern with Matt (SPEC Q5).
   direction_is_relative: >-
-    The same text span is REFUTE relative to one claim and SUPPORTS relative to another.
-    Direction lives on the line, not the item — the microschema gets this right, and this
-    example is the proof that it must.
+    Confirmed by the profile. Direction lives on SieveEvidenceLine (directionOfEvidenceProvided),
+    never on the TextPassage, so the PMID:32943585 passage can be used by the rebutting line
+    (disputes the mechanism) and by the undercut line without contradiction. The target the
+    direction is relative to is the enclosing Statement, which is the part that is missing here.
   prospective_evidence: >-
-    `proposed_experiments` + `would_support` describe evidence that does not exist yet. This is
-    a research-agenda object, arguably outside the evidence model entirely — but it is
-    load-bearing for DisMech's purpose (surfacing what would resolve a controversy) and has no
-    home in either profile.
+    Still open. Nothing in SIEVE describes evidence that does not exist yet:
+    `proposed_experiments` / `would_support` has no class. The closest core notion,
+    Method (a protocol), carries no expected direction and no target claim.
   curation_state_leakage: >-
-    `status: OPEN` and `kind: HUMAN_MODEL_MISMATCH` are curation-workflow state living inside
-    the knowledge base. Track 2 has `CurationStatus`/`CurationDecision` for exactly this;
-    DisMech has invented a parallel vocabulary. Worth reconciling before adoption.
+    Partly addressed in principle. For a Mondo claim, OPEN maps to
+    SieveStatement.reviewState PENDING_REVIEW, and an unresolved verdict to an
+    AssertionDecision with outcome DEFERRED. Here there is no statement to carry either, so
+    neither is rendered, and no decision is invented. `kind: HUMAN_MODEL_MISMATCH` has no
+    counterpart in SIEVE.
   attaches_to_granularity: >-
-    `attaches_to` points at pathophysiology NODES, not at the evidence lines on them. The
-    undercutting relation is therefore not machine-recoverable even in principle from the
-    current data — a curator has to read the rationale prose to know which line is being
-    challenged.
+    Addressed as a capability, not in the data. SIEVE lines have ids, so a defeater COULD
+    point at sieve:el/adsa-null-mouse rather than at a node, as fragment 3 does. DisMech's
+    `attaches_to` still names nodes, and the undercut line here had to be reconstructed from
+    the rationale. Until DisMech items carry line-level ids, the relation is not recoverable
+    from the source.
+  interpretation_provenance: >-
+    Newly expressible. Each line has an InterpretationActivity (agent, date, LLM_JUDGEMENT,
+    method, readCoverage ABSTRACT_ONLY, run id, rationale). DisMech holds the real agent and
+    date only in history/ at section grain. accessStatus is left out because DisMech does
+    not record it.

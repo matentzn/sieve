@@ -122,56 +122,238 @@ minimal:
           reported_in: {id: "DOID:0060450", title: Lisch epithelial corneal dystrophy, document_type: DATABASE_RECORD}
 
 # ---------------------------------------------------------------------------
-# TRACK 2 — what the packet should carry that it does not
+# TRACK 2 — the same packet in the SIEVE profile (validates against schema/sieve.yaml)
+# Per-line differences from `as_is`:
+#   - each ConcordanceItem splits into a ConcordantAssertion (what the source asserts, in its
+#     own ids) + the ExternalRecord that makes it + a ResolutionChain (how OMIM:620763 became
+#     MONDO:0010425). The chain's mapping set is mondo.sssom.tsv; its version is not recorded.
+#   - the lines carry NO scoreOfEvidenceProvided. 0.95 / 0.90 / 0.85 are per-source
+#     constants: they belong on InformationResource.qualityRatings in the registry (see
+#     `_registry` below; not part of the packet), where the inclusion score S picks them up
+#     as q_i (D-060, D-063).
+#   - the NER (1.0) is dropped. It is not the inclusion score S, and nothing computed S, so
+#     statement.score is empty until an AggregationRule runs.
+#   - UNREVIEWED -> reviewState NOT_VERIFIED, no AssertionDecision.
 # ---------------------------------------------------------------------------
 sepio_monarch:
   id: sieve:pkt_000564
-  status: UNREVIEWED
-  statement: "… as in `as_is` …"
-  has_evidence_lines: "… as in `as_is`, plus per line: …"
-  line_extensions:
-    eco_code: <TODO — needs OLS lookup, not invention; spec blocker B2>
-    mapping_set: mondo.sssom.tsv                 # WHICH mapping asserted OMIM:620763 == MONDO:0010425
-    contributions:
-      - type: Contribution
-        contributor: {id: "mondo-ai:OWLExtractor", type: Agent, subtype: software}
-        contribution_type: provision
-        date: '2026-03-18'
-        specified_by: "mondo-ai pipeline, ResourceConfig weights omim=0.95 ordo=0.90 doid=0.85"
-  evidence_synthesis:
-    summary: >-
-      Three source ontologies independently carry this exact synonym. No source is known to
-      lack it (see gaps — absence is not represented). Recommend CONFIRM.
-    score: {value: 1.0, description: Net Evidence Ratio (NER)}
-    direction: supports
-    cited_evidence: [el_omim_0564, el_ordo_29022, el_doid_59964]
-    method: "NER over 3 supporting lines, weights 0.95/0.90/0.85"
-    generated_by: {type: CurationActivity, contributor: {id: "mondo-ai:Scorer", type: Agent}, date: '2026-03-18'}
+  type: EvidencePacket
+  version: "2026-03-18"
+  statement:
+    id: sieve:stmt_18a47f16593f
+    type: SynonymStatement
+    subject: MONDO:0010425
+    predicate: {code: oboInOwl:hasExactSynonym, label: exact synonym}
+    object: LECD
+    statementText: "Lisch epithelial corneal dystrophy has exact synonym 'LECD'"
+    reviewState: NOT_VERIFIED
+    proposingChannel: SOURCE_INGEST
+    hasEvidenceLines:
+      - id: el_omim_0564
+        type: SieveEvidenceLine
+        hasEvidenceItems: [ev_omim_0564]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: strong      # as emitted by mondo-ai; no rule band behind it (see gaps)
+        dateAttached: "2026-03-18"
+        contributions:
+          - id: sieve:act/el_omim_0564
+            type: InterpretationActivity
+            contributor: sieve:agent/mondo-ai-owl-extractor
+            role: INTERPRETER
+            date: "2026-03-18"
+            methodType: COMPUTED_CONCORDANCE
+            specifiedBy: [sieve:method/mondo-ai-concordance]
+            readCoverage: STRUCTURED_RECORD
+        _note: >-
+          mondo-ai labels this grounding EXACT_MATCH_LOW_CONFIDENCE (subject_normalization).
+          The profile has no AlignmentQuality value for it, and no number was emitted, so the
+          chain step carries no confidence. See gaps.grounding_quality_label_has_no_value.
+      - id: el_ordo_29022
+        type: SieveEvidenceLine
+        hasEvidenceItems: [ev_ordo_29022]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: strong
+        dateAttached: "2026-03-18"
+        contributions:
+          - id: sieve:act/el_ordo_29022
+            type: InterpretationActivity
+            contributor: sieve:agent/mondo-ai-owl-extractor
+            role: INTERPRETER
+            date: "2026-03-18"
+            methodType: COMPUTED_CONCORDANCE
+            specifiedBy: [sieve:method/mondo-ai-concordance]
+            readCoverage: STRUCTURED_RECORD
+      - id: el_doid_59964
+        type: SieveEvidenceLine
+        hasEvidenceItems: [ev_doid_59964]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: strong
+        dateAttached: "2026-03-18"
+        contributions:
+          - id: sieve:act/el_doid_59964
+            type: InterpretationActivity
+            contributor: sieve:agent/mondo-ai-owl-extractor
+            role: INTERPRETER
+            date: "2026-03-18"
+            methodType: COMPUTED_CONCORDANCE
+            specifiedBy: [sieve:method/mondo-ai-concordance]
+            readCoverage: STRUCTURED_RECORD
+  concordantAssertions:
+    - id: ev_omim_0564
+      type: ConcordantAssertion
+      subject: OMIM:620763
+      predicate: {code: oboInOwl:hasExactSynonym}
+      object: LECD
+      reportedIn: [OMIM:620763]
+      resource: infores:omim
+      groundings:
+        - id: sieve:chain/omim-620763
+          type: ResolutionChain
+          entitySlot: subject
+          date: "2026-03-18"
+          specifiedBy: [sieve:method/mondo-ai-concordance]
+          steps:
+            - id: sieve:step/omim-620763-1
+              type: AlignmentStep
+              category: GROUNDING
+              method: STRUCTURED_FIELD
+              inputValue: OMIM:620763
+              outputValue: MONDO:0010425
+              predicate: skos:exactMatch
+              mappingSet: https://w3id.org/sieve/mapping-set/mondo.sssom.tsv
+    - id: ev_ordo_29022
+      type: ConcordantAssertion
+      subject: Orphanet:98955
+      predicate: {code: oboInOwl:hasExactSynonym}
+      object: LECD
+      reportedIn: [Orphanet:98955]
+      resource: infores:orphanet
+      groundings:
+        - id: sieve:chain/orphanet-98955
+          type: ResolutionChain
+          entitySlot: subject
+          date: "2026-03-18"
+          specifiedBy: [sieve:method/mondo-ai-concordance]
+          steps:
+            - id: sieve:step/orphanet-98955-1
+              type: AlignmentStep
+              category: GROUNDING
+              method: STRUCTURED_FIELD
+              inputValue: Orphanet:98955
+              outputValue: MONDO:0010425
+              predicate: skos:exactMatch
+              mappingSet: https://w3id.org/sieve/mapping-set/mondo.sssom.tsv
+    - id: ev_doid_59964
+      type: ConcordantAssertion
+      subject: DOID:0060450
+      predicate: {code: oboInOwl:hasExactSynonym}
+      object: LECD
+      reportedIn: [DOID:0060450]
+      resource: infores:disease-ontology
+      groundings:
+        - id: sieve:chain/doid-0060450
+          type: ResolutionChain
+          entitySlot: subject
+          date: "2026-03-18"
+          specifiedBy: [sieve:method/mondo-ai-concordance]
+          steps:
+            - id: sieve:step/doid-0060450-1
+              type: AlignmentStep
+              category: GROUNDING
+              method: STRUCTURED_FIELD
+              inputValue: DOID:0060450
+              outputValue: MONDO:0010425
+              predicate: skos:exactMatch      # stored by mondo-ai under the misnamed key mappingJustification
+              mappingSet: https://w3id.org/sieve/mapping-set/mondo.sssom.tsv
+  externalRecords:
+    - id: OMIM:620763
+      type: ExternalRecord
+      label: corneal dystrophy, lisch epithelial
+      resource: infores:omim
+      generationContext:
+        - {code: "sieve:basis_unknown"}
+      recordMetadata:
+        retrievedFrom: infores:omim
+        retrievalDate: "2026-03-18"            # packet creation date; mondo-ai records no release
+    - id: Orphanet:98955
+      type: ExternalRecord
+      label: Lisch epithelial corneal dystrophy
+      resource: infores:orphanet
+      generationContext:
+        - {code: "sieve:basis_unknown"}
+      recordMetadata:
+        retrievedFrom: infores:orphanet
+        retrievalDate: "2026-03-18"
+    - id: DOID:0060450
+      type: ExternalRecord
+      label: Lisch epithelial corneal dystrophy
+      resource: infores:disease-ontology
+      generationContext:
+        - {code: "sieve:basis_unknown"}
+      recordMetadata:
+        retrievedFrom: infores:disease-ontology
+        retrievalDate: "2026-03-18"
+  # Registry data the packet refers to by id (a SieveRegistry fragment, not part of the
+  # packet). This is where mondo-ai's ResourceConfig weights go: dated, per resource, scoped
+  # to the claim type. DOID derives content from OMIM, so the aggregation rule can put the
+  # DOID line in OMIM's independence cluster.
+  _registry:
+    resources:
+      - {id: infores:omim, type: InformationResource, label: OMIM, curiePrefixes: [OMIM], defaultRole: PRIMARY,
+         qualityRatings: [{level: 0.95, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
+      - {id: infores:orphanet, type: InformationResource, label: Orphanet, curiePrefixes: [Orphanet], defaultRole: PRIMARY,
+         qualityRatings: [{level: 0.90, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
+      - {id: infores:disease-ontology, type: InformationResource, label: Disease Ontology, curiePrefixes: [DOID], defaultRole: PRIMARY,
+         derivesContentFrom: [infores:omim],
+         qualityRatings: [{level: 0.85, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
+    agents:
+      - {id: sieve:agent/mondo-ai-owl-extractor, type: SieveAgent, subtype: software, name: mondo-ai OWLExtractor}
+    methods:
+      - {id: sieve:method/mondo-ai-concordance, type: SieveMethod, label: mondo-ai concordance extraction, version: unknown}
 
 # ---------------------------------------------------------------------------
 gaps:
   score_is_source_reliability_not_evidence_strength: >-
-    `scoreOfEvidenceProvided: 0.95` is a configured constant for OMIM, applied identically to
-    every OMIM-derived line in 160k packets. It is a prior about the SOURCE, not an assessment
-    of THIS evidence. That is defensible — it is exactly the "declared, revisable trust in an
-    interpreter/source" the vision calls for — but it should be recorded as such (a trust level
-    on the source agent, R12) rather than silently occupying the per-line score slot, or the
-    number will be read as "this synonym is 95% right".
+    ADDRESSED: the per-source constant moves to InformationResource.qualityRatings (registry,
+    dated via validFrom, scoped to SynonymStatement), and the inclusion score S applies it as
+    the source prior q_i (D-060, D-063). The line keeps only direction and strength, so 0.95 can
+    no longer be read as "this synonym is 95% right". Remaining: mondo-ai still writes the
+    constant into scoreOfEvidenceProvided; migration must move it, not copy it.
   NER_is_degenerate: >-
-    With `directionOfEvidenceProvided: supports` on every line and no mechanism that can emit a
-    `disputes` line, NER is identically 1.0 across the store. A metric that cannot vary is not
-    a metric. Compare medic hazard H4 — the same defect from the same cause.
+    ADDRESSED in the profile: NER is replaced by the inclusion score S = tanh(L/2) on
+    SieveStatement.score (+ strength band, direction), computed by a versioned AggregationRule
+    with a claim prior L0 per claim type x proposingChannel and one line per independence
+    cluster (SieveEvidenceLine.independenceCluster; DOID derivesContentFrom OMIM). S grows with
+    the amount of evidence and can go negative, so it varies even without disputing lines.
+    Still OPEN in the data: mondo-ai has no rule emitting S, so statement.score is empty here,
+    and nothing yet emits `disputes` lines.
   absence_is_silent_R20: >-
-    A source that does NOT carry the synonym contributes nothing, so "3 of 3 sources agree" and
-    "3 of 12 sources agree" are indistinguishable in the packet. Real concordance evidence needs
-    a denominator. This is the same independence problem as M1 seen from the other side.
+    OPEN. The profile has no denominator either: no way to say "Orphanet record X exists, is
+    mapped to this term, and does not list the synonym". lastConfirmed / lastConfirmedAgainst
+    catch a source that DROPS a synonym it once carried (D-031), and ExternalRecord can be cited
+    with direction disputes, but "never carried it" stays silent.
   concordance_is_not_a_text_span: >-
-    A `ConcordanceItem` has `sourceSubject` and `mappingJustification` but no `value` and no
-    `reported_in`. Squeezing it into the kernel's `TextSpan` range is the one genuine misfit in
-    the corpus. Either the kernel needs a second concrete item shape (a "record match"), or
-    `has_evidence_items` must range over the abstract `EvidenceItem` and let profiles subclass.
-    **This should be raised with SEPIO** — it affects the kernel's class list, not just its enums.
+    ADDRESSED: ConcordantAssertion (the source's own SPO, reportedIn the ExternalRecord, with
+    resource) + ExternalRecord (label as read, resource, recordMetadata) + one ResolutionChain
+    per grounded slot (ConcordantAssertion.groundings, AlignmentStep with predicate and
+    mappingSet). The SynonymStatement matrix permits ConcordantAssertion; no quote is invented.
   no_curation_state_used: >-
-    All 160,187 packets are `UNREVIEWED`. The curation machinery exists and has never been
-    exercised at scale; nothing in the corpus shows a real ACCEPTED/REJECTED decision with a
-    rationale. Any claim that the trust-accumulation model works is currently untested.
+    OPEN (data, not model). All packets are NOT_VERIFIED with no AssertionDecision. The profile
+    now offers the routes that would clear 160k synonyms without 160k sign-offs
+    (DELEGATED_POLICY under a DecisionPolicy, BATCH_SIGN_OFF with a BatchSignOff), but none has
+    been exercised.
+  grounding_quality_label_has_no_value: >-
+    NEW. mondo-ai's subject_normalization EXACT_MATCH_LOW_CONFIDENCE (on the OMIM line only) has
+    no AlignmentQuality value and no confidence number, so the chain step carries neither
+    qualityCategory nor confidence. Either AlignmentQuality needs a "low-confidence exact" value
+    or mondo-ai must emit a numeric confidence with a basis.
+  concordance_strength_has_no_rule: >-
+    NEW. strengthOfEvidenceProvided is meant to be a band from the line's AggregationRule, but a
+    COMPUTED_CONCORDANCE line needs no computedByRule (the profile check only demands it for
+    RULE_BASED_STRENGTH). mondo-ai's "strong" therefore passes validation with nothing behind it.
+  retrieval_release_unknown: >-
+    NEW. ExternalRecord.recordMetadata needs a retrievalDate; mondo-ai records neither the date
+    the source was read nor the release (D-055, D-058). The packet creation date stands in, and
+    sourceRelease / lastConfirmedAgainst stay empty, so lapsed support cannot be detected. The
+    mapping-set version used by the chains (AlignmentStep.mappingSetVersion, D-061) is likewise
+    not recorded.

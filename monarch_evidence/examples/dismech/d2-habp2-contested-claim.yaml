@@ -168,72 +168,369 @@ minimal:
           reported_in: {id: "PMID:33025555", title: "Familial non-medullary thyroid cancer: a critical review.", document_type: REVIEW}
 
 # ---------------------------------------------------------------------------
+# TRACK 2 — SIEVE (SEPIO-core profile driven by the Mondo requirements)
+# ---------------------------------------------------------------------------
+# The GENE-BASIS part of this record is a Mondo claim type: C007 DiseaseAttributeStatement,
+# "familial nonmedullary thyroid carcinoma has material basis in germline mutation in
+# HABP2". It is rendered as one packet whose claim is REJECTED, kept on record with all
+# eight lines. The MECHANISM part (loss of tumour-suppressor function, the causal edge to
+# follicular cell transformation, the hypothesis group) is not a claim type. It is not
+# bent into this packet; see gaps.profile_misfit.
+# One line per DisMech item, each over one TextPassage. Strength bands come from the
+# Track 1 rendering above: DisMech itself records direction only. Agents, methods, rule,
+# dates, run ids and the score are illustrative (sieve:).
 sepio_monarch:
-  id: sieve:pkt_fnmtc_habp2_g534e
-  status: REJECTED
+  id: sieve:pkt/MONDO_0017896-gene-HGNC_4798
+  type: EvidencePacket
+  version: "2026-07-18"
   statement:
-    id: stmt_fnmtc_habp2_g534e
-    type: SieveStatement
-    subject: MONDO:0017896            # familial nonmedullary thyroid carcinoma
-    predicate: {code: has_genetic_basis, label: has genetic basis, system: "https://w3id.org/dismech/"}
-    object: "HGNC:4798 p.Gly534Glu"
-    statement_text: >-
-      Germline HABP2 p.G534E predisposes to familial non-medullary thyroid carcinoma.
-    strength: HYPOTHETICAL             # R17 — DisMech's mechanism_confidence
-  hypothesis_group:
-    id: dismech:habp2_g534e_susceptibility
-    status: DEPRECATED
-
-  # the six lines as above, plus:
-  has_evidence_lines: "… as in `minimal`, each additionally carrying: …"
-  line_extensions:
-    date_authored: '2015-08-13'        # R14 — the ORIGINAL claim, 2015
-    superseded_by: [line_26745718_segregation, line_26906432_nonreplication]   # <- PROPOSED, does not exist
-    contributions:
-      - type: Contribution
-        contributor: {id: "dismech:agent/claude-opus", type: Agent, subtype: software}
-        contribution_type: interpretation
-        specified_by: dismech:skill/dismech-references@<commit>
-
-  evidence_synthesis:
-    summary: >-
-      Three supporting lines, all traceable to the 2015 originating report or a single
-      independent kindred series; five refuting lines from four independent groups, on three
-      logically independent grounds (segregation, population frequency, tissue expression),
-      all published AFTER the original claim. The weight of replication is against a causal
-      role; contemporary reviews treat G534E as a common polymorphism.
-    score: {value: -0.45, description: Net Evidence Ratio (NER), weights: "STRONG=1.0 MODERATE=0.6 WEAK=0.3"}
+    id: sieve:st/MONDO_0017896-gene-HGNC_4798
+    type: DiseaseAttributeStatement
+    subject: MONDO:0017896
+    predicate: {code: RO:0004003, label: has material basis in germline mutation in}
+    object: HGNC:4798
+    statementText: >-
+      Familial nonmedullary thyroid carcinoma has its material basis in germline mutation
+      in HABP2 (proposed allele p.G534E).
+    proposingChannel: AI_AGENT
+    reviewState: VERIFIED
+    score: -0.6
+    strength: moderate
     direction: disputes
-    cited_evidence: [line_26745718_segregation, line_26745718_frequency, line_26745718_expression, line_26906432_nonreplication]
-    generated_by:
-      type: CurationActivity
-      contributor: {id: "dismech:agent/claude-opus", type: Agent}
-      date: '2026-07-18'
-  decisions:
-    - decision_type: REJECT
-      curator: ORCID:0000-0002-7356-1779
-      rationale: Retained as a modelled but refuted branch so the controversy stays auditable.
-      certainty: high
+    hasEvidenceLines:
+
+      # --- supporting: the 2015 originating report (two arguments, one study) -----------
+      - id: sieve:el/habp2-26222560-functional
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:tp/pmid-26222560-functional]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: weak
+        independenceCluster: sieve:cluster/pmid-26222560
+        contributions:
+          - id: sieve:act/habp2-interp-1
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            accessStatus: NOT_RECORDED
+            runId: sieve:run/dismech-fnmtc-session
+            rationale: >-
+              The original functional claim: a dominant-negative effect on a tumor-suppressive
+              HABP2 function, demonstrated in fibroblasts rather than in thyroid cells.
+      - id: sieve:el/habp2-26222560-frequency
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:tp/pmid-26222560-frequency]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: moderate
+        independenceCluster: sieve:cluster/pmid-26222560
+        contributions:
+          - id: sieve:act/habp2-interp-2
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            accessStatus: NOT_RECORDED
+            runId: sieve:run/dismech-fnmtc-session
+            rationale: The case-control frequency argument offered in the original report.
+      - id: sieve:el/habp2-26832773
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:tp/pmid-26832773]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: moderate
+        independenceCluster: sieve:cluster/pmid-26832773
+        contributions:
+          - id: sieve:act/habp2-interp-3
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            accessStatus: NOT_RECORDED
+            runId: sieve:run/dismech-fnmtc-session
+            rationale: The principal independent report favouring a susceptibility role.
+
+      # --- disputing: three arguments from PMID:26745718, kept as three lines --------------
+      - id: sieve:el/habp2-26745718-segregation
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:tp/pmid-26745718-segregation]
+        directionOfEvidenceProvided: disputes
+        strengthOfEvidenceProvided: strong
+        independenceCluster: sieve:cluster/pmid-26745718
+        contributions:
+          - id: sieve:act/habp2-interp-4
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            accessStatus: NOT_RECORDED
+            runId: sieve:run/dismech-fnmtc-session
+            rationale: Segregation failure across seven families, the core genetic argument against causality.
+      - id: sieve:el/habp2-26745718-frequency
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:tp/pmid-26745718-frequency]
+        directionOfEvidenceProvided: disputes
+        strengthOfEvidenceProvided: strong
+        independenceCluster: sieve:cluster/pmid-26745718
+        contributions:
+          - id: sieve:act/habp2-interp-5
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            accessStatus: NOT_RECORDED
+            runId: sieve:run/dismech-fnmtc-session
+            rationale: >-
+              Case and control frequencies are indistinguishable, contradicting the enrichment
+              reported in the original study.
+      - id: sieve:el/habp2-26745718-expression
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:tp/pmid-26745718-expression]
+        directionOfEvidenceProvided: disputes
+        strengthOfEvidenceProvided: strong
+        independenceCluster: sieve:cluster/pmid-26745718
+        contributions:
+          - id: sieve:act/habp2-interp-6
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            accessStatus: NOT_RECORDED
+            runId: sieve:run/dismech-fnmtc-session
+            rationale: >-
+              HABP2 is not expressed in thyroid, a strong biological argument against any
+              thyroid-autonomous tumour-suppressor role.
+      - id: sieve:el/habp2-26906432
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:tp/pmid-26906432]
+        directionOfEvidenceProvided: disputes
+        strengthOfEvidenceProvided: strong
+        independenceCluster: sieve:cluster/pmid-26906432
+        contributions:
+          - id: sieve:act/habp2-interp-7
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            accessStatus: NOT_RECORDED
+            runId: sieve:run/dismech-fnmtc-session
+            rationale: Complete failure to replicate in familial cases and in 509 sporadic cancers.
+
+      # --- the 2020 review: a HIGHER-ORDER line over the refutations (EINT.STACKING) -------
+      # It interprets its own passage AND the four replication lines it synthesises, so it
+      # is recorded as a summary of those lines, not an eighth independent vote.
+      - id: sieve:el/habp2-33025555-synthesis
+        type: SieveEvidenceLine
+        hasEvidenceItems:
+          - sieve:tp/pmid-33025555
+          - sieve:el/habp2-26745718-segregation
+          - sieve:el/habp2-26745718-frequency
+          - sieve:el/habp2-26745718-expression
+          - sieve:el/habp2-26906432
+        directionOfEvidenceProvided: disputes
+        strengthOfEvidenceProvided: moderate
+        independenceCluster: sieve:cluster/habp2-review-synthesis
+        contributions:
+          - id: sieve:act/habp2-interp-8
+            type: InterpretationActivity
+            contributor: sieve:agent/dismech-curation-agent
+            role: INTERPRETER
+            date: 2026-07-18
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/dismech-references-skill]
+            readCoverage: ABSTRACT_ONLY
+            accessStatus: NOT_RECORDED
+            runId: sieve:run/dismech-fnmtc-session
+            rationale: Review-level synthesis reaching the private-variant conclusion.
+
+    assertionDecisions:
+      - id: sieve:dec/habp2-reject
+        type: AssertionDecision
+        contributor: sieve:agent/dismech-curator
+        date: 2026-07-18
+        outcome: REJECTED
+        route: INDIVIDUAL_SIGN_OFF
+        inclusionScore: -0.6
+        scoreBand: moderate
+        aggregationRule: sieve:rule/gene-disease-v1.3
+        signedPacketVersion: "2026-07-18"
+        rationale: >-
+          Retained as a modelled but refuted branch so the controversy stays auditable
+          (DisMech hypothesis status DEPRECATED, mechanism_confidence HYPOTHETICAL).
+
+  # --- evidence items -----------------------------------------------------------------
+  # quoteVerification is NOT_CHECKED: DisMech's validate-references compares PMID snippets
+  # against the cached abstract, but no per-item outcome is recorded. All eight passages
+  # were extracted in one act (one shared SieveContribution).
+  textPassages:
+    - id: sieve:tp/pmid-26222560-functional
+      type: TextPassage
+      statementText: "Since we did not find alterations in the other HABP2 allele in the tumor tissue and our functional studies suggested that HABP2 has a tumor-suppressive effect, we cotransfected equal amounts of the wild-type and G534E mutant constructs into NIH-3T3 cells."
+      reportedIn: [PMID:26222560]
+      textLocation: {section: Abstract}
+      quoteVerification: NOT_CHECKED
+      contributions: &d2_extract
+        - id: sieve:act/habp2-extraction
+          type: SieveContribution
+          contributor: sieve:agent/dismech-curation-agent
+          role: EXTRACTOR
+          date: 2026-07-18
+          specifiedBy: [sieve:method/dismech-references-skill]
+          runId: sieve:run/dismech-fnmtc-session
+    - id: sieve:tp/pmid-26222560-frequency
+      type: TextPassage
+      statementText: "analysis of TCGA data in 423 patients with papillary thyroid cancer showed that 4.7% carried the HABP2 G534E variant, as compared with 0.7% of persons with unknown disease status in multiethnic population databases (P<0.001)."
+      reportedIn: [PMID:26222560]
+      textLocation: {section: Abstract}
+      quoteVerification: NOT_CHECKED
+      contributions: *d2_extract
+    - id: sieve:tp/pmid-26832773
+      type: TextPassage
+      _trimmed: as_is shortens this snippet with an ellipsis
+      statementText: "These results are consistent with HABP2 G534E being a susceptibility gene in a subgroup of FNMTC…"
+      reportedIn: [PMID:26832773]
+      textLocation: {section: Abstract}
+      quoteVerification: NOT_CHECKED
+      contributions: *d2_extract
+    - id: sieve:tp/pmid-26745718-segregation
+      type: TextPassage
+      statementText: "The variant did not segregate with PTC in one large and 6 smaller families in which it occurred."
+      reportedIn: [PMID:26745718]
+      textLocation: {section: Abstract}
+      quoteVerification: NOT_CHECKED
+      contributions: *d2_extract
+    - id: sieve:tp/pmid-26745718-frequency
+      type: TextPassage
+      statementText: "The variant was found to be present in 6.1% familial cases, 8.0% sporadic cases (2 individuals were homozygous for the variant) and 8.7% controls."
+      reportedIn: [PMID:26745718]
+      textLocation: {section: Abstract}
+      quoteVerification: NOT_CHECKED
+      contributions: *d2_extract
+    - id: sieve:tp/pmid-26745718-expression
+      type: TextPassage
+      statementText: "the expression of HABP2 was highest in the liver, much lower in 3 other tested tissues (breast, kidney, brain) but not found in thyroid."
+      reportedIn: [PMID:26745718]
+      textLocation: {section: Abstract}
+      quoteVerification: NOT_CHECKED
+      contributions: *d2_extract
+    - id: sieve:tp/pmid-26906432
+      type: TextPassage
+      statementText: "None of the familial NMTC carried HABP2 mutations. Of 509 sporadic NMTC, only one case (0.2%) harbored the G534E variant."
+      reportedIn: [PMID:26906432]
+      textLocation: {section: Abstract}
+      quoteVerification: NOT_CHECKED
+      contributions: *d2_extract
+    - id: sieve:tp/pmid-33025555
+      type: TextPassage
+      statementText: "All these studies failed in detecting the p.G534E mutation in FNMTC suggesting that Gara et al. identified a private variation"
+      reportedIn: [PMID:33025555]
+      textLocation: {section: Abstract}
+      quoteVerification: NOT_CHECKED
+      contributions: *d2_extract
+
+  publications:
+    - id: PMID:26222560
+      type: Publication
+      pmid: "26222560"
+      title: Germline HABP2 Mutation Causing Familial Nonmedullary Thyroid Cancer.
+      resource: infores:pubmed
+      generationContext:
+        - {code: "dismech:IN_VITRO", label: in vitro (DisMech evidence_source)}
+        - {code: "dismech:HUMAN_CLINICAL", label: human clinical (DisMech evidence_source)}
+    - id: PMID:26832773
+      type: Publication
+      pmid: "26832773"
+      title: HABP2 G534E Mutation in Familial Nonmedullary Thyroid Cancer.
+      resource: infores:pubmed
+      generationContext:
+        - {code: "dismech:HUMAN_CLINICAL", label: human clinical (DisMech evidence_source)}
+    - id: PMID:26745718
+      type: Publication
+      pmid: "26745718"
+      title: HABP2 G534E Variant in Papillary Thyroid Carcinoma.
+      resource: infores:pubmed
+      generationContext:
+        - {code: "dismech:HUMAN_CLINICAL", label: human clinical (DisMech evidence_source)}
+    - id: PMID:26906432
+      type: Publication
+      pmid: "26906432"
+      title: HABP2 Gene Mutations Do Not Cause Familial or Sporadic Non-Medullary Thyroid Cancer in a Highly Inbred Middle Eastern Population.
+      resource: infores:pubmed
+      generationContext:
+        - {code: "dismech:HUMAN_CLINICAL", label: human clinical (DisMech evidence_source)}
+    - id: PMID:33025555
+      type: Publication
+      pmid: "33025555"
+      title: "Familial non-medullary thyroid cancer: a critical review."
+      resource: infores:pubmed
+      generationContext:
+        - {code: "PT:review", label: Review}
 
 # ---------------------------------------------------------------------------
 gaps:
+  profile_misfit: >-
+    Only the gene-basis reading fits a claim type (C007). Lost: the mechanism itself (HABP2
+    G534E causing loss of a tumour-suppressor function), the downstream causal edge to
+    multifocal follicular cell transformation (causal_link_type UNKNOWN), the
+    habp2_g534e_susceptibility hypothesis group and its DEPRECATED status, and the
+    node-level mechanism_confidence. Two more things are lost inside the packet. (1)
+    Allele specificity: the object is the gene HGNC:4798, and the variant p.G534E survives
+    only in statementText, because C007 has no allele qualifier. (2) Susceptibility: Mondo
+    would put a susceptibility gene on a susceptibility subtype term, not on the
+    FNMTC grouping. The subject is kept as DisMech's disease to avoid inventing a term.
   no_aggregation: >-
-    In DisMech the verdict "the refutations win" exists only as prose. A consumer reading the
-    YAML programmatically sees 3 SUPPORT and 5 REFUTE and has no defensible way to combine
-    them. This is exactly what `EvidenceSynthesis` (R9) is for, and it is the clearest
-    single argument for Track 2 in the whole corpus.
+    Addressed. The verdict is now data: the statement carries the inclusion score
+    (score -0.6, direction disputes, strength band), computed by an AggregationRule, and an
+    AssertionDecision records outcome REJECTED with inclusionScore, scoreBand, aggregationRule
+    and signedPacketVersion. A REJECTED claim stays on record with its eight lines, which
+    blocks re-proposal loops. The numbers here are illustrative: DisMech records no
+    strengths, and the bands come from the Track 1 rendering.
   one_document_three_arguments: >-
-    PMID:26745718 yields three logically independent refutations. Under the naive "one line
-    per snippet" rule they become three lines by accident; under the agreed grouping rule
-    (group by direction+strength+source+document) they would WRONGLY merge into one, because
-    the rule has no term for "different reasoning". The rule needs the escape clause made
-    explicit and testable, or extraction pipelines will merge genuinely distinct arguments.
+    Partly addressed. SIEVE puts no maximum on items per line (D-046 parked), so the three
+    PMID:26745718 arguments stay three lines, one per TextPassage. They share
+    independenceCluster pmid-26745718, though, and only the strongest line per cluster
+    counts. That is right if the three arguments rest on one cohort, and wrong if, as
+    here, the expression argument uses independent data. There is still no term for
+    "different reasoning, same document", so the split-or-merge rule is not testable.
   temporality: >-
-    Every refutation postdates the original claim, and the 2020 review is a synthesis OF the
-    refutations, not an eighth independent vote. Counting it as one more REFUTES line
-    double-counts. Neither profile can express supersession (R14) or "this line summarises
-    those lines". `superseded_by` above is a proposal, not an existing slot.
+    Partly addressed. "This line summarises those lines" is now expressible: the 2020
+    review is a higher-order line (EINT.STACKING) whose hasEvidenceItems name the four
+    replication lines. Whether the rule then discounts it, rather than adding it as an
+    eighth vote, depends on the AggregationRule and is not in the data. Supersession, in
+    SIEVE (SieveEvidenceLine.supersedes + validity INVALIDATED + LineStatusChange), means
+    correcting a MISREAD line. It is not "later evidence defeats earlier evidence", so it is
+    deliberately not used: the 2015 lines stay VALID and are outweighed. Ordering is
+    available via Publication.dateAuthored, but the as_is gives no dates, so it is unset.
+    "Refuted by later replication" has no dedicated slot.
   hypothesis_status_vs_statement_strength: >-
-    Three different fields carry the same verdict at three levels — `mechanism_confidence:
-    HYPOTHETICAL` on the node, `status: DEPRECATED` on the hypothesis group, and (in Track 2)
-    `status: REJECTED` on the packet. Which is authoritative, and are the other two derived?
+    Answered for the claim. The AssertionDecision outcome (REJECTED) is authoritative.
+    Statement score, strength and direction are derived from the lines by the rule, and
+    reviewState is workflow state. DisMech's mechanism_confidence (HYPOTHETICAL) and the
+    hypothesis status (DEPRECATED) belong to the mechanism layer, which has no home. They
+    survive only in the decision rationale.
+  interpretation_provenance: >-
+    Newly expressible. Every line has an InterpretationActivity (agent, date, LLM_JUDGEMENT,
+    method, run id, rationale = DisMech `explanation`). readCoverage ABSTRACT_ONLY reflects
+    DisMech's abstract cache. accessStatus is NOT_RECORDED (flagged as a WARNING by the
+    profile checks), because DisMech does not record it. DisMech's per-item `evidence_source`
+    (IN_VITRO vs HUMAN_CLINICAL for the two PMID:26222560 items) can only be copied up to
+    Publication.generationContext, so which argument used which kind of study is lost.

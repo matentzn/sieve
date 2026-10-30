@@ -24,11 +24,13 @@ Every example is one YAML file with the same sections:
 | `summary` | what is interesting, in prose |
 | `as_is` | the record as the resource stores it today, verbatim (trimmed with `…`, never paraphrased) |
 | `minimal` | the same content in the Track 1 microschema |
-| `sepio_monarch` | the same content in the Track 2 SIEVE profile, including slots that **do not exist yet** — those are marked `PROPOSED` |
-| `gaps` | what breaks, what is lost, what neither profile can say |
+| `sepio_monarch` | the same content in the SIEVE SEPIO profile (`schema/sieve.yaml`, 2026-10-29). Either a full `EvidencePacket`, or, where the claim is not one of the profile's Mondo claim types, `{misfit, fragments}`: the reason, plus the parts that do fit, each as an instance of a named profile class |
+| `gaps` | what breaks, what is lost, what neither profile can say; each gap says whether the profile now addresses it and with which element; `profile_misfit` explains a misfit |
 
-Anything marked `PROPOSED` is a proposal for discussion, not an existing slot. Everything in
-`as_is` is real.
+Every `sepio_monarch` block validates: `tests/test_example_corpus.py` checks packets against
+the schema and `sieve.profile_checks`, and fragments against their class. Keys starting with
+`_` are corpus notes, stripped before validation. Ids, agents and dates not present in `as_is`
+are illustrative (`sieve:`-prefixed). Everything in `as_is` is real.
 
 **Identifiers.** MONDO/CHEBI/HGNC CURIEs in the rendered blocks were checked against OLS or taken
 from the source record. ECO codes were **not** invented: where a code would be needed and none was
@@ -317,6 +319,41 @@ an `EvidenceLine` in its own right, taking the packet's other lines as its items
 more SEPIO-shaped and lets one verdict become evidence for a later one.
 
 ---
+
+## The corpus against the SIEVE profile (2026-10-30)
+
+The Track 2 blocks were rewritten against the SIEVE profile, which is driven by the Mondo
+requirements. Four records fit its claim types as whole packets: D2 (gene basis as a
+`DiseaseAttributeStatement`, rejected with a negative inclusion score), N1–N3 (synonyms). D1
+and D3 (DisMech mechanisms, a defeater) and M1–M3 (drug indications) are misfits and carry
+fragments.
+
+What the profile now expresses:
+
+- **Interpretation provenance (R11)**: every line has an `InterpretationActivity` (agent,
+  date, method type, prompt / workflow, read coverage).
+- **Concordance as a record match, not a text span** (N1): `ConcordantAssertion` +
+  `ExternalRecord` + `ResolutionChain`.
+- **Source trust vs line strength** (N1, N3): per-source weights move to dated
+  `InformationResource.qualityRatings`; organisational trust in an AI agent to
+  `SieveAgent.trustLevels`, snapshotted on each act; an AI's self-reported confidence is line
+  `confidence` with basis `PRIOR`, not a score.
+- **Provenance is not evidence** (N2): consortium inclusion is an `OriginEvent`, not a line.
+- **Disputable synthesis** (N3): a verdict is a higher-order line, so a second interpreter can
+  dispute it.
+- **The three confidences** (M1): data quality (`AlignmentStep.confidence`,
+  `chainConfidence`), line strength (`scoreOfEvidenceProvided`), inclusion score S
+  (`Statement.score`).
+- **The chain as a sequence** (M3): `ResolutionChain.steps`, contiguity checked by
+  `sieve.profile_checks`; `confidenceBasis` required with every confidence.
+- **Independence (R20), partly**: `InformationResource.derivesContentFrom`, `defaultRole`,
+  `independenceCluster`, `Publication.reportsStudy` (M1: six documents, four clusters).
+
+Still open: undercutting defeaters (R15, D3); supersession in the "later evidence beats
+earlier" sense (R14, D2; `supersedes` only corrects a misread line); absence as a denominator
+(N1); per-step confidence that does not compose into claim correctness (M2); lines with no
+Mondo statement to target; whole claim kinds outside Mondo (mechanisms, indications,
+regulatory approval). These are tracked in `issues/issue_corpus_profile_misfits.md`.
 
 ## What the corpus establishes
 

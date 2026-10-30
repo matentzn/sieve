@@ -134,84 +134,356 @@ minimal:
           reported_in: {id: "PMDA:EXENATIDE#151-20120330", document_type: REGULATORY_LABEL}
 
 # ---------------------------------------------------------------------------
+# TRACK 2 — the SIEVE profile (SEPIO core profile, Mondo claim types C001–C010)
+# A drug–indication claim is not a Mondo claim type, so there is no packet. What fits is
+# recorded as fragments, each validated against its own profile class: the regulators
+# as InformationResources (role + dependence), the label sentences as TextPassages, the
+# DailyMed disease mention as a ResolutionChain, and one SieveEvidenceLine per document,
+# with the evidence judgement, the linking confidence and the independence cluster in
+# three separate slots. Dates marked `_illustrative` are not in MeDIC's record.
+# ---------------------------------------------------------------------------
 sepio_monarch:
-  id: sieve:pkt_medic_exenatide_t2dm
-  status: UNREVIEWED
-  statement:
-    id: stmt_medic_exenatide_t2dm
-    type: SieveStatement
-    subject: CHEBI:748790
-    subject_label: exenatide
-    predicate: {code: INDICATION, label: is indicated for, system: "https://w3id.org/monarch-initiative/medic/"}
-    object: MONDO:0005148
-    object_label: type 2 diabetes mellitus
-  has_evidence_lines:
-    - id: line_medic_dailymed_53d03c03
-      type: SieveEvidenceLine
-      direction_of_evidence_provided: supports
-      strength_of_evidence_provided: strong
-      evidence_source: REGULATORY
-      has_evidence_items:
-        # the SPAN is the evidence item …
-        - id: span_dailymed_53d03c03_0
-          type: TextMiningResult
-          value: "BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."
-          reported_in: DailyMed:53d03c03-ebf7-418d-88a8-533eabd2ee4f
-          document_section: "LOINC:34067-9 INDICATIONS AND USAGE"
-          text_location: "chars 0-122"            # MeDIC has char_start/char_end; the kernel has one string (SPEC Q7)
-          extraction_method: "medic-extractor/1 + anthropic/claude-haiku-4-5-20251001"
-          extraction_score: 0.9
-          # … and the whole RESOLUTION CHAIN rides along as a data-quality annotation on the
-          # item, ordered and contiguous, NOT decomposed into sibling items (R21 / hazard H5).
-          data_quality:
-            resolution_confidence: 1.0
-            confidence_basis: MEASURED
-            pipeline: [EXTRACTION, GROUNDING, NORMALIZATION]
-            flags: []
-            mention_id: MEDICNE:0d9602db-dfaa-5690-b197-280e24fc1abe
-      # the interpretation act: an LLM read this span as asserting an indication
-      contributions:
-        - type: Contribution
-          contributor: {id: "anthropic/claude-haiku-4-5-20251001", type: Agent, subtype: software}
-          contribution_type: interpretation
-          specified_by: "medic-extractor/1, trigger_cue=indication_phrase"
-  # (five more evidence lines follow, one per source document)
-  evidence_synthesis:
-    summary: >-
-      Six regulatory documents from four jurisdictions attest the indication. Two of the six
-      (EMA Bydureon, EMA Byetta) are different products under one authority and are NOT
-      independent corroborations; likewise the two PMDA review reports. The effective count is
-      four authorities, not six documents.
-    score: {value: 1.0, description: Net Evidence Ratio (NER)}
-    direction: supports
-    method_note: >-
-      MeDIC's own noisy-OR (0.999998) is a data-quality aggregate and must NOT be reported here
-      as an evidence score.
+  misfit: >-
+    "Exenatide is indicated for type 2 diabetes mellitus" is a drug–disease indication
+    asserted by regulators. The profile's claim types are Mondo's ten (C001–C010: term
+    existence, definition, synonym, subclass, negative subclass, mapping, disease
+    attribute, subset, metaclass, value set), all with a Mondo term as subject and a
+    predicate bound to a Mondo value set. None has a CHEBI subject or an INDICATION
+    predicate, and DiseaseAttributeStatement is definitional for the disease, which an
+    indication is not. So there is no SieveStatement and no EvidencePacket. The parts
+    that do fit are below: regulators and the republisher as InformationResources, the
+    six label sentences as TextPassages, the DailyMed disease and relation mentions as
+    ResolutionChains, and the six per-document SieveEvidenceLines, which are the
+    profile's own shape for "one source document, one line". The lines have no
+    enclosing statement to target. The regulatory document itself has no honest class
+    (see gaps.profile_misfit), so the passages point at the document ids without a
+    document fragment.
+  fragments:
+    # --- information resources: role and dependence ---------------------------
+    - class: InformationResource
+      data:
+        id: sieve:resource/fda
+        type: InformationResource
+        label: US Food and Drug Administration
+        defaultRole: PRIMARY
+    - class: InformationResource
+      data:
+        id: sieve:resource/dailymed
+        type: InformationResource
+        label: DailyMed
+        description: Republishes FDA structured product labels (MeDIC source_role INTERMEDIARY).
+        curiePrefixes: [DailyMed]
+        defaultRole: AGGREGATOR
+        derivesContentFrom: [sieve:resource/fda]
+    - class: InformationResource
+      data:
+        id: sieve:resource/ema
+        type: InformationResource
+        label: European Medicines Agency
+        curiePrefixes: [EMA]
+        defaultRole: PRIMARY
+    - class: InformationResource
+      data:
+        id: sieve:resource/cdsco
+        type: InformationResource
+        label: CDSCO India (Approved New Drugs list)
+        curiePrefixes: [INDIA]
+        defaultRole: PRIMARY
+    - class: InformationResource
+      data:
+        id: sieve:resource/pmda
+        type: InformationResource
+        label: Pharmaceuticals and Medical Devices Agency, Japan
+        curiePrefixes: [PMDA]
+        defaultRole: PRIMARY
+
+    # --- the DailyMed sentence, with its two resolution chains -----------------
+    - class: TextPassage
+      data:
+        id: sieve:tp/dailymed-53d03c03-0
+        type: TextPassage
+        statementText: "BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."
+        reportedIn: [DailyMed:53d03c03-ebf7-418d-88a8-533eabd2ee4f]
+        textLocation: {section: "LOINC:34067-9 INDICATIONS AND USAGE", charStart: 0, charEnd: 123}
+        quoteVerification: NOT_CHECKED
+        _quoteVerification_note: >-
+          MeDIC's span is cut from the document by construction, but its record does not
+          say a verbatim check was run, so NOT_CHECKED rather than an assumed VERIFIED.
+        contributions:
+          - id: sieve:act/medic-extract-dailymed-53d03c03
+            type: SieveContribution
+            contributor: sieve:agent/medic-extractor
+            role: EXTRACTOR
+            specifiedBy: [sieve:method/medic-extractor-v1]
+        groundings:
+          - id: sieve:chain/dailymed-53d03c03-object
+            type: ResolutionChain
+            entitySlot: object
+            chainConfidence: 1.0
+            specifiedBy: [sieve:method/medic-extractor-v1]
+            steps:
+              - id: sieve:step/dailymed-53d03c03-object-1
+                type: AlignmentStep
+                category: EXTRACTION
+                method: LLM
+                inputValue: >-
+                  BYETTA is indicated as an adjunct to diet and exercise to improve glycemic
+                  control in adults with type 2 diabetes mellitus. Limitations of Use • BYETTA
+                  contains exenatide. Coadministration with other exenatide-containing
+                  products is not recommended.
+                outputValue: type 2 diabetes mellitus
+                textSpan: {section: "LOINC:34067-9", charStart: 98, charEnd: 122}
+                spanRole: SECTION_TEXT
+                qualityCategory: extraction_verbatim
+                confidence: 1.0
+                confidenceBasis: MEASURED
+                performedBy: [sieve:agent/claude-haiku-4-5-20251001]
+              - id: sieve:step/dailymed-53d03c03-object-2
+                type: AlignmentStep
+                category: GROUNDING
+                method: LEXICAL_MATCH
+                inputValue: type 2 diabetes mellitus
+                outputValue: MONDO:0005148
+                predicate: skos:exactMatch
+                qualityCategory: grounding_lexical_exact
+                _confidence_note: >-
+                  MeDIC gives confidence 1.0 here with no basis. The profile requires a
+                  basis for every confidence (D-062), so the number is left out rather than
+                  given a guessed basis.
+              - id: sieve:step/dailymed-53d03c03-object-3
+                type: AlignmentStep
+                category: NORMALIZATION
+                method: DETERMINISTIC_RULE
+                inputValue: MONDO:0005148
+                outputValue: MONDO:0005148
+                qualityCategory: normalization_identity
+                confidence: 1.0
+                confidenceBasis: DETERMINISTIC
+          - id: sieve:chain/dailymed-53d03c03-predicate
+            type: ResolutionChain
+            entitySlot: predicate
+            steps:
+              - id: sieve:step/dailymed-53d03c03-predicate-1
+                type: AlignmentStep
+                category: EXTRACTION
+                method: LLM
+                inputValue: "BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."
+                outputValue: INDICATION
+                textSpan: {section: "LOINC:34067-9", charStart: 7, charEnd: 36}
+                spanRole: SECTION_TEXT
+                triggerCue: is indicated as an adjunct to
+                confidence: 1.0
+                confidenceBasis: MEASURED
+                performedBy: [sieve:agent/claude-haiku-4-5-20251001]
+                _qualityCategory_note: >-
+                  No AlignmentQuality value exists for relation extraction (trigger_cue
+                  indication_phrase); left out.
+
+    # --- the other five documents' sentences (as quoted in `minimal`) ----------
+    - class: TextPassage
+      data:
+        id: sieve:tp/ema-bydureon-0
+        type: TextPassage
+        statementText: "Bydureon is indicated in adults 18 years and older with type 2 diabetes mellitus to improve glycaemic control…"
+        reportedIn: ["EMA:bydureon"]
+        quoteVerification: NOT_CHECKED
+        contributions:
+          - {id: sieve:act/medic-extract-ema-bydureon, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
+    - class: TextPassage
+      data:
+        id: sieve:tp/ema-byetta-0
+        type: TextPassage
+        statementText: "Byetta is indicated for treatment of type-2 diabetes mellitus in combination with: metformin; sulphonylureas; …"
+        reportedIn: ["EMA:byetta"]
+        quoteVerification: NOT_CHECKED
+        contributions:
+          - {id: sieve:act/medic-extract-ema-byetta, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
+    - class: TextPassage
+      data:
+        id: sieve:tp/india-approved-new-drugs-0
+        type: TextPassage
+        statementText: "For treatment of type 2 diabetes mellitus in combination with Metformin Sulphonylurea Thiazolidinedione…"
+        reportedIn: ["INDIA:Approved-New-Drugs"]
+        quoteVerification: NOT_CHECKED
+        contributions:
+          - {id: sieve:act/medic-extract-india, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
+        groundings:
+          - id: sieve:chain/india-predicate
+            type: ResolutionChain
+            entitySlot: predicate
+            steps:
+              - id: sieve:step/india-predicate-1
+                type: AlignmentStep
+                category: EXTRACTION
+                method: LLM
+                inputValue: "For treatment of type 2 diabetes mellitus in combination with Metformin Sulphonylurea Thiazolidinedione…"
+                outputValue: INDICATION
+                spanRole: TABLE_CELL
+                triggerCue: section_header
+                _note: >-
+                  The relation rests on the table's section, not on a phrase in the cell, so
+                  the trigger is the cue type, not verbatim words.
+    - class: TextPassage
+      data:
+        id: sieve:tp/pmda-161-20101027-0
+        type: TextPassage
+        statementText: "Drugs with a new active ingredient indicated for the treatment of type 2 diabetes mellitus…"
+        reportedIn: ["PMDA:EXENATIDE#161-20101027"]
+        quoteVerification: NOT_CHECKED
+        contributions:
+          - {id: sieve:act/medic-extract-pmda-161, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
+    - class: TextPassage
+      data:
+        id: sieve:tp/pmda-151-20120330-0
+        type: TextPassage
+        statementText: "A drug with a new additional indication and a new dosage in a new dosage form for the treatment of type 2 diabetes mellitus."
+        reportedIn: ["PMDA:EXENATIDE#151-20120330"]
+        quoteVerification: NOT_CHECKED
+        contributions:
+          - {id: sieve:act/medic-extract-pmda-151, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
+
+    # --- one line per document; three numbers in three slots -------------------
+    # strengthOfEvidenceProvided <- evidence.confidence (the evidence judgement)
+    # confidence + confidenceBasis <- assertion.confidence.overall (linking fidelity)
+    # independenceCluster <- the authority, so six documents count as four
+    - class: SieveEvidenceLine
+      data:
+        id: sieve:el/medic-dailymed-53d03c03
+        type: SieveEvidenceLine
+        description: FDA-approved indication from the DailyMed structured product label.
+        hasEvidenceItems: [sieve:tp/dailymed-53d03c03-0]
+        evidenceItemSources: [sieve:resource/dailymed]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: high
+        confidence: 0.9
+        confidenceBasis: MEASURED
+        independenceCluster: sieve:resource/fda
+        contributions:
+          - id: sieve:act/medic-interpret-dailymed-53d03c03
+            type: InterpretationActivity
+            contributor: sieve:agent/claude-haiku-4-5-20251001
+            role: INTERPRETER
+            date: 2026-08-13
+            _date_illustrative: MeDIC records no run date on the assertion.
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/medic-extractor-v1]
+            readCoverage: SECTIONS
+            accessStatus: OPEN_ACCESS
+    - class: SieveEvidenceLine
+      data:
+        id: sieve:el/medic-ema-bydureon
+        type: SieveEvidenceLine
+        description: EMA summary of product characteristics (Bydureon).
+        hasEvidenceItems: [sieve:tp/ema-bydureon-0]
+        evidenceItemSources: [sieve:resource/ema]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: high
+        independenceCluster: sieve:resource/ema
+        contributions:
+          - {id: sieve:act/medic-interpret-ema-bydureon, type: InterpretationActivity, contributor: sieve:agent/claude-haiku-4-5-20251001, date: 2026-08-13, methodType: LLM_JUDGEMENT, readCoverage: SECTIONS, accessStatus: OPEN_ACCESS}
+    - class: SieveEvidenceLine
+      data:
+        id: sieve:el/medic-ema-byetta
+        type: SieveEvidenceLine
+        description: EMA summary of product characteristics (Byetta). Same authority as Bydureon, so same cluster.
+        hasEvidenceItems: [sieve:tp/ema-byetta-0]
+        evidenceItemSources: [sieve:resource/ema]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: high
+        independenceCluster: sieve:resource/ema
+        contributions:
+          - {id: sieve:act/medic-interpret-ema-byetta, type: InterpretationActivity, contributor: sieve:agent/claude-haiku-4-5-20251001, date: 2026-08-13, methodType: LLM_JUDGEMENT, readCoverage: SECTIONS, accessStatus: OPEN_ACCESS}
+    - class: SieveEvidenceLine
+      data:
+        id: sieve:el/medic-india
+        type: SieveEvidenceLine
+        description: CDSCO India approved-new-drugs table; the claim rests on the section, not a phrase.
+        hasEvidenceItems: [sieve:tp/india-approved-new-drugs-0]
+        evidenceItemSources: [sieve:resource/cdsco]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: moderate
+        independenceCluster: sieve:resource/cdsco
+        _confidence_note: >-
+          MeDIC's assertion confidence 0.8 carries no basis in this record, so it is not
+          carried over (a confidence without a basis is a profile violation).
+        contributions:
+          - {id: sieve:act/medic-interpret-india, type: InterpretationActivity, contributor: sieve:agent/claude-haiku-4-5-20251001, date: 2026-08-13, methodType: LLM_JUDGEMENT, readCoverage: STRUCTURED_RECORD, accessStatus: OPEN_ACCESS}
+    - class: SieveEvidenceLine
+      data:
+        id: sieve:el/medic-pmda-161-20101027
+        type: SieveEvidenceLine
+        description: PMDA review report, new active ingredient (2010).
+        hasEvidenceItems: [sieve:tp/pmda-161-20101027-0]
+        evidenceItemSources: [sieve:resource/pmda]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: high
+        independenceCluster: sieve:resource/pmda
+        contributions:
+          - {id: sieve:act/medic-interpret-pmda-161, type: InterpretationActivity, contributor: sieve:agent/claude-haiku-4-5-20251001, date: 2026-08-13, methodType: LLM_JUDGEMENT, readCoverage: SECTIONS, accessStatus: OPEN_ACCESS}
+    - class: SieveEvidenceLine
+      data:
+        id: sieve:el/medic-pmda-151-20120330
+        type: SieveEvidenceLine
+        description: PMDA review report, additional indication/dosage form (2012). Same drug, same authority, same cluster.
+        hasEvidenceItems: [sieve:tp/pmda-151-20120330-0]
+        evidenceItemSources: [sieve:resource/pmda]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: high
+        independenceCluster: sieve:resource/pmda
+        contributions:
+          - {id: sieve:act/medic-interpret-pmda-151, type: InterpretationActivity, contributor: sieve:agent/claude-haiku-4-5-20251001, date: 2026-08-13, methodType: LLM_JUDGEMENT, readCoverage: SECTIONS, accessStatus: OPEN_ACCESS}
 
 # ---------------------------------------------------------------------------
 gaps:
+  profile_misfit: >-
+    The profile cannot hold the claim itself. (1) No indication claim type: the ten claim
+    types are Mondo's, with Mondo subjects and Mondo-bound predicates, so "CHEBI:748790
+    INDICATION MONDO:0005148" has no Statement class, no packet, no AggregationRule
+    (claimType is a ClaimType enum) and no inclusion score S. The six lines float with no
+    enclosing statement to target. (2) No regulatory document class: a structured product
+    label, an SmPC, a PMDA review report and the CDSCO list are none of Publication,
+    WebPage or GuidelineDocument, and calling them so would be false, so the passages
+    reference document ids with no document record. The LOINC section code survives only
+    as a free-text TextLocation.section. (3) No slots for jurisdiction, approval status or
+    regulatory authority. (4) ResourceRole is PRIMARY | AGGREGATOR. It covers MeDIC's
+    PRIMARY / INTERMEDIARY but has no value for NON_REGULATORY, which is an authority
+    dimension, not a retrieval role. (5) TextPassage has no resource /
+    resourceRoleOverride slot, so a per-document role (DailyMed INTERMEDIARY for this
+    label) can only come from the resource default. (6) Relation extraction (trigger_cue,
+    relationship confidence) has no AlignmentQuality value, and a cue TYPE
+    (section_header, indication_phrase) has nowhere to go beside the verbatim triggerCue.
   no_direction_R1: >-
-    MeDIC has no `direction` slot at all. Every assertion is implicitly SUPPORTS, so NER over
-    MeDIC packets is always exactly 1.0 and tells a curator nothing (medic hazard H4). Adding
-    direction is the single largest semantic gain available to MeDIC, and it has the data
-    already — see M2.
+    Addressed in shape: directionOfEvidenceProvided is required on every
+    SieveEvidenceLine and takes supports | disputes, so a regulator's "not indicated"
+    sentence now has a value to take (see M2). Still open in the data: MeDIC emits no
+    disputing lines, so a score over MeDIC lines would still be degenerate (hazard H4).
   independence_R20: >-
-    The noisy-OR treats six documents as six independent corroborations and reaches 0.999998.
-    But EMA:bydureon and EMA:byetta are two products authorised by ONE authority reviewing one
-    dossier lineage, and the two PMDA reports are two milestones for one drug. Corroboration
-    arithmetic needs a notion of source independence; without one, "more documents" inflates
-    confidence mechanically. Note MeDIC's own `reliability: MEDIUM` disagrees with 0.999998 —
-    they are measuring different things and both are reported.
+    Addressed by the profile: dependence is declared once per resource
+    (InformationResource.derivesContentFrom: DailyMed -> FDA) and each line carries
+    SieveEvidenceLine.independenceCluster, where only the strongest line per cluster
+    counts. The six lines fall into four clusters (FDA, EMA, CDSCO, PMDA), not six.
+    Still open: the cluster key here is the authority, which is a modelling choice. The
+    profile does not say whether two products of one authority (Bydureon, Byetta) or two
+    milestones of one drug (the PMDA reports) are dependent; the AggregationRule must,
+    and there is no indication rule. MeDIC's noisy-OR 0.999998 has no slot and should not
+    get one.
   two_confidences_one_word: >-
-    `confidence.overall: 0.999998` (pair, data quality), `assertion.confidence.overall: 0.9`
-    (linking fidelity), and `evidence.confidence: HIGH` (an evidence judgement) all use the
-    word "confidence". Only the last one maps to `strength_of_evidence_provided`. This is
-    hazard H2 and it is a live trap for any integration.
+    Addressed: the three numbers now sit in three different slots.
+    `evidence.confidence: HIGH` (evidence judgement) -> SieveEvidenceLine.strengthOfEvidenceProvided;
+    `assertion.confidence.overall: 0.9` (linking fidelity) -> SieveEvidenceLine.confidence
+    with confidenceBasis MEASURED; per-step resolution confidence ->
+    AlignmentStep.confidence and ResolutionChain.chainConfidence (data quality). The
+    pair-level noisy-OR 0.999998 has no home: the claim-level number is Statement.score
+    (the inclusion score S), computed by an AggregationRule over strengths, not over
+    data-quality numbers. A basis-less MeDIC confidence (grounding step, CDSCO assertion
+    0.8) is rejected by the profile rule that a confidence needs a confidenceBasis.
   source_role_is_evidence: >-
-    `source_role: PRIMARY | INTERMEDIARY | NON_REGULATORY` is a genuine evidence-strength
-    signal (the regulator itself beats a republisher) and has no home in the kernel today. It
-    should feed `strength_of_evidence_provided` together with `evidence.confidence`.
+    Mostly addressed: InformationResource.defaultRole (PRIMARY / AGGREGATOR) plus
+    derivesContentFrom record that DailyMed republishes FDA, and UpstreamItem.resourceRoleOverride
+    exists for per-item exceptions. The role feeds clustering, not strength: the profile
+    puts it in the independence cluster rather than in strengthOfEvidenceProvided. Open:
+    NON_REGULATORY has no value, and TextPassage cannot carry a role override.
   regulatory_vocabulary_missing: >-
-    Neither `EvidenceSource: REGULATORY` nor `DocumentType: REGULATORY_LABEL` exists. Forcing a
-    drug label into `EXPERT_CONSENSUS` or `DATABASE_RECORD` is wrong, and MeDIC is ~9,700 rows
-    of the use case. Contribute upward before B2 closes.
+    Still open, now as a profile misfit (see profile_misfit): no regulatory document class
+    and no indication claim type. The profile is Mondo-driven, so MeDIC's ~9,700 rows
+    need either a MeDIC profile on the same SEPIO core or a regulatory module upstream.

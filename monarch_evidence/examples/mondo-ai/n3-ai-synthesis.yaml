@@ -116,88 +116,251 @@ minimal:
   _lost: ["the synthesis, its author, its prompt version, and the recommended action"]
 
 # ---------------------------------------------------------------------------
-# TRACK 2 — the same synthesis, with the corrections the corpus argues for
+# TRACK 2 — the same synthesis in the SIEVE profile (validates against schema/sieve.yaml)
+#   - the three concordance lines are rendered as in N1 (ConcordantAssertion + ExternalRecord
+#     + ResolutionChain, no per-source score; weights live on InformationResource.qualityRatings).
+#   - the enrichment line cites a TextPassage (the quote) reportedIn the Publication. Its flat
+#     0.5 is the output of a constant rule, so the line is RULE_BASED_STRENGTH with computedByRule.
+#   - the synthesis is a higher-order SieveEvidenceLine by the AI agent: hasEvidenceItems = the
+#     lines it cited (key_evidence), methodType LLM_JUDGEMENT, specifiedBy the prompt version,
+#     and the model's 0.95 as line confidence with confidenceBasis PRIOR — never as a score.
+#     The organisation's trust in the model (0.65) is the agent's registry trust level,
+#     snapshotted on the act.
+#   - the second interpreter (gpt-4o, hypothetical, carried over from the earlier sketch) is a
+#     second LLM_JUDGEMENT line with direction disputes; "neutral" has no value.
+#   - CONFIRM is not a decision: UNREVIEWED -> reviewState NOT_VERIFIED, no AssertionDecision.
 # ---------------------------------------------------------------------------
 sepio_monarch:
   id: sieve:pkt_000564
-  status: UNREVIEWED
-  statement: "… as in as_is …"
-  has_evidence_lines: "… four lines as in as_is, plus per line: …"
+  type: EvidencePacket
+  version: "2026-08-13"
+  previousVersion: "2026-03-18"
+  statement:
+    id: sieve:stmt_18a47f16593f
+    type: SynonymStatement
+    subject: MONDO:0010425
+    predicate: {code: oboInOwl:hasExactSynonym, label: exact synonym}
+    object: LECD
+    statementText: "Lisch epithelial corneal dystrophy has exact synonym 'LECD'"
+    reviewState: NOT_VERIFIED
+    proposingChannel: SOURCE_INGEST
+    hasEvidenceLines:
+      - id: el_omim_0564
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:ca/omim-620763-LECD]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: strong
+        dateAttached: "2026-03-18"
+        contributions:
+          - {id: sieve:act/el_omim_0564, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor,
+             role: INTERPRETER, date: "2026-03-18", methodType: COMPUTED_CONCORDANCE,
+             specifiedBy: [sieve:method/mondo-ai-concordance], readCoverage: STRUCTURED_RECORD}
+      - id: el_ordo_29022
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:ca/orphanet-98955-LECD]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: strong
+        dateAttached: "2026-03-18"
+        contributions:
+          - {id: sieve:act/el_ordo_29022, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor,
+             role: INTERPRETER, date: "2026-03-18", methodType: COMPUTED_CONCORDANCE,
+             specifiedBy: [sieve:method/mondo-ai-concordance], readCoverage: STRUCTURED_RECORD}
+      - id: el_doid_59964
+        type: SieveEvidenceLine
+        hasEvidenceItems: [sieve:ca/doid-0060450-LECD]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: strong
+        dateAttached: "2026-03-18"
+        contributions:
+          - {id: sieve:act/el_doid_59964, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor,
+             role: INTERPRETER, date: "2026-03-18", methodType: COMPUTED_CONCORDANCE,
+             specifiedBy: [sieve:method/mondo-ai-concordance], readCoverage: STRUCTURED_RECORD}
 
-  # PROPOSED: the interpretation act on each line, not only on the synthesis (R11).
-  # Today mondo-ai records the model only once, at the synthesis; which model read which line
-  # is unrecoverable.
-  line_extensions:
-    contributions:
-      - type: Contribution
-        contributor: {id: claude-sonnet-4-20250514, type: Agent, subtype: software}
-        contribution_type: interpretation
-        date: '2026-08-13'
-        specified_by: "mondo-ai prompt v1.0"
+      # added by `mondo-ai enrich`: the quote-bearing line
+      - id: el_lit_9f3c1a72
+        type: SieveEvidenceLine
+        hasEvidenceItems: [ev_lit_1b04ef55]
+        directionOfEvidenceProvided: supports
+        strengthOfEvidenceProvided: moderate
+        scoreOfEvidenceProvided: 0.5            # the constant rule's output, not a reading of the paper
+        computedByRule: sieve:rule/mondo-ai-literature-default
+        contributions:
+          - id: sieve:act/el_lit_9f3c1a72
+            type: InterpretationActivity
+            contributor: sieve:agent/mondo-ai-enricher
+            role: INTERPRETER
+            date: "2026-08-13"                  # enrichment date not recorded; synthesis date as upper bound
+            methodType: RULE_BASED_STRENGTH
+            specifiedBy: [sieve:method/mondo-ai-pubmed-enrichment]
+            readCoverage: ABSTRACT_ONLY
+            accessStatus: NOT_RECORDED          # the enricher read the PubMed abstract; full-text access unknown
+            identifierVerified: NOT_CHECKED
+            groundingChecked: NOT_CHECKED
 
-  evidence_synthesis:
-    summary: >-
-      Three major disease ontologies independently record 'LECD' as an exact synonym, and the
-      literature uses the abbreviation in the same sense. No contradicting evidence.
-    direction: supports
-    recommended_action: CONFIRM
-    cited_evidence: [el_omim_0564, el_ordo_29022, el_lit_9f3c1a72]
-    score:
-      value: 0.95
-      description: model self-reported confidence
-      basis: SELF_REPORTED            # <- PROPOSED, borrowed from MeDIC's confidence_basis
-    # the number that should actually drive curation: the ORGANISATION's declared trust in
-    # this interpreter, times what it concluded. Revisable by deliberation, not by the model.
-    interpreter_trust:
-      agent: claude-sonnet-4-20250514
-      trust_level: 0.65
-      declared_by: monarch-evidence-stewards
-      declared_on: '2026-08-01'
-      rationale: Organisational judgement; revised on review of disagreements with curators.
-    generated_by:
-      type: CurationActivity
-      contributor: {id: claude-sonnet-4-20250514, type: Agent, description: "AI synthesis agent (anthropic)"}
-      date: '2026-08-13'
-      used: ["prompt_version:v1.0"]
+      # the synthesis: an LLM verdict over the lines it cited
+      - id: sieve:el/synthesis-act_7c2f91ab
+        type: SieveEvidenceLine
+        hasEvidenceItems: [el_omim_0564, el_ordo_29022, el_lit_9f3c1a72]
+        directionOfEvidenceProvided: supports   # CONFIRM
+        confidence: 0.95                        # the model's self-reported number
+        confidenceBasis: PRIOR
+        contributions:
+          - id: act_7c2f91ab
+            type: InterpretationActivity
+            contributor: sieve:agent/claude-sonnet-4-20250514
+            role: INTERPRETER
+            agentTrustAtTime: 0.65
+            date: "2026-08-13"
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/mondo-ai-synthesis-prompt]
+            identifierVerified: NOT_CHECKED
+            groundingChecked: NOT_CHECKED
+            rationale: >-
+              Three major disease ontologies independently record 'LECD' as an exact synonym, and
+              the literature uses the abbreviation in the same sense. No contradicting evidence.
+              Recommended action: CONFIRM.
 
-  # PROPOSED: a second interpreter, so synthesis can be DISAGREED with. This is the shape the
-  # vision needs — many weak interpretations accumulating — and it does not exist today.
-  alternative_syntheses:
-    - direction: neutral
-      recommended_action: REVIEW
-      score: {value: 0.55, description: model self-reported confidence, basis: SELF_REPORTED}
-      summary: "'LECD' is also used for Lisch nodules in the literature; the abbreviation may be ambiguous."
-      generated_by: {type: CurationActivity, contributor: {id: gpt-4o, type: Agent}}
-      interpreter_trust: {trust_level: 0.56, declared_by: monarch-evidence-stewards}
+      # a second interpreter disagreeing (hypothetical, as in the earlier sketch)
+      - id: sieve:el/synthesis-gpt-4o-example
+        type: SieveEvidenceLine
+        hasEvidenceItems: [el_lit_9f3c1a72]
+        directionOfEvidenceProvided: disputes   # REVIEW / "neutral" has no Direction value
+        confidence: 0.55
+        confidenceBasis: PRIOR
+        contributions:
+          - id: sieve:act/synthesis-gpt-4o-example
+            type: InterpretationActivity
+            contributor: sieve:agent/gpt-4o
+            role: INTERPRETER
+            agentTrustAtTime: 0.56
+            date: "2026-08-13"
+            methodType: LLM_JUDGEMENT
+            specifiedBy: [sieve:method/mondo-ai-synthesis-prompt]
+            rationale: >-
+              'LECD' is also used for Lisch nodules in the literature; the abbreviation may be
+              ambiguous. Recommended action: REVIEW.
+  concordantAssertions:
+    - {id: sieve:ca/omim-620763-LECD, type: ConcordantAssertion, subject: OMIM:620763,
+       predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reportedIn: [OMIM:620763], resource: infores:omim,
+       groundings: [{id: sieve:chain/omim-620763, type: ResolutionChain, entitySlot: subject,
+         steps: [{id: sieve:step/omim-620763-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD,
+                  inputValue: OMIM:620763, outputValue: MONDO:0010425, predicate: skos:exactMatch,
+                  mappingSet: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
+    - {id: sieve:ca/orphanet-98955-LECD, type: ConcordantAssertion, subject: Orphanet:98955,
+       predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reportedIn: [Orphanet:98955], resource: infores:orphanet,
+       groundings: [{id: sieve:chain/orphanet-98955, type: ResolutionChain, entitySlot: subject,
+         steps: [{id: sieve:step/orphanet-98955-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD,
+                  inputValue: Orphanet:98955, outputValue: MONDO:0010425, predicate: skos:exactMatch,
+                  mappingSet: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
+    - {id: sieve:ca/doid-0060450-LECD, type: ConcordantAssertion, subject: DOID:0060450,
+       predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reportedIn: [DOID:0060450], resource: infores:disease-ontology,
+       groundings: [{id: sieve:chain/doid-0060450, type: ResolutionChain, entitySlot: subject,
+         steps: [{id: sieve:step/doid-0060450-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD,
+                  inputValue: DOID:0060450, outputValue: MONDO:0010425, predicate: skos:exactMatch,
+                  mappingSet: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
+  externalRecords:
+    - {id: OMIM:620763, type: ExternalRecord, label: "corneal dystrophy, lisch epithelial", resource: infores:omim,
+       generationContext: [{code: "sieve:basis_unknown"}],
+       recordMetadata: {retrievedFrom: infores:omim, retrievalDate: "2026-03-18"}}
+    - {id: Orphanet:98955, type: ExternalRecord, label: Lisch epithelial corneal dystrophy, resource: infores:orphanet,
+       generationContext: [{code: "sieve:basis_unknown"}],
+       recordMetadata: {retrievedFrom: infores:orphanet, retrievalDate: "2026-03-18"}}
+    - {id: DOID:0060450, type: ExternalRecord, label: Lisch epithelial corneal dystrophy, resource: infores:disease-ontology,
+       generationContext: [{code: "sieve:basis_unknown"}],
+       recordMetadata: {retrievedFrom: infores:disease-ontology, retrievalDate: "2026-03-18"}}
+  textPassages:
+    - id: ev_lit_1b04ef55
+      type: TextPassage
+      statementText: "Lisch epithelial corneal dystrophy (LECD) is characterised by feathery grey opacities…"
+      reportedIn: [PMID:16109854]
+      # derivedFrom (dependence on the paper, D-046/D-057) omitted: its core range
+      # InformationEntity is inlined, so it cannot reference PMID:16109854 by id. See gaps.
+      textLocation: {section: Abstract}
+      quoteVerification: NOT_CHECKED
+      contributions:
+        - id: sieve:act/ev_lit_1b04ef55-extraction
+          type: SieveContribution
+          contributor: sieve:agent/mondo-ai-enricher
+          role: EXTRACTOR
+          specifiedBy: [sieve:method/mondo-ai-pubmed-enrichment]
+  publications:
+    - id: PMID:16109854
+      type: Publication
+      pmid: "16109854"
+      title: "Lisch epithelial corneal dystrophy (LECD): a rare X-linked disorder"
+      urls: ["https://pubmed.ncbi.nlm.nih.gov/16109854/"]
+      resource: infores:pubmed
+      generationContext:
+        - {code: "sieve:basis_unknown"}
+  # Registry data the packet refers to by id (SieveRegistry fragment, not part of the packet).
+  # The 0.65 / 0.56 are the organisation's declared trust in each model, dated and revisable.
+  _registry:
+    resources:
+      - {id: infores:omim, type: InformationResource, defaultRole: PRIMARY,
+         qualityRatings: [{level: 0.95, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
+      - {id: infores:orphanet, type: InformationResource, defaultRole: PRIMARY,
+         qualityRatings: [{level: 0.90, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
+      - {id: infores:disease-ontology, type: InformationResource, defaultRole: PRIMARY, derivesContentFrom: [infores:omim],
+         qualityRatings: [{level: 0.85, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
+      - {id: infores:pubmed, type: InformationResource, defaultRole: PRIMARY}
+    agents:
+      - {id: sieve:agent/mondo-ai-owl-extractor, type: SieveAgent, subtype: software, name: mondo-ai OWLExtractor}
+      - {id: sieve:agent/mondo-ai-enricher, type: SieveAgent, subtype: software, name: mondo-ai PacketEnricher}
+      - {id: sieve:agent/claude-sonnet-4-20250514, type: SieveAgent, subtype: software, name: mondo-ai SynthesisAgent (anthropic),
+         modelName: claude-sonnet-4-20250514,
+         trustLevels: [{value: ai-agent, level: 0.65, validFrom: "2026-08-01"}]}
+      - {id: sieve:agent/gpt-4o, type: SieveAgent, subtype: software, name: mondo-ai SynthesisAgent (openai), modelName: gpt-4o,
+         trustLevels: [{value: ai-agent, level: 0.56, validFrom: "2026-08-01"}]}
+    methods:
+      - {id: sieve:method/mondo-ai-concordance, type: SieveMethod, version: unknown}
+      - {id: sieve:method/mondo-ai-pubmed-enrichment, type: SieveMethod, version: unknown}
+      - {id: sieve:method/mondo-ai-synthesis-prompt, type: SieveMethod, label: SYSTEM_PROMPT + SYNTHESIS_PROMPT_TEMPLATE, version: v1.0}
+    aggregationRules:
+      - {id: sieve:rule/mondo-ai-literature-default, type: AggregationRule, version: unknown, claimType: SynonymStatement,
+         description: "Every enriched literature line gets strength 0.5 (moderate), whatever the paper says."}
 
 # ---------------------------------------------------------------------------
 gaps:
   self_reported_confidence_is_not_a_score: >-
-    `Score(value=0.95, description="AI confidence score")` is a number the model produced about
-    its own output, stored in the same slot type as a computed NER. A downstream consumer cannot
-    tell them apart. Adopt MeDIC's `confidence_basis` discipline: SELF_REPORTED is a PRIOR, not
-    a MEASURED value. This matters more here than anywhere else in the corpus, because it is the
-    number the vision's whole trust-accumulation argument rests on.
+    ADDRESSED: the model's 0.95 is SieveEvidenceLine.confidence with confidenceBasis PRIOR (the
+    schema rule makes the basis mandatory, D-062). It is data quality: it gates or discounts the
+    line and never becomes its strength or the inclusion score S (SieveStatement.score). The
+    profile has no SELF_REPORTED basis; PRIOR ("assumed constant for the pinned model") is the
+    nearest and slightly overstates what an uncalibrated self-report is.
   trust_belongs_to_the_organisation_not_the_model: >-
-    Per the vision, the meaningful number is not the model's confidence but the curating
-    organisation's declared trust in that interpreter (Opus 65%, Sonnet 56%) — a human judgement,
-    revisable through deliberation. Nothing in mondo-ai records it. `AgentContribution.trust_level`
-    exists but is an enum (community/domain_expert/curator/authority) with no place for a
-    numeric, dated, attributed declaration.
+    ADDRESSED: SieveAgent.trustLevels (registry: numeric level, value, validFrom, optional
+    domain) holds the organisation's trust in each model, and InterpretationActivity
+    .agentTrustAtTime snapshots it on the act, so re-rating never rewrites past lines (D-049,
+    D-052). Still OPEN: a LevelAssignment has no declaredBy / rationale, so WHO declared the
+    trust and why is not recorded.
   synthesis_cannot_be_disputed: >-
-    `evidence_synthesis` is a single-valued slot. Two interpreters reading the same packet and
-    disagreeing cannot both be recorded, which is precisely the scenario the accumulation
-    argument depends on. Either synthesis becomes multivalued, or an AI verdict becomes an
-    EvidenceLine in its own right (with the packet's other lines as its items) — the latter is
-    more SEPIO-shaped and lets a verdict be evidence for a later verdict.
+    ADDRESSED: the verdict is a higher-order SieveEvidenceLine (hasEvidenceItems = the cited
+    lines, EINT.STACKING), so a second interpreter is just another line, here with direction
+    disputes. Remaining: Direction is supports | disputes only, so "REVIEW / ambiguous, neither
+    for nor against" has to be rendered as disputes or dropped; and the recommended action
+    (CONFIRM / REVIEW) has no slot (it lives in the rationale), because a verdict is evidence
+    and the decision belongs to a human AssertionDecision (D-052).
   input_provenance_of_the_synthesis: >-
-    `used: ["prompt_version:v1.0"]` is a good instinct but not enough to reproduce a synthesis.
-    The full prompt, the model id (present), the temperature, and the exact set of lines shown
-    are the inputs; only two are recorded. Compare MeDIC, which pins the dated model id
-    precisely because a model upgrade silently changes output.
+    PARTLY ADDRESSED: InterpretationActivity records the model (contributor -> SieveAgent
+    .modelName), the prompt version (specifiedBy -> SieveMethod v1.0), the run (runId), a
+    reasoningTrace link, and the exact lines cited (hasEvidenceItems). Still OPEN: temperature and
+    other call parameters have no slot on the act (ComputationalScore.parameters exists but only
+    on that item), and the lines SHOWN to the model (all four) are not distinguished from the
+    lines it CITED (three).
   flat_literature_weight: >-
-    Every enriched literature line gets `scoreOfEvidenceProvided: 0.5` regardless of what the
-    paper says. The known open question in mondo-ai's own SPEC (journal-quality weighting) is
-    the wrong framing: the missing judgement is whether the quote actually supports the
-    statement, which is an interpretation act and should produce a direction and strength, not
-    a constant.
+    PARTLY ADDRESSED: the flat 0.5 is now honest about itself, a RULE_BASED_STRENGTH line with
+    computedByRule (a constant rule) and readCoverage ABSTRACT_ONLY, and the quote is a
+    TextPassage with quoteVerification. The missing judgement (does the quote support the
+    synonym?) would be an LLM_JUDGEMENT or EXPERT_JUDGEMENT line over the TextPassage. mondo-ai
+    does not produce one, so the line is still a constant.
+  unknown_access_status: >-
+    Addressed: AccessStatus / ReadCoverage now have NOT_RECORDED, which the profile check
+    accepts with a WARNING (READ_COVERAGE_NOT_RECORDED). The enricher read a PubMed abstract and
+    records nothing about full-text access, so the act says NOT_RECORDED rather than guessing.
+  passage_dependence_by_reference: >-
+    Addressed: TextPassage.derivedFrom now takes packet item ids, so a passage can state its
+    dependence on its paper (D-046 / D-057). Not filled in this record: mondo-ai does not
+    record it, and reportedIn already names the paper.
+  undated_enrichment: >-
+    NEW. InterpretationActivity.date is required but mondo-ai records no enrichment date (and no
+    date on the extraction contribution), so the synthesis date stands in as an upper bound.
