@@ -1,35 +1,57 @@
-# Canonical valid EvidencePacket in the SEPIO/SIEVE shape.
-# SEPIO Entity requires id + type on every entity; evidence is authored as
-# explicit EvidenceLines (no auto-wrapping).
+# Canonical small valid EvidencePacket in the SIEVE SEPIO profile shape
+# (schema/sieve.yaml): C004 MONDO:0004979 'asthma' subClassOf MONDO:0005275
+# 'respiratory system disorder'. Unreviewed: no decision, reviewState NOT_VERIFIED.
+# Identifiers are illustrative.
 id: sieve:pkt_asthma_0001
-status: UNREVIEWED
+type: EvidencePacket
+version: "1"
 statement:
-  id: stmt_asthma_0001
-  type: SieveStatement
+  id: sieve:st/asthma_0001
+  type: SubclassStatement
   subject: MONDO:0004979
-  subject_label: asthma
-  predicate:
-    code: rdfs:subClassOf
-    label: subClassOf
+  predicate: {code: rdfs:subClassOf, label: subClassOf}
   object: MONDO:0005275
-  object_label: respiratory system disorder
-  statement_text: asthma subClassOf respiratory system disorder
-has_evidence_lines:
-  - id: line_0001
-    type: SieveEvidenceLine
-    direction_of_evidence_provided: supports
-    strength_of_evidence_provided: strong
-    score_of_evidence_provided: 0.9
-    has_evidence_items:
-      - id: ev_concordance_0001
-        type: ConcordanceItem
-        source_name: Disease Ontology
-        source_id: DOID:2841
-        rating: ACCEPTED
-        eco_code: ECO:0000269
-      - id: ev_document_0001
-        type: SieveDocument
-        title: Example study
-        pmid: "12345678"
-        quote: asthma is a chronic respiratory disease
-        rating: ACCEPTED
+  statementText: asthma subClassOf respiratory system disorder
+  reviewState: NOT_VERIFIED
+  hasEvidenceLines:
+    - id: sieve:el/asthma_0001
+      type: SieveEvidenceLine
+      hasEvidenceItems: [DOID:2841, sieve:tp/asthma_0001]
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.9
+      contributions:
+        - id: sieve:act/asthma_0001
+          type: InterpretationActivity
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: INTERPRETER
+          date: 2026-10-30
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: ABSTRACT_ONLY
+          accessStatus: OPEN_ACCESS
+externalRecords:
+  - id: DOID:2841
+    type: ExternalRecord
+    label: asthma
+    resource: infores:disease-ontology
+    recordMetadata:
+      retrievedFrom: infores:disease-ontology
+      retrievalDate: 2026-10-30
+textPassages:
+  - id: sieve:tp/asthma_0001
+    type: TextPassage
+    statementText: asthma is a chronic respiratory disease
+    reportedIn: [PMID:12345678]
+    quoteVerification: NOT_CHECKED
+    contributions:
+      - id: sieve:act/tp-asthma_0001
+        type: SieveContribution
+        contributor: sieve:agent/unrecorded-legacy-interpreter
+        role: EXTRACTOR
+        date: 2026-10-30
+publications:
+  - id: PMID:12345678
+    type: Publication
+    title: Example study
+    pmid: "12345678"
+    resource: infores:pubmed

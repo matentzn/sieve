@@ -1,86 +1,156 @@
+# C004: MONDO:0005015 'diabetes mellitus' subClassOf MONDO:0005151 'endocrine system disorder'.
+# One EvidencePacket in the SIEVE SEPIO profile shape (schema/sieve.yaml), converted
+# from the older flat nanopub-like example. Identifiers (nanopub URI, PMIDs, ORCIDs,
+# issue links) are illustrative and kept as they were; sieve: ids are new
+# illustrative ids. The original attribution (2019 release) is recorded as the
+# first sign-off. Who interpreted the literature/concordance items was not recorded,
+# hence sieve:agent/unrecorded-legacy-interpreter.
 id: http://purl.org/np/RA1234567890
-last_updated: "2024-03-15"
-assertion:
-  subject_id: MONDO:0005015
-  subject_label: diabetes mellitus
-  predicate: rdfs:subClassOf
-  predicate_label: subClassOf
-  object_id: MONDO:0005151
-  object_label: endocrine system disorder
-  display_text: "diabetes mellitus subClassOf endocrine system disorder"
-
-provenance:
-  attributed_to:
-    - orcid:0000-0002-9553-7227
-  generated_at: "2019-03-22"
-  source_version: Mondo 2019-03-22
-  source_uri: http://purl.obolibrary.org/obo/mondo/releases/2019-03-22/mondo.owl
-
-evidence:
-  - id: ev-concordance-icd10
-    evidence_type: CONCORDANCE
-    direction: SUPPORTS
-    evidence_strength: 0.95
-    eco_code: ECO:0000204
-    eco_label: similarity evidence
-    description: Cross-ontology concordance with ICD-10 - diabetes classified under endocrine diseases
-    source: https://bioportal.bioontology.org/ontologies/ICD10CM
-    source_name: ICD-10-CM
-    source_type: TERMINOLOGY
-    predicate_id: rdfs:subClassOf
-    predicate_label: subClassOf
-    source_subject_id: ICD10CM:E11
-    source_subject_label: Type 2 diabetes mellitus
-    source_object_id: ICD10CM:E00-E89
-    source_object_label: Endocrine, nutritional and metabolic diseases
-    mapping_set: https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv
-
-  - id: ev-literature-1
-    evidence_type: LITERATURE
-    direction: SUPPORTS
-    evidence_strength: 0.9
-    eco_code: ECO:0000006
-    eco_label: experimental evidence
-    description: Published literature evidence supporting endocrine classification
-    publication_id: PMID:12345678
-    publication_title: Classification of Diabetes as an Endocrine Disorder
-    quoted_text: >-
+type: EvidencePacket
+version: "2024-03-15"
+previousVersion: "2019-03-22"
+statement:
+  id: sieve:st/MONDO_0005015-isa-MONDO_0005151
+  type: SubclassStatement
+  subject: MONDO:0005015
+  predicate: {code: rdfs:subClassOf, label: subClassOf}
+  object: MONDO:0005151
+  statementText: diabetes mellitus subClassOf endocrine system disorder
+  reviewState: VERIFIED
+  proposingChannel: CURATOR
+  hasEvidenceLines:
+    - id: sieve:el/dm-icd10cm
+      type: SieveEvidenceLine
+      description: Cross-ontology concordance with ICD-10 - diabetes classified under endocrine diseases
+      hasEvidenceItems: [sieve:ca/icd10cm-E11-isa-E00-E89]
+      directionOfEvidenceProvided: supports
+      scoreOfEvidenceProvided: 0.95
+      contributions:
+        - id: sieve:act/dm-icd10cm
+          type: InterpretationActivity
+          contributor: sieve:agent/legacy-concordance-import
+          role: INTERPRETER
+          date: 2024-03-15
+          methodType: COMPUTED_CONCORDANCE
+          readCoverage: STRUCTURED_RECORD
+    - id: sieve:el/dm-literature-1
+      type: SieveEvidenceLine
+      description: Published literature evidence supporting endocrine classification
+      hasEvidenceItems: [sieve:tp/pmid-12345678-1]
+      directionOfEvidenceProvided: supports
+      scoreOfEvidenceProvided: 0.9
+      contributions:
+        - id: sieve:act/dm-literature-1
+          type: InterpretationActivity
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: INTERPRETER
+          date: 2024-03-15
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: SECTIONS
+          accessStatus: NOT_RECORDED  # not recorded in the legacy data
+          rationale: >-
+            The text explicitly states that diabetes is rooted in endocrine dysfunction
+            involving pancreatic islet cells, directly supporting its classification
+            as an endocrine system disorder.
+    - id: sieve:el/dm-literature-2
+      type: SieveEvidenceLine
+      description: Some argue diabetes is primarily a metabolic disorder
+      hasEvidenceItems: [sieve:tp/pmid-29876543-1]
+      directionOfEvidenceProvided: disputes
+      scoreOfEvidenceProvided: 0.6
+      contributions:
+        - id: sieve:act/dm-literature-2
+          type: InterpretationActivity
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: INTERPRETER
+          date: 2024-03-15
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: SECTIONS
+          accessStatus: NOT_RECORDED  # not recorded in the legacy data
+          rationale: >-
+            This text argues that diabetes should be classified as a metabolic disorder
+            rather than an endocrine disorder, challenging the traditional classification.
+    - id: sieve:el/dm-expert-review
+      type: SieveEvidenceLine
+      description: Clinical endocrinologist review supporting classification
+      directionOfEvidenceProvided: supports
+      scoreOfEvidenceProvided: 0.85
+      contributions:
+        - id: sieve:act/dm-expert-review
+          type: InterpretationActivity
+          contributor: orcid:0000-0002-1234-5678
+          role: INTERPRETER
+          date: 2024-03-15
+          methodType: EXPERT_JUDGEMENT
+          context: ["https://github.com/monarch-initiative/mondo/issues/5432"]
+  assertionDecisions:
+    - id: sieve:dec/dm-2019-03-22
+      type: AssertionDecision
+      contributor: orcid:0000-0002-9553-7227
+      role: CURATOR
+      date: 2019-03-22
+      outcome: ACCEPTED
+      route: INDIVIDUAL_SIGN_OFF
+      signedPacketVersion: "2019-03-22"
+concordantAssertions:
+  - id: sieve:ca/icd10cm-E11-isa-E00-E89
+    type: ConcordantAssertion
+    subject: ICD10CM:E11
+    predicate: {code: rdfs:subClassOf, label: subClassOf}
+    object: ICD10CM:E00-E89
+    reportedIn: [ICD10CM:E11]
+    resource: infores:icd10cm
+externalRecords:
+  - id: ICD10CM:E11
+    type: ExternalRecord
+    label: Type 2 diabetes mellitus
+    resource: infores:icd10cm
+    recordMetadata:
+      retrievedFrom: infores:icd10cm
+      retrievalDate: 2024-03-15
+textPassages:
+  - id: sieve:tp/pmid-12345678-1
+    type: TextPassage
+    statementText: >-
       Diabetes mellitus represents a heterogeneous group of metabolic
       disorders fundamentally rooted in endocrine dysfunction, specifically
       involving the pancreatic islet cells and their insulin-producing capacity.
-    quote_location: Results, Section 3.2, paragraph 1
-    explanation: >-
-      The text explicitly states that diabetes is rooted in endocrine dysfunction
-      involving pancreatic islet cells, directly supporting its classification
-      as an endocrine system disorder.
-
-  - id: ev-literature-2
-    evidence_type: LITERATURE
-    direction: CONTRADICTS
-    evidence_strength: 0.6
-    eco_code: ECO:0000006
-    eco_label: experimental evidence
-    description: Some argue diabetes is primarily a metabolic disorder
-    publication_id: PMID:29876543
-    publication_title: Rethinking Diabetes Classification - A Metabolic Perspective
-    quoted_text: >-
+    reportedIn: [PMID:12345678]
+    textLocation: {section: "Results, Section 3.2, paragraph 1"}
+    quoteVerification: NOT_CHECKED
+    contributions:
+      - id: sieve:act/tp-pmid-12345678-1
+        type: SieveContribution
+        contributor: sieve:agent/unrecorded-legacy-interpreter
+        role: EXTRACTOR
+        date: 2024-03-15
+  - id: sieve:tp/pmid-29876543-1
+    type: TextPassage
+    statementText: >-
       While traditionally classified under endocrine disorders, diabetes mellitus
       is fundamentally a disorder of glucose metabolism. The focus on insulin
       secretion overlooks the broader metabolic dysregulation that defines the disease.
-    quote_location: Discussion, page 412
-    explanation: >-
-      This text argues that diabetes should be classified as a metabolic disorder
-      rather than an endocrine disorder, challenging the traditional classification.
-
-  - id: ev-expert-review
-    evidence_type: EXPERT_REVIEW
-    direction: SUPPORTS
-    evidence_strength: 0.85
-    eco_code: ECO:0000218
-    eco_label: manual assertion
-    description: Clinical endocrinologist review supporting classification
-    reviewer_orcid: orcid:0000-0002-1234-5678
-    reviewer_name: Dr. Jane Smith
-    reviewer_affiliation: Massachusetts General Hospital, Endocrinology
-    reviewed_at: "2024-03-15"
-    issue: https://github.com/monarch-initiative/mondo/issues/5432
+    reportedIn: [PMID:29876543]
+    textLocation: {section: "Discussion, page 412"}
+    quoteVerification: NOT_CHECKED
+    contributions:
+      - id: sieve:act/tp-pmid-29876543-1
+        type: SieveContribution
+        contributor: sieve:agent/unrecorded-legacy-interpreter
+        role: EXTRACTOR
+        date: 2024-03-15
+publications:
+  - id: PMID:12345678
+    type: Publication
+    title: Classification of Diabetes as an Endocrine Disorder
+    pmid: "12345678"
+    resource: infores:pubmed
+    generationContext:
+      - {code: sieve:basis_unknown}
+  - id: PMID:29876543
+    type: Publication
+    title: Rethinking Diabetes Classification - A Metabolic Perspective
+    pmid: "29876543"
+    resource: infores:pubmed
+    generationContext:
+      - {code: sieve:basis_unknown}

@@ -1,145 +1,220 @@
+# C004: MONDO:0005404 'chronic fatigue syndrome' subClassOf MONDO:0002025 'psychiatric disorder'.
+# One EvidencePacket in the SIEVE SEPIO profile shape (schema/sieve.yaml), converted
+# from the older flat nanopub-like example. Identifiers (nanopub URI, PMIDs, ORCIDs,
+# issue links) are illustrative and kept as they were; sieve: ids are new
+# illustrative ids. The original attribution (2020-03-15 release) is recorded as the
+# first sign-off; the later evidence disputes it, so the claim is back in review.
+# ICD-11 does NOT assert the subclass, so the ICD-11 record itself is the (disputing)
+# evidence item; the NICE guideline is a GuidelineDocument, not a terminology record.
 id: http://purl.org/np/RA5678901234
-last_updated: "2024-07-05"
-assertion:
-  subject_id: MONDO:0005404
-  subject_label: chronic fatigue syndrome
-  predicate: rdfs:subClassOf
-  predicate_label: subClassOf
-  object_id: MONDO:0002025
-  object_label: psychiatric disorder
-  display_text: "chronic fatigue syndrome subClassOf psychiatric disorder"
-
-provenance:
-  attributed_to:
-    - orcid:0000-0002-5678-9012
-  generated_at: "2020-03-15"
-  source_version: Mondo 2020-03-15
-  source_uri: http://purl.obolibrary.org/obo/mondo/releases/2020-03-15/mondo.owl
-  generated_by:
-    id: activity:cfs-classification-2020
-    description: Historical classification of CFS based on psychosomatic theory
-    associated_with:
-      - orcid:0000-0002-5678-9012
-    started_at: "2020-03-10"
-    ended_at: "2020-03-15"
-
-evidence:
-  - id: ev-literature-historical
-    evidence_type: LITERATURE
-    direction: SUPPORTS
-    evidence_strength: 0.3
-    eco_code: ECO:0000006
-    eco_label: experimental evidence
-    description: Historical psychosomatic view of CFS (now largely discredited)
-    publication_id: PMID:8872637
-    publication_title: Chronic Fatigue Syndrome - A Stress Disorder?
-    quoted_text: >-
+type: EvidencePacket
+version: "2024-07-05"
+previousVersion: "2020-03-15"
+statement:
+  id: sieve:st/MONDO_0005404-isa-MONDO_0002025
+  type: SubclassStatement
+  subject: MONDO:0005404
+  predicate: {code: rdfs:subClassOf, label: subClassOf}
+  object: MONDO:0002025
+  statementText: chronic fatigue syndrome subClassOf psychiatric disorder
+  reviewState: PENDING_REVIEW
+  proposingChannel: CURATOR
+  hasEvidenceLines:
+    - id: sieve:el/cfs-literature-historical
+      type: SieveEvidenceLine
+      description: Historical psychosomatic view of CFS (now largely discredited)
+      hasEvidenceItems: [sieve:tp/pmid-8872637-1]
+      directionOfEvidenceProvided: supports
+      scoreOfEvidenceProvided: 0.3
+      contributions:
+        - id: sieve:act/cfs-literature-historical
+          type: InterpretationActivity
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: INTERPRETER
+          date: 2024-07-05
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: SECTIONS
+          accessStatus: NOT_RECORDED  # not recorded in the legacy data
+          rationale: >-
+            This older publication from the psychosomatic era supports psychiatric
+            classification, but this view has been increasingly challenged by
+            biomedical research.
+    - id: sieve:el/cfs-literature-biomarkers
+      type: SieveEvidenceLine
+      description: Biological abnormalities identified in CFS/ME patients
+      hasEvidenceItems: [sieve:tp/pmid-32853382-1]
+      directionOfEvidenceProvided: disputes
+      scoreOfEvidenceProvided: 0.85
+      contributions:
+        - id: sieve:act/cfs-literature-biomarkers
+          type: InterpretationActivity
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: INTERPRETER
+          date: 2024-07-05
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: SECTIONS
+          accessStatus: NOT_RECORDED  # not recorded in the legacy data
+          rationale: >-
+            Identification of biological markers strongly contradicts the psychiatric
+            classification, supporting ME/CFS as a physiological condition.
+    - id: sieve:el/cfs-icd11
+      type: SieveEvidenceLine
+      description: ICD-11 has both CFS and psychiatric disorder concepts but no subclass relationship between them
+      hasEvidenceItems: [ICD11:8E49]
+      directionOfEvidenceProvided: disputes
+      scoreOfEvidenceProvided: 0.95
+      contributions:
+        - id: sieve:act/cfs-icd11
+          type: InterpretationActivity
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: INTERPRETER
+          date: 2024-07-05
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: STRUCTURED_RECORD
+          rationale: >-
+            ICD-11 places 8E49 Postviral fatigue syndrome outside 6A00-6E8Z Mental,
+            behavioural or neurodevelopmental disorders.
+    - id: sieve:el/cfs-nice
+      type: SieveEvidenceLine
+      description: NICE guidelines have both ME/CFS and psychiatric concepts but explicitly reject psychiatric classification
+      hasEvidenceItems: [NICE:NG206]
+      directionOfEvidenceProvided: disputes
+      scoreOfEvidenceProvided: 0.9
+      contributions:
+        - id: sieve:act/cfs-nice
+          type: InterpretationActivity
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: INTERPRETER
+          date: 2024-07-05
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: FULL_TEXT
+          accessStatus: OPEN_ACCESS
+    - id: sieve:el/cfs-expert-immunology
+      type: SieveEvidenceLine
+      description: Immunologist strongly rejects psychiatric classification
+      directionOfEvidenceProvided: disputes
+      scoreOfEvidenceProvided: 0.9
+      contributions:
+        - id: sieve:act/cfs-expert-immunology
+          type: InterpretationActivity
+          contributor: orcid:0000-0003-2345-6789
+          role: INTERPRETER
+          date: 2024-07-01
+          methodType: EXPERT_JUDGEMENT
+          context: ["https://github.com/monarch-initiative/mondo/issues/11456"]
+    - id: sieve:el/cfs-patient-advocacy
+      type: SieveEvidenceLine
+      description: Patient advocacy organizations reject psychiatric classification
+      hasEvidenceItems: ["https://meaction.net/"]
+      directionOfEvidenceProvided: disputes
+      scoreOfEvidenceProvided: 0.6
+      contributions:
+        - id: sieve:act/cfs-patient-advocacy
+          type: InterpretationActivity
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: INTERPRETER
+          date: 2024-07-05
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: FULL_TEXT
+          accessStatus: OPEN_ACCESS
+    - id: sieve:el/cfs-ai-review
+      type: SieveEvidenceLine
+      directionOfEvidenceProvided: disputes
+      scoreOfEvidenceProvided: 0.8
+      confidence: 0.92
+      confidenceBasis: PRIOR  # self-reported by the AI agent, uncalibrated
+      description: >-
+        Comprehensive AI review of ME/CFS classification evidence. Prompt: "Review
+        the scientific evidence on whether ME/CFS should be classified as a
+        psychiatric disorder or a physiological condition." Summary: Analysis of 203
+        sources from 1990-2024 shows a clear shift away from psychiatric
+        classification: pre-2000 ~60% of papers supported or were neutral on the
+        psychiatric view; post-2015 <10% support it; WHO reclassified to neurological
+        in ICD-11 (2019); NICE 2021 guidelines explicitly rejected psychological
+        causation; multiple biological abnormalities now documented; graded exercise
+        therapy (based on the deconditioning hypothesis) now contraindicated due to
+        harm. Conclusion: Strong evidence against psychiatric classification.
+      contributions:
+        - id: sieve:act/cfs-ai-review
+          type: InterpretationActivity
+          contributor: sieve:agent/claude-deep-analysis
+          role: INTERPRETER
+          date: 2024-07-05
+          methodType: LLM_JUDGEMENT
+          specifiedBy: [sieve:method/legacy-deep-research]
+          rationale: Strong evidence in 203 sources against psychiatric classification.
+  assertionDecisions:
+    - id: sieve:dec/cfs-2020-03-15
+      type: AssertionDecision
+      contributor: orcid:0000-0002-5678-9012
+      role: CURATOR
+      date: 2020-03-15
+      outcome: ACCEPTED
+      route: INDIVIDUAL_SIGN_OFF
+      signedPacketVersion: "2020-03-15"
+      rationale: Historical classification of CFS based on psychosomatic theory.
+externalRecords:
+  - id: ICD11:8E49
+    type: ExternalRecord
+    label: Postviral fatigue syndrome
+    resource: sieve:resource/icd11
+    recordMetadata:
+      retrievedFrom: sieve:resource/icd11
+      retrievalDate: 2024-07-05
+textPassages:
+  - id: sieve:tp/pmid-8872637-1
+    type: TextPassage
+    statementText: >-
       Evidence suggests chronic fatigue syndrome may represent a form of
       somatization, where psychological distress manifests as physical symptoms.
-    quote_location: Discussion, page 1156
-    explanation: >-
-      This older publication from the psychosomatic era supports psychiatric
-      classification, but this view has been increasingly challenged by
-      biomedical research.
-
-  - id: ev-literature-biomarkers
-    evidence_type: LITERATURE
-    direction: CONTRADICTS
-    evidence_strength: 0.85
-    eco_code: ECO:0000006
-    eco_label: experimental evidence
-    description: Biological abnormalities identified in CFS/ME patients
-    publication_id: PMID:32853382
-    publication_title: Biological Markers of Myalgic Encephalomyelitis/Chronic Fatigue Syndrome
-    quoted_text: >-
+    reportedIn: [PMID:8872637]
+    textLocation: {section: "Discussion, page 1156"}
+    quoteVerification: NOT_CHECKED
+    contributions:
+      - id: sieve:act/tp-pmid-8872637-1
+        type: SieveContribution
+        contributor: sieve:agent/unrecorded-legacy-interpreter
+        role: EXTRACTOR
+        date: 2024-07-05
+  - id: sieve:tp/pmid-32853382-1
+    type: TextPassage
+    statementText: >-
       Multiple studies have identified objective biological abnormalities in
       ME/CFS patients including immune dysregulation, mitochondrial dysfunction,
       autonomic nervous system abnormalities, and altered gut microbiome.
       These findings are inconsistent with a purely psychiatric etiology.
-    quote_location: Results, page 8
-    explanation: >-
-      Identification of biological markers strongly contradicts the psychiatric
-      classification, supporting ME/CFS as a physiological condition.
-
-  - id: ev-concordance-icd11
-    evidence_type: CONCORDANCE
-    direction: CONTRADICTS
-    evidence_strength: 0.95
-    eco_code: ECO:0000204
-    eco_label: similarity evidence
-    description: ICD-11 has both CFS and psychiatric disorder concepts but no subclass relationship between them
-    source: https://icd.who.int/browse11
-    source_name: ICD-11
-    source_type: TERMINOLOGY
-    predicate_id: rdfs:subClassOf
-    predicate_label: subClassOf
-    source_subject_id: ICD11:8E49
-    source_subject_label: Postviral fatigue syndrome
-    source_object_id: ICD11:6A00-6E8Z
-    source_object_label: Mental, behavioural or neurodevelopmental disorders
-    mapping_set: https://w3id.org/sssom/mappings/mondo-icd11.sssom.tsv
-
-  - id: ev-concordance-nice
-    evidence_type: CONCORDANCE
-    direction: CONTRADICTS
-    evidence_strength: 0.9
-    eco_code: ECO:0000204
-    eco_label: similarity evidence
-    description: NICE guidelines have both ME/CFS and psychiatric concepts but explicitly reject psychiatric classification
-    source: https://www.nice.org.uk/guidance/ng206
-    source_name: NICE Guidelines
-    source_type: OTHER
-    predicate_id: rdfs:subClassOf
-    predicate_label: subClassOf
-    source_subject_id: NICE:NG206
-    source_subject_label: ME/CFS
-    source_object_id: NICE:mental-health
-    source_object_label: Mental health conditions
-
-  - id: ev-expert-immunology
-    evidence_type: EXPERT_REVIEW
-    direction: CONTRADICTS
-    evidence_strength: 0.9
-    eco_code: ECO:0000218
-    eco_label: manual assertion
-    description: Immunologist strongly rejects psychiatric classification
-    reviewer_orcid: orcid:0000-0003-2345-6789
-    reviewer_name: Dr. Anthony Komaroff
-    reviewer_affiliation: Harvard Medical School
-    reviewed_at: "2024-07-01"
-    issue: https://github.com/monarch-initiative/mondo/issues/11456
-
-  - id: ev-patient-advocacy
-    evidence_type: OTHER
-    direction: CONTRADICTS
-    evidence_strength: 0.6
-    eco_code: ECO:0000218
-    eco_label: manual assertion
-    description: Patient advocacy organizations reject psychiatric classification
-    publication_id: https://meaction.net/
-    publication_title: ME Action Position Statement
-
-  - id: ev-ai-review
-    evidence_type: COMPUTATIONAL
-    direction: CONTRADICTS
-    evidence_strength: 0.8
-    eco_code: ECO:0008006
-    eco_label: computational evidence
-    description: Comprehensive AI review of ME/CFS classification evidence
-    method: Claude Deep Analysis
-    method_uri: https://anthropic.com/claude
-    confidence_score: 0.92
-    parameters: >-
-      Prompt: "Review the scientific evidence on whether ME/CFS should be
-      classified as a psychiatric disorder or a physiological condition."
-
-      Summary: Analysis of 203 sources from 1990-2024 shows a clear shift
-      away from psychiatric classification:
-      - Pre-2000: ~60% of papers supported or were neutral on psychiatric view
-      - Post-2015: <10% of papers support psychiatric classification
-      - WHO reclassified to neurological in ICD-11 (2019)
-      - NICE 2021 guidelines explicitly rejected psychological causation
-      - Multiple biological abnormalities now documented
-      - Graded exercise therapy (based on deconditioning hypothesis) now
-        contraindicated due to harm
-      Conclusion: Strong evidence against psychiatric classification.
+    reportedIn: [PMID:32853382]
+    textLocation: {section: "Results, page 8"}
+    quoteVerification: NOT_CHECKED
+    contributions:
+      - id: sieve:act/tp-pmid-32853382-1
+        type: SieveContribution
+        contributor: sieve:agent/unrecorded-legacy-interpreter
+        role: EXTRACTOR
+        date: 2024-07-05
+publications:
+  - id: PMID:8872637
+    type: Publication
+    title: Chronic Fatigue Syndrome - A Stress Disorder?
+    pmid: "8872637"
+    resource: infores:pubmed
+    generationContext:
+      - {code: sieve:basis_unknown}
+  - id: PMID:32853382
+    type: Publication
+    title: Biological Markers of Myalgic Encephalomyelitis/Chronic Fatigue Syndrome
+    pmid: "32853382"
+    resource: infores:pubmed
+    generationContext:
+      - {code: sieve:basis_unknown}
+guidelines:
+  - id: NICE:NG206
+    type: GuidelineDocument
+    title: NICE guideline NG206 (ME/CFS)
+    urls: ["https://www.nice.org.uk/guidance/ng206"]
+    resource: sieve:resource/nice
+webPages:
+  - id: https://meaction.net/
+    type: WebPage
+    title: ME Action Position Statement
+    urls: ["https://meaction.net/"]

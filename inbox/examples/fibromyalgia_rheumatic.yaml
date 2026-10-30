@@ -1,85 +1,153 @@
+# C004: MONDO:0005546 'fibromyalgia' subClassOf MONDO:0005554 'rheumatic disease'.
+# One EvidencePacket in the SIEVE SEPIO profile shape (schema/sieve.yaml), converted
+# from the older flat nanopub-like example. Identifiers (nanopub URI, PMIDs, ORCIDs,
+# issue links, SCTIDs) are illustrative and kept as they were; sieve: ids are new
+# illustrative ids. The original attribution (2022-08-10 release) is recorded as the
+# first sign-off. Two legacy items had direction UNCERTAIN, which the profile does not
+# have (supports | disputes only): the passage is attached as direct evidence
+# (hasEvidence, no interpretation) and the rheumatologist's comment as a statement
+# contribution without a direction or strength.
 id: http://purl.org/np/RA3456789012
-last_updated: "2024-04-22"
-assertion:
-  subject_id: MONDO:0005546
-  subject_label: fibromyalgia
-  predicate: rdfs:subClassOf
-  predicate_label: subClassOf
-  object_id: MONDO:0005554
-  object_label: rheumatic disease
-  display_text: "fibromyalgia subClassOf rheumatic disease"
-
-provenance:
-  attributed_to:
-    - orcid:0000-0002-3456-7890
-  generated_at: "2022-08-10"
-  source_version: Mondo 2022-08-10
-  source_uri: http://purl.obolibrary.org/obo/mondo/releases/2022-08-10/mondo.owl
-
-evidence:
-  - id: ev-literature-acr
-    evidence_type: LITERATURE
-    direction: SUPPORTS
-    evidence_strength: 0.4
-    eco_code: ECO:0000006
-    eco_label: experimental evidence
-    description: ACR historically classified fibromyalgia with rheumatic conditions
-    publication_id: PMID:2306288
-    publication_title: The American College of Rheumatology 1990 Criteria for Fibromyalgia
-    quoted_text: >-
+type: EvidencePacket
+version: "2024-04-22"
+previousVersion: "2022-08-10"
+statement:
+  id: sieve:st/MONDO_0005546-isa-MONDO_0005554
+  type: SubclassStatement
+  subject: MONDO:0005546
+  predicate: {code: rdfs:subClassOf, label: subClassOf}
+  object: MONDO:0005554
+  statementText: fibromyalgia subClassOf rheumatic disease
+  reviewState: PENDING_REVIEW
+  proposingChannel: CURATOR
+  hasEvidence: [sieve:tp/pmid-28389214-1]
+  hasEvidenceLines:
+    - id: sieve:el/fm-literature-acr
+      type: SieveEvidenceLine
+      description: ACR historically classified fibromyalgia with rheumatic conditions
+      hasEvidenceItems: [sieve:tp/pmid-2306288-1]
+      directionOfEvidenceProvided: supports
+      scoreOfEvidenceProvided: 0.4
+      contributions:
+        - id: sieve:act/fm-literature-acr
+          type: InterpretationActivity
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: INTERPRETER
+          date: 2024-04-22
+          methodType: EXPERT_JUDGEMENT
+          readCoverage: SECTIONS
+          accessStatus: NOT_RECORDED  # not recorded in the legacy data
+          rationale: >-
+            Historical classification by ACR placed fibromyalgia among rheumatic conditions,
+            though this was based on symptom presentation rather than pathophysiology.
+    - id: sieve:el/fm-snomed
+      type: SieveEvidenceLine
+      description: SNOMED CT places fibromyalgia under soft tissue disorders
+      hasEvidenceItems: [sieve:ca/sctid-24693007-isa-19660004]
+      directionOfEvidenceProvided: supports
+      scoreOfEvidenceProvided: 0.5
+      contributions:
+        - id: sieve:act/fm-snomed
+          type: InterpretationActivity
+          contributor: sieve:agent/legacy-concordance-import
+          role: INTERPRETER
+          date: 2024-04-22
+          methodType: COMPUTED_CONCORDANCE
+          readCoverage: STRUCTURED_RECORD
+  contributions:
+    - id: sieve:contrib/fm-expert-uncertain
+      type: SieveContribution
+      contributor: orcid:0000-0001-2345-6789
+      date: 2024-04-20
+      description: >-
+        Rheumatologist notes classification is controversial (legacy direction
+        UNCERTAIN, strength 0.5).
+      context: ["https://github.com/monarch-initiative/mondo/issues/6789"]
+  assertionDecisions:
+    - id: sieve:dec/fm-2022-08-10
+      type: AssertionDecision
+      contributor: orcid:0000-0002-3456-7890
+      role: CURATOR
+      date: 2022-08-10
+      outcome: ACCEPTED
+      route: INDIVIDUAL_SIGN_OFF
+      signedPacketVersion: "2022-08-10"
+concordantAssertions:
+  - id: sieve:ca/sctid-24693007-isa-19660004
+    type: ConcordantAssertion
+    subject: SCTID:24693007
+    predicate: {code: rdfs:subClassOf, label: subClassOf}
+    object: SCTID:19660004
+    reportedIn: [SCTID:24693007]
+    resource: sieve:resource/snomedct
+    groundings:
+      - id: sieve:chain/sctid-24693007
+        type: ResolutionChain
+        entitySlot: subject
+        steps:
+          - id: sieve:step/sctid-24693007-1
+            type: AlignmentStep
+            category: GROUNDING
+            method: STRUCTURED_FIELD
+            inputValue: SCTID:24693007
+            outputValue: MONDO:0005546
+            mappingSet: https://w3id.org/sssom/mappings/mondo-snomed.sssom.tsv
+externalRecords:
+  - id: SCTID:24693007
+    type: ExternalRecord
+    label: Fibromyalgia
+    resource: sieve:resource/snomedct
+    recordMetadata:
+      retrievedFrom: sieve:resource/snomedct
+      retrievalDate: 2024-04-22
+textPassages:
+  - id: sieve:tp/pmid-2306288-1
+    type: TextPassage
+    statementText: >-
       Fibromyalgia is classified as a rheumatic condition based on its presentation
       with widespread musculoskeletal pain and tenderness at specific anatomical sites.
-    quote_location: Methods, page 160
-    explanation: >-
-      Historical classification by ACR placed fibromyalgia among rheumatic conditions,
-      though this was based on symptom presentation rather than pathophysiology.
-
-  - id: ev-literature-neuro
-    evidence_type: LITERATURE
-    direction: UNCERTAIN
-    evidence_strength: 0.6
-    eco_code: ECO:0000006
-    eco_label: experimental evidence
-    description: Growing evidence for central sensitization mechanism
-    publication_id: PMID:28389214
-    publication_title: Central Sensitization in Fibromyalgia - A Neurological Perspective
-    quoted_text: >-
+    reportedIn: [PMID:2306288]
+    textLocation: {section: "Methods, page 160"}
+    quoteVerification: NOT_CHECKED
+    contributions:
+      - id: sieve:act/tp-pmid-2306288-1
+        type: SieveContribution
+        contributor: sieve:agent/unrecorded-legacy-interpreter
+        role: EXTRACTOR
+        date: 2024-04-22
+  - id: sieve:tp/pmid-28389214-1
+    type: TextPassage
+    description: >-
+      Growing evidence for central sensitization mechanism. Legacy interpretation
+      (direction UNCERTAIN, strength 0.6): the text indicates uncertainty about the
+      classification, noting evidence for neurological mechanisms while
+      acknowledging the ongoing debate.
+    statementText: >-
       Evidence increasingly suggests that fibromyalgia is characterized by
       central sensitization and altered pain processing in the central nervous
       system. However, the exact classification remains debated, with some
       advocating for neurological and others for rheumatic categorization.
-    quote_location: Discussion, page 892
-    explanation: >-
-      This text indicates uncertainty about the classification, noting evidence
-      for neurological mechanisms while acknowledging the ongoing debate.
-
-  - id: ev-concordance-snomed
-    evidence_type: CONCORDANCE
-    direction: SUPPORTS
-    evidence_strength: 0.5
-    eco_code: ECO:0000204
-    eco_label: similarity evidence
-    description: SNOMED CT places fibromyalgia under soft tissue disorders
-    source: https://browser.ihtsdotools.org/
-    source_name: SNOMED CT
-    source_type: TERMINOLOGY
-    predicate_id: rdfs:subClassOf
-    predicate_label: subClassOf
-    source_subject_id: SCTID:24693007
-    source_subject_label: Fibromyalgia
-    source_object_id: SCTID:19660004
-    source_object_label: Disorder of soft tissue
-    mapping_set: https://w3id.org/sssom/mappings/mondo-snomed.sssom.tsv
-
-  - id: ev-expert-uncertain
-    evidence_type: EXPERT_REVIEW
-    direction: UNCERTAIN
-    evidence_strength: 0.5
-    eco_code: ECO:0000218
-    eco_label: manual assertion
-    description: Rheumatologist notes classification is controversial
-    reviewer_orcid: orcid:0000-0001-2345-6789
-    reviewer_name: Dr. Elena Rodriguez
-    reviewer_affiliation: Johns Hopkins Arthritis Center
-    reviewed_at: "2024-04-20"
-    issue: https://github.com/monarch-initiative/mondo/issues/6789
+    reportedIn: [PMID:28389214]
+    textLocation: {section: "Discussion, page 892"}
+    quoteVerification: NOT_CHECKED
+    contributions:
+      - id: sieve:act/tp-pmid-28389214-1
+        type: SieveContribution
+        contributor: sieve:agent/unrecorded-legacy-interpreter
+        role: EXTRACTOR
+        date: 2024-04-22
+publications:
+  - id: PMID:2306288
+    type: Publication
+    title: The American College of Rheumatology 1990 Criteria for Fibromyalgia
+    pmid: "2306288"
+    resource: infores:pubmed
+    generationContext:
+      - {code: sieve:basis_unknown}
+  - id: PMID:28389214
+    type: Publication
+    title: Central Sensitization in Fibromyalgia - A Neurological Perspective
+    pmid: "28389214"
+    resource: infores:pubmed
+    generationContext:
+      - {code: sieve:basis_unknown}
