@@ -363,6 +363,10 @@ class InterpretationMethod(str, Enum):
     LLM_JUDGEMENT = "LLM_JUDGEMENT"
     COMPUTED_CONCORDANCE = "COMPUTED_CONCORDANCE"
     RULE_BASED_STRENGTH = "RULE_BASED_STRENGTH"
+    COMPETING_CLAIM = "COMPETING_CLAIM"
+    """
+    The one line per claim that combines all live competitors (D-069); disputes, items are CompetingClaims.
+    """
 
 
 class ReadCoverage(str, Enum):
@@ -451,6 +455,43 @@ class ProposingChannel(str, Enum):
     LEGACY_MERGE = "LEGACY_MERGE"
     """
     kBOOM merge.
+    """
+
+
+class CompetitionKind(str, Enum):
+    COMPETING_OBJECT = "COMPETING_OBJECT"
+    """
+    The same name as exact synonym of another disease.
+    """
+    COMPETING_PREDICATE = "COMPETING_PREDICATE"
+    """
+    The same pair under another relation (related synonym, abbreviation).
+    """
+
+
+class LogOddsBasis(str, Enum):
+    OWN_EVIDENCE = "OWN_EVIDENCE"
+    """
+    Computed from the competitor's own evidence packet.
+    """
+    CLAIM_PRIOR = "CLAIM_PRIOR"
+    """
+    Legacy Mondo claim without a packet; its claim prior (D-063).
+    """
+    SOURCE_CANDIDATE = "SOURCE_CANDIDATE"
+    """
+    A candidate claim created from the source record that uses the name.
+    """
+
+
+class StackingPolicy(str, Enum):
+    CAP_AND_ADD = "CAP_AND_ADD"
+    """
+    A higher-order (judgement) line counts as its own line, capped at the strongest line it rests on (D-063 Q2, Q5); its inputs count too.
+    """
+    REPLACE_INPUTS = "REPLACE_INPUTS"
+    """
+    The higher-order line stands for the lines it rests on; they do not count separately.
     """
 
 
@@ -2916,6 +2957,13 @@ class EvidencePacket(DataSet):
     statement: Union[SieveStatement,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement] = Field(default=..., description="""The claim this packet is about.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
     previousVersion: Optional[str] = Field(default=None, description="""The packet version this snapshot supersedes.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-051'}},
          'domain_of': ['EvidencePacket']} })
+    referenceSnapshot: SieveRegistry = Field(default=..., description="""A frozen copy, as of this packet version, of every registry entry the packet references: agents, methods, aggregation rules, policies, batches, information resources and releases. A packet MUST be self-contained. Every reference resolves inside the packet (checked by sieve.profile_checks, UNRESOLVED_REFERENCE), so re-rating a resource, re-levelling an agent or revising a policy in the registry never changes how an existing packet version reads. The SieveRegistry stays where reference data is maintained.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-049 D-051 D-060'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'PROV.ASSERTION.METHODS '
+                                                   'PROV.INTERP.AGENT '
+                                                   'PROV.EI.QUALITY'}},
+         'domain_of': ['EvidencePacket']} })
     externalRecords: Optional[list[ExternalRecord]] = Field(default=[], description="""External database / terminology records referenced as evidence or origin.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
     concordantAssertions: Optional[list[ConcordantAssertion]] = Field(default=[], description="""Structured prior claims made by other sources.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
     textPassages: Optional[list[TextPassage]] = Field(default=[], description="""Text passages extracted from documents (records created in the Mondo ecosystem).""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
@@ -2923,6 +2971,10 @@ class EvidencePacket(DataSet):
     webPages: Optional[list[WebPage]] = Field(default=[], description="""Non-scholarly web pages referenced as evidence or origin.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
     guidelines: Optional[list[GuidelineDocument]] = Field(default=[], description="""Guideline / consensus documents referenced as evidence.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
     computationalScores: Optional[list[ComputationalScore]] = Field(default=[], description="""Computed scores (lexical match, Boomer, AI scores) referenced as evidence.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
+    competingClaims: Optional[list[CompetingClaim]] = Field(default=[], description="""Frozen copies of the claims that compete with this one (D-069), each with the log-odds from its own evidence at this packet version.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'EINT.CONTRADICTION'}},
+         'domain_of': ['EvidencePacket']} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of data set the DataSet instance represents (e.g. a 'clinical data set', a 'sequencing data set', a 'gene expression data set', a 'genome annotation data set').""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute can be used to report a specific type for the '
                       'DataSet, in cases where a model does not define DataSet '
                       'subclasses for this purpose.  Implementers can define their own '
@@ -4877,7 +4929,8 @@ class SynonymStatement(SieveStatement):
                                                 'value': 'ExternalRecord '
                                                          'ConcordantAssertion '
                                                          'TextPassage Publication '
-                                                         'WebPage ComputationalScore'},
+                                                         'WebPage ComputationalScore '
+                                                         'CompetingClaim'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'C003 MATRIX.C003'}},
          'from_schema': 'https://w3id.org/sieve',
@@ -6087,7 +6140,8 @@ class MappingStatement(SieveStatement):
                          'permitted_evidence': {'tag': 'permitted_evidence',
                                                 'value': 'ExternalRecord '
                                                          'ConcordantAssertion '
-                                                         'ComputationalScore'},
+                                                         'ComputationalScore '
+                                                         'CompetingClaim'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'C006 MATRIX.C006'}},
          'from_schema': 'https://w3id.org/sieve',
@@ -10234,6 +10288,337 @@ class ComputationalScore(EvidenceItem, DataItem):
          'status': 'Draft'} })
 
 
+class CompetingClaim(EvidenceItem, Statement):
+    """
+    A claim that cannot be true at the same time as the scored one (D-069): the same name as exact synonym of another disease (competing object), or the same pair under another relation (competing predicate), in Mondo or in a source. It is frozen into the packet with the log-odds L from its OWN evidence only, never its contested score, so the packet stays self-contained and the dependence is not circular. All competitors enter through one \"competing claim\" line.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'EINT.CONTRADICTION'}},
+         'from_schema': 'https://w3id.org/sieve',
+         'mixins': ['EvidenceItem'],
+         'slot_usage': {'id': {'identifier': True, 'name': 'id'},
+                        'object': {'name': 'object', 'required': True},
+                        'predicate': {'name': 'predicate', 'required': True},
+                        'subject': {'name': 'subject',
+                                    'range': 'uriorcurie',
+                                    'required': True},
+                        'type': {'designates_type': True, 'name': 'type'}}})
+
+    competitionKind: CompetitionKind = Field(default=..., json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'}},
+         'domain_of': ['CompetingClaim']} })
+    competitorLogOdds: float = Field(default=..., description="""L_j, the competitor's log-odds from its own evidence at this packet version.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'EINT.CONTRADICTION'}},
+         'domain_of': ['CompetingClaim']} })
+    logOddsBasis: LogOddsBasis = Field(default=..., description="""Where L_j comes from (its own packet, a claim prior, or a source-derived candidate).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'}},
+         'domain_of': ['CompetingClaim']} })
+    competitorPacket: Optional[str] = Field(default=None, description="""\"packet-id@version\" the value was taken from. Provenance text only, not a reference; the packet remains self-contained.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069 D-051'}},
+         'domain_of': ['CompetingClaim']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'EvidenceItem']} })
+    statementText: Optional[str] = Field(default=None, description="""A natural-language expression of what a Statement asserts to be true.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute captures what a Statement says as human readable '
+                      'free text. e.g. that "BRCA2 c.8023A>G is pathogenic for Breast '
+                      'Cancer", or that "there is moderate evidence supporting the '
+                      'pathogenicity of BRCA2 c.8023A>G for Breast Cancer". This '
+                      'optional attribute can be used instead of, or as a complement '
+                      'to, a structured representation of Statement semantics that '
+                      'uses the subject-predicate-object-qualifier pattern.'],
+         'domain_of': ['Statement'],
+         'status': 'Draft'} })
+    proposition: Optional[Proposition] = Field(default=None, description="""A possible fact that the Statement assesses or puts forth as true.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute supports an alternate modeling pattern where the '
+                      'structured semantics of the possible fact asserted or evaluated '
+                      "by a Statement is encapsulated in a separate 'Proposition' "
+                      'object. In such a case, the subject-predicate-object-qualifier '
+                      'properties on the Statement are not utilized. A given '
+                      'implementation should decide which pattern to follow and drop '
+                      'attributes not required for their approach.'],
+         'domain_of': ['Statement'],
+         'status': 'Informative'} })
+    subject: str = Field(default=..., description="""The Entity or concept about which the Statement is made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Statement', 'Proposition'], 'status': 'Draft'} })
+    predicate: Coding = Field(default=..., description="""The relationship declared to hold between the subject and the object of the Statement.""", json_schema_extra = { "linkml_meta": {'comments': ['When applied to represent a particular type of Statement (via '
+                      "'Profiling'), implementers can define a value set of predicates "
+                      'for the relationships relevant in the domain - ideally using '
+                      'terms from community ontologies or terminologies. For example, '
+                      "in a  'Variant Pathogenicity Statement' Profile, the predicate "
+                      'value set might include terms from the GENO ontology defining  '
+                      "'pathogenic for condition', 'benign for condition', and "
+                      "'uncertain significance for condition' relationships "
+                      '(GENO:0000840, GENO:0000843, GENO:0000845).'],
+         'domain_of': ['Statement', 'Proposition', 'AlignmentStep'],
+         'status': 'Draft'} })
+    object: str = Field(default=..., description="""An Entity or concept that is related to the subject of a Statement via its predicate.""", json_schema_extra = { "linkml_meta": {'comments': ['The object of a Statement can be any Entity or concept that is '
+                      'related to the subject, e.g. for Genetic Variation subjects the '
+                      'object is often a disease, drug, gene, molecular consequence, '
+                      'functional impact on gene or protein.'],
+         'domain_of': ['Statement', 'Proposition'],
+         'status': 'Draft'} })
+    qualifier: Optional[list[Qualifier]] = Field(default=[], description="""An additional piece of information that extends or refines the meaning of a Statement's core subject - predicate - object 'triple' - by providing additional detail, or constraining the statement to apply in a particular context.""", json_schema_extra = { "linkml_meta": {'comments': ['-The qualifier attribute allows representation of more complex, '
+                      'n-ary statements that may not be accommodated by a simple '
+                      'subject-predicate-object (SPO) triple. For example, if an SPO '
+                      "triple asserts that 'Variant X' - predicts sensitivity to - "
+                      "'Treatment Y', a qualifier can be used to indicate that this "
+                      "applies in the context of a particular 'Disease Z'. Qualifiers "
+                      'can also add information that quantifies aspects of a Statement '
+                      "- e.g. for a Statement triple asserting that a 'Variant X'- "
+                      "causes - 'Phenotype Y', a qualifier can be used to add "
+                      'frequency/penetrance information that quantifies the percentage '
+                      'of carriers in which the phenotype is observed to manifest. '
+                      'Statement profiles may define more than one qualifier, as '
+                      'needed to capture different types of qualifying information.',
+                      "The SEPIO core model specifies use of a key-value 'Qualifier' "
+                      'object to capture the meaning and value of each type of '
+                      'qualifying information relevant for a given type of Statement. '
+                      'But in practice, profiles for specific Statement types may '
+                      'choose to define one or more specializations of the generic '
+                      "'qualifier' property as named attributes. This makes the data "
+                      'more succinct and parsable, and allows specific constraints to '
+                      'be applied and validated for different qualifiers. For example, '
+                      'a VariantPathogenicityStatement profile may define a named '
+                      "'alleleOriginQualifier' attribute that is required, and a named "
+                      "'geneContextQualifier' attribute that is optional - both of "
+                      "which conceptually specialize the core-im 'qualifier' property. "
+                      "Under this approach, the core 'qualifier' acts as a placeholder "
+                      'to seed such specializations, but is not used directly in '
+                      'Statement profiles.'],
+         'domain_of': ['Statement', 'Proposition'],
+         'status': 'Informative'} })
+    direction: Optional[str] = Field(default=None, description="""A term indicating whether the Statement supports, disputes, or remains neutral w.r.t. the validity of the Proposition it evaluates.""", json_schema_extra = { "linkml_meta": {'comments': ['Statements put forth a Proposition that expresses some possible '
+                      'fact about the world, and may provide an assessment of this '
+                      "proposition's validity (i.e. how likely it is to be true or "
+                      'false based on evaluated evidence). The semantics of the '
+                      "Proposition are captured in the 'subject',  'predicate', "
+                      "'object', and optional 'qualifier' attributes. An assessment of "
+                      "the Proposition's validity can be captured using 'direction', "
+                      "'strength', and 'score' attributes. The 'direction'  attribute "
+                      "is used to indicate whether the Statement's Proposition is "
+                      "*supported* by the agent's assessment (when evidence favors its "
+                      "validity), is *disputed* by the agent's assessment (when "
+                      'evidence argues against its validity), or remains *neutral* '
+                      '(when conflicting or insufficient evidence exists to assert one '
+                      "direction or the other).  (Enumerated values = 'supports', "
+                      "'disputes', 'neutral')."],
+         'domain_of': ['Statement'],
+         'status': 'Draft'} })
+    strength: Optional[str] = Field(default=None, description="""A term used to report the strength of a Proposition's assessment in the direction indicated (i.e. how strongly supported or disputed the Proposition is believed to be).  Implementers may choose to frame a strength assessment in terms of how *confident* an agent is that the Proposition is true or false, or in terms of the *strength of all evidence* they believe supports or disputes it.""", json_schema_extra = { "linkml_meta": {'comments': ['Statements put forth a Proposition that expresses some possible '
+                      'fact about the world, and may provide an assessment of this '
+                      "proposition's validity (i.e. how likely it is to be true or "
+                      'false based on evaluated evidence). The semantics of the '
+                      "Proposition are captured in the 'subject,' 'predicate', "
+                      "'object', and optional 'qualifier' attributes. An assessment of "
+                      "the Proposition's validity can be captured using 'direction',  "
+                      "'strength', and 'score' attributes. The 'strength' attribute is "
+                      'used to report the strength of this assessment in the direction '
+                      'indicated. Strength can be framed as a *level of confidence* '
+                      'that the Proposition is true or false, or as a *level of '
+                      'evidence* that supports or disputes it. Data creators can '
+                      "define the permissible values for the 'strength' attribute to "
+                      "indicate which of these facets is being assessed (e.g. 'high "
+                      "confidence' vs 'low confidence', or 'strong evidence' vs 'weak "
+                      "evidence') - or they can choose values that don't commit to one "
+                      "or the other if they don't want to make the distinction (e.g. "
+                      "'high' vs 'medium' vs 'low')."],
+         'domain_of': ['Statement'],
+         'status': 'Draft'} })
+    score: Optional[float] = Field(default=None, description="""A quantitative score that indicates the strength of a Proposition's validity assessment in the direction indicated (i.e. how strongly supported or disputed the Proposition is believed to be).  Depending on its implementation, a score may reflect how *confident* that agent is that the Proposition is true or false, or the *strength of evidence* they believe supports or disputes it.""", json_schema_extra = { "linkml_meta": {'comments': ['Statements put forth a Proposition that expresses some possible '
+                      'fact about the world, and may provide an assessment of this '
+                      "proposition's validity (i.e. how likely it is to be true or "
+                      'false based on evaluated evidence). The semantics of the '
+                      "Proposition are captured in the 'subject', 'predicate', "
+                      "'object', and optional 'qualifier' attributes. The assessment "
+                      "of the Proposition's validity are captured in 'direction', "
+                      "'strength', and 'score' attributes.  The 'score' attribute "
+                      "serves the same purpose as 'strength', but allows for a "
+                      'quantitative assessment based on a numerical score.'],
+         'domain_of': ['Statement'],
+         'status': 'Draft'} })
+    subjectClassification: Optional[Coding] = Field(default=None, description="""A single term or phrase summarizing the outcome of direction and strength assessments of a Statement's proposition, in terms of a classification of its subject.""", json_schema_extra = { "linkml_meta": {'comments': ['Permissible values for this attribute are  typically selected '
+                      'to be succinct and familiar in the target community of practice '
+                      "- and can be provided to report of a statement's conclusion in "
+                      'user-friendly terms. For example, in a Statement assessing the '
+                      'proposition that "BRCA2 c.8023A>G is pathogenic for Breast '
+                      'Cancer", and reporting a direction of \'supports\' and strength '
+                      "of 'likely', the term  'likely pathogenic' from the ACMG "
+                      'Variant Interpretation Guidelines would be used as a subject '
+                      'classification.'],
+         'domain_of': ['Statement'],
+         'status': 'Draft'} })
+    hasEvidenceOfTypes: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+                      'that describe specific instances of evidence information, such '
+                      'as a particular data item, study result, or prior assertions, '
+                      'etc. Where possible, data cretors should use of terms from '
+                      'ontologies such as the Evidence and Conclusion Ontology (ECO) '
+                      'to describe specific types of evidence (e.g. ECO:0000044 '
+                      "'sequence similarity evidence')."],
+         'domain_of': ['Statement'],
+         'status': 'Informative'} })
+    hasEvidenceLines: Optional[list[EvidenceLine]] = Field(default=[], description="""An evidence-based argument that supports or disputes the validity of the proposition that a Statement assesses or puts forth as true. The strength and direction of this argument (whether it supports or disputes  the proposition, and how strongly) is based on an interpretation of one or more pieces of information as evidence (i.e. 'Evidence Items).""", json_schema_extra = { "linkml_meta": {'comments': ['Evidence Lines result from the interpretation of one or more '
+                      'pieces of information to build an argument for or against a '
+                      'particular Proposition. These arguments have direction '
+                      '(supporting / disputing) and strength (e.g. strong, moderate, '
+                      'weak) relative to the Proposition they are evaluated against. '
+                      'For example, ExaC allele counts and frequency calculations for '
+                      'the BRCA2 c.8023A>G variant in different populations may be '
+                      "collectively assessed to provide an argument of 'moderate' "
+                      "strength in 'support of ' a proposition that the variant is "
+                      'pathogenicity for breast cancer.',
+                      'Evidence Lines are useful in cases where a data provider wants '
+                      'to describe in detail how information was  assessed as evidence '
+                      'to generate and score different arguments for or against a '
+                      "Statement''s proposition. Evidence Lines can be omitted if such "
+                      'information is not available or needed.'],
+         'domain_of': ['Statement'],
+         'status': 'Draft'} })
+    hasEvidence: Optional[list[InformationEntity]] = Field(default=[], description="""A piece of information that represents or contributes to an argument for or against the validity of the Proposition put forth in a Statement. This is a shortcut relation that links a Statement directly to a piece of evidence supporting it, bypassing the Evidence Line class when used data creators do not utilize an Evidence Line object.""", json_schema_extra = { "linkml_meta": {'comments': ['- Evidence is any information that is interpreted in assessing '
+                      'the truth of  the proposition a Statement puts forth as true or '
+                      'false.  A piece of information only becomes evidence when it is '
+                      'interpreted in this way. Different types of information '
+                      'entities can be used and cited as evidence, including direct '
+                      'observation or measurement data, derived statistical '
+                      'calculations, data tables or figures in a publication, '
+                      'conclusions/findings from a particular study, or prior '
+                      'assertions of knowledge  that themselves are based on their own '
+                      'set of evidence.',
+                      'This is a shortcut relation that links a Statement directly to '
+                      'a piece of evidence supporting it, bypassing the Evidence Line '
+                      'class - to be used data creators cannot or do not wish to '
+                      'create an Evidence Line object.'],
+         'domain_of': ['Statement'],
+         'status': 'Informative'} })
+    hasEvidenceFromSources: Optional[list[InformationEntity]] = Field(default=[], description="""An Information Entity (typically a publication, dataset, or database) that provided information used as evidence to generate the knowledge expressed in a Statement.""", json_schema_extra = { "linkml_meta": {'comments': ["This is a 'shortcut property' that can be used to directly link "
+                      'a Statement to sources that provided evidence '
+                      'supporting/disputing it, without having to create Evidence '
+                      'Lines or Evidence Items in the data.'],
+         'domain_of': ['Statement']} })
+    isAbout: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
+                      'be used to indicate entities/concepts it is about, in lieu of '
+                      'providing a more precise description of what the Statement '
+                      'asserts to be true using subject, predicate, object, and '
+                      'qualifier properties. e.g. the Statement that "BRCA2 c.8023A>G '
+                      'is pathogenic for Breast Cancer" might be annotated to be about '
+                      "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
+                      "Cancer'."],
+         'domain_of': ['InformationEntity'],
+         'status': 'Informative'} })
+    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+                      'provide structured descriptions of a contribution made to the '
+                      'Information Entity by a particular agent.'],
+         'domain_of': ['InformationEntity', 'RecordMetadata'],
+         'status': 'Draft'} })
+    dateAuthored: Optional[str] = Field(default=None, description="""Indicates when the information content expressed in the Information Entity was generated.""", json_schema_extra = { "linkml_meta": {'comments': ["The term 'authored' as used in the model refers to the "
+                      "generation of 'information content' in the abstract  sense, as "
+                      'opposed to a concrete encoding of this information in a '
+                      'specific language or format. e.g. for a Statement, this '
+                      'attribute captures when the information content expressed in '
+                      'the Statement was first generated by an agent.  Information '
+                      'about when a particular concrete encoding of this information '
+                      'was created (e.g. as row in a table, or object in a json '
+                      'document) would live in a RecordMetadata object attached to the '
+                      'Information Entity).'],
+         'domain_of': ['InformationEntity'],
+         'status': 'Draft'} })
+    specifiedBy: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
+                      'specification that describe how data were generated, or an '
+                      'evidence interpretation guideline that describes steps taken to '
+                      'interpret data in making a variant pathogenicity '
+                      'classification.',
+                      'Note that this attribute captures specific *instances* of '
+                      'specifications/methods (e.g. the specific electron microscopy '
+                      'method described in https://doi.org/10.1002/ cpz1.1045) - as '
+                      'opposed to reporting a *type* of method applied (e.g. '
+                      '"Transmission Electron Microscopy").'],
+         'domain_of': ['InformationEntity', 'Activity'],
+         'status': 'Draft'} })
+    supportingMethods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity - e.g. '
+                      'methods used to produce data that was interpreted as evidence '
+                      'to generate a Statement of knowledge.',
+                      'This field captures terms representing specific INSTANCES of '
+                      "methods applied, vs the 'supportingMethodTypes' attribute which "
+                      'captures TYPES of methods used.'],
+         'domain_of': ['InformationEntity'],
+         'status': 'Informative'} })
+    supportingMethodTypes: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
+                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
+                      'which capture specific INSTANCES of methods used. These may '
+                      'include types of methods that directly produced the Information '
+                      'Entity, or upstream/accessory methods that indirectly support '
+                      'creation of the Information Entity',
+                      'Implementers should define a relevant source or set of method '
+                      'type codes/terms to use here, based on the needs of the domain '
+                      "or application.'"],
+         'domain_of': ['InformationEntity'],
+         'status': 'Informative'} })
+    derivedFrom: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reportedIn: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
+                      'documents/publications where the Information Entity is '
+                      'expressed or reported.  For a Statement, this might be a '
+                      'publication where the authors express the statement in text. '
+                      'For a Data Item, this might be a publication with a table or '
+                      'figure that reports the value of the  data.'],
+         'domain_of': ['InformationEntity'],
+         'status': 'Draft'} })
+    sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
+                      'InformationEntity.reportedIn (which is used to references a '
+                      'Docuement that directly reports the infrormation), and '
+                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'resources that provided evidence used to generate the knowledge '
+                      'expressed in a Statement). It can be used to cover both cases, '
+                      'in situations where a data provider does not know which is the '
+                      'case, or does not wish to make the distinction.'],
+         'domain_of': ['InformationEntity'],
+         'status': 'Draft'} })
+    informationQuality: Optional[Coding] = Field(default=None, description="""A qualitative term indicating the scientific rigor or reliability with which the information was generated/collected.""", json_schema_extra = { "linkml_meta": {'comments': ['This is typically based on the quality of design and execution '
+                      'of the study or curation activity that generated it (e.g. were '
+                      'relevant controls assessed to show instruments were working, '
+                      'were all samples taken care of and handled identically, are '
+                      'methods sound and well documented, etc.).',
+                      'The quality of information is intrinsic to the information '
+                      'itself, and not to a particular application of the information '
+                      '(e.g. as evidence for making an Assertion)',
+                      'The quality of information is one factor that goes into the '
+                      "confidence we have in the information''s veracity (i.e. that it "
+                      'is an accurate reflection of reality it intends to measure or '
+                      'describe). Other factors informing confidence may include who '
+                      'did it (we may just not trust some Agents), when (if data '
+                      'created 500 years ago, we may have less confidence in it), and '
+                      'for Assertions, the relevance and abundance of supporting '
+                      'evidence.',
+                      'Implementers should define a relevant source of codes or terms '
+                      "to use here, based on the needs of the domain or application.'"],
+         'domain_of': ['InformationEntity'],
+         'status': 'Informative'} })
+    recordMetadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
+                      'can be used to capture when, how, and by whom a record '
+                      'serialization was generated or modified; what upstream '
+                      'resources it was derived or retrieved from; and record-level '
+                      'administrative information such as versioning and lifecycle '
+                      'status.'],
+         'domain_of': ['InformationEntity'],
+         'status': 'Draft'} })
+    identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
+                      'system that provisioned the identifier is clear.',
+                      'A given real world entity - e.g. a genetic variant - may have '
+                      'many business identifiers defined by different systems, which '
+                      'can be captured in the "identifiers" property to indicate that '
+                      'they represent the same thing.'],
+         'domain_of': ['Entity'],
+         'status': 'Informative'} })
+    type: Literal["CompetingClaim"] = Field(default="CompetingClaim", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
+    label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
+    alternativeLabels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
+    description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
+    extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
+                      'definition of custom fields in the data itself. Extensions are '
+                      'not expected to be natively understood, but may be used for '
+                      'pre-negotiated exchange of message attributes between systems.'],
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
+
+
 class SieveEvidenceLine(EvidenceItem, EvidenceLine):
     """
     One evidentiary judgement: these items bear on the enclosing claim in this direction with this strength. Lines are immutable. A misreading is corrected by a new line that supersedes the old one, and the old line is invalidated (kept, excluded from the score), never edited or deleted. The target is always the enclosing Statement, so the core targetProposition is unused.
@@ -10719,6 +11104,11 @@ class SieveAgent(Agent):
          'domain_of': ['SieveAgent']} })
     members: Optional[list[str]] = Field(default=[], description="""Members of a group agent (expert panel).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-046'}},
          'domain_of': ['SieveAgent']} })
+    identityKnown: Optional[bool] = Field(default=True, description="""False for an unknown human interpreter: a person whose identity was not recorded (typical of legacy data). Must be subtype person. Lines by an unknown human get the rule's default prior; a sign-off by one is flagged.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-049 D-051'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'PROV.INTERP.AGENT'}},
+         'domain_of': ['SieveAgent'],
+         'ifabsent': 'true'} })
     subtype: AgentKind = Field(default=..., description="""A specific type of agent the Agent object represents. Must be one of {person, organization, software}""", json_schema_extra = { "linkml_meta": {'comments': ['At present, there are no subclasses in the model representing '
                       'the three high level types of Agent (person, organization, or '
                       'software). If it is determined that there are enough unique '
@@ -10961,6 +11351,29 @@ class AggregationRule(SieveMethod):
                                                    'PROV.ASSERTION.CONFIDENCE_CATEGORY'}},
          'domain_of': ['AggregationRule']} })
     confidenceFloor: Optional[float] = Field(default=None, description="""Lines with confidence below the floor are excluded outright.""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-063'}},
+         'domain_of': ['AggregationRule']} })
+    claimPriors: Optional[list[ClaimPrior]] = Field(default=[], description="""L0 per proposing channel for this claim type (D-063 Q3). Unlisted channels get 0.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-063'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'EINT.DISTINCT_MODELS'}},
+         'domain_of': ['AggregationRule']} })
+    scalingFactor: Optional[float] = Field(default=None, description="""k in L = L0 + k * sum(w). Absent means 1.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-063'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'EINT.NUMERICAL_STRENGTH'}},
+         'domain_of': ['AggregationRule']} })
+    defaultQuality: Optional[float] = Field(default=None, description="""q for a line whose sources carry no quality rating, or whose interpreter has no trust level (e.g. an unknown human). Absent means 0.5.""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-060 D-049 D-063'}},
+         'domain_of': ['AggregationRule']} })
+    stackedLines: Optional[StackingPolicy] = Field(default=StackingPolicy.CAP_AND_ADD, description="""How a higher-order line and the lines it rests on count together.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-046 D-063'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'EINT.STACKING'}},
+         'domain_of': ['AggregationRule'],
+         'ifabsent': 'string(CAP_AND_ADD)'} })
+    exclusive: Optional[bool] = Field(default=False, description="""Whether claims of this type are mutually exclusive, so a competing-claim line applies (D-069): exact synonyms and labels within a branch (abbreviations exempt), exact mappings where 1:1 is expected. Never subclass or disease features.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'EINT.CONTRADICTION'}},
+         'domain_of': ['AggregationRule'],
+         'ifabsent': 'false'} })
+    exclusivityRule: Optional[str] = Field(default=None, description="""The exclusivity criterion in words, versioned with the rule (D-069).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'}},
          'domain_of': ['AggregationRule']} })
     version: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['DataSet', 'SieveMethod']} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of method that a Method instance represents (e.g. 'Variant Interpretation Guideline', or 'Experimental Protocol').""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute can be used to report a specific type for the '
@@ -12334,6 +12747,19 @@ class AppliedRule(Utility):
     certainty: Optional[float] = Field(default=None, ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['AppliedRule']} })
 
 
+class ClaimPrior(Utility):
+    """
+    A claim prior L0 for one proposing channel (D-063 Q3).
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-063'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'EINT.DISTINCT_MODELS'}},
+         'from_schema': 'https://w3id.org/sieve'})
+
+    channel: ProposingChannel = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['ClaimPrior']} })
+    logOdds: float = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['ClaimPrior']} })
+
+
 # Model rebuild
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
 Entity.model_rebuild()
@@ -12382,6 +12808,7 @@ Publication.model_rebuild()
 WebPage.model_rebuild()
 GuidelineDocument.model_rebuild()
 ComputationalScore.model_rebuild()
+CompetingClaim.model_rebuild()
 SieveEvidenceLine.model_rebuild()
 LineStatusChange.model_rebuild()
 SieveAgent.model_rebuild()
@@ -12400,3 +12827,4 @@ TextLocation.model_rebuild()
 QualityRating.model_rebuild()
 LevelAssignment.model_rebuild()
 AppliedRule.model_rebuild()
+ClaimPrior.model_rebuild()

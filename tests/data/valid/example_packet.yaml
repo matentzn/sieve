@@ -55,3 +55,44 @@ publications:
     title: Example study
     pmid: "12345678"
     resource: infores:pubmed
+# Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+referenceSnapshot:
+  id: sieve:pkt_asthma_0001#references
+  type: SieveRegistry
+  version: '1'
+  resources:
+  - id: infores:disease-ontology
+    type: InformationResource
+    label: Disease Ontology
+    curiePrefixes:
+    - DOID
+    defaultRole: PRIMARY
+    derivesContentFrom:
+    - infores:omim
+    qualityRatings:
+    - level: 0.8
+      category: high
+      validFrom: '2026-01-01'
+  - id: infores:omim
+    type: InformationResource
+    label: OMIM
+    curiePrefixes:
+    - OMIM
+    defaultRole: PRIMARY
+    qualityRatings:
+    - level: 0.9
+      category: high
+      validFrom: '2026-01-01'
+  - id: infores:pubmed
+    type: InformationResource
+    label: PubMed
+    curiePrefixes:
+    - PMID
+    defaultRole: PRIMARY
+  agents:
+  - id: sieve:agent/unrecorded-legacy-interpreter
+    type: SieveAgent
+    subtype: person
+    identityKnown: false
+    name: Unrecorded legacy interpreter
+    description: A human whose identity the legacy data does not record.

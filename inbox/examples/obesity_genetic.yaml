@@ -194,3 +194,50 @@ publications:
     resource: infores:pubmed
     generationContext:
       - {code: sieve:basis_unknown}
+# Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+referenceSnapshot:
+  id: http://purl.org/np/RA4567890123#references
+  type: SieveRegistry
+  version: '2024-05-18'
+  resources:
+  - id: infores:icd10cm
+    type: InformationResource
+    label: ICD-10-CM
+    curiePrefixes:
+    - ICD10CM
+    defaultRole: PRIMARY
+  - id: infores:pubmed
+    type: InformationResource
+    label: PubMed
+    curiePrefixes:
+    - PMID
+    defaultRole: PRIMARY
+  agents:
+  - id: orcid:0000-0001-9876-5432
+    type: SieveAgent
+    subtype: person
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: orcid:0000-0002-8765-4321
+    type: SieveAgent
+    subtype: person
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: orcid:0000-0003-4567-8901
+    type: SieveAgent
+    subtype: person
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: sieve:agent/gpt-4-deep-research
+    type: SieveAgent
+    subtype: software
+    name: GPT-4 deep research (legacy run)
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: sieve:agent/unrecorded-legacy-interpreter
+    type: SieveAgent
+    subtype: person
+    identityKnown: false
+    name: Unrecorded legacy interpreter
+    description: A human whose identity the legacy data does not record.
+  methods:
+  - id: sieve:method/legacy-deep-research
+    type: SieveMethod
+    version: not recorded
+    description: Reconstructed for the packet snapshot; not in a maintained registry.

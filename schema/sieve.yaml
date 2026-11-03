@@ -95,6 +95,21 @@ classes:
         description: The packet version this snapshot supersedes.
         annotations:
           decisions: D-051
+      referenceSnapshot:
+        range: SieveRegistry
+        inlined: true
+        required: true
+        description: >-
+          A frozen copy, as of this packet version, of every registry entry the packet
+          references: agents, methods, aggregation rules, policies, batches,
+          information resources and releases. A packet MUST be self-contained. Every
+          reference resolves inside the packet (checked by sieve.profile_checks,
+          UNRESOLVED_REFERENCE), so re-rating a resource, re-levelling an agent or
+          revising a policy in the registry never changes how an existing packet
+          version reads. The SieveRegistry stays where reference data is maintained.
+        annotations:
+          requirements: PROV.ASSERTION.METHODS PROV.INTERP.AGENT PROV.EI.QUALITY
+          decisions: D-049 D-051 D-060
       externalRecords:
         range: ExternalRecord
         multivalued: true
@@ -130,6 +145,16 @@ classes:
         multivalued: true
         inlined_as_list: true
         description: Computed scores (lexical match, Boomer, AI scores) referenced as evidence.
+      competingClaims:
+        range: CompetingClaim
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Frozen copies of the claims that compete with this one (D-069), each with the
+          log-odds from its own evidence at this packet version.
+        annotations:
+          requirements: EINT.CONTRADICTION
+          decisions: D-069
 
   EvidencePacketCollection:
     is_a: DataSet
@@ -448,7 +473,7 @@ classes:
     annotations:
       requirements: C003 MATRIX.C003
       decisions: D-031 D-034 D-035
-      permitted_evidence: ExternalRecord ConcordantAssertion TextPassage Publication WebPage ComputationalScore
+      permitted_evidence: ExternalRecord ConcordantAssertion TextPassage Publication WebPage ComputationalScore CompetingClaim
     slot_usage:
       predicate:
         bindings:
@@ -510,7 +535,7 @@ classes:
     annotations:
       requirements: C006 MATRIX.C006
       decisions: D-006 D-008 D-009 D-011 D-014 D-017
-      permitted_evidence: ExternalRecord ConcordantAssertion ComputationalScore
+      permitted_evidence: ExternalRecord ConcordantAssertion ComputationalScore CompetingClaim
     slot_usage:
       predicate:
         bindings:
@@ -1061,6 +1086,59 @@ classes:
         range: string
         description: Method parameters (key=value or JSON).
 
+  CompetingClaim:
+    is_a: Statement
+    mixins:
+      - EvidenceItem
+    description: >-
+      A claim that cannot be true at the same time as the scored one (D-069): the same
+      name as exact synonym of another disease (competing object), or the same pair under
+      another relation (competing predicate), in Mondo or in a source. It is frozen into
+      the packet with the log-odds L from its OWN evidence only, never its contested
+      score, so the packet stays self-contained and the dependence is not circular. All
+      competitors enter through one "competing claim" line.
+    annotations:
+      requirements: EINT.CONTRADICTION
+      decisions: D-069
+    slot_usage:
+      id:
+        identifier: true
+      type:
+        designates_type: true
+      subject:
+        range: uriorcurie
+        required: true
+      predicate:
+        required: true
+      object:
+        required: true
+    attributes:
+      competitionKind:
+        range: CompetitionKind
+        required: true
+        annotations:
+          decisions: D-069
+      competitorLogOdds:
+        range: float
+        required: true
+        description: L_j, the competitor's log-odds from its own evidence at this packet version.
+        annotations:
+          requirements: EINT.CONTRADICTION
+          decisions: D-069
+      logOddsBasis:
+        range: LogOddsBasis
+        required: true
+        description: Where L_j comes from (its own packet, a claim prior, or a source-derived candidate).
+        annotations:
+          decisions: D-069
+      competitorPacket:
+        range: string
+        description: >-
+          "packet-id@version" the value was taken from. Provenance text only, not a
+          reference; the packet remains self-contained.
+        annotations:
+          decisions: D-069 D-051
+
   # ===========================================================================
   # Module: evidence-line
   # ===========================================================================
@@ -1307,6 +1385,16 @@ classes:
         description: Members of a group agent (expert panel).
         annotations:
           decisions: D-046
+      identityKnown:
+        range: boolean
+        ifabsent: "true"
+        description: >-
+          False for an unknown human interpreter: a person whose identity was not
+          recorded (typical of legacy data). Must be subtype person. Lines by an unknown
+          human get the rule's default prior; a sign-off by one is flagged.
+        annotations:
+          requirements: PROV.INTERP.AGENT
+          decisions: D-049 D-051
 
   SieveMethod:
     is_a: Method
@@ -1354,6 +1442,52 @@ classes:
         description: Lines with confidence below the floor are excluded outright.
         annotations:
           decisions: D-063
+      claimPriors:
+        range: ClaimPrior
+        multivalued: true
+        inlined_as_list: true
+        description: L0 per proposing channel for this claim type (D-063 Q3). Unlisted channels get 0.
+        annotations:
+          requirements: EINT.DISTINCT_MODELS
+          decisions: D-063
+      scalingFactor:
+        range: float
+        description: k in L = L0 + k * sum(w). Absent means 1.
+        annotations:
+          requirements: EINT.NUMERICAL_STRENGTH
+          decisions: D-063
+      defaultQuality:
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+        description: >-
+          q for a line whose sources carry no quality rating, or whose interpreter has no
+          trust level (e.g. an unknown human). Absent means 0.5.
+        annotations:
+          decisions: D-060 D-049 D-063
+      stackedLines:
+        range: StackingPolicy
+        ifabsent: string(CAP_AND_ADD)
+        description: How a higher-order line and the lines it rests on count together.
+        annotations:
+          requirements: EINT.STACKING
+          decisions: D-046 D-063
+      exclusive:
+        range: boolean
+        ifabsent: "false"
+        description: >-
+          Whether claims of this type are mutually exclusive, so a competing-claim line
+          applies (D-069): exact synonyms and labels within a branch (abbreviations
+          exempt), exact mappings where 1:1 is expected. Never subclass or disease
+          features.
+        annotations:
+          requirements: EINT.CONTRADICTION
+          decisions: D-069
+      exclusivityRule:
+        range: string
+        description: The exclusivity criterion in words, versioned with the rule (D-069).
+        annotations:
+          decisions: D-069
 
   DecisionPolicy:
     is_a: SieveMethod
@@ -2028,6 +2162,20 @@ classes:
         minimum_value: 0
         maximum_value: 1
 
+  ClaimPrior:
+    is_a: Utility
+    description: A claim prior L0 for one proposing channel (D-063 Q3).
+    annotations:
+      requirements: EINT.DISTINCT_MODELS
+      decisions: D-063
+    attributes:
+      channel:
+        range: ProposingChannel
+        required: true
+      logOdds:
+        range: float
+        required: true
+
 # =============================================================================
 # Enums
 # =============================================================================
@@ -2207,6 +2355,9 @@ enums:
       LLM_JUDGEMENT: {annotations: {decisions: D-050}}
       COMPUTED_CONCORDANCE: {annotations: {decisions: D-004 D-061}}
       RULE_BASED_STRENGTH: {annotations: {decisions: D-054}}
+      COMPETING_CLAIM:
+        description: The one line per claim that combines all live competitors (D-069); disputes, items are CompetingClaims.
+        annotations: {requirements: EINT.CONTRADICTION, decisions: D-069}
 
   ReadCoverage:
     annotations: {decisions: D-059}
@@ -2278,6 +2429,29 @@ enums:
       PROVIDER_SYNC:
       AI_AGENT:
       LEGACY_MERGE: {description: kBOOM merge.}
+
+  CompetitionKind:
+    annotations: {requirements: EINT.CONTRADICTION, decisions: D-069}
+    permissible_values:
+      COMPETING_OBJECT: {description: The same name as exact synonym of another disease.}
+      COMPETING_PREDICATE: {description: "The same pair under another relation (related synonym, abbreviation)."}
+
+  LogOddsBasis:
+    annotations: {decisions: D-069}
+    permissible_values:
+      OWN_EVIDENCE: {description: Computed from the competitor's own evidence packet.}
+      CLAIM_PRIOR: {description: Legacy Mondo claim without a packet; its claim prior (D-063).}
+      SOURCE_CANDIDATE: {description: A candidate claim created from the source record that uses the name.}
+
+  StackingPolicy:
+    annotations: {requirements: EINT.STACKING, decisions: D-046 D-063}
+    permissible_values:
+      CAP_AND_ADD:
+        description: >-
+          A higher-order (judgement) line counts as its own line, capped at the strongest
+          line it rests on (D-063 Q2, Q5); its inputs count too.
+      REPLACE_INPUTS:
+        description: The higher-order line stands for the lines it rests on; they do not count separately.
 
   EntitySlot:
     permissible_values:

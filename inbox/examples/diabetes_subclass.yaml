@@ -154,3 +154,41 @@ publications:
     resource: infores:pubmed
     generationContext:
       - {code: sieve:basis_unknown}
+# Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+referenceSnapshot:
+  id: http://purl.org/np/RA1234567890#references
+  type: SieveRegistry
+  version: '2024-03-15'
+  resources:
+  - id: infores:icd10cm
+    type: InformationResource
+    label: ICD-10-CM
+    curiePrefixes:
+    - ICD10CM
+    defaultRole: PRIMARY
+  - id: infores:pubmed
+    type: InformationResource
+    label: PubMed
+    curiePrefixes:
+    - PMID
+    defaultRole: PRIMARY
+  agents:
+  - id: orcid:0000-0002-1234-5678
+    type: SieveAgent
+    subtype: person
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: orcid:0000-0002-9553-7227
+    type: SieveAgent
+    subtype: person
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: sieve:agent/legacy-concordance-import
+    type: SieveAgent
+    subtype: software
+    name: Legacy concordance import
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: sieve:agent/unrecorded-legacy-interpreter
+    type: SieveAgent
+    subtype: person
+    identityKnown: false
+    name: Unrecorded legacy interpreter
+    description: A human whose identity the legacy data does not record.

@@ -19,6 +19,11 @@ resources:
     derivesContentFrom: [infores:omim]
     qualityRatings:
       - {level: 0.8, category: high, validFrom: "2026-01-01"}
+  - id: infores:orphanet
+    type: InformationResource
+    label: Orphanet
+    curiePrefixes: [Orphanet]
+    defaultRole: PRIMARY
   - id: infores:medgen
     type: InformationResource
     label: MedGen
@@ -27,6 +32,13 @@ resources:
     derivesContentFrom: [infores:omim]
     qualityRatings:
       - {level: 0.6, category: moderate, validFrom: "2026-01-01"}
+  - id: infores:ncit
+    type: InformationResource
+    label: NCI Thesaurus
+    curiePrefixes: [NCIT]
+    defaultRole: PRIMARY
+    qualityRatings:
+      - {level: 0.8, category: high, validFrom: "2026-01-01"}
   - id: infores:icd10cm
     type: InformationResource
     label: ICD-10-CM
@@ -69,6 +81,12 @@ agents:
     subtype: software
     name: SPO concordance pipeline
     softwareVersion: 1.4.0
+  - id: sieve:agent/unrecorded-legacy-interpreter
+    type: SieveAgent
+    subtype: person
+    identityKnown: false
+    name: Unrecorded legacy interpreter
+    description: A human whose identity the legacy data does not record.
   - id: sieve:agent/policy-runner
     type: SieveAgent
     subtype: software
@@ -86,21 +104,52 @@ aggregationRules:
     claimType: SynonymStatement
     strengthBands: ["strong >= 0.8", "moderate >= 0.4", "weak < 0.4"]
     confidenceFloor: 0.3
+    # Illustrative parameters; calibrating them is the D-063 design task.
+    scalingFactor: 2.0
+    defaultQuality: 0.5
+    stackedLines: CAP_AND_ADD
+    claimPriors:
+      - {channel: SOURCE_INGEST, logOdds: 0.5}
+      - {channel: CURATOR, logOdds: 1.0}
+      - {channel: AI_AGENT, logOdds: -0.5}
+    exclusive: true
+    exclusivityRule: An exact synonym belongs to one live term per branch (human / non-human); ABBREVIATION-typed synonyms are exempt.
   - id: sieve:rule/gene-disease-v1.3
     type: AggregationRule
     version: "1.3"
     claimType: DiseaseAttributeStatement
     strengthBands: ["definitive >= 0.9", "strong >= 0.7", "moderate >= 0.4", "limited < 0.4"]
+    # Illustrative parameters; calibrating them is the D-063 design task.
+    scalingFactor: 2.0
+    defaultQuality: 0.5
+    stackedLines: CAP_AND_ADD
+    claimPriors:
+      - {channel: CURATOR, logOdds: 0.5}
   - id: sieve:rule/negative-subclass-v1.0
     type: AggregationRule
     version: "1.0"
     claimType: NegativeSubclassStatement
     strengthBands: ["strong >= 0.8", "moderate >= 0.4", "weak < 0.4"]
+    # Illustrative parameters; calibrating them is the D-063 design task.
+    scalingFactor: 2.0
+    defaultQuality: 0.5
+    stackedLines: CAP_AND_ADD
+    claimPriors:
+      - {channel: CURATOR, logOdds: 0.5}
   - id: sieve:rule/mapping-v1.0
     type: AggregationRule
     version: "1.0"
     claimType: MappingStatement
     strengthBands: ["strong >= 0.8", "moderate >= 0.4", "weak < 0.4"]
+    # Illustrative parameters; calibrating them is the D-063 design task.
+    scalingFactor: 2.0
+    defaultQuality: 0.5
+    stackedLines: CAP_AND_ADD
+    claimPriors:
+      - {channel: LEXICAL_PIPELINE, logOdds: -1.0}
+      - {channel: CURATOR, logOdds: 0.5}
+    exclusive: true
+    exclusivityRule: An exact match is 1:1 into a source unless the mapping is marked as one of several preferred siblings.
 policies:
   - id: sieve:policy/synonym-v2
     type: DecisionPolicy

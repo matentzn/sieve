@@ -154,3 +154,9 @@ def test_text_passage_derives_from_its_document_by_id(validator):
     packet = _load(DATA / "valid" / "c007_cf_cftr_panel.yaml")
     packet["textPassages"][0]["derivedFrom"] = ["PMID:20301428"]
     assert _errors(validator, packet) == []
+
+
+def test_packet_requires_reference_snapshot(validator, c005):
+    """D-051: a packet carries a frozen snapshot of the reference data it uses."""
+    del c005["referenceSnapshot"]
+    assert any("referenceSnapshot" in e for e in _errors(validator, c005))

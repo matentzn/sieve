@@ -1,0 +1,222 @@
+# C003: MONDO:0010425 'Lisch epithelial corneal dystrophy' has exact synonym 'LECD'
+# (corpus record N1). Shows how several evidence items sit in one evidence line:
+#   - line A groups three ConcordantAssertions (OMIM, Orphanet, DOID) into ONE argument;
+#   - line B mixes item types: an ExternalRecord plus a ComputationalScore;
+#   - line C is a higher-order line whose items are lines A and B.
+# Lines reference items by id; the items themselves live once in the packet's typed
+# lists. Line granularity (one item per line vs grouped) is parked (D-046); both are valid.
+# Ids other than the MONDO / OMIM / Orphanet / DOID CURIEs are illustrative.
+id: sieve:pkt/MONDO_0010425-syn-LECD
+type: EvidencePacket
+version: "2026-10-31"
+statement:
+  id: sieve:st/MONDO_0010425-syn-LECD
+  type: SynonymStatement
+  subject: MONDO:0010425
+  predicate: {code: oboInOwl:hasExactSynonym}
+  object: LECD
+  statementText: "Lisch epithelial corneal dystrophy has exact synonym 'LECD'"
+  reviewState: NOT_VERIFIED
+  proposingChannel: SOURCE_INGEST
+  hasEvidenceLines:
+    - id: sieve:el/lecd-concordance
+      type: SieveEvidenceLine
+      description: Three sources carry the synonym; assessed together as one concordance argument.
+      hasEvidenceItems:
+        - sieve:ca/omim-620763-lecd
+        - sieve:ca/orphanet-98955-lecd
+        - sieve:ca/doid-0060450-lecd
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.85
+      computedByRule: sieve:rule/synonym-v1.1
+      independenceCluster: infores:omim
+      contributions:
+        - id: sieve:act/lecd-concordance
+          type: InterpretationActivity
+          contributor: sieve:agent/concordance-pipeline
+          date: "2026-10-31"
+          methodType: RULE_BASED_STRENGTH
+          specifiedBy: [sieve:method/concordance-workflow]
+          readCoverage: STRUCTURED_RECORD
+    - id: sieve:el/lecd-label-match
+      type: SieveEvidenceLine
+      description: The OMIM record and a lexical match score, read together as one argument.
+      hasEvidenceItems:
+        - OMIM:620763
+        - sieve:score/lecd-lexical
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: weak
+      scoreOfEvidenceProvided: 0.3
+      computedByRule: sieve:rule/synonym-v1.1
+      independenceCluster: infores:omim      # it rests on the OMIM record, like line A
+      contributions:
+        - id: sieve:act/lecd-label-match
+          type: InterpretationActivity
+          contributor: sieve:agent/concordance-pipeline
+          date: "2026-10-31"
+          methodType: RULE_BASED_STRENGTH
+          specifiedBy: [sieve:method/concordance-workflow]
+          readCoverage: STRUCTURED_RECORD
+    - id: sieve:el/lecd-synthesis
+      type: SieveEvidenceLine
+      description: Higher-order line; its items are the two lines above.
+      hasEvidenceItems:
+        - sieve:el/lecd-concordance
+        - sieve:el/lecd-label-match
+      directionOfEvidenceProvided: supports
+      strengthOfEvidenceProvided: strong
+      scoreOfEvidenceProvided: 0.8
+      confidence: 0.9
+      confidenceBasis: PRIOR
+      contributions:
+        - id: sieve:act/lecd-synthesis
+          type: InterpretationActivity
+          contributor: sieve:agent/mondo-ai-extractor
+          date: "2026-10-31"
+          methodType: LLM_JUDGEMENT
+          specifiedBy: [sieve:method/evidence-extraction-prompt]
+concordantAssertions:
+  - id: sieve:ca/omim-620763-lecd
+    type: ConcordantAssertion
+    subject: OMIM:620763
+    predicate: {code: oboInOwl:hasExactSynonym}
+    object: LECD
+    reportedIn: [OMIM:620763]
+    resource: infores:omim
+  - id: sieve:ca/orphanet-98955-lecd
+    type: ConcordantAssertion
+    subject: Orphanet:98955
+    predicate: {code: oboInOwl:hasExactSynonym}
+    object: LECD
+    reportedIn: [Orphanet:98955]
+    resource: infores:orphanet
+  - id: sieve:ca/doid-0060450-lecd
+    type: ConcordantAssertion
+    subject: DOID:0060450
+    predicate: {code: oboInOwl:hasExactSynonym}
+    object: LECD
+    reportedIn: [DOID:0060450]
+    resource: infores:disease-ontology
+externalRecords:
+  - id: OMIM:620763
+    type: ExternalRecord
+    label: corneal dystrophy, lisch epithelial
+    resource: infores:omim
+    recordMetadata:
+      retrievedFrom: infores:omim
+      sourceRelease: sieve:release/omim-2026-10-01
+      retrievalDate: "2026-10-02"
+  - id: Orphanet:98955
+    type: ExternalRecord
+    label: Lisch epithelial corneal dystrophy
+    resource: infores:orphanet
+    recordMetadata:
+      retrievedFrom: infores:orphanet
+      sourceVersion: "2026-07"
+      retrievalDate: "2026-10-02"
+  - id: DOID:0060450
+    type: ExternalRecord
+    label: Lisch epithelial corneal dystrophy
+    resource: infores:disease-ontology
+    recordMetadata:
+      retrievedFrom: infores:disease-ontology
+      sourceRelease: sieve:release/doid-2026-09-01
+      retrievalDate: "2026-10-02"
+computationalScores:
+  - id: sieve:score/lecd-lexical
+    type: ComputationalScore
+    value: "1.0"
+    specifiedBy: [sieve:method/lexmatch]
+    parameters: "match=exact_synonym"
+# Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+referenceSnapshot:
+  id: sieve:pkt/MONDO_0010425-syn-LECD#references
+  type: SieveRegistry
+  version: '2026-10-31'
+  resources:
+  - id: infores:disease-ontology
+    type: InformationResource
+    label: Disease Ontology
+    curiePrefixes:
+    - DOID
+    defaultRole: PRIMARY
+    derivesContentFrom:
+    - infores:omim
+    qualityRatings:
+    - level: 0.8
+      category: high
+      validFrom: '2026-01-01'
+  - id: infores:omim
+    type: InformationResource
+    label: OMIM
+    curiePrefixes:
+    - OMIM
+    defaultRole: PRIMARY
+    qualityRatings:
+    - level: 0.9
+      category: high
+      validFrom: '2026-01-01'
+  - id: infores:orphanet
+    type: InformationResource
+    label: Orphanet
+    curiePrefixes:
+    - Orphanet
+    defaultRole: PRIMARY
+  releases:
+  - id: sieve:release/doid-2026-09-01
+    type: SourceRelease
+    ofResource: infores:disease-ontology
+    version: '2026-09-01'
+    releaseDate: '2026-09-01'
+  - id: sieve:release/omim-2026-10-01
+    type: SourceRelease
+    ofResource: infores:omim
+    version: '2026-10-01'
+    releaseDate: '2026-10-01'
+  agents:
+  - id: sieve:agent/concordance-pipeline
+    type: SieveAgent
+    subtype: software
+    name: SPO concordance pipeline
+    softwareVersion: 1.4.0
+  - id: sieve:agent/mondo-ai-extractor
+    type: SieveAgent
+    subtype: software
+    name: mondo-ai evidence agent
+    softwareVersion: 0.9.2
+    modelName: example-llm-2026-06
+    trustLevels:
+    - value: ai-agent
+      level: 0.7
+      validFrom: '2026-06-01'
+  methods:
+  - id: sieve:method/concordance-workflow
+    type: SieveMethod
+    version: '1.4'
+  - id: sieve:method/evidence-extraction-prompt
+    type: SieveMethod
+    version: 2026-09
+  aggregationRules:
+  - id: sieve:rule/synonym-v1.1
+    type: AggregationRule
+    version: '1.1'
+    claimType: SynonymStatement
+    strengthBands:
+    - strong >= 0.8
+    - moderate >= 0.4
+    - weak < 0.4
+    confidenceFloor: 0.3
+    scalingFactor: 2.0
+    defaultQuality: 0.5
+    stackedLines: CAP_AND_ADD
+    claimPriors:
+    - channel: SOURCE_INGEST
+      logOdds: 0.5
+    - channel: CURATOR
+      logOdds: 1.0
+    - channel: AI_AGENT
+      logOdds: -0.5
+    exclusive: true
+    exclusivityRule: An exact synonym belongs to one live term per branch (human / non-human); ABBREVIATION-typed
+      synonyms are exempt.

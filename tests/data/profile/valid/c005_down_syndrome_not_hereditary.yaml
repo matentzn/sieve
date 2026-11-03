@@ -121,3 +121,72 @@ externalRecords:
       sourceRelease: sieve:release/doid-2026-09-01
       retrievalDate: "2026-09-15"
       sourceLabel: Down syndrome
+# Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+referenceSnapshot:
+  id: sieve:pkt/MONDO_0008608-excl-MONDO_0003847#references
+  type: SieveRegistry
+  version: '2026-10-20'
+  resources:
+  - id: infores:disease-ontology
+    type: InformationResource
+    label: Disease Ontology
+    curiePrefixes:
+    - DOID
+    defaultRole: PRIMARY
+    derivesContentFrom:
+    - infores:omim
+    qualityRatings:
+    - level: 0.8
+      category: high
+      validFrom: '2026-01-01'
+  - id: infores:omim
+    type: InformationResource
+    label: OMIM
+    curiePrefixes:
+    - OMIM
+    defaultRole: PRIMARY
+    qualityRatings:
+    - level: 0.9
+      category: high
+      validFrom: '2026-01-01'
+  releases:
+  - id: sieve:release/doid-2026-09-01
+    type: SourceRelease
+    ofResource: infores:disease-ontology
+    version: '2026-09-01'
+    releaseDate: '2026-09-01'
+  agents:
+  - id: orcid:0000-0001-5208-3432
+    type: SieveAgent
+    subtype: person
+    roles:
+    - value: core curator
+      validFrom: '2018-01-01'
+    trustLevels:
+    - value: curator
+      level: 0.8
+      validFrom: '2018-01-01'
+  - id: sieve:agent/concordance-pipeline
+    type: SieveAgent
+    subtype: software
+    name: SPO concordance pipeline
+    softwareVersion: 1.4.0
+  methods:
+  - id: sieve:method/concordance-workflow
+    type: SieveMethod
+    version: '1.4'
+  aggregationRules:
+  - id: sieve:rule/negative-subclass-v1.0
+    type: AggregationRule
+    version: '1.0'
+    claimType: NegativeSubclassStatement
+    strengthBands:
+    - strong >= 0.8
+    - moderate >= 0.4
+    - weak < 0.4
+    scalingFactor: 2.0
+    defaultQuality: 0.5
+    stackedLines: CAP_AND_ADD
+    claimPriors:
+    - channel: CURATOR
+      logOdds: 0.5

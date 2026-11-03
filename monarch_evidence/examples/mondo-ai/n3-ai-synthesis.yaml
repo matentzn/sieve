@@ -294,31 +294,91 @@ sepio_monarch:
         - {code: "sieve:basis_unknown"}
   # Registry data the packet refers to by id (SieveRegistry fragment, not part of the packet).
   # The 0.65 / 0.56 are the organisation's declared trust in each model, dated and revisable.
-  _registry:
+  # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+  referenceSnapshot:
+    id: sieve:pkt_000564#references
+    type: SieveRegistry
+    version: '2026-08-13'
     resources:
-      - {id: infores:omim, type: InformationResource, defaultRole: PRIMARY,
-         qualityRatings: [{level: 0.95, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
-      - {id: infores:orphanet, type: InformationResource, defaultRole: PRIMARY,
-         qualityRatings: [{level: 0.90, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
-      - {id: infores:disease-ontology, type: InformationResource, defaultRole: PRIMARY, derivesContentFrom: [infores:omim],
-         qualityRatings: [{level: 0.85, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
-      - {id: infores:pubmed, type: InformationResource, defaultRole: PRIMARY}
+    - id: infores:disease-ontology
+      type: InformationResource
+      label: Disease Ontology
+      curiePrefixes:
+      - DOID
+      defaultRole: PRIMARY
+      derivesContentFrom:
+      - infores:omim
+      qualityRatings:
+      - level: 0.8
+        category: high
+        validFrom: '2026-01-01'
+    - id: infores:omim
+      type: InformationResource
+      label: OMIM
+      curiePrefixes:
+      - OMIM
+      defaultRole: PRIMARY
+      qualityRatings:
+      - level: 0.9
+        category: high
+        validFrom: '2026-01-01'
+    - id: infores:orphanet
+      type: InformationResource
+      label: Orphanet
+      curiePrefixes:
+      - Orphanet
+      defaultRole: PRIMARY
+    - id: infores:pubmed
+      type: InformationResource
+      label: PubMed
+      curiePrefixes:
+      - PMID
+      defaultRole: PRIMARY
     agents:
-      - {id: sieve:agent/mondo-ai-owl-extractor, type: SieveAgent, subtype: software, name: mondo-ai OWLExtractor}
-      - {id: sieve:agent/mondo-ai-enricher, type: SieveAgent, subtype: software, name: mondo-ai PacketEnricher}
-      - {id: sieve:agent/claude-sonnet-4-20250514, type: SieveAgent, subtype: software, name: mondo-ai SynthesisAgent (anthropic),
-         modelName: claude-sonnet-4-20250514,
-         trustLevels: [{value: ai-agent, level: 0.65, validFrom: "2026-08-01"}]}
-      - {id: sieve:agent/gpt-4o, type: SieveAgent, subtype: software, name: mondo-ai SynthesisAgent (openai), modelName: gpt-4o,
-         trustLevels: [{value: ai-agent, level: 0.56, validFrom: "2026-08-01"}]}
+    - id: sieve:agent/claude-sonnet-4-20250514
+      type: SieveAgent
+      subtype: software
+      name: mondo-ai SynthesisAgent (anthropic)
+      modelName: claude-sonnet-4-20250514
+      trustLevels:
+      - value: ai-agent
+        level: 0.65
+        validFrom: '2026-08-01'
+    - id: sieve:agent/gpt-4o
+      type: SieveAgent
+      subtype: software
+      name: mondo-ai SynthesisAgent (openai)
+      modelName: gpt-4o
+      trustLevels:
+      - value: ai-agent
+        level: 0.56
+        validFrom: '2026-08-01'
+    - id: sieve:agent/mondo-ai-enricher
+      type: SieveAgent
+      subtype: software
+      name: mondo-ai PacketEnricher
+    - id: sieve:agent/mondo-ai-owl-extractor
+      type: SieveAgent
+      subtype: software
+      name: mondo-ai OWLExtractor
     methods:
-      - {id: sieve:method/mondo-ai-concordance, type: SieveMethod, version: unknown}
-      - {id: sieve:method/mondo-ai-pubmed-enrichment, type: SieveMethod, version: unknown}
-      - {id: sieve:method/mondo-ai-synthesis-prompt, type: SieveMethod, label: SYSTEM_PROMPT + SYNTHESIS_PROMPT_TEMPLATE, version: v1.0}
+    - id: sieve:method/mondo-ai-concordance
+      type: SieveMethod
+      label: mondo-ai concordance extraction
+      version: unknown
+    - id: sieve:method/mondo-ai-pubmed-enrichment
+      type: SieveMethod
+      version: unknown
+    - id: sieve:method/mondo-ai-synthesis-prompt
+      type: SieveMethod
+      label: SYSTEM_PROMPT + SYNTHESIS_PROMPT_TEMPLATE
+      version: v1.0
     aggregationRules:
-      - {id: sieve:rule/mondo-ai-literature-default, type: AggregationRule, version: unknown, claimType: SynonymStatement,
-         description: "Every enriched literature line gets strength 0.5 (moderate), whatever the paper says."}
-
+    - id: sieve:rule/mondo-ai-literature-default
+      type: AggregationRule
+      version: unknown
+      claimType: SynonymStatement
+      description: Every enriched literature line gets strength 0.5 (moderate), whatever the paper says.
 # ---------------------------------------------------------------------------
 gaps:
   self_reported_confidence_is_not_a_score: >-

@@ -92,3 +92,90 @@ externalRecords:
       retrievedFrom: infores:omim
       sourceRelease: sieve:release/omim-2026-10-01
       retrievalDate: "2026-10-02"
+# Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+referenceSnapshot:
+  id: sieve:pkt/MONDO_0012297-syn-SPOAN#references
+  type: SieveRegistry
+  version: '2026-10-20'
+  resources:
+  - id: infores:omim
+    type: InformationResource
+    label: OMIM
+    curiePrefixes:
+    - OMIM
+    defaultRole: PRIMARY
+    qualityRatings:
+    - level: 0.9
+      category: high
+      validFrom: '2026-01-01'
+  releases:
+  - id: sieve:release/omim-2019-04-30
+    type: SourceRelease
+    ofResource: infores:omim
+    version: '2019-04-30'
+  - id: sieve:release/omim-2026-10-01
+    type: SourceRelease
+    ofResource: infores:omim
+    version: '2026-10-01'
+    releaseDate: '2026-10-01'
+  agents:
+  - id: orcid:0000-0001-5208-3432
+    type: SieveAgent
+    subtype: person
+    roles:
+    - value: core curator
+      validFrom: '2018-01-01'
+    trustLevels:
+    - value: curator
+      level: 0.8
+      validFrom: '2018-01-01'
+  - id: sieve:agent/concordance-pipeline
+    type: SieveAgent
+    subtype: software
+    name: SPO concordance pipeline
+    softwareVersion: 1.4.0
+  - id: sieve:agent/policy-runner
+    type: SieveAgent
+    subtype: software
+    name: mondo-ai policy runner
+    softwareVersion: 0.3.0
+  methods:
+  - id: sieve:method/concordance-workflow
+    type: SieveMethod
+    version: '1.4'
+  aggregationRules:
+  - id: sieve:rule/synonym-v1.1
+    type: AggregationRule
+    version: '1.1'
+    claimType: SynonymStatement
+    strengthBands:
+    - strong >= 0.8
+    - moderate >= 0.4
+    - weak < 0.4
+    confidenceFloor: 0.3
+    scalingFactor: 2.0
+    defaultQuality: 0.5
+    stackedLines: CAP_AND_ADD
+    claimPriors:
+    - channel: SOURCE_INGEST
+      logOdds: 0.5
+    - channel: CURATOR
+      logOdds: 1.0
+    - channel: AI_AGENT
+      logOdds: -0.5
+    exclusive: true
+    exclusivityRule: An exact synonym belongs to one live term per branch (human / non-human); ABBREVIATION-typed
+      synonyms are exempt.
+  policies:
+  - id: sieve:policy/synonym-v2
+    type: DecisionPolicy
+    version: '2'
+    approvedBy: orcid:0000-0001-5208-3432
+    approvalDate: '2026-10-01'
+    scopeClaimTypes:
+    - SynonymStatement
+    scopeChannels:
+    - SOURCE_INGEST
+    acceptanceThreshold: 0.8
+    usesRules:
+    - sieve:rule/synonym-v1.1

@@ -198,20 +198,52 @@ sepio_monarch:
       generationContext:
         - {code: "sieve:basis_unknown"}
   # Registry data the packet refers to by id (SieveRegistry fragment, not part of the packet).
-  _registry:
+  # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+  referenceSnapshot:
+    id: sieve:pkt_mondo_0005015_dm#references
+    type: SieveRegistry
+    version: '2026-08-01'
     resources:
-      - {id: infores:mondo, type: InformationResource, label: Mondo, curiePrefixes: [MONDO], defaultRole: PRIMARY,
-         maintainer: sieve:agent/mondo-consortium}
-      - {id: infores:pubmed, type: InformationResource, label: PubMed, curiePrefixes: [PMID], defaultRole: PRIMARY}
+    - id: infores:mondo
+      type: InformationResource
+      label: Mondo
+      curiePrefixes:
+      - MONDO
+      defaultRole: PRIMARY
+      maintainer: sieve:agent/mondo-consortium
+    - id: infores:pubmed
+      type: InformationResource
+      label: PubMed
+      curiePrefixes:
+      - PMID
+      defaultRole: PRIMARY
     releases:
-      - {id: sieve:release/mondo-2026-08-01, type: SourceRelease, ofResource: infores:mondo, version: "2026-08-01"}
+    - id: sieve:release/mondo-2026-08-01
+      type: SourceRelease
+      ofResource: infores:mondo
+      version: '2026-08-01'
     agents:
-      - {id: sieve:agent/mondo-consortium, type: SieveAgent, subtype: organization, name: Mondo Disease Ontology Consortium,
-         trustLevels: [{value: authority, validFrom: "2026-08-01"}]}
-      - {id: orcid:0000-0001-5208-3432, type: SieveAgent, subtype: person,
-         trustLevels: [{value: curator, level: 0.8, validFrom: "2026-08-01"}]}
-      - {id: sieve:agent/mondo-ai-mondo-extractor, type: SieveAgent, subtype: software, name: mondo-ai MondoExtractor}
-
+    - id: orcid:0000-0001-5208-3432
+      type: SieveAgent
+      subtype: person
+      roles:
+      - value: core curator
+        validFrom: '2018-01-01'
+      trustLevels:
+      - value: curator
+        level: 0.8
+        validFrom: '2018-01-01'
+    - id: sieve:agent/mondo-ai-mondo-extractor
+      type: SieveAgent
+      subtype: software
+      name: mondo-ai MondoExtractor
+    - id: sieve:agent/mondo-consortium
+      type: SieveAgent
+      subtype: organization
+      name: Mondo Disease Ontology Consortium
+      trustLevels:
+      - value: authority
+        validFrom: '2026-08-01'
 # ---------------------------------------------------------------------------
 gaps:
   is_a_curator_decision_evidence: >-

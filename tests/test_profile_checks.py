@@ -31,6 +31,11 @@ def c007() -> dict:
 
 
 @pytest.fixture
+def c003() -> dict:
+    return _load(DATA / "c003_spoan_synonym_policy.yaml")
+
+
+@pytest.fixture
 def c006() -> dict:
     return _load(DATA / "c006_down_syndrome_icd10cm_batch.yaml")
 
@@ -167,3 +172,74 @@ def test_unrecorded_read_coverage_warns(c007):
     act.update(readCoverage="NOT_RECORDED", accessStatus="NOT_RECORDED")
     assert "READ_COVERAGE" not in _codes(c007, "ERROR")
     assert "READ_COVERAGE_NOT_RECORDED" in _codes(c007, "WARNING")
+
+
+def test_registry_reference_must_resolve_inside_the_packet(c007):
+    """D-051: a packet is self-contained; every registry reference resolves to its own snapshot."""
+    c007["statement"]["assertionDecisions"][0]["aggregationRule"] = "sieve:rule/not-in-snapshot"
+    issues = [i for i in check_packet(c007) if i.code == "UNRESOLVED_REFERENCE"]
+    assert issues and issues[0].severity == "ERROR"
+    assert "sieve:rule/not-in-snapshot" in issues[0].message
+
+
+def test_registry_reference_must_have_the_right_kind(c007):
+    """A contributor must resolve to an agent, not to some other snapshot entry."""
+    c007["statement"]["hasEvidenceLines"][0]["contributions"][0]["contributor"] = "sieve:rule/gene-disease-v1.3"
+    assert "UNRESOLVED_REFERENCE" in _codes(c007, "ERROR")
+
+
+def test_snapshot_internal_references_resolve(c003):
+    """References between snapshot entries (a policy's approver) must resolve too."""
+    c003["referenceSnapshot"]["policies"][0]["approvedBy"] = "orcid:0000-0000-0000-0000"
+    assert "UNRESOLVED_REFERENCE" in _codes(c003, "ERROR")
+
+
+@pytest.fixture
+def mds() -> dict:
+    return _load(DATA / "c003_mds_competing_claim.yaml")
+
+
+def test_competing_claim_example_passes(mds):
+    assert _codes(mds, "ERROR") == set()
+
+
+def test_contested_claim_is_never_auto_accepted(mds):
+    """D-069 / D-064: no automatic acceptance while a competing-claim line is live."""
+    mds["statement"]["assertionDecisions"] = [
+        {"id": "sieve:dec/mds-auto", "type": "AssertionDecision", "contributor": "sieve:agent/policy-runner",
+         "date": "2026-11-03", "outcome": "ACCEPTED", "route": "DELEGATED_POLICY", "policy": "sieve:policy/synonym-v2"}
+    ]
+    assert "CONTESTED_AUTO_ACCEPT" in _codes(mds, "ERROR")
+
+
+def test_only_one_competing_claim_line(mds):
+    lines = mds["statement"]["hasEvidenceLines"]
+    comp = next(line for line in lines if line["id"] == "sieve:el/mds-competing")
+    lines.append({**comp, "id": "sieve:el/mds-competing-2"})
+    assert "COMPETING_CLAIM_LINE" in _codes(mds, "ERROR")
+
+
+def test_competing_claim_line_disputes(mds):
+    comp = next(line for line in mds["statement"]["hasEvidenceLines"] if line["id"] == "sieve:el/mds-competing")
+    comp["directionOfEvidenceProvided"] = "supports"
+    assert "COMPETING_CLAIM_LINE" in _codes(mds, "ERROR")
+
+
+def test_competing_claims_need_an_exclusive_claim_type(mds):
+    """D-069: exclusivity is declared per claim type in its aggregation rule."""
+    mds["referenceSnapshot"]["aggregationRules"][0]["exclusive"] = False
+    assert "COMPETING_CLAIM_LINE" in _codes(mds, "ERROR")
+
+
+def test_unknown_agent_must_be_a_person(c005):
+    """An unknown human interpreter is a person whose identity is not recorded."""
+    agent = c005["referenceSnapshot"]["agents"][0]
+    agent.update(identityKnown=False, subtype="software")
+    assert "UNKNOWN_AGENT" in _codes(c005, "ERROR")
+
+
+def test_sign_off_by_unknown_human_warns(c005):
+    """D-049: a decision's weight depends on who signs; an unknown signer is flagged."""
+    curator = next(a for a in c005["referenceSnapshot"]["agents"] if a["id"] == "orcid:0000-0001-5208-3432")
+    curator["identityKnown"] = False
+    assert "UNKNOWN_HUMAN_DECISION" in _codes(c005, "WARNING")

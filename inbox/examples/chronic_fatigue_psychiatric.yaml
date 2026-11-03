@@ -218,3 +218,54 @@ webPages:
     type: WebPage
     title: ME Action Position Statement
     urls: ["https://meaction.net/"]
+# Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+referenceSnapshot:
+  id: http://purl.org/np/RA5678901234#references
+  type: SieveRegistry
+  version: '2024-07-05'
+  resources:
+  - id: infores:pubmed
+    type: InformationResource
+    label: PubMed
+    curiePrefixes:
+    - PMID
+    defaultRole: PRIMARY
+  - id: sieve:resource/icd11
+    type: InformationResource
+    label: ICD-11
+    curiePrefixes:
+    - ICD11
+    defaultRole: PRIMARY
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: sieve:resource/nice
+    type: InformationResource
+    label: NICE
+    curiePrefixes:
+    - NICE
+    defaultRole: PRIMARY
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  agents:
+  - id: orcid:0000-0002-5678-9012
+    type: SieveAgent
+    subtype: person
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: orcid:0000-0003-2345-6789
+    type: SieveAgent
+    subtype: person
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: sieve:agent/claude-deep-analysis
+    type: SieveAgent
+    subtype: software
+    name: Claude deep analysis (legacy run)
+    description: Reconstructed for the packet snapshot; not in a maintained registry.
+  - id: sieve:agent/unrecorded-legacy-interpreter
+    type: SieveAgent
+    subtype: person
+    identityKnown: false
+    name: Unrecorded legacy interpreter
+    description: A human whose identity the legacy data does not record.
+  methods:
+  - id: sieve:method/legacy-deep-research
+    type: SieveMethod
+    version: not recorded
+    description: Reconstructed for the packet snapshot; not in a maintained registry.

@@ -129,7 +129,7 @@ minimal:
 #     MONDO:0010425). The chain's mapping set is mondo.sssom.tsv; its version is not recorded.
 #   - the lines carry NO scoreOfEvidenceProvided. 0.95 / 0.90 / 0.85 are per-source
 #     constants: they belong on InformationResource.qualityRatings in the registry (see
-#     `_registry` below; not part of the packet), where the inclusion score S picks them up
+#     packet's referenceSnapshot below), where the inclusion score S picks them up
 #     as q_i (D-060, D-063).
 #   - the NER (1.0) is dropped. It is not the inclusion score S, and nothing computed S, so
 #     statement.score is empty until an AggregationRule runs.
@@ -297,20 +297,50 @@ sepio_monarch:
   # packet). This is where mondo-ai's ResourceConfig weights go: dated, per resource, scoped
   # to the claim type. DOID derives content from OMIM, so the aggregation rule can put the
   # DOID line in OMIM's independence cluster.
-  _registry:
+  # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+  referenceSnapshot:
+    id: sieve:pkt_000564#references
+    type: SieveRegistry
+    version: '2026-03-18'
     resources:
-      - {id: infores:omim, type: InformationResource, label: OMIM, curiePrefixes: [OMIM], defaultRole: PRIMARY,
-         qualityRatings: [{level: 0.95, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
-      - {id: infores:orphanet, type: InformationResource, label: Orphanet, curiePrefixes: [Orphanet], defaultRole: PRIMARY,
-         qualityRatings: [{level: 0.90, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
-      - {id: infores:disease-ontology, type: InformationResource, label: Disease Ontology, curiePrefixes: [DOID], defaultRole: PRIMARY,
-         derivesContentFrom: [infores:omim],
-         qualityRatings: [{level: 0.85, validFrom: "2026-03-18", scope: [SynonymStatement]}]}
+    - id: infores:disease-ontology
+      type: InformationResource
+      label: Disease Ontology
+      curiePrefixes:
+      - DOID
+      defaultRole: PRIMARY
+      derivesContentFrom:
+      - infores:omim
+      qualityRatings:
+      - level: 0.8
+        category: high
+        validFrom: '2026-01-01'
+    - id: infores:omim
+      type: InformationResource
+      label: OMIM
+      curiePrefixes:
+      - OMIM
+      defaultRole: PRIMARY
+      qualityRatings:
+      - level: 0.9
+        category: high
+        validFrom: '2026-01-01'
+    - id: infores:orphanet
+      type: InformationResource
+      label: Orphanet
+      curiePrefixes:
+      - Orphanet
+      defaultRole: PRIMARY
     agents:
-      - {id: sieve:agent/mondo-ai-owl-extractor, type: SieveAgent, subtype: software, name: mondo-ai OWLExtractor}
+    - id: sieve:agent/mondo-ai-owl-extractor
+      type: SieveAgent
+      subtype: software
+      name: mondo-ai OWLExtractor
     methods:
-      - {id: sieve:method/mondo-ai-concordance, type: SieveMethod, label: mondo-ai concordance extraction, version: unknown}
-
+    - id: sieve:method/mondo-ai-concordance
+      type: SieveMethod
+      label: mondo-ai concordance extraction
+      version: unknown
 # ---------------------------------------------------------------------------
 gaps:
   score_is_source_reliability_not_evidence_strength: >-

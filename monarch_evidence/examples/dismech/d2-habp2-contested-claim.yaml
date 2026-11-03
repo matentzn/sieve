@@ -484,7 +484,50 @@ sepio_monarch:
       resource: infores:pubmed
       generationContext:
         - {code: "PT:review", label: Review}
-
+  # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+  referenceSnapshot:
+    id: sieve:pkt/MONDO_0017896-gene-HGNC_4798#references
+    type: SieveRegistry
+    version: '2026-07-18'
+    resources:
+    - id: infores:pubmed
+      type: InformationResource
+      label: PubMed
+      curiePrefixes:
+      - PMID
+      defaultRole: PRIMARY
+    agents:
+    - id: sieve:agent/dismech-curation-agent
+      type: SieveAgent
+      subtype: software
+      name: DisMech curation agent
+      description: Reconstructed for the packet snapshot; not in a maintained registry.
+    - id: sieve:agent/dismech-curator
+      type: SieveAgent
+      subtype: person
+      name: DisMech curator
+      description: Reconstructed for the packet snapshot; not in a maintained registry.
+    methods:
+    - id: sieve:method/dismech-references-skill
+      type: SieveMethod
+      version: not recorded
+      description: Reconstructed for the packet snapshot; not in a maintained registry.
+    aggregationRules:
+    - id: sieve:rule/gene-disease-v1.3
+      type: AggregationRule
+      version: '1.3'
+      claimType: DiseaseAttributeStatement
+      strengthBands:
+      - definitive >= 0.9
+      - strong >= 0.7
+      - moderate >= 0.4
+      - limited < 0.4
+      scalingFactor: 2.0
+      defaultQuality: 0.5
+      stackedLines: CAP_AND_ADD
+      claimPriors:
+      - channel: CURATOR
+        logOdds: 0.5
 # ---------------------------------------------------------------------------
 gaps:
   profile_misfit: >-

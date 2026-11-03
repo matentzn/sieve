@@ -1,0 +1,147 @@
+# C003 with a competing claim (D-069): "MDS" as exact synonym of MONDO:0018881
+# 'myelodysplastic syndrome'. NCIT:C3247 and OMIM:614286 support the name (as in Mondo,
+# where "MDS" is typed ABBREVIATION). The competitor, "MDS" as exact synonym of
+# MONDO:0018158 'mitochondrial DNA depletion syndrome', is illustrative: it follows the
+# D-069 worked example (competitor L = 1.4); Mondo does not carry this synonym there.
+# The competitor enters as ONE refuting line; its L is frozen into the packet.
+id: sieve:pkt/MONDO_0018881-syn-MDS
+type: EvidencePacket
+version: "2026-11-03"
+statement:
+  id: sieve:st/MONDO_0018881-syn-MDS
+  type: SynonymStatement
+  subject: MONDO:0018881
+  predicate: {code: oboInOwl:hasExactSynonym}
+  object: MDS
+  reviewState: PENDING_REVIEW
+  proposingChannel: SOURCE_INGEST
+  hasEvidenceLines:
+    - id: sieve:el/mds-ncit
+      type: SieveEvidenceLine
+      hasEvidenceItems: [sieve:ca/ncit-c3247-mds]
+      directionOfEvidenceProvided: supports
+      scoreOfEvidenceProvided: 0.8
+      computedByRule: sieve:rule/synonym-v1.1
+      independenceCluster: infores:ncit
+      contributions:
+        - {id: sieve:act/mds-ncit, type: InterpretationActivity, contributor: sieve:agent/concordance-pipeline,
+           date: "2026-11-03", methodType: RULE_BASED_STRENGTH, specifiedBy: [sieve:method/concordance-workflow],
+           readCoverage: STRUCTURED_RECORD}
+    - id: sieve:el/mds-omim
+      type: SieveEvidenceLine
+      hasEvidenceItems: [sieve:ca/omim-614286-mds]
+      directionOfEvidenceProvided: supports
+      scoreOfEvidenceProvided: 0.8
+      computedByRule: sieve:rule/synonym-v1.1
+      independenceCluster: infores:omim
+      contributions:
+        - {id: sieve:act/mds-omim, type: InterpretationActivity, contributor: sieve:agent/concordance-pipeline,
+           date: "2026-11-03", methodType: RULE_BASED_STRENGTH, specifiedBy: [sieve:method/concordance-workflow],
+           readCoverage: STRUCTURED_RECORD}
+    - id: sieve:el/mds-competing                # D-069: one line for all live competitors
+      type: SieveEvidenceLine
+      hasEvidenceItems: [sieve:cc/mds-mtdna-depletion]
+      directionOfEvidenceProvided: disputes
+      description: The same name is claimed as exact synonym of another disease.
+      contributions:
+        - {id: sieve:act/mds-competing, type: InterpretationActivity, contributor: sieve:agent/concordance-pipeline,
+           date: "2026-11-03", methodType: COMPETING_CLAIM, specifiedBy: [sieve:method/concordance-workflow]}
+concordantAssertions:
+  - id: sieve:ca/ncit-c3247-mds
+    type: ConcordantAssertion
+    subject: NCIT:C3247
+    predicate: {code: oboInOwl:hasExactSynonym}
+    object: MDS
+    reportedIn: [NCIT:C3247]
+    resource: infores:ncit
+  - id: sieve:ca/omim-614286-mds
+    type: ConcordantAssertion
+    subject: OMIM:614286
+    predicate: {code: oboInOwl:hasExactSynonym}
+    object: MDS
+    reportedIn: [OMIM:614286]
+    resource: infores:omim
+competingClaims:
+  - id: sieve:cc/mds-mtdna-depletion
+    type: CompetingClaim
+    subject: MONDO:0018158
+    predicate: {code: oboInOwl:hasExactSynonym}
+    object: MDS
+    competitionKind: COMPETING_OBJECT
+    competitorLogOdds: 1.4
+    logOddsBasis: OWN_EVIDENCE
+    competitorPacket: "sieve:pkt/MONDO_0018158-syn-MDS@2026-11-03"
+externalRecords:
+  - id: NCIT:C3247
+    type: ExternalRecord
+    resource: infores:ncit
+    recordMetadata: {retrievedFrom: infores:ncit, retrievalDate: "2026-11-01"}
+  - id: OMIM:614286
+    type: ExternalRecord
+    resource: infores:omim
+    recordMetadata: {retrievedFrom: infores:omim, sourceRelease: sieve:release/omim-2026-10-01, retrievalDate: "2026-11-01"}
+# Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+referenceSnapshot:
+  id: sieve:pkt/MONDO_0018881-syn-MDS#references
+  type: SieveRegistry
+  version: '2026-11-03'
+  resources:
+  - id: infores:ncit
+    type: InformationResource
+    label: NCI Thesaurus
+    curiePrefixes:
+    - NCIT
+    defaultRole: PRIMARY
+    qualityRatings:
+    - level: 0.8
+      category: high
+      validFrom: '2026-01-01'
+  - id: infores:omim
+    type: InformationResource
+    label: OMIM
+    curiePrefixes:
+    - OMIM
+    defaultRole: PRIMARY
+    qualityRatings:
+    - level: 0.9
+      category: high
+      validFrom: '2026-01-01'
+  releases:
+  - id: sieve:release/omim-2026-10-01
+    type: SourceRelease
+    ofResource: infores:omim
+    version: '2026-10-01'
+    releaseDate: '2026-10-01'
+  agents:
+  - id: sieve:agent/concordance-pipeline
+    type: SieveAgent
+    subtype: software
+    name: SPO concordance pipeline
+    softwareVersion: 1.4.0
+  methods:
+  - id: sieve:method/concordance-workflow
+    type: SieveMethod
+    version: '1.4'
+  aggregationRules:
+  - id: sieve:rule/synonym-v1.1
+    type: AggregationRule
+    version: '1.1'
+    claimType: SynonymStatement
+    strengthBands:
+    - strong >= 0.8
+    - moderate >= 0.4
+    - weak < 0.4
+    confidenceFloor: 0.3
+    scalingFactor: 2.0
+    defaultQuality: 0.5
+    stackedLines: CAP_AND_ADD
+    claimPriors:
+    - channel: SOURCE_INGEST
+      logOdds: 0.5
+    - channel: CURATOR
+      logOdds: 1.0
+    - channel: AI_AGENT
+      logOdds: -0.5
+    exclusive: true
+    exclusivityRule: An exact synonym belongs to one live term per branch (human / non-human); ABBREVIATION-typed
+      synonyms are exempt.
