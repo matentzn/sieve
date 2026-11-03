@@ -34,8 +34,41 @@ under two constraints:
   `record-metadata` (RecordMetadata), `utility` (Coding, Extension, Qualifier).
 - **Data shape.** One `EvidencePacket` (is_a DataSet, versioned) per claim. It holds
   one claim-type Statement (view B of D-041), the evidence items its lines refer to (by
-  id, in typed lists), and nothing shared. Rules, policies, agents and resources live
-  in a `SieveRegistry` and are referenced by id.
+  id, in typed lists), and a frozen `referenceSnapshot` of the shared reference data.
+- **Self-contained packets (2026-11-03).** A packet MUST be self-contained. Its required
+  `referenceSnapshot` (a `SieveRegistry`) holds a frozen copy of every registry entry it
+  references, as of the packet version; `sieve.profile_checks` fails a packet with any
+  registry reference (agents, methods, rules, policies, batches, resources, releases,
+  including references between snapshot entries) that does not resolve, with the right
+  kind, inside it. The registry stays where reference data is maintained.
+- **Evidence items by reference, not inlined.** Lines list item ids; each item lives once in
+  the packet's typed lists. Reasons: one item backs several lines (M2, D1); the same record
+  is origin or evidence depending on where it is referenced (D-030); lines can be items of
+  higher-order lines (EINT.STACKING); dependence links (`derivedFrom`, `reportedIn`) need
+  addressable items; corrections are new lines citing the same items (D-052); and the
+  workbook asks for individual addressability (EIT F5 = YES). LinkML adds a technical
+  reason: inlined polymorphic items become a JSON-Schema `anyOf` that hides errors. Cost:
+  referential integrity is a profile check, not a schema guarantee. An inlined alternative
+  (ids + type designators) is tracked in `issues/issue_inline_evidence_items.md`.
+- **Competing claims (D-069, 2026-11-03).** A `CompetingClaim` item freezes a competitor's
+  SPO and its log-odds from its own evidence (`competitorLogOdds`, `logOddsBasis`) into the
+  packet. All live competitors enter through ONE disputing line whose act has
+  `methodType: COMPETING_CLAIM`; weight ln(1 + Σ e^L_j), outside k. Only claim types whose
+  AggregationRule is `exclusive` may have one (synonyms, mappings). Profile checks:
+  `COMPETING_CLAIM_LINE` (shape, count, exclusivity) and `CONTESTED_AUTO_ACCEPT` (no
+  automated acceptance while the line is live).
+- **Unknown human interpreter (2026-11-03).** `SieveAgent.identityKnown: false` marks a
+  person whose identity was not recorded (legacy data). It must be subtype person
+  (`UNKNOWN_AGENT`); a sign-off by one is a WARNING (`UNKNOWN_HUMAN_DECISION`); its lines
+  get the rule's `defaultQuality` as prior unless the act snapshots a trust level.
+- **Reference inclusion score (`sieve.inclusion_score`, 2026-11-03).** D-063 + D-069,
+  every parameter read from the packet's frozen AggregationRule (`claimPriors`,
+  `scalingFactor`, `defaultQuality`, `confidenceFloor`, `stackedLines`, `exclusive`).
+  q is the interpreter's trust for judgement lines and the best valid source rating
+  otherwise (Q2). Two choices the decision log leaves open are made explicit and
+  per-rule: for a line with several items, q is the best-rated source; for a
+  higher-order line, `stackedLines` = CAP_AND_ADD (it counts too, capped at the
+  strongest line it rests on, Q5) or REPLACE_INPUTS (it stands for its inputs).
 - **Claim types = Statement profiles.** One class per C001–C010, each binding its
   `predicate` to a value set (`bindings`). The claim-evidence matrix is a
   `permitted_evidence` annotation on each class.

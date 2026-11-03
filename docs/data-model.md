@@ -35,9 +35,14 @@ annotations.
   the packet (`externalRecords`, `concordantAssertions`, `textPassages`,
   `publications`, `webPages`, `guidelines`, `computationalScores`), and lines refer
   to them by id.
-- **Shared reference data lives in a `SieveRegistry`.** Information resources, source
-  releases, agents, methods, aggregation rules, decision policies and batch sign-offs
-  are maintained once and referenced by id.
+- **Shared reference data is maintained in a `SieveRegistry`.** Information resources,
+  source releases, agents, methods, aggregation rules, decision policies and batch
+  sign-offs are maintained once there.
+- **A packet is self-contained.** Its required `referenceSnapshot` (a `SieveRegistry`) holds a
+  frozen copy, as of the packet version, of every registry entry the packet references.
+  Every reference must resolve inside the packet (`UNRESOLVED_REFERENCE` in
+  `sieve.profile_checks`), so revising the registry never changes how an existing packet
+  version reads (D-049, D-051, D-060).
 - **Released artefacts** are `EvidencePacketCollection`s. Encoding provenance (which
   pipeline serialised the dump, with which export rules) is recorded there, never
   per claim.
@@ -294,8 +299,9 @@ recorded). Every issue names the requirement it enforces. See the [Python API](a
 
 A mapping claim accepted in a batch sign-off, adapted from
 `tests/data/profile/valid/c006_down_syndrome_icd10cm_batch.yaml`. The ids `sieve:rule/...`,
-`sieve:batch/...`, `sieve:release/...` and `infores:...` resolve in the registry
-(`tests/data/profile/registry.yaml`).
+`sieve:batch/...`, `sieve:release/...` and `infores:...` resolve in the packet's own
+`referenceSnapshot`, a frozen copy of the entries in the registry
+(`tests/data/profile/registry.yaml`). The snapshot is left out of the excerpt below.
 
 ```yaml
 id: sieve:pkt/MONDO_0008608-exact-ICD10CM_Q90

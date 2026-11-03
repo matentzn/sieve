@@ -87,8 +87,9 @@ graph TD
 - **Origin**: where the claim was copied or cloned from. That is not the same as
   evidence for it.
 
-Rules, policies, agents and information resources are shared, so they live once in a
-**registry** and packets refer to them by id.
+Rules, policies, agents and information resources are shared, so they are maintained
+once in a **registry**. Each packet still stands on its own: it carries a frozen
+`referenceSnapshot` of every registry entry it refers to, as of its version.
 
 ---
 
