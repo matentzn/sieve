@@ -164,11 +164,11 @@ For orientation, the nearest counterparts in the profile (not a decided mapping)
 | --- | --- |
 | `EvidencedClaim` | a claim-type statement (`SubclassStatement`, `DiseaseAttributeStatement`, ...) with SPO on the statement, inside a versioned `EvidencePacket` |
 | `EvidenceLine` | `SieveEvidenceLine`, which also requires the `InterpretationActivity` that produced it |
-| `TextSpan`, inlined in the line | `TextPassage` in the packet's `textPassages`, referenced from the line by id, with its extraction provenance |
-| `Document`, inlined via `reported_in` | `Publication` in the packet's `publications`, referenced from `TextPassage.reportedIn` |
+| `TextSpan`, inlined in the line | `TextPassage` in the packet's `text_passages`, referenced from the line by id, with its extraction provenance |
+| `Document`, inlined via `reported_in` | `Publication` in the packet's `publications`, referenced from `TextPassage.reported_in` |
 | `Direction` (`SUPPORTS` / `REFUTES` / `NEUTRAL`) | `Direction` (`supports` / `disputes`; no neutral) |
-| `Strength` | `strengthOfEvidenceProvided` (band) and `scoreOfEvidenceProvided` (0-1) |
-| `evidence_source` (ECO branch) | no direct slot; the nearest is the item's `generationContext` |
+| `Strength` | `strength_of_evidence_provided` (band) and `score_of_evidence_provided` (0-1) |
+| `evidence_source` (ECO branch) | no direct slot; the nearest is the item's `generation_context` |
 
 See the [Data Model](data-model.md) for the profile.
 

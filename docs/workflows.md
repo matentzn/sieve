@@ -31,55 +31,55 @@ statement:
   subject: MONDO:0012297
   predicate: {code: oboInOwl:hasExactSynonym}
   object: SPOAN syndrome
-  reviewState: NOT_VERIFIED
-  proposingChannel: SOURCE_INGEST
+  review_state: NOT_VERIFIED
+  proposing_channel: SOURCE_INGEST
   origin:                              # where the claim came from (not evidence)
     - id: sieve:origin/spoan-omim
       type: OriginEvent
-      derivationType: COPIED_FROM
-      sourceItem: OMIM:609541
-      sourceLabel: SPOAN syndrome
-      sourceRelease: sieve:release/omim-2019-04-30
-      performedBy: [sieve:agent/concordance-pipeline]
+      derivation_type: COPIED_FROM
+      source_item: OMIM:609541
+      source_label: SPOAN syndrome
+      source_release: sieve:release/omim-2019-04-30
+      performed_by: [sieve:agent/concordance-pipeline]
       date: "2019-05-02"
-  hasEvidenceLines:                    # what corroborates it now
+  has_evidence_lines:                    # what corroborates it now
     - id: sieve:el/spoan-omim
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:ca/omim-609541-syn]
-      directionOfEvidenceProvided: supports
-      strengthOfEvidenceProvided: strong
-      scoreOfEvidenceProvided: 0.9
-      computedByRule: sieve:rule/synonym-v1.1
+      has_evidence_items: [sieve:ca/omim-609541-syn]
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: strong
+      score_of_evidence_provided: 0.9
+      computed_by_rule: sieve:rule/synonym-v1.1
       confidence: 1.0
-      confidenceBasis: DETERMINISTIC
-      lastConfirmed: "2026-10-01"
-      lastConfirmedAgainst: sieve:release/omim-2026-10-01
+      confidence_basis: DETERMINISTIC
+      last_confirmed: "2026-10-01"
+      last_confirmed_against: sieve:release/omim-2026-10-01
       contributions:
         - id: sieve:act/spoan-omim
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
           date: "2026-10-20"
-          methodType: COMPUTED_CONCORDANCE
-          specifiedBy: [sieve:method/concordance-workflow]
-          readCoverage: STRUCTURED_RECORD
-concordantAssertions:
+          method_type: COMPUTED_CONCORDANCE
+          specified_by: [sieve:method/concordance-workflow]
+          read_coverage: STRUCTURED_RECORD
+prior_claims:
   - id: sieve:ca/omim-609541-syn
-    type: ConcordantAssertion
+    type: SynonymStatement
     subject: OMIM:609541
     predicate: {code: oboInOwl:hasExactSynonym}
     object: SPOAN syndrome
-    reportedIn: [OMIM:609541]
+    reported_in: [OMIM:609541]
     resource: infores:omim
-externalRecords:
+external_records:
   - id: OMIM:609541
     type: ExternalRecord
     resource: infores:omim
-    generationContext:
+    generation_context:
       - {code: "sieve:basis_unknown"}
-    recordMetadata:
-      retrievedFrom: infores:omim
-      sourceRelease: sieve:release/omim-2026-10-01
-      retrievalDate: "2026-10-02"
+    record_metadata:
+      retrieved_from: infores:omim
+      source_release: sieve:release/omim-2026-10-01
+      retrieval_date: "2026-10-02"
 ```
 
 Notes:
@@ -89,7 +89,7 @@ Notes:
 - Lines refer to items by id. Each item goes in the list for its class.
 - Rules, releases, agents and methods (`sieve:rule/...`, `sieve:release/...`,
   `infores:...`) are ids in a `SieveRegistry`; see `tests/data/profile/registry.yaml`.
-- A new claim usually has no `assertionDecisions` yet. The full test file adds the
+- A new claim usually has no `assertion_decisions` yet. The full test file adds the
   policy-based acceptance and the resolution chain for the OMIM id.
 - Quote dates, so linkml-validate reads them as strings.
 
@@ -135,7 +135,7 @@ from sieve.datamodel import EvidencePacket
 
 packet = EvidencePacket.model_validate(yaml.safe_load(open("inbox/my_packet.yaml")))
 type(packet.statement).__name__     # "SynonymStatement"
-packet.statement.hasEvidenceLines[0].directionOfEvidenceProvided
+packet.statement.has_evidence_lines[0].direction_of_evidence_provided
 ```
 
 The `type` designators select the concrete classes, so no custom loader is needed.
@@ -190,7 +190,7 @@ entry, or `SIEVE_DEV_MODE=true`) could accept or reject individual items and rec
 the packet's `status`.
 
 In the profile these become a `LineStatusChange` on a line, an `AssertionDecision`
-with route `INDIVIDUAL_SIGN_OFF`, and the statement's `reviewState`.
+with route `INDIVIDUAL_SIGN_OFF`, and the statement's `review_state`.
 
 ---
 

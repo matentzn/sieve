@@ -123,7 +123,7 @@ flowchart LR
   emits the pre-profile shape (see [Minimal Evidence Model](monarch-evidence.md)).
 
 The migration maps the old flow onto the profile: packet `status` becomes
-`reviewState` plus `assertionDecisions`, `CurationDecision` becomes
+`review_state` plus `assertion_decisions`, `CurationDecision` becomes
 `AssertionDecision`, per-item ratings become `LineStatusChange`s, and the Net Evidence
 Ratio becomes the inclusion score.
 

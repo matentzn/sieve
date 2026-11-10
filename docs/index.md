@@ -17,7 +17,7 @@ Everything hangs off one container per claim, the versioned **`EvidencePacket`**
   `MappingStatement`, `SynonymStatement`, ...). Subject, predicate and object sit on
   the statement; `negated: true` makes a negative claim.
 - **Evidence items**: the information used as evidence (`ExternalRecord`,
-  `ConcordantAssertion`, `TextPassage`, `Publication`, `WebPage`,
+  prior claims (claim-type statements), `TextPassage`, `Publication`, `WebPage`,
   `GuidelineDocument`, `ComputationalScore`), in typed lists on the packet.
 - **Evidence lines**: each `SieveEvidenceLine` is one judgement that some items
   support or dispute the claim, with a strength in [0, 1] and the

@@ -33,7 +33,7 @@ One versioned `EvidencePacket` per claim. The statement is one of ten claim type
 `ValueSetMembershipStatement`), each binding its predicate to a value set and listing
 the evidence it accepts. Evidence lines (`SieveEvidenceLine`, each with its
 `InterpretationActivity`) sit on the statement and refer by id to evidence items in
-typed lists on the packet (`ExternalRecord`, `ConcordantAssertion`, `TextPassage`,
+typed lists on the packet (`ExternalRecord`, prior claims typed by claim type, `TextPassage`,
 `Publication`, `WebPage`, `GuidelineDocument`, `ComputationalScore`). An
 `AssertionDecision` records the outcome, route, inclusion score S in [-1, 1], rule,
 policy or batch, and the packet version it was given on. Rules, policies, agents and
@@ -50,27 +50,27 @@ statement:
   predicate: {code: rdfs:subClassOf}
   object: MONDO:0003847               # hereditary disease
   negated: true
-  reviewState: VERIFIED
-  hasEvidenceLines:
+  review_state: VERIFIED
+  has_evidence_lines:
     - id: sieve:el/ds-doid-dispute
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:ca/doid-14250-isa-630]
-      directionOfEvidenceProvided: disputes
-      scoreOfEvidenceProvided: 0.5
+      has_evidence_items: [sieve:ca/doid-14250-isa-630]
+      direction_of_evidence_provided: disputes
+      score_of_evidence_provided: 0.5
       contributions:
         - id: sieve:act/ds-doid-concordance
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
           date: "2026-10-20"
-          methodType: COMPUTED_CONCORDANCE
-          specifiedBy: [sieve:method/concordance-workflow]
-concordantAssertions:
+          method_type: COMPUTED_CONCORDANCE
+          specified_by: [sieve:method/concordance-workflow]
+prior_claims:
   - id: sieve:ca/doid-14250-isa-630
-    type: ConcordantAssertion
+    type: SubclassStatement            # a prior claim, typed by what it claims
     subject: DOID:14250
     predicate: {code: rdfs:subClassOf}
     object: DOID:630
-    reportedIn: [DOID:14250]
+    reported_in: [DOID:14250]
     resource: infores:disease-ontology
 ```
 

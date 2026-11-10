@@ -33,7 +33,7 @@ uv run linkml-validate -s schema/sieve.yaml -C EvidencePacket packet.yaml
 
 Prints `No issues found` or one `[ERROR]` line per problem, and exits 1 on errors.
 It checks required fields, ranges, enums (`Direction`, `ReviewState`,
-`AssertionRoute`, ...), numeric bounds (line `scoreOfEvidenceProvided` in [0, 1],
+`AssertionRoute`, ...), numeric bounds (line `score_of_evidence_provided` in [0, 1],
 inclusion score in [-1, 1]) and the class rules (policy and provider routes only
 accept and name their policy; batch decisions name batch and review depth; a
 confidence needs a basis). The validator is closed, so unknown fields are errors.
@@ -46,7 +46,7 @@ for those (see [Workflows](workflows.md#2-validate)).
 ### just extract-requirements
 
 ```bash
-just extract-requirements                                   # ../sepio-linkml/docs/requirements-collection/projects/mondo/...
+just extract-requirements                                   # ../../notes/evidence/background/mondo-requirements/...
 just extract-requirements /path/to/Mondo_Requirements_Collection_Forms.xlsx
 ```
 

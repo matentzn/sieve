@@ -17,35 +17,35 @@ An agent's output is one `EvidencePacket` per claim, in the profile shape (camel
 - **evidence items it created**: a `TextPassage` with the verbatim quote it
   extracted, plus the `Publication` / `WebPage` / `GuidelineDocument` it came from;
 - **evidence lines**: its interpretation of those items, each with an
-  `InterpretationActivity` of `methodType: LLM_JUDGEMENT`;
+  `InterpretationActivity` of `method_type: LLM_JUDGEMENT`;
 - **groundings**: `ResolutionChain`s recording how mentions in the passage were
   resolved to Mondo, HGNC or other ids, step by step.
 
-An agent does **not** write `assertionDecisions` and does not set the inclusion score.
+An agent does **not** write `assertion_decisions` and does not set the inclusion score.
 Decisions are made by a person, or by a policy runner acting under a human-approved
-`DecisionPolicy`. Leave `reviewState: NOT_VERIFIED`, and set
-`proposingChannel: AI_AGENT` when the agent proposed the claim.
+`DecisionPolicy`. Leave `review_state: NOT_VERIFIED`, and set
+`proposing_channel: AI_AGENT` when the agent proposed the claim.
 
 ## What the profile asks of AI evidence
 
 | Where | Field | What to record |
 |---|---|---|
-| `TextPassage` | `statementText` | The quote, verbatim. |
-| | `reportedIn`, `documentVersion`, `textLocation` | Which document and version, and where (section, character offsets). |
-| | `quoteVerification` | `VERIFIED` only if a machine check found the quote in the source; otherwise `NOT_CHECKED` or `FAILED`. |
-| | `contributions` | The extraction act: `contributor`, `role: EXTRACTOR`, `date`, `specifiedBy` (prompt or workflow version), `runId`. Required. |
-| `InterpretationActivity` | `methodType` | `LLM_JUDGEMENT`. |
-| | `specifiedBy` | The prompt or workflow version. Required for AI lines. |
-| | `readCoverage`, `accessStatus` | How much of the document was read (`TITLE_ONLY`, `ABSTRACT_ONLY`, `SECTIONS`, `FULL_TEXT`) and whether it was open. Required on document-based lines. |
-| | `identifierVerified`, `groundingChecked` | Whether the cited id resolves and is about the topic, and whether the entities map to the claim's actual terms. |
-| | `soughtDisputingEvidence` | Whether the search looked for evidence against the claim. |
-| | `reasoningTrace` | A link to the trace. The trace itself is not stored. |
-| `SieveEvidenceLine` | `confidence`, `confidenceBasis` | The probability the evidence was read and linked correctly, and its basis (usually `PRIOR` for a pinned model version, `MEASURED` if a scorer evaluated this input). A confidence without a basis fails validation. |
-| | `dataQualityFlags` | Flag known failures (`QUOTE_NOT_FOUND`, `IDENTIFIER_UNRESOLVED`, `MISGROUNDED`, `SUSPECTED_HALLUCINATION`). |
-| `SieveAgent` (registry) | `softwareVersion`, `modelName`, `trustLevels` | The agent's version and model. Trust is maintained by the registry, from the agent's record of accepted and invalidated lines. |
+| `TextPassage` | `statement_text` | The quote, verbatim. |
+| | `reported_in`, `document_version`, `text_location` | Which document and version, and where (section, character offsets). |
+| | `quote_verification` | `VERIFIED` only if a machine check found the quote in the source; otherwise `NOT_CHECKED` or `FAILED`. |
+| | `contributions` | The extraction act: `contributor`, `role: EXTRACTOR`, `date`, `specified_by` (prompt or workflow version), `run_id`. Required. |
+| `InterpretationActivity` | `method_type` | `LLM_JUDGEMENT`. |
+| | `specified_by` | The prompt or workflow version. Required for AI lines. |
+| | `read_coverage`, `access_status` | How much of the document was read (`TITLE_ONLY`, `ABSTRACT_ONLY`, `SECTIONS`, `FULL_TEXT`) and whether it was open. Required on document-based lines. |
+| | `identifier_verified`, `grounding_checked` | Whether the cited id resolves and is about the topic, and whether the entities map to the claim's actual terms. |
+| | `sought_disputing_evidence` | Whether the search looked for evidence against the claim. |
+| | `reasoning_trace` | A link to the trace. The trace itself is not stored. |
+| `SieveEvidenceLine` | `confidence`, `confidence_basis` | The probability the evidence was read and linked correctly, and its basis (usually `PRIOR` for a pinned model version, `MEASURED` if a scorer evaluated this input). A confidence without a basis fails validation. |
+| | `data_quality_flags` | Flag known failures (`QUOTE_NOT_FOUND`, `IDENTIFIER_UNRESOLVED`, `MISGROUNDED`, `SUSPECTED_HALLUCINATION`). |
+| `SieveAgent` (registry) | `software_version`, `model_name`, `trust_levels` | The agent's version and model. Trust is maintained by the registry, from the agent's record of accepted and invalidated lines. |
 
 Confidence is data quality, not evidence strength. Put your read of how strongly the
-evidence bears on the claim in `scoreOfEvidenceProvided`, and your read of whether you
+evidence bears on the claim in `score_of_evidence_provided`, and your read of whether you
 extracted and grounded it correctly in `confidence`.
 
 ## An example
@@ -63,52 +63,52 @@ statement:
   subject: MONDO:0009061              # cystic fibrosis
   predicate: {code: RO:0004003, label: has material basis in germline mutation in}
   object: HGNC:1884                   # CFTR
-  reviewState: NOT_VERIFIED
-  proposingChannel: AI_AGENT
-  hasEvidenceLines:
+  review_state: NOT_VERIFIED
+  proposing_channel: AI_AGENT
+  has_evidence_lines:
     - id: sieve:el/cf-passage
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:tp/pmid-20301428-1]
-      directionOfEvidenceProvided: supports
-      scoreOfEvidenceProvided: 0.8
+      has_evidence_items: [sieve:tp/pmid-20301428-1]
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 0.8
       confidence: 0.85
-      confidenceBasis: PRIOR
+      confidence_basis: PRIOR
       contributions:
         - id: sieve:act/cf-passage
           type: InterpretationActivity
           contributor: sieve:agent/mondo-ai-extractor
           role: INTERPRETER
           date: "2026-10-10"
-          methodType: LLM_JUDGEMENT
-          specifiedBy: [sieve:method/evidence-extraction-prompt]
-          readCoverage: FULL_TEXT
-          accessStatus: OPEN_ACCESS
-          identifierVerified: VERIFIED
-          groundingChecked: VERIFIED
-          soughtDisputingEvidence: true
-          runId: mondo-ai-evidence-2026-10-10-r7
-textPassages:
+          method_type: LLM_JUDGEMENT
+          specified_by: [sieve:method/evidence-extraction-prompt]
+          read_coverage: FULL_TEXT
+          access_status: OPEN_ACCESS
+          identifier_verified: VERIFIED
+          grounding_checked: VERIFIED
+          sought_disputing_evidence: true
+          run_id: mondo-ai-evidence-2026-10-10-r7
+text_passages:
   - id: sieve:tp/pmid-20301428-1
     type: TextPassage
-    statementText: "Illustrative passage: cystic fibrosis is caused by pathogenic variants in CFTR."
-    reportedIn: [PMID:20301428]
-    documentVersion: "2025-01"
-    textLocation: {section: Molecular Genetics, charStart: 1200, charEnd: 1278}
-    quoteVerification: NOT_CHECKED    # VERIFIED only after a machine check
+    statement_text: "Illustrative passage: cystic fibrosis is caused by pathogenic variants in CFTR."
+    reported_in: [PMID:20301428]
+    document_version: "2025-01"
+    text_location: {section: Molecular Genetics, char_start: 1200, char_end: 1278}
+    quote_verification: NOT_CHECKED    # VERIFIED only after a machine check
     contributions:
       - id: sieve:act/tp-extraction
         type: SieveContribution
         contributor: sieve:agent/mondo-ai-extractor
         role: EXTRACTOR
         date: "2026-10-10"
-        specifiedBy: [sieve:method/evidence-extraction-prompt]
-        runId: mondo-ai-evidence-2026-10-10-r7
+        specified_by: [sieve:method/evidence-extraction-prompt]
+        run_id: mondo-ai-evidence-2026-10-10-r7
 publications:
   - id: PMID:20301428
     type: Publication
     pmid: "20301428"
     resource: infores:pubmed
-    generationContext:
+    generation_context:
       - {code: "PT:review", label: Review}
 ```
 
@@ -137,8 +137,8 @@ errors = [i for i in issues if i.severity == "ERROR"]
 ```
 
 Quote dates in YAML for linkml-validate. `check_packet` catches what JSON Schema cannot,
-including a document-based line without `readCoverage` / `accessStatus`, an AI line
-without `specifiedBy`, a predicate outside the claim type's value set, evidence the
+including a document-based line without `read_coverage` / `access_status`, an AI line
+without `specified_by`, a predicate outside the claim type's value set, evidence the
 claim type does not permit, and references to items that are not in the packet. Fix
 every ERROR before handing a packet off.
 
@@ -155,10 +155,10 @@ every ERROR before handing a packet off.
 **DON'T**
 
 - Don't fabricate references, PMIDs, quotes or concordances.
-- Don't set `quoteVerification: VERIFIED` or `identifierVerified: VERIFIED` without a
+- Don't set `quote_verification: VERIFIED` or `identifier_verified: VERIFIED` without a
   machine check.
-- Don't write `assertionDecisions`, `reviewState: VERIFIED` or the statement `score`.
+- Don't write `assertion_decisions`, `review_state: VERIFIED` or the statement `score`.
 - Don't fold data quality into strength: a shaky extraction gets a low `confidence`,
-  not a low `scoreOfEvidenceProvided`.
+  not a low `score_of_evidence_provided`.
 - Don't use the pre-profile shape (`status`, `has_evidence_lines`, `SieveDocument`,
   `ComputationalResult`, items inlined in lines).

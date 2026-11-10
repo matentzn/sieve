@@ -38,7 +38,7 @@ from sieve.datamodel import (
     SubclassStatement, NegativeSubclassStatement, MappingStatement,
     DiseaseAttributeStatement, SubsetMembershipStatement,
     MetaclassStatement, ValueSetMembershipStatement,
-    ExternalRecord, ConcordantAssertion, TextPassage, Publication, WebPage,
+    ExternalRecord, TextPassage, Publication, WebPage,
     ComputationalScore, InformationResource,
     SieveEvidenceLine, InterpretationActivity, AssertionDecision,
     SieveAgent, DecisionPolicy,
@@ -58,7 +58,7 @@ data = yaml.safe_load(open("tests/data/profile/valid/c007_cf_cftr_panel.yaml"))
 packet = EvidencePacket.model_validate(data)
 type(packet.statement).__name__          # "DiseaseAttributeStatement"
 packet.statement.score                   # 0.97
-packet.textPassages[0].quoteVerification # "NOT_CHECKED"
+packet.text_passages[0].quote_verification # "NOT_CHECKED"
 ```
 
 ---
@@ -112,11 +112,11 @@ subject obsolescence is read from term status, not stored on mappings.
 | `PREFERRED_NOT_EXACT` | ERROR | `preferred` on a mapping that is not `skos:exactMatch` (C006) |
 | `DANGLING_REFERENCE` | ERROR | a line references an item not in the packet (EINT.REQUIRED) |
 | `EVIDENCE_NOT_PERMITTED` | ERROR | item class not in the claim-evidence matrix (MATRIX.C00N) |
-| `READ_COVERAGE` | ERROR | document-based line without `readCoverage` / `accessStatus` (PROV.SA.EXECUTION) |
-| `METHOD_REQUIRED` | ERROR | AI or rule-based line without `specifiedBy`, or rule-based line without `computedByRule` (PROV.INTERP.METHODS) |
+| `READ_COVERAGE` | ERROR | document-based line without `read_coverage` / `access_status` (PROV.SA.EXECUTION) |
+| `METHOD_REQUIRED` | ERROR | AI or rule-based line without `specified_by`, or rule-based line without `computed_by_rule` (PROV.INTERP.METHODS) |
 | `SUPERSEDED_NOT_INVALIDATED` | ERROR | a superseded line is still VALID (EINT.FLAT_COLLAPSE) |
 | `CHAIN_CONTIGUITY` | ERROR | a resolution step does not read the previous step's output (PROV.SA.EXECUTION) |
-| `BLIND_APPROVAL_EVIDENCE` | ERROR | a `reviewDepth: NONE` decision contributes an evidence line |
+| `BLIND_APPROVAL_EVIDENCE` | ERROR | a `review_depth: NONE` decision contributes an evidence line |
 | `OBSOLETE_TO_OBSOLETE`, `DEFINITION_WITHOUT_SOURCE`, `CONCORDANCE_DIRECTION`, `READ_COVERAGE_NOT_RECORDED` | WARNING | states that need a person |
 
 ```python

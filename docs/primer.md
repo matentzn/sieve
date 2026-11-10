@@ -21,36 +21,36 @@ statement:
   predicate: {code: rdfs:subClassOf}
   object: MONDO:0003847               # hereditary disease
   negated: true                       # the claim is that it is NOT a subclass
-  reviewState: VERIFIED
-  hasEvidenceLines:
+  review_state: VERIFIED
+  has_evidence_lines:
     - id: sieve:el/ds-doid-dispute
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:ca/doid-14250-isa-630]
-      directionOfEvidenceProvided: disputes
-      scoreOfEvidenceProvided: 0.5
+      has_evidence_items: [sieve:ca/doid-14250-isa-630]
+      direction_of_evidence_provided: disputes
+      score_of_evidence_provided: 0.5
       contributions:
         - id: sieve:act/ds-doid-concordance
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
           date: "2026-10-20"
-          methodType: COMPUTED_CONCORDANCE
-          specifiedBy: [sieve:method/concordance-workflow]
-  assertionDecisions:
+          method_type: COMPUTED_CONCORDANCE
+          specified_by: [sieve:method/concordance-workflow]
+  assertion_decisions:
     - id: sieve:dec/ds-excl-2026
       type: AssertionDecision
       contributor: orcid:0000-0001-5208-3432
       date: "2026-10-20"
       outcome: CONTROVERSIAL
       route: INDIVIDUAL_SIGN_OFF
-      inclusionScore: 0.46
-      signedPacketVersion: "2026-10-20"
-concordantAssertions:
+      inclusion_score: 0.46
+      signed_packet_version: "2026-10-20"
+prior_claims:
   - id: sieve:ca/doid-14250-isa-630
-    type: ConcordantAssertion
+    type: SubclassStatement           # a prior claim: DOID's own subclass assertion
     subject: DOID:14250               # Disease Ontology: Down syndrome
     predicate: {code: rdfs:subClassOf}
     object: DOID:630                  # genetic disease
-    reportedIn: [DOID:14250]
+    reported_in: [DOID:14250]
     resource: infores:disease-ontology
 ```
 
@@ -79,7 +79,7 @@ graph TD
 - **Statement**: the one claim. Its `type` says which kind of claim it is.
 - **Evidence item**: one piece of information (a database record, another source's
   assertion, a passage from a paper, a computed score). Items sit in typed lists on
-  the packet (`externalRecords`, `concordantAssertions`, `textPassages`, ...).
+  the packet (`external_records`, `prior_claims`, `text_passages`, ...).
 - **Evidence line**: one judgement that some items bear on the claim, in one
   direction, with some strength. Lines point at items by id.
 - **Assertion decision**: whether the claim goes into Mondo, who decided, and on which
@@ -89,7 +89,7 @@ graph TD
 
 Rules, policies, agents and information resources are shared, so they are maintained
 once in a **registry**. Each packet still stands on its own: it carries a frozen
-`referenceSnapshot` of every registry entry it refers to, as of its version.
+`reference_snapshot` of every registry entry it refers to, as of its version.
 
 ---
 

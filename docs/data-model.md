@@ -27,18 +27,18 @@ annotations.
 
 - **One `EvidencePacket` per claim.** A packet (is_a `DataSet`) holds one claim-type
   statement, the evidence items its lines refer to, and a required `version`. A
-  change to its lines, items or score makes a new version (`previousVersion` points
+  change to its lines, items or score makes a new version (`previous_version` points
   back). Packets are never deleted: a rejected claim stays on record with its
   evidence and decisions.
 - **Lines live on the statement, items live on the packet.** Evidence lines are
-  inlined under `statement.hasEvidenceLines`. Evidence items sit in typed lists on
-  the packet (`externalRecords`, `concordantAssertions`, `textPassages`,
-  `publications`, `webPages`, `guidelines`, `computationalScores`), and lines refer
+  inlined under `statement.has_evidence_lines`. Evidence items sit in typed lists on
+  the packet (`external_records`, `prior_claims`, `text_passages`,
+  `publications`, `web_pages`, `guidelines`, `computational_scores`), and lines refer
   to them by id.
 - **Shared reference data is maintained in a `SieveRegistry`.** Information resources,
   source releases, agents, methods, aggregation rules, decision policies and batch
   sign-offs are maintained once there.
-- **A packet is self-contained.** Its required `referenceSnapshot` (a `SieveRegistry`) holds a
+- **A packet is self-contained.** Its required `reference_snapshot` (a `SieveRegistry`) holds a
   frozen copy, as of the packet version, of every registry entry the packet references.
   Every reference must resolve inside the packet (`UNRESOLVED_REFERENCE` in
   `sieve.profile_checks`), so revising the registry never changes how an existing packet
@@ -56,11 +56,11 @@ flowchart TD
     L --> IA["InterpretationActivity<br/>who, when, how"]
     S --> D["AssertionDecision<br/>outcome, route, S, packet version"]
     S --> O["OriginEvent<br/>copied / cloned / inspired by"]
-    P --> I["typed item lists<br/>externalRecords, concordantAssertions,<br/>textPassages, publications, ..."]
-    L -. "hasEvidenceItems (ids)" .-> I
+    P --> I["typed item lists<br/>external_records, prior_claims,<br/>text_passages, publications, ..."]
+    L -. "has_evidence_items (ids)" .-> I
     R[("SieveRegistry<br/>resources, releases, agents,<br/>methods, rules, policies, batches")]
-    L -. "computedByRule" .-> R
-    D -. "policy, batch, aggregationRule" .-> R
+    L -. "computed_by_rule" .-> R
+    D -. "policy, batch, aggregation_rule" .-> R
 ```
 
 ## SEPIO design modules
@@ -72,7 +72,7 @@ core's class groups. Each requirement is assigned to one module in
 | Module | SEPIO core classes | Profile classes |
 |---|---|---|
 | `statement` | Statement, Proposition, Qualifier | `SieveStatement` and the ten claim types |
-| `evidence-item` | InformationEntity, Document, DataItem, DataSet, StudyResult | `ExternalRecord`, `ConcordantAssertion`, `TextPassage`, `Publication`, `WebPage`, `GuidelineDocument`, `ComputationalScore`, `InformationResource`, `SourceRelease`, `EvidencePacket` |
+| `evidence-item` | InformationEntity, Document, DataItem, DataSet, StudyResult | `ExternalRecord`, `TextPassage`, `Publication`, `WebPage`, `GuidelineDocument`, `ComputationalScore`, `InformationResource`, `SourceRelease`, `EvidencePacket` |
 | `evidence-line` | EvidenceLine | `SieveEvidenceLine`, `LineStatusChange` |
 | `provenance` | Activity, Contribution, Agent, Method | `SieveAgent`, `SieveMethod`, `AggregationRule`, `DecisionPolicy`, `BatchSignOff`, `SieveContribution`, `InterpretationActivity`, `AssertionDecision`, `OriginEvent`, `ResolutionChain`, `AlignmentStep` |
 | `record-metadata` | RecordMetadata | `RetrievalMetadata` |
@@ -91,14 +91,14 @@ concordance and dispute are matched on subject, predicate, object and `negated`.
 | `predicate` | Coding | Yes | The relation. Each claim type binds it to a value set. |
 | `object` | string / uriorcurie | Yes | Term, text or value, depending on the claim type. |
 | `negated` | boolean | No | The claim is that subject-predicate-object does **not** hold. Default false. |
-| `statementText` | string | No | Human-readable rendering of the claim. |
-| `reviewState` | ReviewState | Yes | `NOT_VERIFIED` (default), `PENDING_REVIEW`, `VERIFIED`. Workflow state, distinct from the decision outcome. |
-| `proposingChannel` | ProposingChannel | No | Who proposed the claim (curator, source ingest, lexical pipeline, AI agent, ...). Selects the claim prior. |
-| `hasEvidenceLines` | SieveEvidenceLine[] | No | The evidence lines, inlined. |
-| `hasEvidence` | ids | No | Direct claim-to-item links with no interpretation. |
-| `hasEvidenceFromSources` | InformationResource ids | No | Source-level attribution without a record id (e.g. MONDO:DOID). |
+| `statement_text` | string | No | Human-readable rendering of the claim. |
+| `review_state` | ReviewState | Yes | `NOT_VERIFIED` (default), `PENDING_REVIEW`, `VERIFIED`. Workflow state, distinct from the decision outcome. |
+| `proposing_channel` | ProposingChannel | No | Who proposed the claim (curator, source ingest, lexical pipeline, AI agent, ...). Selects the claim prior. |
+| `has_evidence_lines` | SieveEvidenceLine[] | No | The evidence lines, inlined. |
+| `has_evidence` | ids | No | Direct claim-to-item links with no interpretation. |
+| `has_evidence_from_sources` | InformationResource ids | No | Source-level attribution without a record id (e.g. MONDO:DOID). |
 | `origin` | OriginEvent[] | No | Where the claim was copied, cloned or adapted from. |
-| `assertionDecisions` | AssertionDecision[] | No | Decision history, oldest first. |
+| `assertion_decisions` | AssertionDecision[] | No | Decision history, oldest first. |
 | `contributions` | SieveContribution[] | No | Non-asserting roles: provider, stakeholder, endorser. |
 | `score` | float, [-1, 1] | No | The current inclusion score S. |
 | `strength` | string | No | The band of S, as declared by the rule that computed it. |
@@ -110,19 +110,19 @@ annotation (the claim-evidence matrix).
 
 | ID | Class | Predicates | Permitted evidence |
 |---|---|---|---|
-| C001 | `TermExistenceStatement` | `rdf:type`, `owl:deprecated`, `IAO:0100001`, `oboInOwl:consider` | ExternalRecord, ConcordantAssertion, Publication, GuidelineDocument |
+| C001 | `TermExistenceStatement` | `rdf:type`, `owl:deprecated`, `IAO:0100001`, `oboInOwl:consider` | ExternalRecord, prior claim, Publication, GuidelineDocument |
 | C002 | `DefinitionStatement` | `IAO:0000115` | Publication, WebPage |
-| C003 | `SynonymStatement` | `oboInOwl:has{Exact,Related,Narrow,Broad}Synonym` | ExternalRecord, ConcordantAssertion, TextPassage, Publication, WebPage, ComputationalScore |
-| C004 | `SubclassStatement` | `rdfs:subClassOf`, `owl:equivalentClass` | ExternalRecord, ConcordantAssertion, TextPassage, Publication, WebPage, GuidelineDocument |
-| C005 | `NegativeSubclassStatement` | as C004, with `negated: true` | ExternalRecord, ConcordantAssertion, Publication |
-| C006 | `MappingStatement` | `skos:exactMatch`, `broadMatch`, `narrowMatch`, `relatedMatch` | ExternalRecord, ConcordantAssertion, ComputationalScore |
-| C007 | `DiseaseAttributeStatement` | `RO:0004003`, `RO:0000053`, `RO:0004029`, `RO:0004026`, `RO:0014001`, `RO:0002162`, `mondoRel:predisposes_towards` | ExternalRecord, ConcordantAssertion, TextPassage, Publication, WebPage, GuidelineDocument |
-| C008 | `SubsetMembershipStatement` | `oboInOwl:inSubset` | ExternalRecord, ConcordantAssertion |
-| C009 | `MetaclassStatement` (candidate) | `sieve:isKindOfClass`; object is a `DiseaseKind` | ExternalRecord, ConcordantAssertion |
-| C010 | `ValueSetMembershipStatement` (candidate) | `sieve:memberOfRecordScope` | ExternalRecord, ConcordantAssertion |
+| C003 | `SynonymStatement` | `oboInOwl:has{Exact,Related,Narrow,Broad}Synonym` | ExternalRecord, prior claim, TextPassage, Publication, WebPage, ComputationalScore |
+| C004 | `SubclassStatement` | `rdfs:subClassOf`, `owl:equivalentClass` | ExternalRecord, prior claim, TextPassage, Publication, WebPage, GuidelineDocument |
+| C005 | `NegativeSubclassStatement` | as C004, with `negated: true` | ExternalRecord, prior claim, Publication |
+| C006 | `MappingStatement` | `skos:exactMatch`, `broadMatch`, `narrowMatch`, `relatedMatch` | ExternalRecord, prior claim, ComputationalScore |
+| C007 | `DiseaseAttributeStatement` | `RO:0004003`, `RO:0000053`, `RO:0004029`, `RO:0004026`, `RO:0014001`, `RO:0002162`, `mondoRel:predisposes_towards` | ExternalRecord, prior claim, TextPassage, Publication, WebPage, GuidelineDocument |
+| C008 | `SubsetMembershipStatement` | `oboInOwl:inSubset` | ExternalRecord, prior claim |
+| C009 | `MetaclassStatement` (candidate) | `sieve:isKindOfClass`; object is a `DiseaseKind` | ExternalRecord, prior claim |
+| C010 | `ValueSetMembershipStatement` (candidate) | `sieve:memberOfRecordScope` | ExternalRecord, prior claim |
 
-Some claim types add qualifiers: `obsolescenceReason` and `scheduledObsoletionDate`
-on C001; `preferred`, `validDirection` and `objectObsoleteInSourceVersion` on C006.
+Some claim types add qualifiers: `obsolescence_reason` and `scheduled_obsoletion_date`
+on C001; `preferred`, `valid_direction` and `object_obsolete_in_source_version` on C006.
 C004 represents a logical definition as one statement per `intersection_of` element.
 C009 and C010 use `sieve:` placeholder IRIs for their predicates.
 
@@ -134,43 +134,43 @@ evidence line, or from `statement.origin`.
 
 | Class | Core parent | Packet list | What it is |
 |---|---|---|---|
-| `ExternalRecord` | InformationEntity | `externalRecords` | A record in an external database or terminology (`DOID:14250`, `OMIM:219700`), as read from a release. Requires `resource` and `recordMetadata`; `obsoleteInSource` flags obsolete records. |
-| `ConcordantAssertion` | Statement | `concordantAssertions` | A prior claim another source makes, in its own identifiers (`DOID:14250 is_a DOID:630`). `reportedIn` names the record; `groundings` records how each id was resolved to Mondo. |
-| `TextPassage` | Statement | `textPassages` | A verbatim passage (`statementText`) from a document (`reportedIn`). Created in the Mondo ecosystem, so it requires its extraction `contributions` and a `quoteVerification` outcome. |
-| `Publication` | Document | `publications` | A PMID, DOI or ISBN. Publications sharing a `reportsStudy` key are not independent. |
-| `WebPage` | Document | `webPages` | A non-scholarly page (GARD, MedlinePlus, Wikipedia). GitHub issues are not web-page evidence: they go in a contribution's `context`. |
+| `ExternalRecord` | InformationEntity | `external_records` | A record in an external database or terminology (`DOID:14250`, `OMIM:219700`), as read from a release. Requires `resource` and `record_metadata`; `obsolete_in_source` flags obsolete records. |
+| any claim type (e.g. `SubclassStatement`) | Statement | `prior_claims` | A prior claim a source makes, in its own identifiers (`DOID:14250 is_a DOID:630`), typed by what it claims, never by its role. `reported_in` names the record; `groundings` records how each id was resolved to Mondo; `own_log_odds` is set when a competing-claim line cites it (D-069). |
+| `TextPassage` | Statement | `text_passages` | A verbatim passage (`statement_text`) from a document (`reported_in`). Created in the Mondo ecosystem, so it requires its extraction `contributions` and a `quote_verification` outcome. |
+| `Publication` | Document | `publications` | A PMID, DOI or ISBN. Publications sharing a `reports_study` key are not independent. |
+| `WebPage` | Document | `web_pages` | A non-scholarly page (GARD, MedlinePlus, Wikipedia). GitHub issues are not web-page evidence: they go in a contribution's `context`. |
 | `GuidelineDocument` | Document | `guidelines` | A guideline or consensus document. |
-| `ComputationalScore` | DataItem | `computationalScores` | A computed score (lexical match, Boomer, AI score): `value`, the method in `specifiedBy`, `softwareVersion`, `parameters`. |
+| `ComputationalScore` | DataItem | `computational_scores` | A computed score (lexical match, Boomer, AI score): `value`, the method in `specified_by`, `software_version`, `parameters`. |
 
 Two mixins supply the shared slots. `EvidenceItem` marks everything a line can point at
 (including lines themselves, for higher-order lines). `UpstreamItem` marks items made
-outside Mondo and adds `resource`, `generationContext` (study type or curation basis;
-`sieve:basis_unknown` when the source does not say) and `resourceRoleOverride`.
+outside Mondo and adds `resource`, `generation_context` (study type or curation basis;
+`sieve:basis_unknown` when the source does not say) and `resource_role_override`.
 
 The registry describes sources as a whole. An `InformationResource` has a
-`defaultRole` (`PRIMARY` or `AGGREGATOR`), `derivesContentFrom` (dependence between
-sources) and dated `qualityRatings`. A `SourceRelease` is one versioned snapshot of a
+`default_role` (`PRIMARY` or `AGGREGATOR`), `derives_content_from` (dependence between
+sources) and dated `quality_ratings`. A `SourceRelease` is one versioned snapshot of a
 resource.
 
 ### Evidence lines
 
 `SieveEvidenceLine` (is_a `EvidenceLine`) is one evidentiary judgement: these items
 bear on the enclosing claim, in this direction, with this strength. Its target is always
-the enclosing statement, so the core `targetProposition` is unused.
+the enclosing statement, so the core `target_proposition` is unused.
 
 | Field | Range | Req | Description |
 |---|---|---|---|
-| `hasEvidenceItems` | ids | No | Items (or other lines) this line interprets. |
-| `directionOfEvidenceProvided` | Direction | Yes | `supports` or `disputes`. There is no neutral. |
-| `strengthOfEvidenceProvided` | string | No | Categorical band, from the rule's `strengthBands`. |
-| `scoreOfEvidenceProvided` | float, [0, 1] | No | Strength on the shared 0-1 scale. Direction is not carried by the sign. |
+| `has_evidence_items` | ids | No | Items (or other lines) this line interprets. |
+| `direction_of_evidence_provided` | Direction | Yes | `supports` or `disputes`. There is no neutral. |
+| `strength_of_evidence_provided` | string | No | Categorical band, from the rule's `strength_bands`. |
+| `score_of_evidence_provided` | float, [0, 1] | No | Strength on the shared 0-1 scale. Direction is not carried by the sign. |
 | `contributions` | InterpretationActivity[] | Yes | The interpretation act. A collective act is one contribution with `participants`. |
-| `computedByRule` | AggregationRule id | No | Required for rule-based lines (profile check). |
-| `confidence`, `confidenceBasis` | float [0, 1], ConfidenceBasis | No | Data quality. A confidence requires a basis (class rule). |
-| `dataQualityFlags` | DataQualityFlag[] | No | Failure flags that gate the line (`QUOTE_NOT_FOUND`, `SUSPECTED_HALLUCINATION`, ...). |
-| `independenceCluster` | string | No | Cluster assigned by the rule. Only the strongest line per cluster counts. |
-| `validity`, `statusChanges`, `supersedes` | LineValidity, LineStatusChange[], ids | No | Invalidation and supersession history. |
-| `dateAttached`, `lastConfirmed`, `lastConfirmedAgainst` | date, date, SourceRelease id | No | When the evidence was attached and last confirmed against a release. |
+| `computed_by_rule` | AggregationRule id | No | Required for rule-based lines (profile check). |
+| `confidence`, `confidence_basis` | float [0, 1], ConfidenceBasis | No | Data quality. A confidence requires a basis (class rule). |
+| `data_quality_flags` | DataQualityFlag[] | No | Failure flags that gate the line (`QUOTE_NOT_FOUND`, `SUSPECTED_HALLUCINATION`, ...). |
+| `independence_cluster` | string | No | Cluster assigned by the rule. Only the strongest line per cluster counts. |
+| `validity`, `status_changes`, `supersedes` | LineValidity, LineStatusChange[], ids | No | Invalidation and supersession history. |
+| `date_attached`, `last_confirmed`, `last_confirmed_against` | date, date, SourceRelease id | No | When the evidence was attached and last confirmed against a release. |
 
 Lines are **immutable**. A misreading is corrected by a new line that `supersedes` the
 old one. The old line becomes `INVALIDATED`, stays on record and is excluded from the
@@ -181,29 +181,29 @@ and why. That is also where a reviewer's verdict on an AI's line goes.
 
 | Class | is_a | Role |
 |---|---|---|
-| `SieveAgent` | Agent | A person (ORCID), organisation or group, or software. Dated `roles` and `trustLevels`; `softwareVersion` and `modelName` for software; `members` for panels. |
+| `SieveAgent` | Agent | A person (ORCID), organisation or group, or software. Dated `roles` and `trust_levels`; `software_version` and `model_name` for software; `members` for panels. |
 | `SieveMethod` | Method | A versioned method: guideline, workflow, prompt version, export rule set. |
-| `AggregationRule` | SieveMethod | Per claim type: line strengths, `strengthBands`, `confidenceFloor`. Computes S. |
-| `DecisionPolicy` | SieveMethod | A human-approved procedure under which an automated system may accept claims: scope, `acceptanceThreshold`, pinned rules. It can only accept. |
-| `BatchSignOff` | Activity | A one-off curator approval of a filtered result set: re-runnable `filterQuery`, frozen `resultSet` of `packet@version`, `reviewBands`. |
-| `SieveContribution` | Contribution | An agent's act, with `role`, `participants`, and `agentRoleAtTime` / `agentTrustAtTime` snapshotted as of the act; `context` (issue, PR, call), `runId`, `perspective`. |
-| `InterpretationActivity` | SieveContribution | The act behind a line: `date`, `methodType`, `readCoverage`, `accessStatus`, and the checks an AI act records (`identifierVerified`, `groundingChecked`, `soughtDisputingEvidence`, `reasoningTrace`). |
+| `AggregationRule` | SieveMethod | Per claim type: line strengths, `strength_bands`, `confidence_floor`. Computes S. |
+| `DecisionPolicy` | SieveMethod | A human-approved procedure under which an automated system may accept claims: scope, `acceptance_threshold`, pinned rules. It can only accept. |
+| `BatchSignOff` | Activity | A one-off curator approval of a filtered result set: re-runnable `filter_query`, frozen `result_set` of `packet@version`, `review_bands`. |
+| `SieveContribution` | Contribution | An agent's act, with `role`, `participants`, and `agent_role_at_time` / `agent_trust_at_time` snapshotted as of the act; `context` (issue, PR, call), `run_id`, `perspective`. |
+| `InterpretationActivity` | SieveContribution | The act behind a line: `date`, `method_type`, `read_coverage`, `access_status`, and the checks an AI act records (`identifier_verified`, `grounding_checked`, `sought_disputing_evidence`, `reasoning_trace`). |
 | `AssertionDecision` | SieveContribution | The decision on the claim (see [below](#two-levels-of-judgement)). |
-| `OriginEvent` | Activity | How the claim entered Mondo: `derivationType` (`CLONED_FROM`, `COPIED_FROM`, `INSPIRED_BY`), `sourceItem`, `sourceLabel`, `sourceRelease`, pipeline and date. |
-| `ResolutionChain` | Activity | How a source id or mention was resolved to the target id: ordered `steps` for one `entitySlot`, with `chainConfidence`. |
-| `AlignmentStep` | Activity | One extraction, translation, grounding or normalisation step: `inputValue`, `outputValue`, `method`, `qualityCategory`, `confidence` + basis, mapping set and version, `reviewStatus`. |
+| `OriginEvent` | Activity | How the claim entered Mondo: `derivation_type` (`CLONED_FROM`, `COPIED_FROM`, `INSPIRED_BY`), `source_item`, `source_label`, `source_release`, pipeline and date. |
+| `ResolutionChain` | Activity | How a source id or mention was resolved to the target id: ordered `steps` for one `entity_slot`, with `chain_confidence`. |
+| `AlignmentStep` | Activity | One extraction, translation, grounding or normalisation step: `input_value`, `output_value`, `method`, `quality_category`, `confidence` + basis, mapping set and version, `review_status`. |
 
 ### Record metadata
 
 `RetrievalMetadata` (is_a `RecordMetadata`) says where and when a concrete record was
-read: `retrievedFrom` (resource), `sourceRelease` or `sourceVersion`, `retrievalDate`
-and the source's own label at the time (`sourceLabel`). It is required on
-`ExternalRecord`. `EvidencePacketCollection.recordMetadata` carries artefact-level
+read: `retrieved_from` (resource), `source_release` or `source_version`, `retrieval_date`
+and the source's own label at the time (`source_label`). It is required on
+`ExternalRecord`. `EvidencePacketCollection.record_metadata` carries artefact-level
 encoding provenance.
 
 ### Utilities
 
-The core `Coding` (`code`, `label`, `system`, `systemVersion`) types the predicate and
+The core `Coding` (`code`, `label`, `system`, `system_version`) types the predicate and
 generation context. The profile adds `TextLocation` (section, character offsets),
 `QualityRating` (dated level, optionally per claim type), `LevelAssignment` (dated role
 or trust level, optionally per domain) and `AppliedRule` (a named alignment rule with its
@@ -223,11 +223,11 @@ SIEVE keeps two judgements apart:
 |---|---|
 | `outcome` | `ACCEPTED`, `REJECTED`, `CONTROVERSIAL`, `DEFERRED`. |
 | `route` | `INDIVIDUAL_SIGN_OFF`, `CONSENSUS_SIGN_OFF`, `DELEGATED_POLICY`, `PROVIDER_AUTHORITY`, `BATCH_SIGN_OFF`. |
-| `inclusionScore`, `scoreBand`, `aggregationRule` | S at decision time, its band, and the rule version that computed it. |
-| `signedPacketVersion` | The packet version decided on. A later version re-queues the claim. |
-| `policy`, `thresholdPassed` | For policy routes. |
-| `batch`, `reviewDepth` | For batch sign-offs. A `NONE`-depth approval adds no evidence. |
-| `evidenceLine` | The expert line this decision contributed, if any. |
+| `inclusion_score`, `score_band`, `aggregation_rule` | S at decision time, its band, and the rule version that computed it. |
+| `signed_packet_version` | The packet version decided on. A later version re-queues the claim. |
+| `policy`, `threshold_passed` | For policy routes. |
+| `batch`, `review_depth` | For batch sign-offs. A `NONE`-depth approval adds no evidence. |
+| `evidence_line` | The expert line this decision contributed, if any. |
 | `contributor`, `date`, `rationale`, `context` | Who decided, when, why, where. |
 
 Every claim rests on a human decision, made per claim (sign-off, consensus, batch) or
@@ -244,9 +244,9 @@ Three questions are recorded separately, so one cannot stand in for another:
   `ResolutionChain`, contributions and retrieval metadata. "Cloned from OMIM" is
   origin, not evidence that the term is right.
 - **Evidence**: does it support or dispute the claim, and how strongly? Line
-  `directionOfEvidenceProvided` and `scoreOfEvidenceProvided` in [0, 1].
+  `direction_of_evidence_provided` and `score_of_evidence_provided` in [0, 1].
 - **Data quality**: was the evidence read and linked correctly? SEPIO `confidence` on
-  lines and alignment steps, with a required `confidenceBasis` (`MEASURED`,
+  lines and alignment steps, with a required `confidence_basis` (`MEASURED`,
   `DETERMINISTIC`, `PRIOR`). Confidence gates or discounts a line. It never rewrites
   the line's strength.
 
@@ -263,11 +263,11 @@ L   = L0 + k * sum(w_i)          L0 = claim prior (claim type + proposing channe
 S   = tanh(L / 2)                = 2 * P(true) - 1
 ```
 
-Lines whose confidence is below the rule's `confidenceFloor` are excluded. Above it,
+Lines whose confidence is below the rule's `confidence_floor` are excluded. Above it,
 confidence discounts the line, so a misread contributes nothing rather than negative
 evidence. `statement.strength` is the band of S and `statement.direction` its sign.
 S is computed, not asserted: a signer's view goes in as an expert line, not as an edit
-to S. The S that a decision was given on is copied to `AssertionDecision.inclusionScore`.
+to S. The S that a decision was given on is copied to `AssertionDecision.inclusion_score`.
 
 The scoring code has not been written for this model yet. The values in the example
 packets are illustrative (see `issues/issue_migrate_app_to_profile.md`).
@@ -300,7 +300,7 @@ recorded). Every issue names the requirement it enforces. See the [Python API](a
 A mapping claim accepted in a batch sign-off, adapted from
 `tests/data/profile/valid/c006_down_syndrome_icd10cm_batch.yaml`. The ids `sieve:rule/...`,
 `sieve:batch/...`, `sieve:release/...` and `infores:...` resolve in the packet's own
-`referenceSnapshot`, a frozen copy of the entries in the registry
+`reference_snapshot`, a frozen copy of the entries in the registry
 (`tests/data/profile/registry.yaml`). The snapshot is left out of the excerpt below.
 
 ```yaml
@@ -314,43 +314,43 @@ statement:
   predicate: {code: skos:exactMatch}
   object: ICD10CM:Q90
   preferred: true
-  validDirection: BOTH
-  reviewState: VERIFIED
-  proposingChannel: LEXICAL_PIPELINE
+  valid_direction: BOTH
+  review_state: VERIFIED
+  proposing_channel: LEXICAL_PIPELINE
   score: 0.93
   strength: strong
   direction: supports
-  hasEvidenceLines:
+  has_evidence_lines:
     - id: sieve:el/q90-lexical
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:score/q90-lexical]
-      directionOfEvidenceProvided: supports
-      strengthOfEvidenceProvided: weak
-      scoreOfEvidenceProvided: 0.3
-      computedByRule: sieve:rule/mapping-v1.0
+      has_evidence_items: [sieve:score/q90-lexical]
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: weak
+      score_of_evidence_provided: 0.3
+      computed_by_rule: sieve:rule/mapping-v1.0
       contributions:
         - id: sieve:act/q90-lexical
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
           date: "2026-10-24"
-          methodType: RULE_BASED_STRENGTH
-          specifiedBy: [sieve:method/mondo-mapping-guide]
+          method_type: RULE_BASED_STRENGTH
+          specified_by: [sieve:method/mondo-mapping-guide]
     - id: sieve:el/q90-record
       type: SieveEvidenceLine
-      hasEvidenceItems: [ICD10CM:Q90]
-      directionOfEvidenceProvided: supports
-      strengthOfEvidenceProvided: strong
-      scoreOfEvidenceProvided: 0.8
-      computedByRule: sieve:rule/mapping-v1.0
+      has_evidence_items: [ICD10CM:Q90]
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: strong
+      score_of_evidence_provided: 0.8
+      computed_by_rule: sieve:rule/mapping-v1.0
       contributions:
         - id: sieve:act/q90-record
           type: InterpretationActivity
           contributor: orcid:0000-0001-5208-3432
           date: "2026-10-25"
-          methodType: EXPERT_JUDGEMENT
-          specifiedBy: [sieve:method/mondo-mapping-guide]
-          readCoverage: STRUCTURED_RECORD
-  assertionDecisions:
+          method_type: EXPERT_JUDGEMENT
+          specified_by: [sieve:method/mondo-mapping-guide]
+          read_coverage: STRUCTURED_RECORD
+  assertion_decisions:
     - id: sieve:dec/q90-batch
       type: AssertionDecision
       contributor: orcid:0000-0001-5208-3432
@@ -358,27 +358,27 @@ statement:
       outcome: ACCEPTED
       route: BATCH_SIGN_OFF
       batch: sieve:batch/mappings-2026-10-25
-      reviewDepth: EYEBALLED
-      inclusionScore: 0.93
-      scoreBand: strong
-      aggregationRule: sieve:rule/mapping-v1.0
-      signedPacketVersion: "2026-10-25"
-externalRecords:
+      review_depth: EYEBALLED
+      inclusion_score: 0.93
+      score_band: strong
+      aggregation_rule: sieve:rule/mapping-v1.0
+      signed_packet_version: "2026-10-25"
+external_records:
   - id: ICD10CM:Q90
     type: ExternalRecord
     label: Down syndrome
     resource: infores:icd10cm
-    recordMetadata:
-      retrievedFrom: infores:icd10cm
-      sourceRelease: sieve:release/icd10cm-2026
-      retrievalDate: "2026-10-01"
-      sourceLabel: Down syndrome
-computationalScores:
+    record_metadata:
+      retrieved_from: infores:icd10cm
+      source_release: sieve:release/icd10cm-2026
+      retrieval_date: "2026-10-01"
+      source_label: Down syndrome
+computational_scores:
   - id: sieve:score/q90-lexical
     type: ComputationalScore
     value: "0.97"
-    specifiedBy: [sieve:method/lexmatch]
-    softwareVersion: oak-0.6
+    specified_by: [sieve:method/lexmatch]
+    software_version: oak-0.6
     parameters: "normalize=true"
 ```
 
@@ -394,9 +394,9 @@ is gone. Roughly:
 
 | Before | Now |
 |---|---|
-| `status`, `CurationDecision` | `statement.reviewState` + `statement.assertionDecisions` |
+| `status`, `CurationDecision` | `statement.review_state` + `statement.assertion_decisions` |
 | items inlined in lines | items in typed packet lists, referenced by id |
-| `ConcordanceItem` | `ConcordantAssertion` (the claim) + `ExternalRecord` (the record) |
+| `ConcordanceItem` | a prior claim, e.g. `SynonymStatement` (the claim) + `ExternalRecord` (the record) |
 | `SieveDocument` with `quote` | `Publication` / `WebPage` / `GuidelineDocument`, plus `TextPassage` for the quote |
 | `ComputationalResult` | `ComputationalScore` |
 | `AgentContribution` | an expert line with its `InterpretationActivity`, or a `SieveContribution` |
