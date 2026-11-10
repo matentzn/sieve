@@ -59,7 +59,7 @@ gen-pydantic:
   uv run python -m sieve.datamodel.codegen schema/sieve.yaml src/sieve/datamodel/sieve_models.py
 
 # Re-extract the requirements TSV from the Mondo requirements workbook
-extract-requirements workbook="../sepio-linkml/docs/requirements-collection/projects/mondo/Mondo_Requirements_Collection_Forms.xlsx":
+extract-requirements workbook="../../notes/evidence/background/mondo-requirements/Mondo_Requirements_Collection_Forms.xlsx":
   uv run python scripts/extract_requirements.py {{workbook}}
 
 # Regenerate docs/requirements-traceability.md

@@ -1,6 +1,6 @@
 """Extract the Mondo requirements workbook into a flat, diffable TSV.
 
-The workbook (sepio-linkml ``docs/requirements-collection/projects/mondo/
+The workbook (``~/ws/notes/evidence/background/mondo-requirements/
 Mondo_Requirements_Collection_Forms.xlsx``) is the source of truth. This script
 turns its response rows into ``requirements/mondo_requirements.tsv`` so the
 traceability tests can run without the workbook. Category / grouping rows

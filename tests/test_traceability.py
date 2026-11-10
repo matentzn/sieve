@@ -18,8 +18,8 @@ from sieve.traceability import (
 )
 
 WORKBOOK = (
-    ROOT.parent
-    / "sepio-linkml/docs/requirements-collection/projects/mondo/Mondo_Requirements_Collection_Forms.xlsx"
+    ROOT.parent.parent
+    / "notes/evidence/background/mondo-requirements/Mondo_Requirements_Collection_Forms.xlsx"
 )
 
 
