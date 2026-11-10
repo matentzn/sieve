@@ -157,7 +157,7 @@ sepio_monarch:
         pmid: "26433933"
         title: Age-dependent gait abnormalities in mice lacking the Rnf170 gene linked to human autosomal-dominant sensory ataxia.
         resource: infores:pubmed
-        generationContext:
+        generation_context:
           - {code: "dismech:MODEL_ORGANISM", label: model organism (DisMech evidence_source)}
     - class: Publication
       data:
@@ -166,7 +166,7 @@ sepio_monarch:
         pmid: "32943585"
         title: "Mutation in RNF170 causes sensory ataxic neuropathy with vestibular areflexia: a CANVAS mimic."
         resource: infores:pubmed
-        generationContext:
+        generation_context:
           - {code: "dismech:HUMAN_CLINICAL", label: human clinical (DisMech evidence_source)}
     - class: Publication
       data:
@@ -175,45 +175,45 @@ sepio_monarch:
         pmid: "39177409"
         title: Canine RNF170 Single Base Deletion in a Naturally Occurring Model for Human Neuroaxonal Dystrophy.
         resource: infores:pubmed
-        generationContext:
+        generation_context:
           - {code: "dismech:MODEL_ORGANISM", label: model organism (DisMech evidence_source)}
 
     # --- passages (the discussion's three items) ----------------------------------------
-    # quoteVerification is NOT_CHECKED: DisMech's validate-references compares PMID snippets
+    # quote_verification is NOT_CHECKED: DisMech's validate-references compares PMID snippets
     # against the cached abstract, but no per-item outcome is recorded.
     - class: TextPassage
       data:
         id: sieve:tp/pmid-26433933-dominant-unresolved
         type: TextPassage
-        statementText: "Although this mutant allele is known to be dominant, the functional identity thereof has not been clearly established."
-        reportedIn: [PMID:26433933]
-        textLocation: {section: Abstract}
-        quoteVerification: NOT_CHECKED
+        statement_text: "Although this mutant allele is known to be dominant, the functional identity thereof has not been clearly established."
+        reported_in: [PMID:26433933]
+        text_location: {section: Abstract}
+        quote_verification: NOT_CHECKED
         contributions: &d3_extract
           - id: sieve:act/adsa-extraction
             type: SieveContribution
             contributor: sieve:agent/dismech-curation-agent
             role: EXTRACTOR
             date: 2026-07-18
-            specifiedBy: [sieve:method/dismech-references-skill]
-            runId: sieve:run/dismech-adsa-session
+            specified_by: [sieve:method/dismech-references-skill]
+            run_id: sieve:run/dismech-adsa-session
     - class: TextPassage
       data:
         id: sieve:tp/pmid-32943585-haploinsufficiency
         type: TextPassage
-        statementText: "despite previous evidence of reduced stability and expression level of mutant Arg199Cys RNF170 haploinsufficiency is unlikely to be the primary disease since heterozygous carriers of nonsense variants in RNF170 were later shown to be unaffected"
-        reportedIn: [PMID:32943585]
-        textLocation: {section: Abstract}
-        quoteVerification: NOT_CHECKED
+        statement_text: "despite previous evidence of reduced stability and expression level of mutant Arg199Cys RNF170 haploinsufficiency is unlikely to be the primary disease since heterozygous carriers of nonsense variants in RNF170 were later shown to be unaffected"
+        reported_in: [PMID:32943585]
+        text_location: {section: Abstract}
+        quote_verification: NOT_CHECKED
         contributions: *d3_extract
     - class: TextPassage
       data:
         id: sieve:tp/pmid-39177409-spg85
         type: TextPassage
-        statementText: "RNF170 variants were previously identified in human patients with autosomal recessive spastic paraplegia-85 (SPG85); this clinical phenotype shows similarities to the dogs described herein."
-        reportedIn: [PMID:39177409]
-        textLocation: {section: Abstract}
-        quoteVerification: NOT_CHECKED
+        statement_text: "RNF170 variants were previously identified in human patients with autosomal recessive spastic paraplegia-85 (SPG85); this clinical phenotype shows similarities to the dogs described herein."
+        reported_in: [PMID:39177409]
+        text_location: {section: Abstract}
+        quote_verification: NOT_CHECKED
         contributions: *d3_extract
 
     # --- 1. the line being undercut --------------------------------------------------
@@ -225,19 +225,19 @@ sepio_monarch:
           discussion rationale and points at the publication, not at a passage.
         id: sieve:el/adsa-null-mouse
         type: SieveEvidenceLine
-        hasEvidenceItems: [PMID:26433933]
-        directionOfEvidenceProvided: supports
-        independenceCluster: sieve:cluster/pmid-26433933
+        has_evidence_items: [PMID:26433933]
+        direction_of_evidence_provided: supports
+        independence_cluster: sieve:cluster/pmid-26433933
         contributions:
           - id: sieve:act/adsa-interp-null-mouse
             type: InterpretationActivity
             contributor: sieve:agent/dismech-curation-agent
             role: INTERPRETER
             date: 2026-07-18
-            methodType: LLM_JUDGEMENT
-            specifiedBy: [sieve:method/dismech-references-skill]
-            readCoverage: ABSTRACT_ONLY
-            runId: sieve:run/dismech-adsa-session
+            method_type: LLM_JUDGEMENT
+            specified_by: [sieve:method/dismech-references-skill]
+            read_coverage: ABSTRACT_ONLY
+            run_id: sieve:run/dismech-adsa-session
             rationale: Rnf170-/- mice develop ADSA-like proprioceptive loss and age-dependent gait abnormality.
 
     # --- 2. genuine rebuttal: human genetics against the loss-of-function mechanism -----
@@ -246,19 +246,19 @@ sepio_monarch:
         _target: "pathophysiology#RNF170 Protein Destabilization by Enhanced Autoubiquitination (loss-of-function reading)"
         id: sieve:el/adsa-haploinsufficiency-32943585
         type: SieveEvidenceLine
-        hasEvidenceItems: [sieve:tp/pmid-32943585-haploinsufficiency]
-        directionOfEvidenceProvided: disputes
-        independenceCluster: sieve:cluster/pmid-32943585
+        has_evidence_items: [sieve:tp/pmid-32943585-haploinsufficiency]
+        direction_of_evidence_provided: disputes
+        independence_cluster: sieve:cluster/pmid-32943585
         contributions:
           - id: sieve:act/adsa-interp-haploinsufficiency
             type: InterpretationActivity
             contributor: sieve:agent/dismech-curation-agent
             role: INTERPRETER
             date: 2026-07-18
-            methodType: LLM_JUDGEMENT
-            specifiedBy: [sieve:method/dismech-references-skill]
-            readCoverage: ABSTRACT_ONLY
-            runId: sieve:run/dismech-adsa-session
+            method_type: LLM_JUDGEMENT
+            specified_by: [sieve:method/dismech-references-skill]
+            read_coverage: ABSTRACT_ONLY
+            run_id: sieve:run/dismech-adsa-session
             rationale: >-
               Human genetic evidence that the loss-of-function state modelled by the null
               mouse does not cause the dominant disease.
@@ -275,23 +275,23 @@ sepio_monarch:
           referenced line as the one under attack rather than as supporting input.
         id: sieve:el/adsa-undercut
         type: SieveEvidenceLine
-        hasEvidenceItems:
+        has_evidence_items:
           - sieve:el/adsa-null-mouse
           - sieve:tp/pmid-32943585-haploinsufficiency
           - sieve:tp/pmid-39177409-spg85
           - sieve:tp/pmid-26433933-dominant-unresolved
-        directionOfEvidenceProvided: disputes
-        independenceCluster: sieve:cluster/adsa-null-mouse-admissibility
+        direction_of_evidence_provided: disputes
+        independence_cluster: sieve:cluster/adsa-null-mouse-admissibility
         contributions:
           - id: sieve:act/adsa-interp-undercut
             type: InterpretationActivity
             contributor: sieve:agent/dismech-curation-agent
             role: INTERPRETER
             date: 2026-07-18
-            methodType: LLM_JUDGEMENT
-            specifiedBy: [sieve:method/dismech-references-skill]
-            readCoverage: ABSTRACT_ONLY
-            runId: sieve:run/dismech-adsa-session
+            method_type: LLM_JUDGEMENT
+            specified_by: [sieve:method/dismech-references-skill]
+            read_coverage: ABSTRACT_ONLY
+            run_id: sieve:run/dismech-adsa-session
             rationale: >-
               Heterozygous human null carriers are unaffected and homozygotes have SPG85, so
               the null mouse models the recessive disease and its phenotype cannot be used as
@@ -312,12 +312,12 @@ gaps:
     relative to the enclosing Statement. There is no "undercuts" direction and no line
     target. The nearest mechanisms do not fit. LineStatusChange INVALIDATED +
     validity INVALIDATED records a curator's verdict that a line is out, with no evidence
-    of its own, and the discussion is OPEN, so no such verdict exists. dataQualityFlags
+    of its own, and the discussion is OPEN, so no such verdict exists. data_quality_flags
     cover misreading (QUOTE_NOT_FOUND, MISGROUNDED), not translational validity. A naive
     aggregation over the fragments would therefore still count the undercut as a rebuttal.
     Settle the pattern with Matt (SPEC Q5).
   direction_is_relative: >-
-    Confirmed by the profile. Direction lives on SieveEvidenceLine (directionOfEvidenceProvided),
+    Confirmed by the profile. Direction lives on SieveEvidenceLine (direction_of_evidence_provided),
     never on the TextPassage, so the PMID:32943585 passage can be used by the rebutting line
     (disputes the mechanism) and by the undercut line without contradiction. The target the
     direction is relative to is the enclosing Statement, which is the part that is missing here.
@@ -327,7 +327,7 @@ gaps:
     Method (a protocol), carries no expected direction and no target claim.
   curation_state_leakage: >-
     Partly addressed in principle. For a Mondo claim, OPEN maps to
-    SieveStatement.reviewState PENDING_REVIEW, and an unresolved verdict to an
+    SieveStatement.review_state PENDING_REVIEW, and an unresolved verdict to an
     AssertionDecision with outcome DEFERRED. Here there is no statement to carry either, so
     neither is rendered, and no decision is invented. `kind: HUMAN_MODEL_MISMATCH` has no
     counterpart in SIEVE.
@@ -339,6 +339,6 @@ gaps:
     from the source.
   interpretation_provenance: >-
     Newly expressible. Each line has an InterpretationActivity (agent, date, LLM_JUDGEMENT,
-    method, readCoverage ABSTRACT_ONLY, run id, rationale). DisMech holds the real agent and
-    date only in history/ at section grain. accessStatus is left out because DisMech does
+    method, read_coverage ABSTRACT_ONLY, run id, rationale). DisMech holds the real agent and
+    date only in history/ at section grain. access_status is left out because DisMech does
     not record it.

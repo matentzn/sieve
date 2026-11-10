@@ -150,9 +150,9 @@ sepio_monarch:
         type: InformationResource
         label: Государственный реестр лекарственных средств (GRLS)
         description: Russian state register of medicines (MeDIC source_role PRIMARY).
-        curiePrefixes: [GRLS]
+        curie_prefixes: [GRLS]
         maintainer: sieve:agent/moh-russia
-        defaultRole: PRIMARY
+        default_role: PRIMARY
     - class: SieveAgent
       data:
         id: sieve:agent/moh-russia
@@ -165,7 +165,7 @@ sepio_monarch:
         type: SieveAgent
         label: medic-ingest-russia
         subtype: software
-        softwareVersion: 1.0.0
+        software_version: 1.0.0
     - class: SieveAgent
       data:
         id: sieve:agent/deepl
@@ -175,21 +175,21 @@ sepio_monarch:
         subtype: software
         _softwareVersion: >-
           Deliberately absent: DeepL publishes no engine version. The profile leaves
-          softwareVersion optional, so the honest gap stays visible as a missing value.
+          software_version optional, so the honest gap stays visible as a missing value.
     - class: SieveAgent
       data:
         id: sieve:agent/medic-lexical-grounder
         type: SieveAgent
         label: medic-lexical-grounder
         subtype: software
-        softwareVersion: "1"
+        software_version: "1"
     - class: SieveAgent
       data:
         id: sieve:agent/medic-normalizer
         type: SieveAgent
         label: medic-normalizer
         subtype: software
-        softwareVersion: "1"
+        software_version: "1"
 
     - class: ExternalRecord
       data:
@@ -197,22 +197,22 @@ sepio_monarch:
         type: ExternalRecord
         label: Гемифлоксацин
         resource: sieve:resource/grls
-        dateAuthored: "2011-08-12"
+        date_authored: "2011-08-12"
         _dateAuthored_note: The registration date (MeDIC approval_date 20110812).
-        recordMetadata:
-          retrievedFrom: sieve:resource/grls
-          recordIdentifier: ЛС-000940
-          retrievalDate: 2026-08-13
+        record_metadata:
+          retrieved_from: sieve:resource/grls
+          record_identifier: ЛС-000940
+          retrieval_date: 2026-08-13
           _retrievalDate_illustrative: Taken from the MeDIC build date; MeDIC stores no per-record read date here.
-          sourceLabel: Гемифлоксацин
+          source_label: Гемифлоксацин
 
     # --- the chain: ordered, contiguous, replayable ----------------------------
     - class: ResolutionChain
       data:
         id: sieve:chain/grls-ls000940-subject
         type: ResolutionChain
-        entitySlot: subject
-        chainConfidence: 0.855
+        entity_slot: subject
+        chain_confidence: 0.855
         _chainConfidence_note: Product of the step confidences, 1.0 x 0.95 x 0.9 x 1.0.
         _mentionId: MEDICNE:18eb4063-9c1c-5ae2-8868-620d124d2c16   # no profile slot, see gaps.mention_identity
         steps:
@@ -220,51 +220,51 @@ sepio_monarch:
             type: AlignmentStep
             category: EXTRACTION
             method: STRUCTURED_FIELD
-            inputValue: Гемифлоксацин
-            outputValue: Гемифлоксацин
-            qualityCategory: extraction_verbatim
+            input_value: Гемифлоксацин
+            output_value: Гемифлоксацин
+            quality_category: extraction_verbatim
             confidence: 1.0
-            confidenceBasis: DETERMINISTIC
-            performedBy: [sieve:agent/medic-ingest-russia]
+            confidence_basis: DETERMINISTIC
+            performed_by: [sieve:agent/medic-ingest-russia]
           - id: sieve:step/grls-ls000940-subject-2
             type: AlignmentStep
             category: TRANSLATION
             method: API
-            inputValue: Гемифлоксацин
-            outputValue: Gemifloxacin
+            input_value: Гемифлоксацин
+            output_value: Gemifloxacin
             confidence: 0.95
-            confidenceBasis: PRIOR
-            reviewStatus: CANDIDATE
-            performedBy: [sieve:agent/deepl]
-            specifiedBy: [sieve:method/babelon-0.3.6]
+            confidence_basis: PRIOR
+            review_status: CANDIDATE
+            performed_by: [sieve:agent/deepl]
+            specified_by: [sieve:method/babelon-0.3.6]
             _qualityCategory: >-
               MeDIC quality `close` (and translator_expertise ALGORITHM) has no
               AlignmentQuality value: the enum has grounding_*, extraction_* and
               normalization_* values only. Left out.
             _languages: {source_language: ru, target_language: en-us}   # no profile slot
-            _flags: [unreviewed_machine]   # no step-level flag slot; reviewStatus CANDIDATE carries it
+            _flags: [unreviewed_machine]   # no step-level flag slot; review_status CANDIDATE carries it
           - id: sieve:step/grls-ls000940-subject-3
             type: AlignmentStep
             category: GROUNDING
             method: LEXICAL_MATCH
-            inputValue: Gemifloxacin
-            outputValue: CHEBI:101853
-            mappingJustification: semapv:LexicalMatching
-            qualityCategory: grounding_lexical_exact_normalized
+            input_value: Gemifloxacin
+            output_value: CHEBI:101853
+            mapping_justification: semapv:LexicalMatching
+            quality_category: grounding_lexical_exact_normalized
             confidence: 0.9
-            confidenceBasis: MEASURED
-            performedBy: [sieve:agent/medic-lexical-grounder]
-            _mappingSet: mappings/drug_grounding.sssom.tsv   # a repo path, not a URI; mappingSet is uri-typed
+            confidence_basis: MEASURED
+            performed_by: [sieve:agent/medic-lexical-grounder]
+            _mappingSet: mappings/drug_grounding.sssom.tsv   # a repo path, not a URI; mapping_set is uri-typed
           - id: sieve:step/grls-ls000940-subject-4
             type: AlignmentStep
             category: NORMALIZATION
             method: DETERMINISTIC_RULE
-            inputValue: CHEBI:101853
-            outputValue: CHEBI:101853
-            qualityCategory: normalization_identity
+            input_value: CHEBI:101853
+            output_value: CHEBI:101853
+            quality_category: normalization_identity
             confidence: 1.0
-            confidenceBasis: DETERMINISTIC
-            performedBy: [sieve:agent/medic-normalizer]
+            confidence_basis: DETERMINISTIC
+            performed_by: [sieve:agent/medic-normalizer]
 
     # --- the one evidence line --------------------------------------------------
     - class: SieveEvidenceLine
@@ -272,25 +272,25 @@ sepio_monarch:
         id: sieve:el/grls-ls000940
         type: SieveEvidenceLine
         description: Russian Ministry of Health state register of medicines, registration ЛС-000940 (2011-08-12).
-        hasEvidenceItems: [GRLS:ЛС-000940]
-        directionOfEvidenceProvided: supports
-        strengthOfEvidenceProvided: high
+        has_evidence_items: [GRLS:ЛС-000940]
+        direction_of_evidence_provided: supports
+        strength_of_evidence_provided: high
         confidence: 0.855
-        confidenceBasis: PRIOR
+        confidence_basis: PRIOR
         _confidenceBasis_note: >-
           The line's data-quality number is the chain confidence. It combines DETERMINISTIC,
           PRIOR and MEASURED steps. ConfidenceBasis has no "composed" value, so the weakest
           basis in the chain (PRIOR, the translation) is given.
-        independenceCluster: sieve:resource/grls
+        independence_cluster: sieve:resource/grls
         contributions:
           - id: sieve:act/medic-interpret-grls-ls000940
             type: InterpretationActivity
             contributor: sieve:agent/medic-ingest-russia
             date: 2026-08-13
             _date_illustrative: The MeDIC build date of the old Track 2 block.
-            methodType: RULE_BASED_STRENGTH
-            readCoverage: STRUCTURED_RECORD
-            accessStatus: OPEN_ACCESS
+            method_type: RULE_BASED_STRENGTH
+            read_coverage: STRUCTURED_RECORD
+            access_status: OPEN_ACCESS
             rationale: A PRIMARY regulatory registration record maps to evidence confidence HIGH.
 
 # ---------------------------------------------------------------------------
@@ -301,18 +301,18 @@ gaps:
     types. (2) AlignmentQuality has no translation values: MeDIC's `close` (and
     translator_expertise ALGORITHM) is dropped from the TRANSLATION step, although
     TransformationCategory has TRANSLATION. (3) No source / target language slots on
-    AlignmentStep. (4) No step-level flags (`unreviewed_machine`); only reviewStatus.
+    AlignmentStep. (4) No step-level flags (`unreviewed_machine`); only review_status.
     (5) ConfidenceBasis has no value for a composed number such as a chain confidence fed
-    to a line. (6) No slot for a mention id (MEDICNE:). (7) AlignmentStep.mappingSet is a
+    to a line. (6) No slot for a mention id (MEDICNE:). (7) AlignmentStep.mapping_set is a
     URI, and MeDIC records a repo-relative path, so it is left out. (8) No slots for
     approval status, application number as such, or the regulatory document URL beyond
-    RetrievalMetadata.recordIdentifier.
+    RetrievalMetadata.record_identifier.
   set_vs_sequence_R21: >-
     Addressed: ResolutionChain.steps is an ordered list of AlignmentSteps, and
-    sieve.profile_checks verifies contiguity (step n outputValue == step n+1 inputValue,
+    sieve.profile_checks verifies contiguity (step n output_value == step n+1 input_value,
     MeDIC invariant I-8) for every chain inside a packet. The chain no longer has to ride
     inside one evidence item as an opaque blob: it is a provenance object next to the
-    record, not a member of hasEvidenceItems, so the bag semantics of evidence items do
+    record, not a member of has_evidence_items, so the bag semantics of evidence items do
     not touch it. Caveat: as a standalone fragment here, only the schema is checked, not
     contiguity.
   chain_decomposes_across_two_item_types: >-
@@ -321,15 +321,15 @@ gaps:
     AlignmentSteps in one chain, told apart by `category`.
   translation_has_no_sepio_counterpart: >-
     Mostly addressed: TransformationCategory TRANSLATION plus method API, the agent
-    (DeepL) with its wikidata identifier, the tool as specifiedBy, confidence 0.95 with
-    basis PRIOR and reviewStatus CANDIDATE all have slots. Still open: no source / target
+    (DeepL) with its wikidata identifier, the tool as specified_by, confidence 0.95 with
+    basis PRIOR and review_status CANDIDATE all have slots. Still open: no source / target
     language, no translator expertise, and no AlignmentQuality value for a translation
     (see profile_misfit).
   confidence_basis_is_a_good_idea_worth_stealing: >-
     Adopted: ConfidenceBasis (MEASURED | DETERMINISTIC | PRIOR) is in the profile, and a
     rule on both AlignmentStep and SieveEvidenceLine requires a basis whenever a
     confidence is given (D-062). It applies to data-quality confidence only, not to
-    SieveEvidenceLine.scoreOfEvidenceProvided (strength), so an AI interpreter's
+    SieveEvidenceLine.score_of_evidence_provided (strength), so an AI interpreter's
     self-reported strength still carries no basis. Open: no basis value for a composed
     confidence (chain -> line), where PRIOR is used here as the weakest component.
   mention_identity: >-

@@ -152,17 +152,17 @@ sepio_monarch:
     subject: MONDO:0005015
     predicate: {code: oboInOwl:hasExactSynonym, label: exact synonym}
     object: DM
-    statementText: "diabetes mellitus has exact synonym 'DM'"
-    reviewState: NOT_VERIFIED
-    proposingChannel: CURATOR
-    hasEvidence: [PMID:12345678]
+    statement_text: "diabetes mellitus has exact synonym 'DM'"
+    review_state: NOT_VERIFIED
+    proposing_channel: CURATOR
+    has_evidence: [PMID:12345678]
     origin:
       - id: sieve:origin/mondo-0005015-dm
         type: OriginEvent
-        derivationType: COPIED_FROM
-        sourceItem: sieve:rec/mondo-2026-08-01-MONDO_0005015
-        sourceRelease: sieve:release/mondo-2026-08-01
-        performedBy: [sieve:agent/mondo-ai-mondo-extractor]
+        derivation_type: COPIED_FROM
+        source_item: sieve:rec/mondo-2026-08-01-MONDO_0005015
+        source_release: sieve:release/mondo-2026-08-01
+        performed_by: [sieve:agent/mondo-ai-mondo-extractor]
         _note: >-
           No date: the extractor records none, and the release date is when the axiom was
           published, not when mondo-ai harvested it.
@@ -177,29 +177,29 @@ sepio_monarch:
         type: SieveContribution
         contributor: orcid:0000-0001-5208-3432
         role: CURATOR
-        agentRoleAtTime: curator
-        agentTrustAtTime: 0.8
-  externalRecords:
+        agent_role_at_time: curator
+        agent_trust_at_time: 0.8
+  external_records:
     - id: sieve:rec/mondo-2026-08-01-MONDO_0005015
       type: ExternalRecord
       label: diabetes mellitus
       resource: infores:mondo
-      recordMetadata:
-        retrievedFrom: infores:mondo
-        sourceRelease: sieve:release/mondo-2026-08-01
-        recordIdentifier: MONDO:0005015
-        retrievalDate: "2026-08-01"            # reconstructed: release date stands in for the read date
+      record_metadata:
+        retrieved_from: infores:mondo
+        source_release: sieve:release/mondo-2026-08-01
+        record_identifier: MONDO:0005015
+        retrieval_date: "2026-08-01"            # reconstructed: release date stands in for the read date
   publications:
     - id: PMID:12345678
       type: Publication
       pmid: "12345678"
       urls: ["https://pubmed.ncbi.nlm.nih.gov/12345678/"]
       resource: infores:pubmed
-      generationContext:
+      generation_context:
         - {code: "sieve:basis_unknown"}
   # Registry data the packet refers to by id (SieveRegistry fragment, not part of the packet).
   # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
-  referenceSnapshot:
+  reference_snapshot:
     id: sieve:pkt_mondo_0005015_dm#references
     type: SieveRegistry
     version: '2026-08-01'
@@ -207,20 +207,20 @@ sepio_monarch:
     - id: infores:mondo
       type: InformationResource
       label: Mondo
-      curiePrefixes:
+      curie_prefixes:
       - MONDO
-      defaultRole: PRIMARY
+      default_role: PRIMARY
       maintainer: sieve:agent/mondo-consortium
     - id: infores:pubmed
       type: InformationResource
       label: PubMed
-      curiePrefixes:
+      curie_prefixes:
       - PMID
-      defaultRole: PRIMARY
+      default_role: PRIMARY
     releases:
     - id: sieve:release/mondo-2026-08-01
       type: SourceRelease
-      ofResource: infores:mondo
+      of_resource: infores:mondo
       version: '2026-08-01'
     agents:
     - id: orcid:0000-0001-5208-3432
@@ -228,11 +228,11 @@ sepio_monarch:
       subtype: person
       roles:
       - value: core curator
-        validFrom: '2018-01-01'
-      trustLevels:
+        valid_from: '2018-01-01'
+      trust_levels:
       - value: curator
         level: 0.8
-        validFrom: '2018-01-01'
+        valid_from: '2018-01-01'
     - id: sieve:agent/mondo-ai-mondo-extractor
       type: SieveAgent
       subtype: software
@@ -241,48 +241,48 @@ sepio_monarch:
       type: SieveAgent
       subtype: organization
       name: Mondo Disease Ontology Consortium
-      trustLevels:
+      trust_levels:
       - value: authority
-        validFrom: '2026-08-01'
+        valid_from: '2026-08-01'
 # ---------------------------------------------------------------------------
 gaps:
   is_a_curator_decision_evidence: >-
     ADDRESSED, with the testimony question parked where Mondo parked it. The profile splits the
     two: consortium inclusion is provenance (OriginEvent COPIED_FROM the release record +
     SieveContribution role PROVIDER), and the ORCID is the curator responsible for the axiom
-    (SieveContribution role CURATOR, agentRoleAtTime / agentTrustAtTime). Testimony has a
-    defined home for NEW sign-offs: an AssertionDecision whose evidenceLine is an
+    (SieveContribution role CURATOR, agent_role_at_time / agent_trust_at_time). Testimony has a
+    defined home for NEW sign-offs: an AssertionDecision whose evidence_line is an
     EXPERT_JUDGEMENT line weighted by the signer's trust (D-049, D-051). D-049 is still
     provisional, and a legacy ORCID annotation cannot be lifted into it (no date, outcome or
     packet version), so this record leaves it as provenance.
   circularity: >-
     ADDRESSED: inclusion in the release is an origin event, not a line, so it adds nothing to the
     inclusion score S. Where a sign-off does become an expert line, AssertionDecision records
-    signedPacketVersion and the line is scored on the packet as signed, excluding itself (D-049);
-    a no-look approval may not carry an evidenceLine (profile check BLIND_APPROVAL_EVIDENCE,
+    signed_packet_version and the line is scored on the packet as signed, excluding itself (D-049);
+    a no-look approval may not carry an evidence_line (profile check BLIND_APPROVAL_EVIDENCE,
     D-066).
   scores_are_priors_not_measurements: >-
     ADDRESSED: each constant now has a typed, dated home instead of the line score. Agent trust
-    -> SieveAgent.trustLevels (registry) snapshotted as SieveContribution.agentTrustAtTime;
-    source quality -> InformationResource.qualityRatings; base rates -> the claim prior L0 per
-    claim type x proposingChannel in the AggregationRule; AI self-confidence ->
-    SieveEvidenceLine.confidence with required confidenceBasis (PRIOR). Here none of 0.6 / 0.8 /
+    -> SieveAgent.trust_levels (registry) snapshotted as SieveContribution.agent_trust_at_time;
+    source quality -> InformationResource.quality_ratings; base rates -> the claim prior L0 per
+    claim type x proposing_channel in the AggregationRule; AI self-confidence ->
+    SieveEvidenceLine.confidence with required confidence_basis (PRIOR). Here none of 0.6 / 0.8 /
     0.4 survives as evidence weight.
   no_span_no_evidence: >-
-    PARTLY ADDRESSED: the unread PMID is a Publication linked by statement.hasEvidence (direct,
+    PARTLY ADDRESSED: the unread PMID is a Publication linked by statement.has_evidence (direct,
     uninterpreted), so it carries no weight. Once read it becomes a TextPassage
-    (quoteVerification) under a line whose InterpretationActivity must state readCoverage and
-    accessStatus (profile check). Still OPEN: whether the PMID resolves and is on topic
-    (identifierVerified) lives only on an InterpretationActivity, so an uninterpreted citation
+    (quote_verification) under a line whose InterpretationActivity must state read_coverage and
+    access_status (profile check). Still OPEN: whether the PMID resolves and is on topic
+    (identifier_verified) lives only on an InterpretationActivity, so an uninterpreted citation
     cannot record "checked, resolves" or "candidate, unchecked".
   track1_pressure_Q3: >-
     OPEN for Track 1 (the kernel, unchanged). In the profile: every line must carry
-    SieveEvidenceLine.contributions (InterpretationActivity with contributor, date, methodType),
+    SieveEvidenceLine.contributions (InterpretationActivity with contributor, date, method_type),
     so who interpreted what is mandatory, not optional.
   legacy_curator_has_no_date: >-
     NEW. The ORCID in oboInOwl:source has no date, so the CURATOR contribution is undated. It
     cannot become an AssertionDecision (date required) or an InterpretationActivity (date
-    required) without inventing one, and the trust snapshot (agentTrustAtTime 0.8) is as of an
+    required) without inventing one, and the trust snapshot (agent_trust_at_time 0.8) is as of an
     unknown time. Migrating ~all legacy ORCID annotations has the same problem (D-004).
   consortium_role_is_a_stretch: >-
     NEW. AgentRole has no value for "maintainer of the target ontology itself". PROVIDER ("Mondo

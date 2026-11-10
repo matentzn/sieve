@@ -148,7 +148,7 @@ sepio_monarch:
     profile's ten claim types are Mondo's (C001–C010), with a Mondo subject and a
     predicate bound to a Mondo value set. None has a CHEBI subject or an INDICATION
     predicate, so there is no SieveStatement and no packet. Because a SieveEvidenceLine
-    always targets its enclosing Statement (targetProposition is unused), the three
+    always targets its enclosing Statement (target_proposition is unused), the three
     `disputes` lines below cannot say WHICH non-indication each disputes except in
     free-text `description`. That is exactly the information hazard H3 says must not be
     lost. What fits: the passages, the as-is and corrected resolution chains with
@@ -161,90 +161,90 @@ sepio_monarch:
         type: InformationResource
         label: DailyMed
         description: Republishes FDA structured product labels (MeDIC source_role INTERMEDIARY).
-        curiePrefixes: [DailyMed]
-        defaultRole: AGGREGATOR
-        derivesContentFrom: [sieve:resource/fda]
+        curie_prefixes: [DailyMed]
+        default_role: AGGREGATOR
+        derives_content_from: [sieve:resource/fda]
 
     # --- defect 1: the narrowing, as the as-is chain plus its correction -------
     - class: TextPassage
       data:
         id: sieve:tp/zolmi-indication
         type: TextPassage
-        statementText: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
-        reportedIn: [DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c]
-        textLocation: {section: "LOINC:34067-9 INDICATIONS AND USAGE"}
-        quoteVerification: NOT_CHECKED
+        statement_text: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+        reported_in: [DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c]
+        text_location: {section: "LOINC:34067-9 INDICATIONS AND USAGE"}
+        quote_verification: NOT_CHECKED
         contributions:
-          - {id: sieve:act/medic-extract-zolmi-indication, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR, specifiedBy: [sieve:method/medic-extractor-v1]}
+          - {id: sieve:act/medic-extract-zolmi-indication, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR, specified_by: [sieve:method/medic-extractor-v1]}
         groundings:
           # as-is: every step locally "correct", chain confidence 1.0, result too narrow
           - id: sieve:chain/zolmi-object-asis
             type: ResolutionChain
-            entitySlot: object
-            chainConfidence: 1.0
-            specifiedBy: [sieve:method/medic-extractor-v1]
+            entity_slot: object
+            chain_confidence: 1.0
+            specified_by: [sieve:method/medic-extractor-v1]
             steps:
               - id: sieve:step/zolmi-object-asis-1
                 type: AlignmentStep
                 category: EXTRACTION
                 method: LLM
-                inputValue: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
-                outputValue: migraine with aura
-                spanRole: SECTION_TEXT
-                qualityCategory: extraction_verbatim
+                input_value: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+                output_value: migraine with aura
+                span_role: SECTION_TEXT
+                quality_category: extraction_verbatim
                 confidence: 1.0
-                confidenceBasis: MEASURED
-                performedBy: [sieve:agent/claude-haiku-4-5-20251001]
-                reviewStatus: REJECTED
-                reviewedBy: sieve:agent/curator-example
-                reviewDate: 2026-10-30
+                confidence_basis: MEASURED
+                performed_by: [sieve:agent/claude-haiku-4-5-20251001]
+                review_status: REJECTED
+                reviewed_by: sieve:agent/curator-example
+                review_date: 2026-10-30
                 _review_illustrative: >-
                   MeDIC's step is MACHINE (unreviewed). REJECTED is what a curator reading
                   the span records: the output is narrower than the source phrase, and is
                   not even a contiguous substring of it ("migraine with or without aura"),
-                  so `extraction_verbatim` is wrong as well. No textSpan, because no span
+                  so `extraction_verbatim` is wrong as well. No text_span, because no span
                   of the input yields this output.
               - id: sieve:step/zolmi-object-asis-2
                 type: AlignmentStep
                 category: GROUNDING
                 method: LEXICAL_MATCH
-                inputValue: migraine with aura
-                outputValue: MONDO:0005475
+                input_value: migraine with aura
+                output_value: MONDO:0005475
                 predicate: skos:exactMatch
-                qualityCategory: grounding_lexical_exact
+                quality_category: grounding_lexical_exact
                 _confidence_note: MeDIC's 1.0 has no basis here; left out (a confidence needs a basis).
               - id: sieve:step/zolmi-object-asis-3
                 type: AlignmentStep
                 category: NORMALIZATION
                 method: DETERMINISTIC_RULE
-                inputValue: MONDO:0005475
-                outputValue: MONDO:0005475
-                qualityCategory: normalization_identity
+                input_value: MONDO:0005475
+                output_value: MONDO:0005475
+                quality_category: normalization_identity
           # corrected: the full phrase, grounded by a curator to the parent term
           - id: sieve:chain/zolmi-object-corrected
             type: ResolutionChain
-            entitySlot: object
+            entity_slot: object
             steps:
               - id: sieve:step/zolmi-object-corrected-1
                 type: AlignmentStep
                 category: EXTRACTION
                 method: HUMAN
-                inputValue: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
-                outputValue: migraine with or without aura
-                textSpan: {section: "LOINC:34067-9", charStart: 84, charEnd: 113}
-                spanRole: SECTION_TEXT
-                qualityCategory: extraction_verbatim
-                performedBy: [sieve:agent/curator-example]
-                reviewStatus: CONFIRMED
+                input_value: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+                output_value: migraine with or without aura
+                text_span: {section: "LOINC:34067-9", char_start: 84, char_end: 113}
+                span_role: SECTION_TEXT
+                quality_category: extraction_verbatim
+                performed_by: [sieve:agent/curator-example]
+                review_status: CONFIRMED
               - id: sieve:step/zolmi-object-corrected-2
                 type: AlignmentStep
                 category: GROUNDING
                 method: HUMAN
-                inputValue: migraine with or without aura
-                outputValue: MONDO:0005277
-                qualityCategory: grounding_curated
-                performedBy: [sieve:agent/curator-example]
-                reviewStatus: CONFIRMED
+                input_value: migraine with or without aura
+                output_value: MONDO:0005277
+                quality_category: grounding_curated
+                performed_by: [sieve:agent/curator-example]
+                review_status: CONFIRMED
 
     - class: SieveEvidenceLine
       data:
@@ -253,34 +253,34 @@ sepio_monarch:
         description: >-
           As emitted: FDA-approved indication, read as zolmitriptan INDICATION MONDO:0005475
           (migraine with aura).
-        hasEvidenceItems: [sieve:tp/zolmi-indication]
-        evidenceItemSources: [sieve:resource/dailymed]
-        directionOfEvidenceProvided: supports
-        strengthOfEvidenceProvided: high
+        has_evidence_items: [sieve:tp/zolmi-indication]
+        evidence_item_sources: [sieve:resource/dailymed]
+        direction_of_evidence_provided: supports
+        strength_of_evidence_provided: high
         confidence: 0.9
-        confidenceBasis: MEASURED
-        dataQualityFlags: [MISGROUNDED]
+        confidence_basis: MEASURED
+        data_quality_flags: [MISGROUNDED]
         validity: INVALIDATED
-        independenceCluster: sieve:resource/fda
+        independence_cluster: sieve:resource/fda
         contributions:
           - id: sieve:act/medic-interpret-zolmi-indication
             type: InterpretationActivity
             contributor: sieve:agent/claude-haiku-4-5-20251001
             date: 2026-08-13
             _date_illustrative: MeDIC records no run date on the assertion.
-            methodType: LLM_JUDGEMENT
-            specifiedBy: [sieve:method/medic-extractor-v1]
-            readCoverage: SECTIONS
-            accessStatus: OPEN_ACCESS
-            groundingChecked: NOT_CHECKED
-        statusChanges:
+            method_type: LLM_JUDGEMENT
+            specified_by: [sieve:method/medic-extractor-v1]
+            read_coverage: SECTIONS
+            access_status: OPEN_ACCESS
+            grounding_checked: NOT_CHECKED
+        status_changes:
           - id: sieve:lsc/zolmi-indication-superseded
             type: LineStatusChange
             contributor: sieve:agent/curator-example
             date: 2026-10-30
             action: SUPERSEDED
             reason: Object grounded narrower than the source text; re-grounded to MONDO:0005277.
-            replacementLine: sieve:el/zolmi-indication-corrected
+            replacement_line: sieve:el/zolmi-indication-corrected
     - class: SieveEvidenceLine
       data:
         id: sieve:el/zolmi-indication-corrected
@@ -288,53 +288,53 @@ sepio_monarch:
         description: >-
           FDA-approved acute-treatment indication, read as zolmitriptan INDICATION
           MONDO:0005277 (migraine disorder).
-        hasEvidenceItems: [sieve:tp/zolmi-indication]
-        evidenceItemSources: [sieve:resource/dailymed]
-        directionOfEvidenceProvided: supports
-        strengthOfEvidenceProvided: high
+        has_evidence_items: [sieve:tp/zolmi-indication]
+        evidence_item_sources: [sieve:resource/dailymed]
+        direction_of_evidence_provided: supports
+        strength_of_evidence_provided: high
         supersedes: [sieve:el/zolmi-indication-asis]
-        independenceCluster: sieve:resource/fda
+        independence_cluster: sieve:resource/fda
         contributions:
           - id: sieve:act/curator-interpret-zolmi-indication
             type: InterpretationActivity
             contributor: sieve:agent/curator-example
             date: 2026-10-30
-            methodType: EXPERT_JUDGEMENT
-            readCoverage: SECTIONS
-            accessStatus: OPEN_ACCESS
+            method_type: EXPERT_JUDGEMENT
+            read_coverage: SECTIONS
+            access_status: OPEN_ACCESS
 
     # --- defect 2: the limitation sentence, one passage, three disputing lines --
     - class: TextPassage
       data:
         id: sieve:tp/zolmi-limitation
         type: TextPassage
-        statementText: >-
+        statement_text: >-
           Only use zolmitriptan orally disintegrating tablets if a clear diagnosis of migraine
           has been established. If a patient has no response to zolmitriptan for the first
           migraine attack, reconsider the diagnosis of migraine before zolmitriptan is
           administered to treat any subsequent attacks. Zolmitriptan orally disintegrating
           tablets are not indicated for the prophylactic therapy of migraine or for the
           treatment of hemiplegic or basilar migraine.
-        reportedIn: [DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c]
-        textLocation: {section: "LOINC:34067-9 Limitations of Use"}
-        quoteVerification: NOT_CHECKED
-        _spanRole: LIMITATION_STATEMENT       # no TextPassage slot; spanRole exists only on AlignmentStep
+        reported_in: [DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c]
+        text_location: {section: "LOINC:34067-9 Limitations of Use"}
+        quote_verification: NOT_CHECKED
+        _spanRole: LIMITATION_STATEMENT       # no TextPassage slot; span_role exists only on AlignmentStep
         contributions:
           - {id: sieve:act/medic-extract-zolmi-limitation, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
         groundings:
           - id: sieve:chain/zolmi-limitation-hemiplegic
             type: ResolutionChain
-            entitySlot: object
+            entity_slot: object
             steps:
               - id: sieve:step/zolmi-limitation-hemiplegic-1
                 type: AlignmentStep
                 category: EXTRACTION
                 method: LLM
-                inputValue: "Zolmitriptan orally disintegrating tablets are not indicated for the prophylactic therapy of migraine or for the treatment of hemiplegic or basilar migraine."
-                outputValue: hemiplegic migraine
-                spanRole: LIMITATION_STATEMENT
-                triggerCue: are not indicated for
-                qualityCategory: extraction_canonicalized
+                input_value: "Zolmitriptan orally disintegrating tablets are not indicated for the prophylactic therapy of migraine or for the treatment of hemiplegic or basilar migraine."
+                output_value: hemiplegic migraine
+                span_role: LIMITATION_STATEMENT
+                trigger_cue: are not indicated for
+                quality_category: extraction_canonicalized
                 _note: >-
                   Illustrative: MeDIC does not extract the limitation's mentions. The output
                   expands the coordination "hemiplegic or basilar migraine", hence
@@ -343,13 +343,13 @@ sepio_monarch:
                 type: AlignmentStep
                 category: GROUNDING
                 method: LEXICAL_MATCH
-                inputValue: hemiplegic migraine
-                outputValue: hemiplegic migraine
-                qualityCategory: grounding_unresolved
+                input_value: hemiplegic migraine
+                output_value: hemiplegic migraine
+                quality_category: grounding_unresolved
                 _note: >-
                   Mondo has familial (MONDO:0000700) and sporadic (MONDO:0020757) hemiplegic
                   migraine but no grouping term, so the step stays unresolved instead of being
-                  forced to a child. outputValue repeats the input because the slot is
+                  forced to a child. output_value repeats the input because the slot is
                   required and there is no id to give.
 
     - class: SieveEvidenceLine
@@ -359,13 +359,13 @@ sepio_monarch:
         description: >-
           Target: "zolmitriptan is indicated for the prophylactic therapy of migraine".
           Explicit non-indication in the Limitations of Use subsection.
-        hasEvidenceItems: [sieve:tp/zolmi-limitation]
-        evidenceItemSources: [sieve:resource/dailymed]
-        directionOfEvidenceProvided: disputes
-        strengthOfEvidenceProvided: high
-        independenceCluster: sieve:resource/fda
+        has_evidence_items: [sieve:tp/zolmi-limitation]
+        evidence_item_sources: [sieve:resource/dailymed]
+        direction_of_evidence_provided: disputes
+        strength_of_evidence_provided: high
+        independence_cluster: sieve:resource/fda
         contributions:
-          - {id: sieve:act/interpret-zolmi-not-prophylaxis, type: InterpretationActivity, contributor: sieve:agent/curator-example, date: 2026-10-30, methodType: EXPERT_JUDGEMENT, readCoverage: SECTIONS, accessStatus: OPEN_ACCESS}
+          - {id: sieve:act/interpret-zolmi-not-prophylaxis, type: InterpretationActivity, contributor: sieve:agent/curator-example, date: 2026-10-30, method_type: EXPERT_JUDGEMENT, read_coverage: SECTIONS, access_status: OPEN_ACCESS}
     - class: SieveEvidenceLine
       data:
         id: sieve:el/zolmi-not-hemiplegic
@@ -373,26 +373,26 @@ sepio_monarch:
         description: >-
           Target: "zolmitriptan is indicated for hemiplegic migraine" (object unresolved,
           see sieve:chain/zolmi-limitation-hemiplegic).
-        hasEvidenceItems: [sieve:tp/zolmi-limitation]
-        evidenceItemSources: [sieve:resource/dailymed]
-        directionOfEvidenceProvided: disputes
-        strengthOfEvidenceProvided: high
-        independenceCluster: sieve:resource/fda
+        has_evidence_items: [sieve:tp/zolmi-limitation]
+        evidence_item_sources: [sieve:resource/dailymed]
+        direction_of_evidence_provided: disputes
+        strength_of_evidence_provided: high
+        independence_cluster: sieve:resource/fda
         contributions:
-          - {id: sieve:act/interpret-zolmi-not-hemiplegic, type: InterpretationActivity, contributor: sieve:agent/curator-example, date: 2026-10-30, methodType: EXPERT_JUDGEMENT, readCoverage: SECTIONS, accessStatus: OPEN_ACCESS}
+          - {id: sieve:act/interpret-zolmi-not-hemiplegic, type: InterpretationActivity, contributor: sieve:agent/curator-example, date: 2026-10-30, method_type: EXPERT_JUDGEMENT, read_coverage: SECTIONS, access_status: OPEN_ACCESS}
     - class: SieveEvidenceLine
       data:
         id: sieve:el/zolmi-not-basilar
         type: SieveEvidenceLine
         description: >-
           Target: "zolmitriptan is indicated for basilar migraine".
-        hasEvidenceItems: [sieve:tp/zolmi-limitation]
-        evidenceItemSources: [sieve:resource/dailymed]
-        directionOfEvidenceProvided: disputes
-        strengthOfEvidenceProvided: high
-        independenceCluster: sieve:resource/fda
+        has_evidence_items: [sieve:tp/zolmi-limitation]
+        evidence_item_sources: [sieve:resource/dailymed]
+        direction_of_evidence_provided: disputes
+        strength_of_evidence_provided: high
+        independence_cluster: sieve:resource/fda
         contributions:
-          - {id: sieve:act/interpret-zolmi-not-basilar, type: InterpretationActivity, contributor: sieve:agent/curator-example, date: 2026-10-30, methodType: EXPERT_JUDGEMENT, readCoverage: SECTIONS, accessStatus: OPEN_ACCESS}
+          - {id: sieve:act/interpret-zolmi-not-basilar, type: InterpretationActivity, contributor: sieve:agent/curator-example, date: 2026-10-30, method_type: EXPERT_JUDGEMENT, read_coverage: SECTIONS, access_status: OPEN_ACCESS}
 
 # ---------------------------------------------------------------------------
 gaps:
@@ -400,25 +400,25 @@ gaps:
     (1) No indication claim type, and no non-indication either: the ten claim types are
     Mondo's, so neither "indicated for" nor "not indicated for" has a Statement class, a
     packet, an AggregationRule or an inclusion score. (2) A SieveEvidenceLine targets its
-    enclosing Statement only (targetProposition is unused), so a LIMITATION_STATEMENT that
+    enclosing Statement only (target_proposition is unused), so a LIMITATION_STATEMENT that
     disputes three SEPARATE statements cannot name its targets outside a packet. Here
     they sit in free-text `description`. Inside a future indication profile each line would
     sit in its own statement's packet, which works. (3) TextPassage has no span-role slot:
-    LIMITATION_STATEMENT / SUBSECTION_HEADER survive only on AlignmentStep.spanRole, i.e.
+    LIMITATION_STATEMENT / SUBSECTION_HEADER survive only on AlignmentStep.span_role, i.e.
     only once a mention in the span is grounded. (4) No regulatory document class (SPL),
     no slots for approval status, approval date (19971125) or authority. (5) An unresolved
-    grounding has no "no output" form: AlignmentStep.outputValue is required, so a
+    grounding has no "no output" form: AlignmentStep.output_value is required, so a
     grounding_unresolved step must repeat its input. (6) MeDIC's `scope_narrowed`,
     `negated_inversion`, `over_extraction`, `wrong_section` have no DataQualityFlag value;
     MISGROUNDED is the nearest.
   quality_gates_miss_composed_errors: >-
     Still open. The profile records the chain faithfully (ResolutionChain.steps,
-    chainConfidence 1.0) and sieve.profile_checks checks step contiguity, but contiguity
+    chain_confidence 1.0) and sieve.profile_checks checks step contiguity, but contiguity
     is exactly what the narrowing satisfies. Nothing composes per-step confidence into
     claim correctness, and a chain of 1.0s still scores 1.0. What the profile adds is the
-    repair path: AlignmentStep.reviewStatus REJECTED on the faulty step, a second chain
+    repair path: AlignmentStep.review_status REJECTED on the faulty step, a second chain
     with the curated grounding, and the line INVALIDATED and SUPERSEDED
-    (SieveEvidenceLine.validity / statusChanges / supersedes) instead of edited. Note that
+    (SieveEvidenceLine.validity / status_changes / supersedes) instead of edited. Note that
     "migraine with aura" is not a contiguous substring of "migraine with or without aura",
     so a plain substring check on extraction_verbatim steps would have caught this one.
     The record's `summary` says otherwise.
@@ -429,14 +429,14 @@ gaps:
     indication statement. Still open: there is no indication / non-indication claim type
     to hold those statements (see profile_misfit), so the target exists only as text.
   operational_flags_are_not_evidence: >-
-    Addressed in principle: SieveEvidenceLine.dataQualityFlags (enum DataQualityFlag) is a
-    separate slot from directionOfEvidenceProvided, and flags gate the line rather than
+    Addressed in principle: SieveEvidenceLine.data_quality_flags (enum DataQualityFlag) is a
+    separate slot from direction_of_evidence_provided, and flags gate the line rather than
     signing it, so extraction failures cannot leak into Direction. Open: the enum has no
     value for scope narrowing, negation inversion, over-extraction or wrong section;
     MISGROUNDED is used here as the nearest fit. Step-level flags have no slot at all
-    (AlignmentStep has reviewStatus, not flags).
+    (AlignmentStep has review_status, not flags).
   one_span_many_statements: >-
     Expressible: one TextPassage (sieve:tp/zolmi-limitation) is referenced by three
-    SieveEvidenceLines through hasEvidenceItems, each with its own direction and
+    SieveEvidenceLines through has_evidence_items, each with its own direction and
     interpretation act. Evidence items are referenced by id, so reuse costs nothing. The
     statements the lines target are still missing (profile_misfit).

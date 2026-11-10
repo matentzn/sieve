@@ -332,22 +332,22 @@ What the profile now expresses:
 
 - **Interpretation provenance (R11)**: every line has an `InterpretationActivity` (agent,
   date, method type, prompt / workflow, read coverage).
-- **Concordance as a record match, not a text span** (N1): `ConcordantAssertion` +
+- **Concordance as a record match, not a text span** (N1): a prior claim typed by what it claims (`SynonymStatement`) +
   `ExternalRecord` + `ResolutionChain`.
 - **Source trust vs line strength** (N1, N3): per-source weights move to dated
-  `InformationResource.qualityRatings`; organisational trust in an AI agent to
-  `SieveAgent.trustLevels`, snapshotted on each act; an AI's self-reported confidence is line
+  `InformationResource.quality_ratings`; organisational trust in an AI agent to
+  `SieveAgent.trust_levels`, snapshotted on each act; an AI's self-reported confidence is line
   `confidence` with basis `PRIOR`, not a score.
 - **Provenance is not evidence** (N2): consortium inclusion is an `OriginEvent`, not a line.
 - **Disputable synthesis** (N3): a verdict is a higher-order line, so a second interpreter can
   dispute it.
 - **The three confidences** (M1): data quality (`AlignmentStep.confidence`,
-  `chainConfidence`), line strength (`scoreOfEvidenceProvided`), inclusion score S
+  `chain_confidence`), line strength (`score_of_evidence_provided`), inclusion score S
   (`Statement.score`).
 - **The chain as a sequence** (M3): `ResolutionChain.steps`, contiguity checked by
-  `sieve.profile_checks`; `confidenceBasis` required with every confidence.
-- **Independence (R20), partly**: `InformationResource.derivesContentFrom`, `defaultRole`,
-  `independenceCluster`, `Publication.reportsStudy` (M1: six documents, four clusters).
+  `sieve.profile_checks`; `confidence_basis` required with every confidence.
+- **Independence (R20), partly**: `InformationResource.derives_content_from`, `default_role`,
+  `independence_cluster`, `Publication.reports_study` (M1: six documents, four clusters).
 
 Still open: undercutting defeaters (R15, D3); supersession in the "later evidence beats
 earlier" sense (R14, D2; `supersedes` only corrects a misread line); absence as a denominator

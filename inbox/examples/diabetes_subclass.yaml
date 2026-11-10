@@ -8,46 +8,46 @@
 id: http://purl.org/np/RA1234567890
 type: EvidencePacket
 version: "2024-03-15"
-previousVersion: "2019-03-22"
+previous_version: "2019-03-22"
 statement:
   id: sieve:st/MONDO_0005015-isa-MONDO_0005151
   type: SubclassStatement
   subject: MONDO:0005015
   predicate: {code: rdfs:subClassOf, label: subClassOf}
   object: MONDO:0005151
-  statementText: diabetes mellitus subClassOf endocrine system disorder
-  reviewState: VERIFIED
-  proposingChannel: CURATOR
-  hasEvidenceLines:
+  statement_text: diabetes mellitus subClassOf endocrine system disorder
+  review_state: VERIFIED
+  proposing_channel: CURATOR
+  has_evidence_lines:
     - id: sieve:el/dm-icd10cm
       type: SieveEvidenceLine
       description: Cross-ontology concordance with ICD-10 - diabetes classified under endocrine diseases
-      hasEvidenceItems: [sieve:ca/icd10cm-E11-isa-E00-E89]
-      directionOfEvidenceProvided: supports
-      scoreOfEvidenceProvided: 0.95
+      has_evidence_items: [sieve:ca/icd10cm-E11-isa-E00-E89]
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 0.95
       contributions:
         - id: sieve:act/dm-icd10cm
           type: InterpretationActivity
           contributor: sieve:agent/legacy-concordance-import
           role: INTERPRETER
           date: "2024-03-15"
-          methodType: COMPUTED_CONCORDANCE
-          readCoverage: STRUCTURED_RECORD
+          method_type: COMPUTED_CONCORDANCE
+          read_coverage: STRUCTURED_RECORD
     - id: sieve:el/dm-literature-1
       type: SieveEvidenceLine
       description: Published literature evidence supporting endocrine classification
-      hasEvidenceItems: [sieve:tp/pmid-12345678-1]
-      directionOfEvidenceProvided: supports
-      scoreOfEvidenceProvided: 0.9
+      has_evidence_items: [sieve:tp/pmid-12345678-1]
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 0.9
       contributions:
         - id: sieve:act/dm-literature-1
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
           date: "2024-03-15"
-          methodType: EXPERT_JUDGEMENT
-          readCoverage: SECTIONS
-          accessStatus: NOT_RECORDED  # not recorded in the legacy data
+          method_type: EXPERT_JUDGEMENT
+          read_coverage: SECTIONS
+          access_status: NOT_RECORDED  # not recorded in the legacy data
           rationale: >-
             The text explicitly states that diabetes is rooted in endocrine dysfunction
             involving pancreatic islet cells, directly supporting its classification
@@ -55,35 +55,35 @@ statement:
     - id: sieve:el/dm-literature-2
       type: SieveEvidenceLine
       description: Some argue diabetes is primarily a metabolic disorder
-      hasEvidenceItems: [sieve:tp/pmid-29876543-1]
-      directionOfEvidenceProvided: disputes
-      scoreOfEvidenceProvided: 0.6
+      has_evidence_items: [sieve:tp/pmid-29876543-1]
+      direction_of_evidence_provided: disputes
+      score_of_evidence_provided: 0.6
       contributions:
         - id: sieve:act/dm-literature-2
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
           date: "2024-03-15"
-          methodType: EXPERT_JUDGEMENT
-          readCoverage: SECTIONS
-          accessStatus: NOT_RECORDED  # not recorded in the legacy data
+          method_type: EXPERT_JUDGEMENT
+          read_coverage: SECTIONS
+          access_status: NOT_RECORDED  # not recorded in the legacy data
           rationale: >-
             This text argues that diabetes should be classified as a metabolic disorder
             rather than an endocrine disorder, challenging the traditional classification.
     - id: sieve:el/dm-expert-review
       type: SieveEvidenceLine
       description: Clinical endocrinologist review supporting classification
-      directionOfEvidenceProvided: supports
-      scoreOfEvidenceProvided: 0.85
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 0.85
       contributions:
         - id: sieve:act/dm-expert-review
           type: InterpretationActivity
           contributor: orcid:0000-0002-1234-5678
           role: INTERPRETER
           date: "2024-03-15"
-          methodType: EXPERT_JUDGEMENT
+          method_type: EXPERT_JUDGEMENT
           context: ["https://github.com/monarch-initiative/mondo/issues/5432"]
-  assertionDecisions:
+  assertion_decisions:
     - id: sieve:dec/dm-2019-03-22
       type: AssertionDecision
       contributor: orcid:0000-0002-9553-7227
@@ -91,33 +91,33 @@ statement:
       date: "2019-03-22"
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
-      signedPacketVersion: "2019-03-22"
-concordantAssertions:
+      signed_packet_version: "2019-03-22"
+prior_claims:
   - id: sieve:ca/icd10cm-E11-isa-E00-E89
-    type: ConcordantAssertion
+    type: SubclassStatement
     subject: ICD10CM:E11
     predicate: {code: rdfs:subClassOf, label: subClassOf}
     object: ICD10CM:E00-E89
-    reportedIn: [ICD10CM:E11]
+    reported_in: [ICD10CM:E11]
     resource: infores:icd10cm
-externalRecords:
+external_records:
   - id: ICD10CM:E11
     type: ExternalRecord
     label: Type 2 diabetes mellitus
     resource: infores:icd10cm
-    recordMetadata:
-      retrievedFrom: infores:icd10cm
-      retrievalDate: "2024-03-15"
-textPassages:
+    record_metadata:
+      retrieved_from: infores:icd10cm
+      retrieval_date: "2024-03-15"
+text_passages:
   - id: sieve:tp/pmid-12345678-1
     type: TextPassage
-    statementText: >-
+    statement_text: >-
       Diabetes mellitus represents a heterogeneous group of metabolic
       disorders fundamentally rooted in endocrine dysfunction, specifically
       involving the pancreatic islet cells and their insulin-producing capacity.
-    reportedIn: [PMID:12345678]
-    textLocation: {section: "Results, Section 3.2, paragraph 1"}
-    quoteVerification: NOT_CHECKED
+    reported_in: [PMID:12345678]
+    text_location: {section: "Results, Section 3.2, paragraph 1"}
+    quote_verification: NOT_CHECKED
     contributions:
       - id: sieve:act/tp-pmid-12345678-1
         type: SieveContribution
@@ -126,13 +126,13 @@ textPassages:
         date: "2024-03-15"
   - id: sieve:tp/pmid-29876543-1
     type: TextPassage
-    statementText: >-
+    statement_text: >-
       While traditionally classified under endocrine disorders, diabetes mellitus
       is fundamentally a disorder of glucose metabolism. The focus on insulin
       secretion overlooks the broader metabolic dysregulation that defines the disease.
-    reportedIn: [PMID:29876543]
-    textLocation: {section: "Discussion, page 412"}
-    quoteVerification: NOT_CHECKED
+    reported_in: [PMID:29876543]
+    text_location: {section: "Discussion, page 412"}
+    quote_verification: NOT_CHECKED
     contributions:
       - id: sieve:act/tp-pmid-29876543-1
         type: SieveContribution
@@ -145,17 +145,17 @@ publications:
     title: Classification of Diabetes as an Endocrine Disorder
     pmid: "12345678"
     resource: infores:pubmed
-    generationContext:
+    generation_context:
       - {code: sieve:basis_unknown}
   - id: PMID:29876543
     type: Publication
     title: Rethinking Diabetes Classification - A Metabolic Perspective
     pmid: "29876543"
     resource: infores:pubmed
-    generationContext:
+    generation_context:
       - {code: sieve:basis_unknown}
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
-referenceSnapshot:
+reference_snapshot:
   id: http://purl.org/np/RA1234567890#references
   type: SieveRegistry
   version: '2024-03-15'
@@ -163,15 +163,15 @@ referenceSnapshot:
   - id: infores:icd10cm
     type: InformationResource
     label: ICD-10-CM
-    curiePrefixes:
+    curie_prefixes:
     - ICD10CM
-    defaultRole: PRIMARY
+    default_role: PRIMARY
   - id: infores:pubmed
     type: InformationResource
     label: PubMed
-    curiePrefixes:
+    curie_prefixes:
     - PMID
-    defaultRole: PRIMARY
+    default_role: PRIMARY
   agents:
   - id: orcid:0000-0002-1234-5678
     type: SieveAgent
@@ -189,6 +189,6 @@ referenceSnapshot:
   - id: sieve:agent/unrecorded-legacy-interpreter
     type: SieveAgent
     subtype: person
-    identityKnown: false
+    identity_known: false
     name: Unrecorded legacy interpreter
     description: A human whose identity the legacy data does not record.

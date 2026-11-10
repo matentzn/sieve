@@ -198,7 +198,7 @@ sepio_monarch:
         pmid: "25604431"
         title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
         resource: infores:pubmed
-        generationContext:
+        generation_context:
           - {code: "PT:review", label: Review}
     - class: Publication
       data:
@@ -207,7 +207,7 @@ sepio_monarch:
         pmid: "29962408"
         title: Inhibition of the Amyloidogenesis of Transthyretin by Natural Products and Synthetic Compounds.
         resource: infores:pubmed
-        generationContext:
+        generation_context:
           - {code: "PT:review", label: Review}
     - class: Publication
       data:
@@ -216,58 +216,58 @@ sepio_monarch:
         pmid: "42436580"
         title: Disrupted glutathione homeostasis in the pathogenesis of TTR-V30M amyloidosis.
         resource: infores:pubmed
-        generationContext:
+        generation_context:
           - {code: "PT:journal-article", label: Journal Article}
           - {code: "dismech:HUMAN_CLINICAL", label: human clinical (DisMech evidence_source)}
 
     # --- passages ------------------------------------------------------------------------
     # The hypothesis item and the node item quote the SAME sentence of PMID:25604431, so they
     # are one TextPassage referenced by two lines. The edge item quotes a sub-span: a second
-    # passage. quoteVerification is NOT_CHECKED: DisMech's validate-references compares PMID
+    # passage. quote_verification is NOT_CHECKED: DisMech's validate-references compares PMID
     # snippets against the cached abstract, but no per-item outcome is recorded.
     - class: TextPassage
       data:
         id: sieve:tp/pmid-25604431-tetramer
         type: TextPassage
-        statementText: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
-        reportedIn: [PMID:25604431]
-        textLocation: {section: Abstract}
-        quoteVerification: NOT_CHECKED
+        statement_text: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
+        reported_in: [PMID:25604431]
+        text_location: {section: Abstract}
+        quote_verification: NOT_CHECKED
         contributions: &d1_extract
           - id: sieve:act/attr-extraction
             type: SieveContribution
             contributor: sieve:agent/dismech-curation-agent
             role: EXTRACTOR
             date: 2026-07-18
-            specifiedBy: [sieve:method/dismech-references-skill]
-            runId: sieve:run/dismech-attr-session
+            specified_by: [sieve:method/dismech-references-skill]
+            run_id: sieve:run/dismech-attr-session
     - class: TextPassage
       data:
         id: sieve:tp/pmid-25604431-fibrils
         type: TextPassage
-        statementText: "to then misfold and aggregate into amyloid fibrils"
-        reportedIn: [PMID:25604431]
-        textLocation: {section: Abstract}
-        quoteVerification: NOT_CHECKED
+        statement_text: "to then misfold and aggregate into amyloid fibrils"
+        reported_in: [PMID:25604431]
+        text_location: {section: Abstract}
+        quote_verification: NOT_CHECKED
         contributions: *d1_extract
     - class: TextPassage
       data:
         id: sieve:tp/pmid-29962408-destabilize
         type: TextPassage
-        statementText: "The mutations destabilize the tetramer and/or monomer of TTR, and thus the stabilization of TTR is a key strategy for the treatment of TTR-related amyloidosis."
-        reportedIn: [PMID:29962408]
-        textLocation: {section: Abstract}
-        quoteVerification: NOT_CHECKED
+        statement_text: "The mutations destabilize the tetramer and/or monomer of TTR, and thus the stabilization of TTR is a key strategy for the treatment of TTR-related amyloidosis."
+        reported_in: [PMID:29962408]
+        text_location: {section: Abstract}
+        quote_verification: NOT_CHECKED
         contributions: *d1_extract
     - class: TextPassage
       data:
         id: sieve:tp/pmid-42436580-gsh
         type: TextPassage
         _trimmed: as_is shortens this snippet with an ellipsis
-        statementText: "These findings identify disrupted GSH homeostasis and inflammatory activation as metabolic features associated with symptomatic TTR-V30M amyloidosis in vivo…"
-        reportedIn: [PMID:42436580]
-        textLocation: {section: Abstract}
-        quoteVerification: NOT_CHECKED
+        statement_text: "These findings identify disrupted GSH homeostasis and inflammatory activation as metabolic features associated with symptomatic TTR-V30M amyloidosis in vivo…"
+        reported_in: [PMID:42436580]
+        text_location: {section: Abstract}
+        quote_verification: NOT_CHECKED
         contributions: *d1_extract
 
     # --- lines: one per DisMech item; direction only, DisMech records no strength --------
@@ -276,57 +276,57 @@ sepio_monarch:
         _target: mechanistic_hypotheses[canonical_variant_ttr_amyloidogenesis] (status CANONICAL)
         id: sieve:el/attr-canonical-25604431
         type: SieveEvidenceLine
-        hasEvidenceItems: [sieve:tp/pmid-25604431-tetramer]
-        directionOfEvidenceProvided: supports
-        independenceCluster: sieve:cluster/pmid-25604431
+        has_evidence_items: [sieve:tp/pmid-25604431-tetramer]
+        direction_of_evidence_provided: supports
+        independence_cluster: sieve:cluster/pmid-25604431
         contributions:
           - id: sieve:act/attr-interp-1
             type: InterpretationActivity
             contributor: sieve:agent/dismech-curation-agent
             role: INTERPRETER
             date: 2026-07-18
-            methodType: LLM_JUDGEMENT
-            specifiedBy: [sieve:method/dismech-references-skill]
-            readCoverage: ABSTRACT_ONLY
-            runId: sieve:run/dismech-attr-session
+            method_type: LLM_JUDGEMENT
+            specified_by: [sieve:method/dismech-references-skill]
+            read_coverage: ABSTRACT_ONLY
+            run_id: sieve:run/dismech-attr-session
             rationale: This directly states the canonical variant-to-tetramer-to-fibril sequence.
     - class: SieveEvidenceLine
       data:
         _target: mechanistic_hypotheses[canonical_variant_ttr_amyloidogenesis] (status CANONICAL)
         id: sieve:el/attr-canonical-29962408
         type: SieveEvidenceLine
-        hasEvidenceItems: [sieve:tp/pmid-29962408-destabilize]
-        directionOfEvidenceProvided: supports
-        independenceCluster: sieve:cluster/pmid-29962408
+        has_evidence_items: [sieve:tp/pmid-29962408-destabilize]
+        direction_of_evidence_provided: supports
+        independence_cluster: sieve:cluster/pmid-29962408
         contributions:
           - id: sieve:act/attr-interp-2
             type: InterpretationActivity
             contributor: sieve:agent/dismech-curation-agent
             role: INTERPRETER
             date: 2026-07-18
-            methodType: LLM_JUDGEMENT
-            specifiedBy: [sieve:method/dismech-references-skill]
-            readCoverage: ABSTRACT_ONLY
-            runId: sieve:run/dismech-attr-session
+            method_type: LLM_JUDGEMENT
+            specified_by: [sieve:method/dismech-references-skill]
+            read_coverage: ABSTRACT_ONLY
+            run_id: sieve:run/dismech-attr-session
             rationale: The review independently supports TTR destabilization and its therapeutic tractability.
     - class: SieveEvidenceLine
       data:
         _target: mechanistic_hypotheses[val30met_glutathione_signature] (status EMERGING)
         id: sieve:el/attr-gsh-42436580
         type: SieveEvidenceLine
-        hasEvidenceItems: [sieve:tp/pmid-42436580-gsh]
-        directionOfEvidenceProvided: supports
-        independenceCluster: sieve:cluster/pmid-42436580
+        has_evidence_items: [sieve:tp/pmid-42436580-gsh]
+        direction_of_evidence_provided: supports
+        independence_cluster: sieve:cluster/pmid-42436580
         contributions:
           - id: sieve:act/attr-interp-3
             type: InterpretationActivity
             contributor: sieve:agent/dismech-curation-agent
             role: INTERPRETER
             date: 2026-07-18
-            methodType: LLM_JUDGEMENT
-            specifiedBy: [sieve:method/dismech-references-skill]
-            readCoverage: ABSTRACT_ONLY
-            runId: sieve:run/dismech-attr-session
+            method_type: LLM_JUDGEMENT
+            specified_by: [sieve:method/dismech-references-skill]
+            read_coverage: ABSTRACT_ONLY
+            run_id: sieve:run/dismech-attr-session
             rationale: >-
               The study reports an association with manifest Val30Met disease without
               establishing the causal direction.
@@ -335,38 +335,38 @@ sepio_monarch:
         _target: pathophysiology[TTR Tetramer Destabilization, Misfolding, and Oligomerization]
         id: sieve:el/attr-node-25604431
         type: SieveEvidenceLine
-        hasEvidenceItems: [sieve:tp/pmid-25604431-tetramer]
-        directionOfEvidenceProvided: supports
-        independenceCluster: sieve:cluster/pmid-25604431
+        has_evidence_items: [sieve:tp/pmid-25604431-tetramer]
+        direction_of_evidence_provided: supports
+        independence_cluster: sieve:cluster/pmid-25604431
         contributions:
           - id: sieve:act/attr-interp-4
             type: InterpretationActivity
             contributor: sieve:agent/dismech-curation-agent
             role: INTERPRETER
             date: 2026-07-18
-            methodType: LLM_JUDGEMENT
-            specifiedBy: [sieve:method/dismech-references-skill]
-            readCoverage: ABSTRACT_ONLY
-            runId: sieve:run/dismech-attr-session
+            method_type: LLM_JUDGEMENT
+            specified_by: [sieve:method/dismech-references-skill]
+            read_coverage: ABSTRACT_ONLY
+            run_id: sieve:run/dismech-attr-session
             rationale: The review supplies the complete tetramer-dissociation and monomer-misfolding sequence.
     - class: SieveEvidenceLine
       data:
         _target: "pathophysiology[…].downstream[TTR Amyloid Fibril Formation and Extracellular Deposition] (DIRECT; hypothesis_groups: canonical_variant_ttr_amyloidogenesis)"
         id: sieve:el/attr-edge-25604431
         type: SieveEvidenceLine
-        hasEvidenceItems: [sieve:tp/pmid-25604431-fibrils]
-        directionOfEvidenceProvided: supports
-        independenceCluster: sieve:cluster/pmid-25604431
+        has_evidence_items: [sieve:tp/pmid-25604431-fibrils]
+        direction_of_evidence_provided: supports
+        independence_cluster: sieve:cluster/pmid-25604431
         contributions:
           - id: sieve:act/attr-interp-5
             type: InterpretationActivity
             contributor: sieve:agent/dismech-curation-agent
             role: INTERPRETER
             date: 2026-07-18
-            methodType: LLM_JUDGEMENT
-            specifiedBy: [sieve:method/dismech-references-skill]
-            readCoverage: ABSTRACT_ONLY
-            runId: sieve:run/dismech-attr-session
+            method_type: LLM_JUDGEMENT
+            specified_by: [sieve:method/dismech-references-skill]
+            read_coverage: ABSTRACT_ONLY
+            run_id: sieve:run/dismech-attr-session
             rationale: The source directly links monomer misfolding to amyloid fibril aggregation.
 
 # ---------------------------------------------------------------------------
@@ -380,30 +380,30 @@ gaps:
     and validates, is the evidence side: publications, passages, lines and interpretation acts.
   reuse_vs_duplication: >-
     Addressed for the evidence side. Each publication is one Publication object referenced
-    by id. The sentence quoted twice is one TextPassage (reportedIn the paper)
+    by id. The sentence quoted twice is one TextPassage (reported_in the paper)
     referenced by two lines, and the sub-span is a second passage. All four passages share
-    one extraction SieveContribution (same id and runId), which records that they came from
+    one extraction SieveContribution (same id and run_id), which records that they came from
     one act by one agent. What stays open is reuse across statements: with no statement,
     nothing records that the shared passage backs two different claims, beyond the two
     lines that point at it. See SPEC Q2.
   evidence_source_misuse: >-
-    Partly addressed. The document-type axis has a home: Publication.generationContext
+    Partly addressed. The document-type axis has a home: Publication.generation_context
     takes the PubMed publication type (Review), separately from any study kind. DisMech's
-    `evidence_source` is still per item, though, while generationContext sits on the
+    `evidence_source` is still per item, though, while generation_context sits on the
     publication. The OTHER tags here simply disappear (Review says more). A per-item study
     kind such as HUMAN_CLINICAL can only be copied up to the publication. The profile has no
     ECO slot, so an ECO binding (B2) has nowhere to land in SIEVE either.
   hypothesis_grouping: >-
     Still open. Claim grouping ("these edges belong to the same competing model", with
-    CANONICAL / EMERGING status) has no counterpart in SIEVE. independenceCluster groups
+    CANONICAL / EMERGING status) has no counterpart in SIEVE. independence_cluster groups
     lines for counting, not claims into models, and must not be used for this (R19).
   granularity_rule: >-
     Still open. SIEVE puts no maximum on items per line (EINT.GRANULARITY, D-046 parked),
     so one line per DisMech item is valid. Here the three PMID:25604431 lines share an
-    independenceCluster, so an aggregation rule counts the paper once per claim. The
+    independence_cluster, so an aggregation rule counts the paper once per claim. The
     grouping rule (direction + strength + source + document) is still not written down.
   interpretation_provenance: >-
     Newly expressible. Each line carries an InterpretationActivity (agent, date, LLM_JUDGEMENT,
-    method, readCoverage ABSTRACT_ONLY, run id, rationale = DisMech `explanation`). DisMech
+    method, read_coverage ABSTRACT_ONLY, run id, rationale = DisMech `explanation`). DisMech
     records the agent and date only in history/ at section grain, so per-item values need the
-    Step 6 join. accessStatus is left out because DisMech does not record it.
+    Step 6 join. access_status is left out because DisMech does not record it.
