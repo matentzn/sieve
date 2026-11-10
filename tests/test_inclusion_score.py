@@ -63,9 +63,9 @@ def test_lecd_breakdown(lecd):
 
 
 def test_stacking_replace_inputs(lecd):
-    """With stackedLines REPLACE_INPUTS the synthesis stands for the lines it read."""
-    rule = lecd["referenceSnapshot"]["aggregationRules"][0]
-    rule["stackedLines"] = "REPLACE_INPUTS"
+    """With stacked_lines REPLACE_INPUTS the synthesis stands for the lines it read."""
+    rule = lecd["reference_snapshot"]["aggregation_rules"][0]
+    rule["stacked_lines"] = "REPLACE_INPUTS"
     b = score_packet(lecd)
     assert _line(b, "sieve:el/lecd-concordance").state == "replaced by higher-order line"
     assert b.l_evidence == pytest.approx(0.5 + 2.0 * 0.504)
@@ -73,13 +73,13 @@ def test_stacking_replace_inputs(lecd):
 
 def test_judgement_capped_by_what_it_read(lecd):
     """D-063 Q5: a judgement line cannot be stronger than the lines it rests on."""
-    lecd["statement"]["hasEvidenceLines"][2]["scoreOfEvidenceProvided"] = 1.0
+    lecd["statement"]["has_evidence_lines"][2]["score_of_evidence_provided"] = 1.0
     synthesis = _line(score_packet(lecd), "sieve:el/lecd-synthesis")
     assert synthesis.s == pytest.approx(0.85)
 
 
 def test_invalidated_and_low_confidence_lines_do_not_count(lecd):
-    lines = lecd["statement"]["hasEvidenceLines"]
+    lines = lecd["statement"]["has_evidence_lines"]
     lines[0]["validity"] = "INVALIDATED"
     lines[2]["confidence"] = 0.2
     b = score_packet(lecd)
@@ -89,7 +89,7 @@ def test_invalidated_and_low_confidence_lines_do_not_count(lecd):
 
 def test_disputing_line_lowers_s(lecd):
     before = score_packet(lecd).s
-    lecd["statement"]["hasEvidenceLines"][2]["directionOfEvidenceProvided"] = "disputes"
+    lecd["statement"]["has_evidence_lines"][2]["direction_of_evidence_provided"] = "disputes"
     assert score_packet(lecd).s < before
 
 
@@ -100,17 +100,17 @@ def test_competing_claim_line(mds):
     assert b.l_final == pytest.approx(b.l_evidence - b.competition)
     assert b.s == pytest.approx(math.tanh(b.l_final / 2))
     without = copy.deepcopy(mds)
-    without["statement"]["hasEvidenceLines"] = [
-        line for line in without["statement"]["hasEvidenceLines"] if line["id"] != "sieve:el/mds-competing"
+    without["statement"]["has_evidence_lines"] = [
+        line for line in without["statement"]["has_evidence_lines"] if line["id"] != "sieve:el/mds-competing"
     ]
     assert score_packet(without).s > b.s
 
 
 def test_unknown_human_gets_the_default_prior(lecd):
-    act = lecd["statement"]["hasEvidenceLines"][2]["contributions"][0]
-    act.update(contributor="sieve:agent/unknown-human", methodType="EXPERT_JUDGEMENT")
-    lecd["referenceSnapshot"]["agents"].append(
-        {"id": "sieve:agent/unknown-human", "type": "SieveAgent", "subtype": "person", "identityKnown": False}
+    act = lecd["statement"]["has_evidence_lines"][2]["contributions"][0]
+    act.update(contributor="sieve:agent/unknown-human", method_type="EXPERT_JUDGEMENT")
+    lecd["reference_snapshot"]["agents"].append(
+        {"id": "sieve:agent/unknown-human", "type": "SieveAgent", "subtype": "person", "identity_known": False}
     )
     synthesis = _line(score_packet(lecd), "sieve:el/lecd-synthesis")
-    assert synthesis.q == pytest.approx(0.5)  # rule.defaultQuality
+    assert synthesis.q == pytest.approx(0.5)  # rule.default_quality

@@ -90,12 +90,12 @@ classes:
         inlined: true
         required: true
         description: The claim this packet is about.
-      previousVersion:
+      previous_version:
         range: string
         description: The packet version this snapshot supersedes.
         annotations:
           decisions: D-051
-      referenceSnapshot:
+      reference_snapshot:
         range: SieveRegistry
         inlined: true
         required: true
@@ -110,17 +110,24 @@ classes:
         annotations:
           requirements: PROV.ASSERTION.METHODS PROV.INTERP.AGENT PROV.EI.QUALITY
           decisions: D-049 D-051 D-060
-      externalRecords:
+      external_records:
         range: ExternalRecord
         multivalued: true
         inlined_as_list: true
         description: External database / terminology records referenced as evidence or origin.
-      concordantAssertions:
-        range: ConcordantAssertion
+      prior_claims:
+        range: SieveStatement
         multivalued: true
         inlined_as_list: true
-        description: Structured prior claims made by other sources.
-      textPassages:
+        description: >-
+          Structured claims made by sources (or by Mondo elsewhere), each typed by
+          what it claims: a DOID subclass assertion is a SubclassStatement, an OMIM
+          synonym a SynonymStatement. Whether one supports, disputes or competes is
+          decided by the line that cites it, never by its type.
+        annotations:
+          requirements: EI.PRIOR_CLAIM.DIRECT_STRUCTURED
+          decisions: D-004 D-061 D-069
+      text_passages:
         range: TextPassage
         multivalued: true
         inlined_as_list: true
@@ -130,7 +137,7 @@ classes:
         multivalued: true
         inlined_as_list: true
         description: Scientific publications referenced as evidence or origin.
-      webPages:
+      web_pages:
         range: WebPage
         multivalued: true
         inlined_as_list: true
@@ -140,21 +147,11 @@ classes:
         multivalued: true
         inlined_as_list: true
         description: Guideline / consensus documents referenced as evidence.
-      computationalScores:
+      computational_scores:
         range: ComputationalScore
         multivalued: true
         inlined_as_list: true
         description: Computed scores (lexical match, Boomer, AI scores) referenced as evidence.
-      competingClaims:
-        range: CompetingClaim
-        multivalued: true
-        inlined_as_list: true
-        description: >-
-          Frozen copies of the claims that compete with this one (D-069), each with the
-          log-odds from its own evidence at this packet version.
-        annotations:
-          requirements: EINT.CONTRADICTION
-          decisions: D-069
 
   EvidencePacketCollection:
     is_a: DataSet
@@ -170,17 +167,17 @@ classes:
         identifier: true
       type:
         designates_type: true
-      recordMetadata:
+      record_metadata:
         description: >-
-          Artefact-level encoding provenance: recordIdentifier = where the artefact
+          Artefact-level encoding provenance: record_identifier = where the artefact
           lives; contributions = the pipeline that serialised it.
         annotations:
           requirements: PROV.ENCODING.AGENT PROV.ENCODING.SYSTEM
-      supportingMethodTypes:
+      supporting_method_types:
         description: Kinds of encoding used (LinkML-Map, SSSOM export, OWL serialisation).
         annotations:
           requirements: PROV.ENCODING.METHOD_TYPES
-      releaseDate:
+      release_date:
         annotations:
           requirements: PROV.ENCODING.DATE
       version:
@@ -191,7 +188,7 @@ classes:
         range: EvidencePacket
         multivalued: true
         inlined_as_list: true
-      encodingSpecifications:
+      encoding_specifications:
         range: SieveMethod
         multivalued: true
         required: true
@@ -234,7 +231,7 @@ classes:
         multivalued: true
         inlined_as_list: true
         description: Guidelines, workflows, export rule sets.
-      aggregationRules:
+      aggregation_rules:
         range: AggregationRule
         multivalued: true
         inlined_as_list: true
@@ -254,9 +251,17 @@ classes:
   SieveStatement:
     is_a: Statement
     abstract: true
+    mixins:
+      - EvidenceItem
+      - UpstreamItem
     description: >-
-      A Mondo claim as an identified SEPIO Statement. SPO sits directly on the
-      Statement. There are no Proposition objects. Each concrete subclass is one claim
+      A claim as an identified SEPIO Statement, typed by what it claims (one subclass
+      per claim type). The same classes serve the packet's own Mondo claim and the
+      prior claims other sources make (packet.prior_claims): a claim's type never
+      encodes the role it plays as evidence. Curation slots (review_state,
+      assertion_decisions, origin, proposing_channel, has_evidence_lines, score) belong to
+      the packet's own claim only; a profile check rejects them on prior claims.
+      SPO sits directly on the Statement. There are no Proposition objects. Each concrete subclass is one claim
       type and binds the predicate to that type's value set. The Statement-level
       assessment uses the core's "proposition assessment mode": score = the inclusion
       score S, strength = its band, direction = its sign.
@@ -299,7 +304,7 @@ classes:
         required: true
         annotations:
           requirements: RCS.STRUCTURED_STATEMENT
-      statementText:
+      statement_text:
         description: Optional human-readable rendering of the claim (e.g. generated for review).
         annotations:
           requirements: RCS.FREE_TEXT
@@ -325,14 +330,14 @@ classes:
         annotations:
           requirements: PROV.ASSERTION.CONFIDENCE_CATEGORY EINT.CATEGORICAL_STRENGTH
           decisions: D-062 D-063
-      hasEvidenceLines:
+      has_evidence_lines:
         range: SieveEvidenceLine
         inlined_as_list: true
         description: The evidence lines interpreting evidence for or against this claim.
         annotations:
           requirements: EINT.REQUIRED
           decisions: D-045
-      hasEvidence:
+      has_evidence:
         range: EvidenceItem
         inlined: false
         description: >-
@@ -341,7 +346,7 @@ classes:
         annotations:
           requirements: EINT.DIRECT_EVIDENCE
           decisions: D-037 D-041
-      hasEvidenceFromSources:
+      has_evidence_from_sources:
         range: InformationResource
         inlined: false
         description: >-
@@ -349,6 +354,11 @@ classes:
         annotations:
           requirements: EINT.SOURCE_ONLY
           decisions: D-025
+      reported_in:
+        range: EvidenceItem
+        description: For a prior claim, the record or document that makes it.
+        annotations:
+          requirements: EI.PRIOR_CLAIM.DIRECT_STRUCTURED
       contributions:
         range: SieveContribution
         inlined_as_list: true
@@ -369,15 +379,16 @@ classes:
         annotations:
           requirements: RCS.QUALIFIERS C005
           decisions: D-032
-      reviewState:
+      review_state:
         range: ReviewState
-        required: true
-        ifabsent: string(NOT_VERIFIED)
-        description: Where the claim is in the curation workflow (distinct from the decision outcome).
+        description: >-
+          Where the claim is in the curation workflow (distinct from the decision
+          outcome). Required on the packet's own claim (profile check), absent on prior
+          claims.
         annotations:
           requirements: C006
           decisions: D-011 D-017 D-024 D-053
-      assertionDecisions:
+      assertion_decisions:
         range: AssertionDecision
         multivalued: true
         inlined_as_list: true
@@ -398,7 +409,7 @@ classes:
         annotations:
           requirements: C001 C002 PROV.RETRIEVAL.AGENT PROV.RETRIEVAL.SOURCE_SYSTEM PROV.RETRIEVAL.DATE
           decisions: D-030 D-031
-      proposingChannel:
+      proposing_channel:
         range: ProposingChannel
         description: >-
           The channel that proposed the claim. Together with the claim type it selects
@@ -406,6 +417,37 @@ classes:
         annotations:
           requirements: PROV.RETRIEVAL.AGENT
           decisions: D-063
+      groundings:
+        range: ResolutionChain
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          For a prior claim made in a source's own identifiers, one resolution chain per
+          grounded entity slot, with a frozen copy of the mapping it used.
+        annotations:
+          requirements: PROV.SA.EXECUTION EI.PRIOR_CLAIM.DIRECT_STRUCTURED
+          decisions: D-061
+      own_log_odds:
+        range: float
+        description: >-
+          The claim's log-odds L from its own evidence only, frozen at this packet
+          version. Set on a prior claim that a competing-claim line cites (D-069); never
+          its contested score.
+        annotations:
+          requirements: EINT.CONTRADICTION
+          decisions: D-069
+      log_odds_basis:
+        range: LogOddsBasis
+        description: Where own_log_odds comes from. Required with it (profile check).
+        annotations:
+          decisions: D-069
+      log_odds_source_packet:
+        range: string
+        description: >-
+          "packet-id@version" own_log_odds was taken from. Provenance text only, not a
+          reference; the packet stays self-contained.
+        annotations:
+          decisions: D-069 D-051
 
   TermExistenceStatement:
     is_a: SieveStatement
@@ -417,7 +459,7 @@ classes:
     annotations:
       requirements: C001 MATRIX.C001
       decisions: D-030 D-039
-      permitted_evidence: ExternalRecord ConcordantAssertion Publication GuidelineDocument
+      permitted_evidence: ExternalRecord SieveStatement Publication GuidelineDocument
     slot_usage:
       predicate:
         bindings:
@@ -431,12 +473,12 @@ classes:
           rdf:type -> MONDO:0000001; owl:deprecated -> "true"; replaced by / consider ->
           the replacement term CURIE.
     attributes:
-      obsolescenceReason:
+      obsolescence_reason:
         range: uriorcurie
         description: Reason for obsoletion (OMO term, e.g. OMO:0001000 out of scope).
         annotations:
           requirements: C001 RCS.QUALIFIERS
-      scheduledObsoletionDate:
+      scheduled_obsoletion_date:
         range: date
         description: Announced date of a scheduled obsoletion.
         annotations:
@@ -468,12 +510,12 @@ classes:
     description: >-
       C003: the term has this synonym; scope (exact / related / narrow / broad) is the
       predicate. Support is time-sensitive: a source that drops the name stops
-      supporting it, which is why lines carry lastConfirmed. Synonym types
+      supporting it, which is why lines carry last_confirmed. Synonym types
       (abbreviation, deprecated, ...) are ordinary term metadata and not modelled.
     annotations:
       requirements: C003 MATRIX.C003
       decisions: D-031 D-034 D-035
-      permitted_evidence: ExternalRecord ConcordantAssertion TextPassage Publication WebPage ComputationalScore CompetingClaim
+      permitted_evidence: ExternalRecord SieveStatement TextPassage Publication WebPage ComputationalScore
     slot_usage:
       predicate:
         bindings:
@@ -495,7 +537,7 @@ classes:
     annotations:
       requirements: C004 MATRIX.C004
       decisions: D-004 D-018 D-025 D-037
-      permitted_evidence: ExternalRecord ConcordantAssertion TextPassage Publication WebPage GuidelineDocument
+      permitted_evidence: ExternalRecord SieveStatement TextPassage Publication WebPage GuidelineDocument
     slot_usage:
       predicate:
         bindings:
@@ -516,7 +558,7 @@ classes:
     annotations:
       requirements: C005 MATRIX.C005
       decisions: D-032 D-033
-      permitted_evidence: ExternalRecord ConcordantAssertion Publication
+      permitted_evidence: ExternalRecord SieveStatement Publication
     slot_usage:
       negated:
         required: true
@@ -535,7 +577,7 @@ classes:
     annotations:
       requirements: C006 MATRIX.C006
       decisions: D-006 D-008 D-009 D-011 D-014 D-017
-      permitted_evidence: ExternalRecord ConcordantAssertion ComputationalScore CompetingClaim
+      permitted_evidence: ExternalRecord SieveStatement ComputationalScore
     slot_usage:
       predicate:
         bindings:
@@ -549,7 +591,7 @@ classes:
         range: uriorcurie
         description: The external term.
     attributes:
-      objectObsoleteInSourceVersion:
+      object_obsolete_in_source_version:
         range: string
         description: >-
           The source release in which the object term is obsolete. Kept for legacy-ID
@@ -566,7 +608,7 @@ classes:
         annotations:
           requirements: C006 RCS.QUALIFIERS
           decisions: D-012
-      validDirection:
+      valid_direction:
         range: MappingDirection
         ifabsent: string(BOTH)
         description: >-
@@ -588,7 +630,7 @@ classes:
     annotations:
       requirements: C007 MATRIX.C007
       decisions: D-039 D-020
-      permitted_evidence: ExternalRecord ConcordantAssertion TextPassage Publication WebPage GuidelineDocument
+      permitted_evidence: ExternalRecord SieveStatement TextPassage Publication WebPage GuidelineDocument
     slot_usage:
       predicate:
         bindings:
@@ -609,7 +651,7 @@ classes:
     annotations:
       requirements: C008 MATRIX.C008
       decisions: D-002 D-035
-      permitted_evidence: ExternalRecord ConcordantAssertion
+      permitted_evidence: ExternalRecord SieveStatement
     slot_usage:
       predicate:
         bindings:
@@ -630,7 +672,7 @@ classes:
     annotations:
       requirements: C009 MATRIX.C009
       decisions: D-040
-      permitted_evidence: ExternalRecord ConcordantAssertion
+      permitted_evidence: ExternalRecord SieveStatement
     slot_usage:
       predicate:
         bindings:
@@ -653,7 +695,7 @@ classes:
     annotations:
       requirements: C010 MATRIX.C010
       decisions: D-013 D-040
-      permitted_evidence: ExternalRecord ConcordantAssertion
+      permitted_evidence: ExternalRecord SieveStatement
     slot_usage:
       predicate:
         bindings:
@@ -673,7 +715,7 @@ classes:
   EvidenceItem:
     mixin: true
     description: >-
-      Marker mixin for everything an evidence line (or hasEvidence) may point at:
+      Marker mixin for everything an evidence line (or has_evidence) may point at:
       each evidence-item class, and SieveEvidenceLine itself (higher-order lines).
       References are by id. The items live in the packet's typed lists.
     annotations:
@@ -702,7 +744,7 @@ classes:
         annotations:
           requirements: PROV.EI.AGENT
           decisions: D-055
-      generationContext:
+      generation_context:
         range: Coding
         multivalued: true
         inlined_as_list: true
@@ -714,7 +756,7 @@ classes:
         annotations:
           requirements: PROV.EI.GENERATION_CONTEXT
           decisions: D-056 D-058
-      resourceRoleOverride:
+      resource_role_override:
         range: ResourceRole
         description: >-
           Overrides the resource's default primary / aggregator role for this item
@@ -740,7 +782,7 @@ classes:
       type:
         designates_type: true
     attributes:
-      curiePrefixes:
+      curie_prefixes:
         range: string
         multivalued: true
         description: CURIE prefixes whose records belong to this resource.
@@ -749,7 +791,7 @@ classes:
         description: The organisation responsible for the resource.
         annotations:
           requirements: PROV.EI.AGENT
-      defaultRole:
+      default_role:
         range: ResourceRole
         required: true
         description: >-
@@ -758,7 +800,7 @@ classes:
         annotations:
           requirements: PROV.RETRIEVAL.SOURCE_ROLE
           decisions: D-063 D-067
-      derivesContentFrom:
+      derives_content_from:
         range: InformationResource
         multivalued: true
         description: >-
@@ -767,7 +809,7 @@ classes:
         annotations:
           requirements: EINT.GROUPING
           decisions: D-046
-      qualityRatings:
+      quality_ratings:
         range: QualityRating
         multivalued: true
         inlined_as_list: true
@@ -795,7 +837,7 @@ classes:
       version:
         required: true
     attributes:
-      ofResource:
+      of_resource:
         range: InformationResource
         required: true
 
@@ -825,78 +867,27 @@ classes:
           decisions: D-010 D-067
       resource:
         required: true
-      dateAuthored:
+      date_authored:
         description: When upstream created or last revised the record.
         annotations:
           requirements: PROV.EI.DATE
-      recordMetadata:
+      record_metadata:
         range: RetrievalMetadata
         required: true
         annotations:
           requirements: PROV.EI.RETRIEVAL_SOURCE
-      informationQuality:
+      information_quality:
         description: Item-level quality where it deviates from the resource rating.
         annotations:
           requirements: PROV.EI.QUALITY
     attributes:
-      obsoleteInSource:
+      obsolete_in_source:
         range: boolean
         description: The record is obsolete in the release it was read from.
         annotations:
           requirements: EI.COMPOSITE.EXTERNAL_RECORD
           decisions: D-010
 
-  ConcordantAssertion:
-    is_a: Statement
-    mixins:
-      - EvidenceItem
-      - UpstreamItem
-    description: >-
-      A prior claim another source makes about the same proposition, in that
-      source's own terms (DOID:0110413 is_a DOID:10584). It is the principal evidence
-      type for Mondo (concordance). It is matched to the Mondo claim by SPO plus
-      negation. Each grounded entity carries a resolution chain recording how the
-      source id became the Mondo id. The source's own relation qualifiers (Orphanet
-      /e, /btnt) are not recorded.
-    annotations:
-      requirements: EI.PRIOR_CLAIM.DIRECT_STRUCTURED
-      decisions: D-004 D-005 D-061
-    slot_usage:
-      id:
-        identifier: true
-      type:
-        designates_type: true
-      subject:
-        range: uriorcurie
-        required: true
-        description: Subject in the source's own identifiers.
-      object:
-        required: true
-        description: Object in the source's own identifiers (or text, for synonyms).
-      predicate:
-        required: true
-      reportedIn:
-        range: ExternalRecord
-        required: true
-        description: The external record that makes the assertion.
-      resource:
-        required: true
-      recordMetadata:
-        range: RetrievalMetadata
-        annotations:
-          requirements: PROV.EI.RETRIEVAL_SOURCE
-    attributes:
-      groundings:
-        range: ResolutionChain
-        multivalued: true
-        inlined_as_list: true
-        description: >-
-          One resolution chain per grounded entity slot (subject; object when it is an
-          id). Each chain keeps a frozen copy of the mapping it used. It does not point
-          at the live mapping claim.
-        annotations:
-          requirements: PROV.SA.EXECUTION
-          decisions: D-061
 
   TextPassage:
     is_a: Statement
@@ -915,19 +906,19 @@ classes:
         identifier: true
       type:
         designates_type: true
-      statementText:
+      statement_text:
         required: true
         description: The verbatim quote.
         annotations:
           requirements: EI.PRIOR_CLAIM.DIRECT_TEXT
           decisions: D-050
-      reportedIn:
+      reported_in:
         range: EvidenceItem
         required: true
         description: The document (Publication / WebPage / GuidelineDocument) the passage comes from.
         annotations:
           requirements: PROV.EI.EXECUTION
-      derivedFrom:
+      derived_from:
         range: EvidenceItem
         inlined: false
         description: >-
@@ -940,24 +931,24 @@ classes:
         range: SieveContribution
         required: true
         inlined_as_list: true
-        description: The extraction act(s), with agent, date and method (specifiedBy).
+        description: The extraction act(s), with agent, date and method (specified_by).
         annotations:
           requirements: PROV.EI.EXECUTION PROV.EI.DATE
           decisions: D-057
     attributes:
-      documentVersion:
+      document_version:
         range: string
         description: The version of the document the passage was extracted from.
         annotations:
           requirements: PROV.EI.EXECUTION
-      textLocation:
+      text_location:
         range: TextLocation
         inlined: true
         description: Exact location (section, character offsets).
         annotations:
           requirements: PROV.EI.EXECUTION PROV.SA.EXECUTION
           decisions: D-050 D-057
-      quoteVerification:
+      quote_verification:
         range: VerificationOutcome
         required: true
         description: Whether the quote was machine-verified to occur verbatim in the source.
@@ -989,28 +980,28 @@ classes:
         identifier: true
       type:
         designates_type: true
-      dateAuthored:
+      date_authored:
         description: Publication date.
         annotations:
           requirements: PROV.EI.DATE
           decisions: D-056
-      informationQuality:
+      information_quality:
         description: Item-level quality, e.g. sieve:retracted.
         annotations:
           requirements: PROV.EI.QUALITY
           decisions: D-060
-      recordMetadata:
+      record_metadata:
         range: RetrievalMetadata
         annotations:
           requirements: PROV.EI.RETRIEVAL_SOURCE
-      generationContext:
+      generation_context:
         description: PubMed publication types (case report, cohort study, review, ...).
         annotations:
           requirements: PROV.EI.GENERATION_CONTEXT
     attributes:
       isbn:
         range: string
-      reportsStudy:
+      reports_study:
         range: string
         description: >-
           Key of the underlying study, family or cohort. Publications that share a key
@@ -1038,9 +1029,9 @@ classes:
         designates_type: true
       urls:
         required: true
-      recordMetadata:
+      record_metadata:
         range: RetrievalMetadata
-        description: retrievalDate = date accessed.
+        description: retrieval_date = date accessed.
         annotations:
           requirements: PROV.EI.RETRIEVAL_SOURCE
 
@@ -1066,7 +1057,7 @@ classes:
       - EvidenceItem
     description: >-
       A computed score used as machine evidence: lexical match, Boomer probability,
-      AI agent score. The value is the score. The method is the core specifiedBy.
+      AI agent score. The value is the score. The method is the core specified_by.
       Hand-curated method tags such as MONDO:exact-label-match are gone: this
       information comes from the computational system itself (D-021).
     annotations:
@@ -1077,67 +1068,15 @@ classes:
         identifier: true
       type:
         designates_type: true
-      specifiedBy:
+      specified_by:
         description: The method / tool that computed the score.
     attributes:
-      softwareVersion:
+      software_version:
         range: string
       parameters:
         range: string
         description: Method parameters (key=value or JSON).
 
-  CompetingClaim:
-    is_a: Statement
-    mixins:
-      - EvidenceItem
-    description: >-
-      A claim that cannot be true at the same time as the scored one (D-069): the same
-      name as exact synonym of another disease (competing object), or the same pair under
-      another relation (competing predicate), in Mondo or in a source. It is frozen into
-      the packet with the log-odds L from its OWN evidence only, never its contested
-      score, so the packet stays self-contained and the dependence is not circular. All
-      competitors enter through one "competing claim" line.
-    annotations:
-      requirements: EINT.CONTRADICTION
-      decisions: D-069
-    slot_usage:
-      id:
-        identifier: true
-      type:
-        designates_type: true
-      subject:
-        range: uriorcurie
-        required: true
-      predicate:
-        required: true
-      object:
-        required: true
-    attributes:
-      competitionKind:
-        range: CompetitionKind
-        required: true
-        annotations:
-          decisions: D-069
-      competitorLogOdds:
-        range: float
-        required: true
-        description: L_j, the competitor's log-odds from its own evidence at this packet version.
-        annotations:
-          requirements: EINT.CONTRADICTION
-          decisions: D-069
-      logOddsBasis:
-        range: LogOddsBasis
-        required: true
-        description: Where L_j comes from (its own packet, a claim prior, or a source-derived candidate).
-        annotations:
-          decisions: D-069
-      competitorPacket:
-        range: string
-        description: >-
-          "packet-id@version" the value was taken from. Provenance text only, not a
-          reference; the packet remains self-contained.
-        annotations:
-          decisions: D-069 D-051
 
   # ===========================================================================
   # Module: evidence-line
@@ -1152,7 +1091,7 @@ classes:
       direction with this strength. Lines are immutable. A misreading is corrected by
       a new line that supersedes the old one, and the old line is invalidated (kept,
       excluded from the score), never edited or deleted. The target is always the
-      enclosing Statement, so the core targetProposition is unused.
+      enclosing Statement, so the core target_proposition is unused.
     annotations:
       requirements: EINT.REQUIRED EINT.FLAT_COLLAPSE
       decisions: D-044 D-045 D-052
@@ -1161,12 +1100,12 @@ classes:
         identifier: true
       type:
         designates_type: true
-      targetProposition:
+      target_proposition:
         description: Not used. The target is always the enclosing Statement.
         annotations:
           requirements: RCS.STRUCTURED_PROPOSITION
           decisions: D-042
-      hasEvidenceItems:
+      has_evidence_items:
         range: EvidenceItem
         inlined: false
         description: >-
@@ -1175,27 +1114,27 @@ classes:
         annotations:
           requirements: EINT.GRANULARITY EINT.STACKING
           decisions: D-046
-      directionOfEvidenceProvided:
+      direction_of_evidence_provided:
         range: Direction
         required: true
         annotations:
           requirements: EINT.DIRECTION
           decisions: D-033 D-051
-      strengthOfEvidenceProvided:
-        description: Categorical band, from the strengthBands of the line's AggregationRule.
+      strength_of_evidence_provided:
+        description: Categorical band, from the strength_bands of the line's AggregationRule.
         annotations:
           requirements: EINT.CATEGORICAL_STRENGTH
           decisions: D-047 D-054
-      scoreOfEvidenceProvided:
+      score_of_evidence_provided:
         minimum_value: 0
         maximum_value: 1
         description: >-
           Strength s_i on the shared normalised 0-1 scale. Direction is carried by
-          directionOfEvidenceProvided, not by the sign.
+          direction_of_evidence_provided, not by the sign.
         annotations:
           requirements: EINT.NUMERICAL_STRENGTH
           decisions: D-047 D-054
-      evidenceItemSources:
+      evidence_item_sources:
         description: Source-level attribution for this line (resource ids), when no item is represented.
         annotations:
           requirements: EINT.SOURCE_ONLY
@@ -1210,7 +1149,7 @@ classes:
           requirements: PROV.INTERP.AGENT EINT.REQUIRED
           decisions: D-044 D-046
     attributes:
-      computedByRule:
+      computed_by_rule:
         range: AggregationRule
         description: >-
           The per-claim-type rule (and version) that assigned the strength. Required
@@ -1227,7 +1166,7 @@ classes:
         annotations:
           requirements: EINT.FLAT_COLLAPSE
           decisions: D-052
-      statusChanges:
+      status_changes:
         range: LineStatusChange
         multivalued: true
         inlined_as_list: true
@@ -1253,19 +1192,19 @@ classes:
         annotations:
           requirements: PROV.SA.CONFIDENCE_SCORE
           decisions: D-050 D-062 D-063
-      confidenceBasis:
+      confidence_basis:
         range: ConfidenceBasis
         description: Required whenever confidence is given.
         annotations:
           requirements: PROV.SA.CONFIDENCE_SCORE
           decisions: D-062
-      dataQualityFlags:
+      data_quality_flags:
         range: DataQualityFlag
         multivalued: true
         description: Failure flags that gate the line (e.g. unverifiable quote).
         annotations:
           decisions: D-050 D-062 D-063
-      independenceCluster:
+      independence_cluster:
         range: string
         description: >-
           The independence cluster the aggregation rule assigned the line to. Only the
@@ -1273,19 +1212,19 @@ classes:
         annotations:
           requirements: EINT.GROUPING
           decisions: D-046 D-063
-      dateAttached:
+      date_attached:
         range: date
         description: When the evidence was first attached to the claim.
         annotations:
           requirements: PROV.RETRIEVAL.DATE
           decisions: D-030 D-067
-      lastConfirmed:
+      last_confirmed:
         range: date
         description: When the evidence was last confirmed against a source release.
         annotations:
           requirements: PROV.RETRIEVAL.DATE
           decisions: D-031 D-067
-      lastConfirmedAgainst:
+      last_confirmed_against:
         range: SourceRelease
         description: The release the evidence was last confirmed against.
         annotations:
@@ -1299,7 +1238,7 @@ classes:
               value_presence: PRESENT
         postconditions:
           slot_conditions:
-            confidenceBasis:
+            confidence_basis:
               required: true
 
   LineStatusChange:
@@ -1324,7 +1263,7 @@ classes:
         required: true
       reason:
         range: string
-      replacementLine:
+      replacement_line:
         range: SieveEvidenceLine
         description: The new line that corrects this one (action SUPERSEDED).
 
@@ -1358,7 +1297,7 @@ classes:
         description: Dated role / expertise assignments, possibly per domain.
         annotations:
           decisions: D-049
-      trustLevels:
+      trust_levels:
         range: LevelAssignment
         multivalued: true
         inlined_as_list: true
@@ -1367,13 +1306,13 @@ classes:
           accepted vs invalidated lines).
         annotations:
           decisions: D-049 D-052
-      softwareVersion:
+      software_version:
         range: string
         description: Exact tool / pipeline version (software agents).
         annotations:
           requirements: PROV.SA.AGENT
           decisions: D-050
-      modelName:
+      model_name:
         range: string
         description: LLM model identifier (AI agents).
         annotations:
@@ -1385,7 +1324,7 @@ classes:
         description: Members of a group agent (expert panel).
         annotations:
           decisions: D-046
-      identityKnown:
+      identity_known:
         range: boolean
         ifabsent: "true"
         description: >-
@@ -1425,24 +1364,24 @@ classes:
       requirements: EINT.DISTINCT_MODELS PROV.ASSERTION.METHODS PROV.INTERP.METHODS
       decisions: D-048 D-054 D-063
     attributes:
-      claimType:
+      claim_type:
         range: ClaimType
         required: true
-      strengthBands:
+      strength_bands:
         range: string
         multivalued: true
         description: Ordered categorical bands with their cut-offs, e.g. "strong >= 0.8".
         annotations:
           requirements: EINT.CATEGORICAL_STRENGTH PROV.ASSERTION.CONFIDENCE_CATEGORY
           decisions: D-047 D-063
-      confidenceFloor:
+      confidence_floor:
         range: float
         minimum_value: 0
         maximum_value: 1
         description: Lines with confidence below the floor are excluded outright.
         annotations:
           decisions: D-063
-      claimPriors:
+      claim_priors:
         range: ClaimPrior
         multivalued: true
         inlined_as_list: true
@@ -1450,13 +1389,13 @@ classes:
         annotations:
           requirements: EINT.DISTINCT_MODELS
           decisions: D-063
-      scalingFactor:
+      scaling_factor:
         range: float
         description: k in L = L0 + k * sum(w). Absent means 1.
         annotations:
           requirements: EINT.NUMERICAL_STRENGTH
           decisions: D-063
-      defaultQuality:
+      default_quality:
         range: float
         minimum_value: 0
         maximum_value: 1
@@ -1465,7 +1404,7 @@ classes:
           trust level (e.g. an unknown human). Absent means 0.5.
         annotations:
           decisions: D-060 D-049 D-063
-      stackedLines:
+      stacked_lines:
         range: StackingPolicy
         ifabsent: string(CAP_AND_ADD)
         description: How a higher-order line and the lines it rests on count together.
@@ -1483,7 +1422,7 @@ classes:
         annotations:
           requirements: EINT.CONTRADICTION
           decisions: D-069
-      exclusivityRule:
+      exclusivity_rule:
         range: string
         description: The exclusivity criterion in words, versioned with the rule (D-069).
         annotations:
@@ -1500,27 +1439,27 @@ classes:
       requirements: PROV.ASSERTION.METHODS PROV.ASSERTION.AGENT
       decisions: D-017 D-064
     attributes:
-      approvedBy:
+      approved_by:
         range: SieveAgent
         required: true
         annotations:
           requirements: PROV.ASSERTION.AGENT
-      approvalDate:
+      approval_date:
         range: date
         required: true
-      scopeClaimTypes:
+      scope_claim_types:
         range: ClaimType
         multivalued: true
         required: true
-      scopeChannels:
+      scope_channels:
         range: ProposingChannel
         multivalued: true
-      acceptanceThreshold:
+      acceptance_threshold:
         range: float
         minimum_value: -1
         maximum_value: 1
         description: Minimum inclusion score S for automatic acceptance.
-      usesRules:
+      uses_rules:
         range: AggregationRule
         multivalued: true
         description: The rule versions the policy pins.
@@ -1543,26 +1482,26 @@ classes:
         identifier: true
       type:
         designates_type: true
-      performedBy:
+      performed_by:
         range: SieveAgent
         required: true
       date:
         required: true
     attributes:
-      filterQuery:
+      filter_query:
         range: string
         required: true
         description: Machine-readable, re-runnable query over packet contents.
-      resultSet:
+      result_set:
         range: string
         multivalued: true
         required: true
         description: Frozen result set as "packet-id@version" entries.
-      reviewBands:
+      review_bands:
         range: string
         multivalued: true
         description: Score bands with their review depth, e.g. "0.90-0.95 EYEBALLED".
-      spotCheckErrors:
+      spot_check_errors:
         range: integer
         description: Errors found in the spot-check sample (feeds calibration of S).
 
@@ -1581,9 +1520,9 @@ classes:
       contributor:
         range: SieveAgent
         required: true
-      performedBy:
+      performed_by:
         range: SieveAgent
-      specifiedBy:
+      specified_by:
         range: SieveMethod
         description: Guideline / SOP / workflow / prompt version followed.
         annotations:
@@ -1602,13 +1541,13 @@ classes:
         annotations:
           requirements: PROV.INTERP.AGENT PROV.ASSERTION.AGENT
           decisions: D-046
-      agentRoleAtTime:
+      agent_role_at_time:
         range: string
         description: The contributor's role / expertise level as of the act.
         annotations:
           requirements: PROV.INTERP.AGENT PROV.ASSERTION.AGENT
           decisions: D-049 D-051
-      agentTrustAtTime:
+      agent_trust_at_time:
         range: float
         minimum_value: 0
         maximum_value: 1
@@ -1625,7 +1564,7 @@ classes:
         annotations:
           requirements: PROV.INTERP.LOCATION PROV.ASSERTION.LOCATION
           decisions: D-036
-      runId:
+      run_id:
         range: string
         description: Identifier of the automated run that performed the act.
         annotations:
@@ -1654,37 +1593,37 @@ classes:
           requirements: PROV.INTERP.DATE
           decisions: D-049 D-051 D-060
     attributes:
-      methodType:
+      method_type:
         range: InterpretationMethod
         required: true
         annotations:
           requirements: PROV.INTERP.METHOD_TYPES
-      readCoverage:
+      read_coverage:
         range: ReadCoverage
         description: How much of the document was looked at. Mandatory for document-based lines (profile check).
         annotations:
           decisions: D-050 D-059
-      accessStatus:
+      access_status:
         range: AccessStatus
         description: Access status of the document. Mandatory for document-based lines (profile check).
         annotations:
           decisions: D-059
-      identifierVerified:
+      identifier_verified:
         range: VerificationOutcome
         description: The cited identifier resolves and is about the topic (AI acts).
         annotations:
           decisions: D-050
-      groundingChecked:
+      grounding_checked:
         range: VerificationOutcome
         description: The entities in the evidence map to the claim's actual terms (AI acts).
         annotations:
           decisions: D-050
-      soughtDisputingEvidence:
+      sought_disputing_evidence:
         range: boolean
         description: Search scope included disputing evidence (experimental).
         annotations:
           decisions: D-050
-      reasoningTrace:
+      reasoning_trace:
         range: uriorcurie
         description: Link to an external reasoning trace. The trace itself is not stored.
         annotations:
@@ -1728,7 +1667,7 @@ classes:
         annotations:
           requirements: PROV.ASSERTION.METHOD_TYPES PROV.RETRIEVAL.TARGET_ROLE
           decisions: D-046 D-048 D-064 D-066 D-067
-      inclusionScore:
+      inclusion_score:
         range: float
         minimum_value: -1
         maximum_value: 1
@@ -1736,19 +1675,19 @@ classes:
         annotations:
           requirements: PROV.ASSERTION.CONFIDENCE_SCORE
           decisions: D-063
-      scoreBand:
+      score_band:
         range: string
-        description: Band of S at decision time, from the rule's strengthBands.
+        description: Band of S at decision time, from the rule's strength_bands.
         annotations:
           requirements: PROV.ASSERTION.CONFIDENCE_CATEGORY
           decisions: D-063
-      aggregationRule:
+      aggregation_rule:
         range: AggregationRule
         description: The rule version that computed S.
         annotations:
           requirements: PROV.ASSERTION.METHODS
           decisions: D-048 D-054
-      signedPacketVersion:
+      signed_packet_version:
         range: string
         description: The packet version the decision was given on. A later version re-queues the claim.
         annotations:
@@ -1760,7 +1699,7 @@ classes:
         annotations:
           requirements: PROV.ASSERTION.METHODS
           decisions: D-064
-      thresholdPassed:
+      threshold_passed:
         range: float
         description: The policy threshold S passed.
         annotations:
@@ -1771,12 +1710,12 @@ classes:
         annotations:
           requirements: PROV.ASSERTION.METHODS
           decisions: D-066
-      reviewDepth:
+      review_depth:
         range: ReviewDepth
         description: How closely this claim was looked at. A no-look approval adds no evidence.
         annotations:
           decisions: D-066
-      evidenceLine:
+      evidence_line:
         range: SieveEvidenceLine
         description: >-
           The expert line this decision contributed, if any (provisional). The line is
@@ -1819,7 +1758,7 @@ classes:
           slot_conditions:
             batch:
               required: true
-            reviewDepth:
+            review_depth:
               required: true
 
   OriginEvent:
@@ -1835,12 +1774,12 @@ classes:
     slot_usage:
       type:
         designates_type: true
-      performedBy:
+      performed_by:
         range: SieveAgent
         description: The pipeline (kBOOM merge, mondo-ingest slurp, provider sync, mondo-ai harvesting) or curator.
         annotations:
           requirements: PROV.RETRIEVAL.AGENT
-      specifiedBy:
+      specified_by:
         range: SieveMethod
         description: Pipeline version.
         annotations:
@@ -1850,23 +1789,23 @@ classes:
         annotations:
           requirements: PROV.RETRIEVAL.DATE
     attributes:
-      derivationType:
+      derivation_type:
         range: DerivationType
         required: true
         annotations:
           decisions: D-030 D-031
-      sourceItem:
+      source_item:
         range: EvidenceItem
         required: true
         description: The upstream item (ExternalRecord, Publication, WebPage) the claim came from.
         annotations:
           requirements: PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
-      sourceLabel:
+      source_label:
         range: string
         description: The source's own label at attachment time.
         annotations:
           requirements: PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
-      sourceRelease:
+      source_release:
         range: SourceRelease
         description: The release the claim was copied from.
         annotations:
@@ -1890,13 +1829,13 @@ classes:
         description: Timestamp of the run that computed the chain.
         annotations:
           requirements: PROV.SA.DATE
-      specifiedBy:
+      specified_by:
         range: SieveMethod
         description: The alignment workflow (and version).
         annotations:
           requirements: PROV.SA.METHODS
     attributes:
-      entitySlot:
+      entity_slot:
         range: EntitySlot
         required: true
         description: Which entity of the assertion this chain grounds.
@@ -1908,14 +1847,14 @@ classes:
         description: Ordered steps; step n's output is step n+1's input (profile check).
         annotations:
           requirements: PROV.SA.EXECUTION
-      chainConfidence:
+      chain_confidence:
         range: float
         minimum_value: 0
         maximum_value: 1
         annotations:
           requirements: PROV.SA.CONFIDENCE_SCORE
           decisions: D-062
-      runId:
+      run_id:
         range: string
 
   AlignmentStep:
@@ -1931,12 +1870,12 @@ classes:
     slot_usage:
       type:
         designates_type: true
-      performedBy:
+      performed_by:
         range: SieveAgent
         description: The agent (with version) that performed the step.
         annotations:
           requirements: PROV.SA.AGENT
-      specifiedBy:
+      specified_by:
         range: SieveMethod
         annotations:
           requirements: PROV.SA.METHODS
@@ -1955,12 +1894,12 @@ classes:
         required: true
         annotations:
           requirements: PROV.SA.METHOD_TYPES
-      inputValue:
+      input_value:
         range: string
         required: true
         annotations:
           requirements: PROV.SA.EXECUTION
-      outputValue:
+      output_value:
         range: string
         required: true
         annotations:
@@ -1968,16 +1907,16 @@ classes:
       predicate:
         range: uriorcurie
         description: Mapping predicate of a grounding / normalisation step (e.g. skos:exactMatch).
-      mappingJustification:
+      mapping_justification:
         range: uriorcurie
         description: SSSOM / semapv mapping justification.
-      mappingSet:
+      mapping_set:
         range: uri
         description: The mapping set the step used.
         annotations:
           requirements: PROV.SA.EXECUTION
           decisions: D-061
-      mappingSetVersion:
+      mapping_set_version:
         range: string
         description: >-
           Frozen version of the mapping set. A newer version triggers revision of the
@@ -1985,29 +1924,29 @@ classes:
         annotations:
           requirements: PROV.SA.EXECUTION PROV.SA.DATE
           decisions: D-061
-      appliedRules:
+      applied_rules:
         range: AppliedRule
         multivalued: true
         inlined_as_list: true
         annotations:
           requirements: PROV.SA.METHODS
-      textSpan:
+      text_span:
         range: TextLocation
         inlined: true
         description: Span anchoring for text sources.
         annotations:
           requirements: PROV.SA.EXECUTION
-      spanRole:
+      span_role:
         range: string
         description: Role of the span (MeDIC TextSpanRoleEnum, e.g. SECTION_TEXT).
         annotations:
           requirements: PROV.SA.EXECUTION
-      triggerCue:
+      trigger_cue:
         range: string
         description: The verbatim words that establish a relation (assertion layer).
         annotations:
           requirements: PROV.SA.EXECUTION
-      qualityCategory:
+      quality_category:
         range: AlignmentQuality
         annotations:
           requirements: PROV.SA.CONFIDENCE_CATEGORY
@@ -2018,21 +1957,21 @@ classes:
         maximum_value: 1
         annotations:
           requirements: PROV.SA.CONFIDENCE_SCORE
-      confidenceBasis:
+      confidence_basis:
         range: ConfidenceBasis
         annotations:
           requirements: PROV.SA.CONFIDENCE_SCORE
-      reviewStatus:
+      review_status:
         range: StepStatus
         ifabsent: string(MACHINE)
         description: Absent means MACHINE (not reviewed).
         annotations:
           requirements: PROV.SA.REVIEW
-      reviewedBy:
+      reviewed_by:
         range: SieveAgent
         annotations:
           requirements: PROV.SA.REVIEW
-      reviewDate:
+      review_date:
         range: date
         annotations:
           requirements: PROV.SA.REVIEW
@@ -2044,7 +1983,7 @@ classes:
               value_presence: PRESENT
         postconditions:
           slot_conditions:
-            confidenceBasis:
+            confidence_basis:
               required: true
 
   # ===========================================================================
@@ -2060,29 +1999,29 @@ classes:
       requirements: PROV.EI.RETRIEVAL_SOURCE PROV.RETRIEVAL.SOURCE_SYSTEM PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
       decisions: D-055 D-058
     slot_usage:
-      recordIdentifier:
+      record_identifier:
         description: The record id in the source (if it differs from the item id).
     attributes:
-      retrievedFrom:
+      retrieved_from:
         range: InformationResource
         required: true
         annotations:
           requirements: PROV.EI.RETRIEVAL_SOURCE
-      sourceRelease:
+      source_release:
         range: SourceRelease
         annotations:
           requirements: PROV.EI.RETRIEVAL_SOURCE PROV.RETRIEVAL.SOURCE_SYSTEM
-      sourceVersion:
+      source_version:
         range: string
         description: Release / version string, when no SourceRelease is registered.
-      retrievalDate:
+      retrieval_date:
         range: date
         required: true
         description: Date read (date accessed, for web pages).
         annotations:
           requirements: PROV.EI.RETRIEVAL_SOURCE
           decisions: D-055
-      sourceLabel:
+      source_label:
         range: string
         annotations:
           requirements: PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
@@ -2099,10 +2038,10 @@ classes:
     attributes:
       section:
         range: string
-      charStart:
+      char_start:
         range: integer
         minimum_value: 0
-      charEnd:
+      char_end:
         range: integer
         minimum_value: 0
 
@@ -2120,7 +2059,7 @@ classes:
         required: true
       category:
         range: string
-      validFrom:
+      valid_from:
         range: date
         required: true
       scope:
@@ -2142,7 +2081,7 @@ classes:
         range: float
         minimum_value: 0
         maximum_value: 1
-      validFrom:
+      valid_from:
         range: date
         required: true
       domain:
@@ -2172,7 +2111,7 @@ classes:
       channel:
         range: ProposingChannel
         required: true
-      logOdds:
+      log_odds:
         range: float
         required: true
 
@@ -2356,7 +2295,7 @@ enums:
       COMPUTED_CONCORDANCE: {annotations: {decisions: D-004 D-061}}
       RULE_BASED_STRENGTH: {annotations: {decisions: D-054}}
       COMPETING_CLAIM:
-        description: The one line per claim that combines all live competitors (D-069); disputes, items are CompetingClaims.
+        description: The one line per claim that combines all live competitors (D-069); it disputes, and its items are prior claims with own_log_odds.
         annotations: {requirements: EINT.CONTRADICTION, decisions: D-069}
 
   ReadCoverage:
@@ -2429,12 +2368,6 @@ enums:
       PROVIDER_SYNC:
       AI_AGENT:
       LEGACY_MERGE: {description: kBOOM merge.}
-
-  CompetitionKind:
-    annotations: {requirements: EINT.CONTRADICTION, decisions: D-069}
-    permissible_values:
-      COMPETING_OBJECT: {description: The same name as exact synonym of another disease.}
-      COMPETING_PREDICATE: {description: "The same pair under another relation (related synonym, abbreviation)."}
 
   LogOddsBasis:
     annotations: {decisions: D-069}

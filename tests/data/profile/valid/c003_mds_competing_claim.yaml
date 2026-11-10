@@ -13,75 +13,73 @@ statement:
   subject: MONDO:0018881
   predicate: {code: oboInOwl:hasExactSynonym}
   object: MDS
-  reviewState: PENDING_REVIEW
-  proposingChannel: SOURCE_INGEST
-  hasEvidenceLines:
+  review_state: PENDING_REVIEW
+  proposing_channel: SOURCE_INGEST
+  has_evidence_lines:
     - id: sieve:el/mds-ncit
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:ca/ncit-c3247-mds]
-      directionOfEvidenceProvided: supports
-      scoreOfEvidenceProvided: 0.8
-      computedByRule: sieve:rule/synonym-v1.1
-      independenceCluster: infores:ncit
+      has_evidence_items: [sieve:ca/ncit-c3247-mds]
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 0.8
+      computed_by_rule: sieve:rule/synonym-v1.1
+      independence_cluster: infores:ncit
       contributions:
         - {id: sieve:act/mds-ncit, type: InterpretationActivity, contributor: sieve:agent/concordance-pipeline,
-           date: "2026-11-03", methodType: RULE_BASED_STRENGTH, specifiedBy: [sieve:method/concordance-workflow],
-           readCoverage: STRUCTURED_RECORD}
+           date: "2026-11-03", method_type: RULE_BASED_STRENGTH, specified_by: [sieve:method/concordance-workflow],
+           read_coverage: STRUCTURED_RECORD}
     - id: sieve:el/mds-omim
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:ca/omim-614286-mds]
-      directionOfEvidenceProvided: supports
-      scoreOfEvidenceProvided: 0.8
-      computedByRule: sieve:rule/synonym-v1.1
-      independenceCluster: infores:omim
+      has_evidence_items: [sieve:ca/omim-614286-mds]
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 0.8
+      computed_by_rule: sieve:rule/synonym-v1.1
+      independence_cluster: infores:omim
       contributions:
         - {id: sieve:act/mds-omim, type: InterpretationActivity, contributor: sieve:agent/concordance-pipeline,
-           date: "2026-11-03", methodType: RULE_BASED_STRENGTH, specifiedBy: [sieve:method/concordance-workflow],
-           readCoverage: STRUCTURED_RECORD}
+           date: "2026-11-03", method_type: RULE_BASED_STRENGTH, specified_by: [sieve:method/concordance-workflow],
+           read_coverage: STRUCTURED_RECORD}
     - id: sieve:el/mds-competing                # D-069: one line for all live competitors
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:cc/mds-mtdna-depletion]
-      directionOfEvidenceProvided: disputes
+      has_evidence_items: [sieve:cc/mds-mtdna-depletion]
+      direction_of_evidence_provided: disputes
       description: The same name is claimed as exact synonym of another disease.
       contributions:
         - {id: sieve:act/mds-competing, type: InterpretationActivity, contributor: sieve:agent/concordance-pipeline,
-           date: "2026-11-03", methodType: COMPETING_CLAIM, specifiedBy: [sieve:method/concordance-workflow]}
-concordantAssertions:
+           date: "2026-11-03", method_type: COMPETING_CLAIM, specified_by: [sieve:method/concordance-workflow]}
+prior_claims:
   - id: sieve:ca/ncit-c3247-mds
-    type: ConcordantAssertion
+    type: SynonymStatement
     subject: NCIT:C3247
     predicate: {code: oboInOwl:hasExactSynonym}
     object: MDS
-    reportedIn: [NCIT:C3247]
+    reported_in: [NCIT:C3247]
     resource: infores:ncit
   - id: sieve:ca/omim-614286-mds
-    type: ConcordantAssertion
+    type: SynonymStatement
     subject: OMIM:614286
     predicate: {code: oboInOwl:hasExactSynonym}
     object: MDS
-    reportedIn: [OMIM:614286]
+    reported_in: [OMIM:614286]
     resource: infores:omim
-competingClaims:
-  - id: sieve:cc/mds-mtdna-depletion
-    type: CompetingClaim
+  - id: sieve:cc/mds-mtdna-depletion           # the same name on another disease; its role is set by the line
+    type: SynonymStatement
     subject: MONDO:0018158
     predicate: {code: oboInOwl:hasExactSynonym}
     object: MDS
-    competitionKind: COMPETING_OBJECT
-    competitorLogOdds: 1.4
-    logOddsBasis: OWN_EVIDENCE
-    competitorPacket: "sieve:pkt/MONDO_0018158-syn-MDS@2026-11-03"
-externalRecords:
+    own_log_odds: 1.4
+    log_odds_basis: OWN_EVIDENCE
+    log_odds_source_packet: "sieve:pkt/MONDO_0018158-syn-MDS@2026-11-03"
+external_records:
   - id: NCIT:C3247
     type: ExternalRecord
     resource: infores:ncit
-    recordMetadata: {retrievedFrom: infores:ncit, retrievalDate: "2026-11-01"}
+    record_metadata: {retrieved_from: infores:ncit, retrieval_date: "2026-11-01"}
   - id: OMIM:614286
     type: ExternalRecord
     resource: infores:omim
-    recordMetadata: {retrievedFrom: infores:omim, sourceRelease: sieve:release/omim-2026-10-01, retrievalDate: "2026-11-01"}
+    record_metadata: {retrieved_from: infores:omim, source_release: sieve:release/omim-2026-10-01, retrieval_date: "2026-11-01"}
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
-referenceSnapshot:
+reference_snapshot:
   id: sieve:pkt/MONDO_0018881-syn-MDS#references
   type: SieveRegistry
   version: '2026-11-03'
@@ -89,59 +87,59 @@ referenceSnapshot:
   - id: infores:ncit
     type: InformationResource
     label: NCI Thesaurus
-    curiePrefixes:
+    curie_prefixes:
     - NCIT
-    defaultRole: PRIMARY
-    qualityRatings:
+    default_role: PRIMARY
+    quality_ratings:
     - level: 0.8
       category: high
-      validFrom: '2026-01-01'
+      valid_from: '2026-01-01'
   - id: infores:omim
     type: InformationResource
     label: OMIM
-    curiePrefixes:
+    curie_prefixes:
     - OMIM
-    defaultRole: PRIMARY
-    qualityRatings:
+    default_role: PRIMARY
+    quality_ratings:
     - level: 0.9
       category: high
-      validFrom: '2026-01-01'
+      valid_from: '2026-01-01'
   releases:
   - id: sieve:release/omim-2026-10-01
     type: SourceRelease
-    ofResource: infores:omim
+    of_resource: infores:omim
     version: '2026-10-01'
-    releaseDate: '2026-10-01'
+    release_date: '2026-10-01'
   agents:
   - id: sieve:agent/concordance-pipeline
     type: SieveAgent
     subtype: software
     name: SPO concordance pipeline
-    softwareVersion: 1.4.0
+    software_version: 1.4.0
   methods:
   - id: sieve:method/concordance-workflow
     type: SieveMethod
     version: '1.4'
-  aggregationRules:
+  aggregation_rules:
   - id: sieve:rule/synonym-v1.1
     type: AggregationRule
     version: '1.1'
-    claimType: SynonymStatement
-    strengthBands:
+    claim_type: SynonymStatement
+    strength_bands:
     - strong >= 0.8
     - moderate >= 0.4
     - weak < 0.4
-    confidenceFloor: 0.3
-    scalingFactor: 2.0
-    defaultQuality: 0.5
-    stackedLines: CAP_AND_ADD
-    claimPriors:
+    confidence_floor: 0.3
+    scaling_factor: 2.0
+    default_quality: 0.5
+    stacked_lines: CAP_AND_ADD
+    claim_priors:
     - channel: SOURCE_INGEST
-      logOdds: 0.5
+      log_odds: 0.5
     - channel: CURATOR
-      logOdds: 1.0
+      log_odds: 1.0
     - channel: AI_AGENT
-      logOdds: -0.5
+      log_odds: -0.5
     exclusive: true
-    exclusivityRule: An exact synonym belongs to one live term per branch (human / non-human); ABBREVIATION-typed
+    exclusivity_rule: An exact synonym belongs to one live term per branch (human / non-human); ABBREVIATION-typed
       synonyms are exempt.

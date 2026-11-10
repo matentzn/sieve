@@ -10,44 +10,44 @@ statement:
   predicate: {code: skos:exactMatch}
   object: ICD10CM:Q90
   preferred: true
-  validDirection: BOTH
-  reviewState: VERIFIED
-  proposingChannel: LEXICAL_PIPELINE
+  valid_direction: BOTH
+  review_state: VERIFIED
+  proposing_channel: LEXICAL_PIPELINE
   score: 0.93
   strength: strong
   direction: supports
-  hasEvidenceFromSources: [infores:icd10cm]
-  hasEvidenceLines:
+  has_evidence_from_sources: [infores:icd10cm]
+  has_evidence_lines:
     - id: sieve:el/q90-lexical
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:score/q90-lexical]
-      directionOfEvidenceProvided: supports
-      strengthOfEvidenceProvided: weak
-      scoreOfEvidenceProvided: 0.3
-      computedByRule: sieve:rule/mapping-v1.0
+      has_evidence_items: [sieve:score/q90-lexical]
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: weak
+      score_of_evidence_provided: 0.3
+      computed_by_rule: sieve:rule/mapping-v1.0
       contributions:
         - id: sieve:act/q90-lexical
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
           date: "2026-10-24"
-          methodType: RULE_BASED_STRENGTH
-          specifiedBy: [sieve:method/mondo-mapping-guide]
+          method_type: RULE_BASED_STRENGTH
+          specified_by: [sieve:method/mondo-mapping-guide]
     - id: sieve:el/q90-record
       type: SieveEvidenceLine
-      hasEvidenceItems: [ICD10CM:Q90]
-      directionOfEvidenceProvided: supports
-      strengthOfEvidenceProvided: strong
-      scoreOfEvidenceProvided: 0.8
-      computedByRule: sieve:rule/mapping-v1.0
+      has_evidence_items: [ICD10CM:Q90]
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: strong
+      score_of_evidence_provided: 0.8
+      computed_by_rule: sieve:rule/mapping-v1.0
       contributions:
         - id: sieve:act/q90-record
           type: InterpretationActivity
           contributor: orcid:0000-0001-5208-3432
           date: "2026-10-25"
-          methodType: EXPERT_JUDGEMENT
-          specifiedBy: [sieve:method/mondo-mapping-guide]
-          readCoverage: STRUCTURED_RECORD
-  assertionDecisions:
+          method_type: EXPERT_JUDGEMENT
+          specified_by: [sieve:method/mondo-mapping-guide]
+          read_coverage: STRUCTURED_RECORD
+  assertion_decisions:
     - id: sieve:dec/q90-batch
       type: AssertionDecision
       contributor: orcid:0000-0001-5208-3432
@@ -55,31 +55,31 @@ statement:
       outcome: ACCEPTED
       route: BATCH_SIGN_OFF
       batch: sieve:batch/mappings-2026-10-25
-      reviewDepth: EYEBALLED
-      inclusionScore: 0.93
-      scoreBand: strong
-      aggregationRule: sieve:rule/mapping-v1.0
-      signedPacketVersion: "2026-10-25"
-externalRecords:
+      review_depth: EYEBALLED
+      inclusion_score: 0.93
+      score_band: strong
+      aggregation_rule: sieve:rule/mapping-v1.0
+      signed_packet_version: "2026-10-25"
+external_records:
   - id: ICD10CM:Q90
     type: ExternalRecord
     label: Down syndrome
     resource: infores:icd10cm
-    obsoleteInSource: false
-    recordMetadata:
-      retrievedFrom: infores:icd10cm
-      sourceRelease: sieve:release/icd10cm-2026
-      retrievalDate: "2026-10-01"
-      sourceLabel: Down syndrome
-computationalScores:
+    obsolete_in_source: false
+    record_metadata:
+      retrieved_from: infores:icd10cm
+      source_release: sieve:release/icd10cm-2026
+      retrieval_date: "2026-10-01"
+      source_label: Down syndrome
+computational_scores:
   - id: sieve:score/q90-lexical
     type: ComputationalScore
     value: "0.97"
-    specifiedBy: [sieve:method/lexmatch]
-    softwareVersion: oak-0.6
+    specified_by: [sieve:method/lexmatch]
+    software_version: oak-0.6
     parameters: "normalize=true"
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
-referenceSnapshot:
+reference_snapshot:
   id: sieve:pkt/MONDO_0008608-exact-ICD10CM_Q90#references
   type: SieveRegistry
   version: '2026-10-25'
@@ -87,13 +87,13 @@ referenceSnapshot:
   - id: infores:icd10cm
     type: InformationResource
     label: ICD-10-CM
-    curiePrefixes:
+    curie_prefixes:
     - ICD10CM
-    defaultRole: PRIMARY
+    default_role: PRIMARY
   releases:
   - id: sieve:release/icd10cm-2026
     type: SourceRelease
-    ofResource: infores:icd10cm
+    of_resource: infores:icd10cm
     version: '2026'
   agents:
   - id: orcid:0000-0001-5208-3432
@@ -101,51 +101,51 @@ referenceSnapshot:
     subtype: person
     roles:
     - value: core curator
-      validFrom: '2018-01-01'
-    trustLevels:
+      valid_from: '2018-01-01'
+    trust_levels:
     - value: curator
       level: 0.8
-      validFrom: '2018-01-01'
+      valid_from: '2018-01-01'
   - id: sieve:agent/concordance-pipeline
     type: SieveAgent
     subtype: software
     name: SPO concordance pipeline
-    softwareVersion: 1.4.0
+    software_version: 1.4.0
   methods:
   - id: sieve:method/mondo-mapping-guide
     type: SieveMethod
     version: 2026-03
-  aggregationRules:
+  aggregation_rules:
   - id: sieve:rule/mapping-v1.0
     type: AggregationRule
     version: '1.0'
-    claimType: MappingStatement
-    strengthBands:
+    claim_type: MappingStatement
+    strength_bands:
     - strong >= 0.8
     - moderate >= 0.4
     - weak < 0.4
-    scalingFactor: 2.0
-    defaultQuality: 0.5
-    stackedLines: CAP_AND_ADD
-    claimPriors:
+    scaling_factor: 2.0
+    default_quality: 0.5
+    stacked_lines: CAP_AND_ADD
+    claim_priors:
     - channel: LEXICAL_PIPELINE
-      logOdds: -1.0
+      log_odds: -1.0
     - channel: CURATOR
-      logOdds: 0.5
+      log_odds: 0.5
     exclusive: true
-    exclusivityRule: An exact match is 1:1 into a source unless the mapping is marked as one of several
+    exclusivity_rule: An exact match is 1:1 into a source unless the mapping is marked as one of several
       preferred siblings.
   batches:
   - id: sieve:batch/mappings-2026-10-25
     type: BatchSignOff
-    performedBy:
+    performed_by:
     - orcid:0000-0001-5208-3432
     date: '2026-10-25'
-    filterQuery: claimType = MappingStatement AND S >= 0.9 AND hasSupportingLineFrom = infores:omim AND
+    filter_query: claim_type = MappingStatement AND S >= 0.9 AND hasSupportingLineFrom = infores:omim AND
       rule = sieve:rule/mapping-v1.0
-    resultSet:
+    result_set:
     - sieve:pkt/MONDO_0008608-exact-ICD10CM_Q90@2026-10-25
-    reviewBands:
+    review_bands:
     - 0.95-1.00 NONE
     - 0.90-0.95 EYEBALLED
-    spotCheckErrors: 0
+    spot_check_errors: 0

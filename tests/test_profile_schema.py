@@ -1,7 +1,7 @@
-"""The SIEVE schema is a conforming profile of the unchanged SEPIO core."""
+"""The SIEVE schema is a conforming profile of the SEPIO core (snake_case derivation)."""
 
-import hashlib
 import importlib.util
+import re
 import sys
 
 import pytest
@@ -12,8 +12,8 @@ from sieve.datamodel.codegen import generate_pydantic
 from sieve.traceability import CORE_SCHEMA, ROOT, SCHEMA
 
 # sepio-framework/sepio-linkml src/sepio_linkml/schema/sepio_classes.yaml @ 8c2c233
-CORE_SHA256 = "1fcab419a4da060e2ebd9ed2cc4d0cb208698667b5c0026199b2c44ff2c3651b"
 CANONICAL_CORE = ROOT.parent / "sepio-linkml/src/sepio_linkml/schema/sepio_classes.yaml"
+SNAKE = re.compile(r"^[a-z][a-z0-9_]*$")
 
 # Slots whose core range is a plain string: a profile may narrow these to any
 # datatype, enum or reference without widening the core.
@@ -31,8 +31,27 @@ def core() -> SchemaView:
 
 
 @pytest.mark.skipif(not CANONICAL_CORE.exists(), reason="sepio-linkml not checked out next to sieve")
-def test_core_is_canonical_and_unchanged():
-    assert CANONICAL_CORE.read_bytes() == CORE_SCHEMA.read_bytes()
+def test_core_is_derived_from_canonical():
+    """sepio_core.yaml is exactly what scripts/snake_case_core.py makes of the canonical core."""
+    spec = importlib.util.spec_from_file_location("snake_case_core", ROOT / "scripts" / "snake_case_core.py")
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert module.render(CANONICAL_CORE) == CORE_SCHEMA.read_text(encoding="utf-8")
+
+
+def test_core_keeps_canonical_slot_iris(core):
+    """Renamed slots keep their canonical camelCase IRI."""
+    slot = core.induced_slot("has_evidence_lines", "Statement")
+    assert slot.slot_uri == "sepio-model:hasEvidenceLines"
+
+
+def test_all_slots_are_snake_case(sv):
+    """Slots are snake_case in core and profile; classes stay CamelCase."""
+    for name, cls in sv.all_classes().items():
+        assert name[0].isupper(), name
+        for slot in sv.class_induced_slots(name):
+            assert SNAKE.match(slot.name), f"{name}.{slot.name}"
 
 
 def test_profile_does_not_redefine_core(sv, core):
@@ -108,8 +127,3 @@ def test_pydantic_generates_and_imports(tmp_path):
 def test_checked_in_models_are_current():
     committed = (ROOT / "src" / "sieve" / "datamodel" / "sieve_models.py").read_text()
     assert committed == generate_pydantic(SCHEMA), "run: just gen-pydantic"
-
-
-def test_core_hash_is_pinned():
-    """Guard against silent edits to the vendored core: update together with the core."""
-    assert CORE_SHA256 == hashlib.sha256(CORE_SCHEMA.read_bytes()).hexdigest()

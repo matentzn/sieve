@@ -48,22 +48,22 @@ def test_predicate_must_come_from_claim_type_value_set(c007):
 
 def test_evidence_type_must_be_permitted_for_claim_type(c005):
     """MATRIX.C005: text passages are not evidence for a negative subclass claim."""
-    c005["textPassages"] = [
-        {"id": "sieve:tp/x", "type": "TextPassage", "statementText": "x", "reportedIn": ["PMID:1"]}
+    c005["text_passages"] = [
+        {"id": "sieve:tp/x", "type": "TextPassage", "statement_text": "x", "reported_in": ["PMID:1"]}
     ]
-    c005["statement"]["hasEvidenceLines"][0]["hasEvidenceItems"] = ["sieve:tp/x"]
+    c005["statement"]["has_evidence_lines"][0]["has_evidence_items"] = ["sieve:tp/x"]
     assert "EVIDENCE_NOT_PERMITTED" in _codes(c005, "ERROR")
 
 
 def test_dangling_evidence_reference(c005):
-    c005["statement"]["hasEvidenceLines"][0]["hasEvidenceItems"] = ["DOID:999999"]
+    c005["statement"]["has_evidence_lines"][0]["has_evidence_items"] = ["DOID:999999"]
     assert "DANGLING_REFERENCE" in _codes(c005, "ERROR")
 
 
 def test_higher_order_line_may_reference_a_line(c005):
     """EINT.STACKING: a line can interpret other lines."""
-    lines = c005["statement"]["hasEvidenceLines"]
-    lines.append({**lines[1], "id": "sieve:el/stack", "hasEvidenceItems": [lines[0]["id"], lines[1]["id"]]})
+    lines = c005["statement"]["has_evidence_lines"]
+    lines.append({**lines[1], "id": "sieve:el/stack", "has_evidence_items": [lines[0]["id"], lines[1]["id"]]})
     assert _codes(c005, "ERROR") == set()
 
 
@@ -80,7 +80,7 @@ def test_plain_subclass_must_not_be_negated(c005):
 
 def test_supporting_concordance_on_negative_claim_warns(c005):
     """MATRIX.C005 / D-033: a source asserting the positive subclass disputes."""
-    c005["statement"]["hasEvidenceLines"][0]["directionOfEvidenceProvided"] = "supports"
+    c005["statement"]["has_evidence_lines"][0]["direction_of_evidence_provided"] = "supports"
     assert "CONCORDANCE_DIRECTION" in _codes(c005, "WARNING")
 
 
@@ -96,7 +96,7 @@ def test_obsolete_object_mapping_needs_review(c006):
     Subject obsolescence is not stored on the mapping (D-009); the caller supplies it
     from the terms' existence claims.
     """
-    c006["statement"]["objectObsoleteInSourceVersion"] = "2026"
+    c006["statement"]["object_obsolete_in_source_version"] = "2026"
     assert "OBSOLETE_TO_OBSOLETE" not in _codes(c006)
     issues = check_packet(c006, obsolete_terms={"MONDO:0008608"})
     assert any(i.code == "OBSOLETE_TO_OBSOLETE" and i.severity == "WARNING" for i in issues)
@@ -114,7 +114,7 @@ def test_definition_without_any_source_warns():
             "subject": "MONDO:1",
             "predicate": {"code": "IAO:0000115"},
             "object": "A disease.",
-            "reviewState": "NOT_VERIFIED",
+            "review_state": "NOT_VERIFIED",
         },
     }
     assert "DEFINITION_WITHOUT_SOURCE" in _codes(packet, "WARNING")
@@ -123,30 +123,30 @@ def test_definition_without_any_source_warns():
 
 def test_document_based_line_needs_read_coverage(c007):
     """D-059: what was read, and whether it was paywalled, is mandatory."""
-    del c007["statement"]["hasEvidenceLines"][1]["contributions"][0]["accessStatus"]
+    del c007["statement"]["has_evidence_lines"][1]["contributions"][0]["access_status"]
     assert "READ_COVERAGE" in _codes(c007, "ERROR")
 
 
 def test_ai_line_needs_its_workflow(c007):
     """PROV.INTERP.METHODS / D-050: AI lines name their workflow / prompt version."""
-    del c007["statement"]["hasEvidenceLines"][1]["contributions"][0]["specifiedBy"]
+    del c007["statement"]["has_evidence_lines"][1]["contributions"][0]["specified_by"]
     assert "METHOD_REQUIRED" in _codes(c007, "ERROR")
 
 
 def test_rule_based_line_needs_its_rule(c007):
-    del c007["statement"]["hasEvidenceLines"][0]["computedByRule"]
+    del c007["statement"]["has_evidence_lines"][0]["computed_by_rule"]
     assert "METHOD_REQUIRED" in _codes(c007, "ERROR")
 
 
 def test_resolution_chain_is_contiguous(c007):
     """PROV.SA.EXECUTION: step n output = step n+1 input."""
-    c007["textPassages"][0]["groundings"][0]["steps"][1]["inputValue"] = "CFTR gene"
+    c007["text_passages"][0]["groundings"][0]["steps"][1]["input_value"] = "CFTR gene"
     assert "CHAIN_CONTIGUITY" in _codes(c007, "ERROR")
 
 
 def test_superseded_line_must_be_invalidated(c005):
     """EINT.FLAT_COLLAPSE / D-052: corrections are new lines; the old one is invalidated."""
-    lines = c005["statement"]["hasEvidenceLines"]
+    lines = c005["statement"]["has_evidence_lines"]
     lines.append({**lines[0], "id": "sieve:el/ds-doid-dispute-v2", "supersedes": [lines[0]["id"]]})
     assert "SUPERSEDED_NOT_INVALIDATED" in _codes(c005, "ERROR")
     lines[0]["validity"] = "INVALIDATED"
@@ -155,8 +155,8 @@ def test_superseded_line_must_be_invalidated(c005):
 
 def test_blind_approval_adds_no_evidence(c006):
     """D-066: a no-look approval contributes no evidence line."""
-    decision = c006["statement"]["assertionDecisions"][0]
-    decision.update(reviewDepth="NONE", evidenceLine="sieve:el/q90-record")
+    decision = c006["statement"]["assertion_decisions"][0]
+    decision.update(review_depth="NONE", evidence_line="sieve:el/q90-record")
     assert "BLIND_APPROVAL_EVIDENCE" in _codes(c006, "ERROR")
 
 
@@ -168,15 +168,15 @@ def test_issues_name_their_requirement(c007):
 
 def test_unrecorded_read_coverage_warns(c007):
     """D-059: legacy data may say NOT_RECORDED explicitly; it is flagged, not silently accepted."""
-    act = c007["statement"]["hasEvidenceLines"][1]["contributions"][0]
-    act.update(readCoverage="NOT_RECORDED", accessStatus="NOT_RECORDED")
+    act = c007["statement"]["has_evidence_lines"][1]["contributions"][0]
+    act.update(read_coverage="NOT_RECORDED", access_status="NOT_RECORDED")
     assert "READ_COVERAGE" not in _codes(c007, "ERROR")
     assert "READ_COVERAGE_NOT_RECORDED" in _codes(c007, "WARNING")
 
 
 def test_registry_reference_must_resolve_inside_the_packet(c007):
     """D-051: a packet is self-contained; every registry reference resolves to its own snapshot."""
-    c007["statement"]["assertionDecisions"][0]["aggregationRule"] = "sieve:rule/not-in-snapshot"
+    c007["statement"]["assertion_decisions"][0]["aggregation_rule"] = "sieve:rule/not-in-snapshot"
     issues = [i for i in check_packet(c007) if i.code == "UNRESOLVED_REFERENCE"]
     assert issues and issues[0].severity == "ERROR"
     assert "sieve:rule/not-in-snapshot" in issues[0].message
@@ -184,13 +184,13 @@ def test_registry_reference_must_resolve_inside_the_packet(c007):
 
 def test_registry_reference_must_have_the_right_kind(c007):
     """A contributor must resolve to an agent, not to some other snapshot entry."""
-    c007["statement"]["hasEvidenceLines"][0]["contributions"][0]["contributor"] = "sieve:rule/gene-disease-v1.3"
+    c007["statement"]["has_evidence_lines"][0]["contributions"][0]["contributor"] = "sieve:rule/gene-disease-v1.3"
     assert "UNRESOLVED_REFERENCE" in _codes(c007, "ERROR")
 
 
 def test_snapshot_internal_references_resolve(c003):
     """References between snapshot entries (a policy's approver) must resolve too."""
-    c003["referenceSnapshot"]["policies"][0]["approvedBy"] = "orcid:0000-0000-0000-0000"
+    c003["reference_snapshot"]["policies"][0]["approved_by"] = "orcid:0000-0000-0000-0000"
     assert "UNRESOLVED_REFERENCE" in _codes(c003, "ERROR")
 
 
@@ -205,7 +205,7 @@ def test_competing_claim_example_passes(mds):
 
 def test_contested_claim_is_never_auto_accepted(mds):
     """D-069 / D-064: no automatic acceptance while a competing-claim line is live."""
-    mds["statement"]["assertionDecisions"] = [
+    mds["statement"]["assertion_decisions"] = [
         {"id": "sieve:dec/mds-auto", "type": "AssertionDecision", "contributor": "sieve:agent/policy-runner",
          "date": "2026-11-03", "outcome": "ACCEPTED", "route": "DELEGATED_POLICY", "policy": "sieve:policy/synonym-v2"}
     ]
@@ -213,33 +213,63 @@ def test_contested_claim_is_never_auto_accepted(mds):
 
 
 def test_only_one_competing_claim_line(mds):
-    lines = mds["statement"]["hasEvidenceLines"]
+    lines = mds["statement"]["has_evidence_lines"]
     comp = next(line for line in lines if line["id"] == "sieve:el/mds-competing")
     lines.append({**comp, "id": "sieve:el/mds-competing-2"})
     assert "COMPETING_CLAIM_LINE" in _codes(mds, "ERROR")
 
 
 def test_competing_claim_line_disputes(mds):
-    comp = next(line for line in mds["statement"]["hasEvidenceLines"] if line["id"] == "sieve:el/mds-competing")
-    comp["directionOfEvidenceProvided"] = "supports"
+    comp = next(line for line in mds["statement"]["has_evidence_lines"] if line["id"] == "sieve:el/mds-competing")
+    comp["direction_of_evidence_provided"] = "supports"
     assert "COMPETING_CLAIM_LINE" in _codes(mds, "ERROR")
 
 
 def test_competing_claims_need_an_exclusive_claim_type(mds):
     """D-069: exclusivity is declared per claim type in its aggregation rule."""
-    mds["referenceSnapshot"]["aggregationRules"][0]["exclusive"] = False
+    mds["reference_snapshot"]["aggregation_rules"][0]["exclusive"] = False
     assert "COMPETING_CLAIM_LINE" in _codes(mds, "ERROR")
 
 
 def test_unknown_agent_must_be_a_person(c005):
     """An unknown human interpreter is a person whose identity is not recorded."""
-    agent = c005["referenceSnapshot"]["agents"][0]
-    agent.update(identityKnown=False, subtype="software")
+    agent = c005["reference_snapshot"]["agents"][0]
+    agent.update(identity_known=False, subtype="software")
     assert "UNKNOWN_AGENT" in _codes(c005, "ERROR")
 
 
 def test_sign_off_by_unknown_human_warns(c005):
     """D-049: a decision's weight depends on who signs; an unknown signer is flagged."""
-    curator = next(a for a in c005["referenceSnapshot"]["agents"] if a["id"] == "orcid:0000-0001-5208-3432")
-    curator["identityKnown"] = False
+    curator = next(a for a in c005["reference_snapshot"]["agents"] if a["id"] == "orcid:0000-0001-5208-3432")
+    curator["identity_known"] = False
     assert "UNKNOWN_HUMAN_DECISION" in _codes(c005, "WARNING")
+
+
+def test_prior_claim_is_typed_by_what_it_claims(c005):
+    """A source's subclass assertion is a SubclassStatement, held in prior_claims."""
+    assert c005["prior_claims"][0]["type"] == "SubclassStatement"
+    assert _codes(c005, "ERROR") == set()
+
+
+def test_prior_claim_cannot_carry_curation(c005):
+    """Review state, decisions, lines and score belong to the packet's own claim."""
+    c005["prior_claims"][0]["review_state"] = "VERIFIED"
+    assert "PRIOR_CLAIM_CURATION" in _codes(c005, "ERROR")
+
+
+def test_packet_claim_needs_review_state(c005):
+    del c005["statement"]["review_state"]
+    assert "REVIEW_STATE" in _codes(c005, "ERROR")
+
+
+def test_prior_claim_predicate_binding(c005):
+    """Predicate value sets apply to prior claims as to the packet's own claim."""
+    c005["prior_claims"][0]["predicate"] = {"code": "skos:exactMatch"}
+    assert "PREDICATE_BINDING" in _codes(c005, "ERROR")
+
+
+def test_competitor_needs_its_own_log_odds(mds):
+    """D-069: a claim cited by the competing-claim line carries its own log-odds."""
+    competitor = next(c for c in mds["prior_claims"] if c["id"] == "sieve:cc/mds-mtdna-depletion")
+    del competitor["own_log_odds"]
+    assert "COMPETING_CLAIM_LINE" in _codes(mds, "ERROR")

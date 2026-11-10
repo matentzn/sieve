@@ -1,6 +1,6 @@
 # Canonical small valid EvidencePacket in the SIEVE SEPIO profile shape
 # (schema/sieve.yaml): C004 MONDO:0004979 'asthma' subClassOf MONDO:0005275
-# 'respiratory system disorder'. Unreviewed: no decision, reviewState NOT_VERIFIED.
+# 'respiratory system disorder'. Unreviewed: no decision, review_state NOT_VERIFIED.
 # Identifiers are illustrative.
 id: sieve:pkt_asthma_0001
 type: EvidencePacket
@@ -11,38 +11,38 @@ statement:
   subject: MONDO:0004979
   predicate: {code: rdfs:subClassOf, label: subClassOf}
   object: MONDO:0005275
-  statementText: asthma subClassOf respiratory system disorder
-  reviewState: NOT_VERIFIED
-  hasEvidenceLines:
+  statement_text: asthma subClassOf respiratory system disorder
+  review_state: NOT_VERIFIED
+  has_evidence_lines:
     - id: sieve:el/asthma_0001
       type: SieveEvidenceLine
-      hasEvidenceItems: [DOID:2841, sieve:tp/asthma_0001]
-      directionOfEvidenceProvided: supports
-      strengthOfEvidenceProvided: strong
-      scoreOfEvidenceProvided: 0.9
+      has_evidence_items: [DOID:2841, sieve:tp/asthma_0001]
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: strong
+      score_of_evidence_provided: 0.9
       contributions:
         - id: sieve:act/asthma_0001
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           role: INTERPRETER
           date: "2026-10-30"
-          methodType: EXPERT_JUDGEMENT
-          readCoverage: ABSTRACT_ONLY
-          accessStatus: OPEN_ACCESS
-externalRecords:
+          method_type: EXPERT_JUDGEMENT
+          read_coverage: ABSTRACT_ONLY
+          access_status: OPEN_ACCESS
+external_records:
   - id: DOID:2841
     type: ExternalRecord
     label: asthma
     resource: infores:disease-ontology
-    recordMetadata:
-      retrievedFrom: infores:disease-ontology
-      retrievalDate: "2026-10-30"
-textPassages:
+    record_metadata:
+      retrieved_from: infores:disease-ontology
+      retrieval_date: "2026-10-30"
+text_passages:
   - id: sieve:tp/asthma_0001
     type: TextPassage
-    statementText: asthma is a chronic respiratory disease
-    reportedIn: [PMID:12345678]
-    quoteVerification: NOT_CHECKED
+    statement_text: asthma is a chronic respiratory disease
+    reported_in: [PMID:12345678]
+    quote_verification: NOT_CHECKED
     contributions:
       - id: sieve:act/tp-asthma_0001
         type: SieveContribution
@@ -56,7 +56,7 @@ publications:
     pmid: "12345678"
     resource: infores:pubmed
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
-referenceSnapshot:
+reference_snapshot:
   id: sieve:pkt_asthma_0001#references
   type: SieveRegistry
   version: '1'
@@ -64,35 +64,35 @@ referenceSnapshot:
   - id: infores:disease-ontology
     type: InformationResource
     label: Disease Ontology
-    curiePrefixes:
+    curie_prefixes:
     - DOID
-    defaultRole: PRIMARY
-    derivesContentFrom:
+    default_role: PRIMARY
+    derives_content_from:
     - infores:omim
-    qualityRatings:
+    quality_ratings:
     - level: 0.8
       category: high
-      validFrom: '2026-01-01'
+      valid_from: '2026-01-01'
   - id: infores:omim
     type: InformationResource
     label: OMIM
-    curiePrefixes:
+    curie_prefixes:
     - OMIM
-    defaultRole: PRIMARY
-    qualityRatings:
+    default_role: PRIMARY
+    quality_ratings:
     - level: 0.9
       category: high
-      validFrom: '2026-01-01'
+      valid_from: '2026-01-01'
   - id: infores:pubmed
     type: InformationResource
     label: PubMed
-    curiePrefixes:
+    curie_prefixes:
     - PMID
-    defaultRole: PRIMARY
+    default_role: PRIMARY
   agents:
   - id: sieve:agent/unrecorded-legacy-interpreter
     type: SieveAgent
     subtype: person
-    identityKnown: false
+    identity_known: false
     name: Unrecorded legacy interpreter
     description: A human whose identity the legacy data does not record.

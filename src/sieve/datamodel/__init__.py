@@ -3,7 +3,6 @@
 from sieve.datamodel.sieve_models import (
     AssertionDecision,
     ComputationalScore,
-    ConcordantAssertion,
     DecisionPolicy,
     DefinitionStatement,
     DiseaseAttributeStatement,
@@ -31,7 +30,6 @@ from sieve.datamodel.sieve_models import (
 __all__ = [
     "AssertionDecision",
     "ComputationalScore",
-    "ConcordantAssertion",
     "DecisionPolicy",
     "DefinitionStatement",
     "DiseaseAttributeStatement",

@@ -1,5 +1,5 @@
 # Invalid EvidencePacket in the SIEVE SEPIO profile shape (schema/sieve.yaml).
-# Everything is valid except scoreOfEvidenceProvided, which must lie in [0, 1].
+# Everything is valid except score_of_evidence_provided, which must lie in [0, 1].
 id: sieve:pkt_bad_0001
 type: EvidencePacket
 version: "1"
@@ -9,30 +9,30 @@ statement:
   subject: MONDO:0004979
   predicate: {code: rdfs:subClassOf, label: subClassOf}
   object: MONDO:0005275
-  reviewState: NOT_VERIFIED
-  hasEvidenceLines:
+  review_state: NOT_VERIFIED
+  has_evidence_lines:
     - id: sieve:el/bad_0001
       type: SieveEvidenceLine
-      hasEvidenceItems: [DOID:2841]
-      directionOfEvidenceProvided: supports
-      scoreOfEvidenceProvided: 1.5   # invalid: maximum is 1
+      has_evidence_items: [DOID:2841]
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 1.5   # invalid: maximum is 1
       contributions:
         - id: sieve:act/bad_0001
           type: InterpretationActivity
           contributor: sieve:agent/unrecorded-legacy-interpreter
           date: "2026-10-30"
-          methodType: EXPERT_JUDGEMENT
-          readCoverage: STRUCTURED_RECORD
-externalRecords:
+          method_type: EXPERT_JUDGEMENT
+          read_coverage: STRUCTURED_RECORD
+external_records:
   - id: DOID:2841
     type: ExternalRecord
     label: asthma
     resource: infores:disease-ontology
-    recordMetadata:
-      retrievedFrom: infores:disease-ontology
-      retrievalDate: "2026-10-30"
+    record_metadata:
+      retrieved_from: infores:disease-ontology
+      retrieval_date: "2026-10-30"
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
-referenceSnapshot:
+reference_snapshot:
   id: sieve:pkt_bad_0001#references
   type: SieveRegistry
   version: '1'
@@ -40,29 +40,29 @@ referenceSnapshot:
   - id: infores:disease-ontology
     type: InformationResource
     label: Disease Ontology
-    curiePrefixes:
+    curie_prefixes:
     - DOID
-    defaultRole: PRIMARY
-    derivesContentFrom:
+    default_role: PRIMARY
+    derives_content_from:
     - infores:omim
-    qualityRatings:
+    quality_ratings:
     - level: 0.8
       category: high
-      validFrom: '2026-01-01'
+      valid_from: '2026-01-01'
   - id: infores:omim
     type: InformationResource
     label: OMIM
-    curiePrefixes:
+    curie_prefixes:
     - OMIM
-    defaultRole: PRIMARY
-    qualityRatings:
+    default_role: PRIMARY
+    quality_ratings:
     - level: 0.9
       category: high
-      validFrom: '2026-01-01'
+      valid_from: '2026-01-01'
   agents:
   - id: sieve:agent/unrecorded-legacy-interpreter
     type: SieveAgent
     subtype: person
-    identityKnown: false
+    identity_known: false
     name: Unrecorded legacy interpreter
     description: A human whose identity the legacy data does not record.

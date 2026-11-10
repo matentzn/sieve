@@ -9,42 +9,42 @@ statement:
   subject: MONDO:0012297
   predicate: {code: oboInOwl:hasExactSynonym}
   object: SPOAN syndrome
-  reviewState: NOT_VERIFIED
-  proposingChannel: SOURCE_INGEST
+  review_state: NOT_VERIFIED
+  proposing_channel: SOURCE_INGEST
   score: 0.86
   strength: strong
   direction: supports
   origin:
     - id: sieve:origin/spoan-omim
       type: OriginEvent
-      derivationType: COPIED_FROM
-      sourceItem: OMIM:609541
-      sourceLabel: SPOAN syndrome
-      sourceRelease: sieve:release/omim-2019-04-30
-      performedBy: [sieve:agent/concordance-pipeline]
+      derivation_type: COPIED_FROM
+      source_item: OMIM:609541
+      source_label: SPOAN syndrome
+      source_release: sieve:release/omim-2019-04-30
+      performed_by: [sieve:agent/concordance-pipeline]
       date: "2019-05-02"
-  hasEvidenceLines:
+  has_evidence_lines:
     - id: sieve:el/spoan-omim
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:ca/omim-609541-syn]
-      directionOfEvidenceProvided: supports
-      strengthOfEvidenceProvided: strong
-      scoreOfEvidenceProvided: 0.9
-      computedByRule: sieve:rule/synonym-v1.1
+      has_evidence_items: [sieve:ca/omim-609541-syn]
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: strong
+      score_of_evidence_provided: 0.9
+      computed_by_rule: sieve:rule/synonym-v1.1
       confidence: 1.0
-      confidenceBasis: DETERMINISTIC
-      dateAttached: "2019-05-02"
-      lastConfirmed: "2026-10-01"
-      lastConfirmedAgainst: sieve:release/omim-2026-10-01
+      confidence_basis: DETERMINISTIC
+      date_attached: "2019-05-02"
+      last_confirmed: "2026-10-01"
+      last_confirmed_against: sieve:release/omim-2026-10-01
       contributions:
         - id: sieve:act/spoan-omim
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
           date: "2026-10-20"
-          methodType: COMPUTED_CONCORDANCE
-          specifiedBy: [sieve:method/concordance-workflow]
-          readCoverage: STRUCTURED_RECORD
-  assertionDecisions:
+          method_type: COMPUTED_CONCORDANCE
+          specified_by: [sieve:method/concordance-workflow]
+          read_coverage: STRUCTURED_RECORD
+  assertion_decisions:
     - id: sieve:dec/spoan-policy
       type: AssertionDecision
       contributor: sieve:agent/policy-runner
@@ -52,48 +52,48 @@ statement:
       outcome: ACCEPTED
       route: DELEGATED_POLICY
       policy: sieve:policy/synonym-v2
-      inclusionScore: 0.86
-      scoreBand: strong
-      thresholdPassed: 0.8
-      aggregationRule: sieve:rule/synonym-v1.1
-      signedPacketVersion: "2026-10-20"
-      runId: mondo-ai-synonym-batch-2026-10-20-r3
-concordantAssertions:
+      inclusion_score: 0.86
+      score_band: strong
+      threshold_passed: 0.8
+      aggregation_rule: sieve:rule/synonym-v1.1
+      signed_packet_version: "2026-10-20"
+      run_id: mondo-ai-synonym-batch-2026-10-20-r3
+prior_claims:
   - id: sieve:ca/omim-609541-syn
-    type: ConcordantAssertion
+    type: SynonymStatement
     subject: OMIM:609541
     predicate: {code: oboInOwl:hasExactSynonym}
     object: SPOAN syndrome
-    reportedIn: [OMIM:609541]
+    reported_in: [OMIM:609541]
     resource: infores:omim
     groundings:
       - id: sieve:chain/omim-609541
         type: ResolutionChain
-        entitySlot: subject
+        entity_slot: subject
         steps:
           - id: sieve:step/omim-609541-1
             type: AlignmentStep
             category: GROUNDING
             method: SOURCE_ASSERTED
-            inputValue: OMIM:609541
-            outputValue: MONDO:0012297
+            input_value: OMIM:609541
+            output_value: MONDO:0012297
             predicate: skos:exactMatch
-            mappingSetVersion: "2026-10-01"
-            qualityCategory: grounding_curated
+            mapping_set_version: "2026-10-01"
+            quality_category: grounding_curated
             confidence: 1.0
-            confidenceBasis: DETERMINISTIC
-externalRecords:
+            confidence_basis: DETERMINISTIC
+external_records:
   - id: OMIM:609541
     type: ExternalRecord
     resource: infores:omim
-    generationContext:
+    generation_context:
       - {code: "sieve:basis_unknown"}
-    recordMetadata:
-      retrievedFrom: infores:omim
-      sourceRelease: sieve:release/omim-2026-10-01
-      retrievalDate: "2026-10-02"
+    record_metadata:
+      retrieved_from: infores:omim
+      source_release: sieve:release/omim-2026-10-01
+      retrieval_date: "2026-10-02"
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
-referenceSnapshot:
+reference_snapshot:
   id: sieve:pkt/MONDO_0012297-syn-SPOAN#references
   type: SieveRegistry
   version: '2026-10-20'
@@ -101,81 +101,81 @@ referenceSnapshot:
   - id: infores:omim
     type: InformationResource
     label: OMIM
-    curiePrefixes:
+    curie_prefixes:
     - OMIM
-    defaultRole: PRIMARY
-    qualityRatings:
+    default_role: PRIMARY
+    quality_ratings:
     - level: 0.9
       category: high
-      validFrom: '2026-01-01'
+      valid_from: '2026-01-01'
   releases:
   - id: sieve:release/omim-2019-04-30
     type: SourceRelease
-    ofResource: infores:omim
+    of_resource: infores:omim
     version: '2019-04-30'
   - id: sieve:release/omim-2026-10-01
     type: SourceRelease
-    ofResource: infores:omim
+    of_resource: infores:omim
     version: '2026-10-01'
-    releaseDate: '2026-10-01'
+    release_date: '2026-10-01'
   agents:
   - id: orcid:0000-0001-5208-3432
     type: SieveAgent
     subtype: person
     roles:
     - value: core curator
-      validFrom: '2018-01-01'
-    trustLevels:
+      valid_from: '2018-01-01'
+    trust_levels:
     - value: curator
       level: 0.8
-      validFrom: '2018-01-01'
+      valid_from: '2018-01-01'
   - id: sieve:agent/concordance-pipeline
     type: SieveAgent
     subtype: software
     name: SPO concordance pipeline
-    softwareVersion: 1.4.0
+    software_version: 1.4.0
   - id: sieve:agent/policy-runner
     type: SieveAgent
     subtype: software
     name: mondo-ai policy runner
-    softwareVersion: 0.3.0
+    software_version: 0.3.0
   methods:
   - id: sieve:method/concordance-workflow
     type: SieveMethod
     version: '1.4'
-  aggregationRules:
+  aggregation_rules:
   - id: sieve:rule/synonym-v1.1
     type: AggregationRule
     version: '1.1'
-    claimType: SynonymStatement
-    strengthBands:
+    claim_type: SynonymStatement
+    strength_bands:
     - strong >= 0.8
     - moderate >= 0.4
     - weak < 0.4
-    confidenceFloor: 0.3
-    scalingFactor: 2.0
-    defaultQuality: 0.5
-    stackedLines: CAP_AND_ADD
-    claimPriors:
+    confidence_floor: 0.3
+    scaling_factor: 2.0
+    default_quality: 0.5
+    stacked_lines: CAP_AND_ADD
+    claim_priors:
     - channel: SOURCE_INGEST
-      logOdds: 0.5
+      log_odds: 0.5
     - channel: CURATOR
-      logOdds: 1.0
+      log_odds: 1.0
     - channel: AI_AGENT
-      logOdds: -0.5
+      log_odds: -0.5
     exclusive: true
-    exclusivityRule: An exact synonym belongs to one live term per branch (human / non-human); ABBREVIATION-typed
+    exclusivity_rule: An exact synonym belongs to one live term per branch (human / non-human); ABBREVIATION-typed
       synonyms are exempt.
   policies:
   - id: sieve:policy/synonym-v2
     type: DecisionPolicy
     version: '2'
-    approvedBy: orcid:0000-0001-5208-3432
-    approvalDate: '2026-10-01'
-    scopeClaimTypes:
+    approved_by: orcid:0000-0001-5208-3432
+    approval_date: '2026-10-01'
+    scope_claim_types:
     - SynonymStatement
-    scopeChannels:
+    scope_channels:
     - SOURCE_INGEST
-    acceptanceThreshold: 0.8
-    usesRules:
+    acceptance_threshold: 0.8
+    uses_rules:
     - sieve:rule/synonym-v1.1

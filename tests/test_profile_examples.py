@@ -66,13 +66,13 @@ def c003() -> dict:
 
 def test_neutral_direction_rejected(validator, c005):
     """EINT.DIRECTION: lines either support or dispute."""
-    c005["statement"]["hasEvidenceLines"][0]["directionOfEvidenceProvided"] = "neutral"
+    c005["statement"]["has_evidence_lines"][0]["direction_of_evidence_provided"] = "neutral"
     assert any("neutral" in e for e in _errors(validator, c005))
 
 
 def test_line_score_outside_shared_scale_rejected(validator, c005):
     """EINT.NUMERICAL_STRENGTH: line strength lives on a shared 0-1 scale."""
-    c005["statement"]["hasEvidenceLines"][0]["scoreOfEvidenceProvided"] = 1.5
+    c005["statement"]["has_evidence_lines"][0]["score_of_evidence_provided"] = 1.5
     assert any("1.5" in e for e in _statement_errors(validator, c005))
 
 
@@ -95,68 +95,70 @@ def test_unknown_claim_type_rejected(validator, c005):
 
 def test_line_requires_interpretation_act(validator, c005):
     """EINT.REQUIRED / PROV.INTERP.AGENT: every line records who interpreted it."""
-    del c005["statement"]["hasEvidenceLines"][0]["contributions"]
+    del c005["statement"]["has_evidence_lines"][0]["contributions"]
     assert any("contributions" in e for e in _errors(validator, c005))
 
 
 def test_line_confidence_needs_basis(validator, c005):
     """PROV.SA.CONFIDENCE_SCORE: a confidence states its basis."""
-    del c005["statement"]["hasEvidenceLines"][0]["confidenceBasis"]
-    assert any("confidenceBasis" in e for e in _statement_errors(validator, c005))
+    del c005["statement"]["has_evidence_lines"][0]["confidence_basis"]
+    assert any("confidence_basis" in e for e in _statement_errors(validator, c005))
 
 
 def test_step_confidence_needs_basis(validator, c005):
-    step = c005["concordantAssertions"][0]["groundings"][0]["steps"][0]
-    del step["confidenceBasis"]
-    assert any("confidenceBasis" in e for e in _errors(validator, c005))
+    claim = c005["prior_claims"][0]
+    del claim["groundings"][0]["steps"][0]["confidence_basis"]
+    assert _errors(validator, c005)
+    # Prior claims are polymorphic in the packet; validate against the concrete type for the reason.
+    assert any("confidence_basis" in e for e in _errors(validator, claim, claim["type"]))
 
 
 def test_policy_never_auto_rejects(validator, c003):
     """PROV.ASSERTION.METHOD_TYPES / D-064: automated routes can only accept."""
-    c003["statement"]["assertionDecisions"][0]["outcome"] = "REJECTED"
+    c003["statement"]["assertion_decisions"][0]["outcome"] = "REJECTED"
     assert any("ACCEPTED" in e for e in _statement_errors(validator, c003))
 
 
 def test_policy_decision_names_its_policy(validator, c003):
-    del c003["statement"]["assertionDecisions"][0]["policy"]
+    del c003["statement"]["assertion_decisions"][0]["policy"]
     assert any("policy" in e for e in _statement_errors(validator, c003))
 
 
 def test_batch_decision_needs_review_depth(validator):
     packet = _load(DATA / "valid" / "c006_down_syndrome_icd10cm_batch.yaml")
-    del packet["statement"]["assertionDecisions"][0]["reviewDepth"]
-    assert any("reviewDepth" in e for e in _statement_errors(validator, packet))
+    del packet["statement"]["assertion_decisions"][0]["review_depth"]
+    assert any("review_depth" in e for e in _statement_errors(validator, packet))
 
 
 def test_human_rejection_allowed(validator, c005):
     """EINT.CONTRADICTION / D-053: a human may reject; the packet is kept."""
-    decision = copy.deepcopy(c005["statement"]["assertionDecisions"][-1])
+    decision = copy.deepcopy(c005["statement"]["assertion_decisions"][-1])
     decision.update(id="sieve:dec/ds-excl-reject", outcome="REJECTED")
-    c005["statement"]["assertionDecisions"].append(decision)
+    c005["statement"]["assertion_decisions"].append(decision)
     assert _errors(validator, c005) == []
 
 
 def test_text_passage_requires_creation_provenance(validator):
     """PROV.EI.EXECUTION / D-057: created records carry who / when / how."""
     packet = _load(DATA / "valid" / "c007_cf_cftr_panel.yaml")
-    del packet["textPassages"][0]["contributions"]
+    del packet["text_passages"][0]["contributions"]
     assert any("contributions" in e for e in _errors(validator, packet))
 
 
 def test_external_record_requires_retrieval_metadata(validator, c005):
     """PROV.EI.RETRIEVAL_SOURCE / D-055: when and from which release a record was read."""
-    del c005["externalRecords"][0]["recordMetadata"]
-    assert any("recordMetadata" in e for e in _errors(validator, c005))
+    del c005["external_records"][0]["record_metadata"]
+    assert any("record_metadata" in e for e in _errors(validator, c005))
 
 
 def test_text_passage_derives_from_its_document_by_id(validator):
     """EINT.GROUPING / D-057: a passage states its dependence on the source document."""
     packet = _load(DATA / "valid" / "c007_cf_cftr_panel.yaml")
-    packet["textPassages"][0]["derivedFrom"] = ["PMID:20301428"]
+    packet["text_passages"][0]["derived_from"] = ["PMID:20301428"]
     assert _errors(validator, packet) == []
 
 
 def test_packet_requires_reference_snapshot(validator, c005):
     """D-051: a packet carries a frozen snapshot of the reference data it uses."""
-    del c005["referenceSnapshot"]
-    assert any("referenceSnapshot" in e for e in _errors(validator, c005))
+    del c005["reference_snapshot"]
+    assert any("reference_snapshot" in e for e in _errors(validator, c005))

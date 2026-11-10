@@ -1,14 +1,14 @@
 """Reference implementation of the inclusion score S (D-063, amended by D-069).
 
 Every parameter comes from the packet itself: the AggregationRule for the statement's
-claim type, frozen in the packet's ``referenceSnapshot``. Nothing is read from outside
+claim type, frozen in the packet's ``reference_snapshot``. Nothing is read from outside
 the packet, so the same packet version always scores the same.
 
 Per valid evidence line i::
 
     w_i = d_i * s_i * q_i * c_i
     d   direction (+1 supports, -1 disputes)
-    s   scoreOfEvidenceProvided; a judgement line is capped at the strongest line it rests on (Q5)
+    s   score_of_evidence_provided; a judgement line is capped at the strongest line it rests on (Q5)
     q   prior: for a judgement line (expert, panel, LLM) the interpreter's trust as of the act;
         otherwise the best quality rating, valid at the act date, of the line's sources (Q2)
     c   confidence (data quality); below the rule's floor the line is excluded (Q1)
@@ -19,7 +19,7 @@ Only the strongest line per independence cluster counts (D-046). Then::
     L' = L - ln(1 + sum_j e^(L_j))         (D-069 competing-claim line, outside k)
     S  = tanh(L' / 2)
 
-How a higher-order line and its inputs count is the rule's ``stackedLines`` policy:
+How a higher-order line and its inputs count is the rule's ``stacked_lines`` policy:
 CAP_AND_ADD (both count, the higher-order line capped) or REPLACE_INPUTS.
 """
 
@@ -29,14 +29,13 @@ from typing import Any
 
 JUDGEMENT_METHODS = {"EXPERT_JUDGEMENT", "CONSENSUS_PANEL", "LLM_JUDGEMENT"}
 ITEM_LISTS = (
-    "externalRecords",
-    "concordantAssertions",
-    "textPassages",
+    "external_records",
+    "prior_claims",
+    "text_passages",
     "publications",
-    "webPages",
+    "web_pages",
     "guidelines",
-    "computationalScores",
-    "competingClaims",
+    "computational_scores",
 )
 DIRECTION = {"supports": 1, "disputes": -1}
 
@@ -114,17 +113,17 @@ def _valid_at(levels: list[dict], date: str | None, claim_type: str) -> float | 
         lv
         for lv in levels
         if lv.get("level") is not None
-        and (date is None or lv["validFrom"] <= date)
+        and (date is None or lv["valid_from"] <= date)
         and (not lv.get("scope") or claim_type in lv["scope"])
     ]
     if not usable:
         return None
-    return float(max(usable, key=lambda lv: lv["validFrom"])["level"])
+    return float(max(usable, key=lambda lv: lv["valid_from"])["level"])
 
 
 def _rule_for(packet: dict) -> dict:
     claim_type = packet["statement"]["type"]
-    rules = [r for r in packet["referenceSnapshot"].get("aggregationRules") or [] if r.get("claimType") == claim_type]
+    rules = [r for r in packet["reference_snapshot"].get("aggregation_rules") or [] if r.get("claim_type") == claim_type]
     if len(rules) != 1:
         raise ValueError(f"expected exactly one AggregationRule for {claim_type} in the snapshot, found {len(rules)}")
     return rules[0]
@@ -134,22 +133,22 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
     """Compute S for one self-contained EvidencePacket (as loaded from YAML / JSON)."""
     statement = packet["statement"]
     claim_type = statement["type"]
-    snapshot = packet["referenceSnapshot"]
+    snapshot = packet["reference_snapshot"]
     rule = _rule_for(packet)
-    default_q = float(rule.get("defaultQuality", 0.5))
-    floor = float(rule.get("confidenceFloor", 0.0))
-    policy = rule.get("stackedLines", "CAP_AND_ADD")
-    priors = {p["channel"]: float(p["logOdds"]) for p in rule.get("claimPriors") or []}
+    default_q = float(rule.get("default_quality", 0.5))
+    floor = float(rule.get("confidence_floor", 0.0))
+    policy = rule.get("stacked_lines", "CAP_AND_ADD")
+    priors = {p["channel"]: float(p["log_odds"]) for p in rule.get("claim_priors") or []}
     out = ScoreBreakdown(
         rule_id=rule["id"],
-        l0=priors.get(statement.get("proposingChannel", ""), 0.0),
-        k=float(rule.get("scalingFactor", 1.0)),
+        l0=priors.get(statement.get("proposing_channel", ""), 0.0),
+        k=float(rule.get("scaling_factor", 1.0)),
     )
 
     items = {i["id"]: i for key in ITEM_LISTS for i in packet.get(key) or []}
     agents = {a["id"]: a for a in snapshot.get("agents") or []}
     resources = {r["id"]: r for r in snapshot.get("resources") or []}
-    lines = {line["id"]: line for line in statement.get("hasEvidenceLines") or []}
+    lines = {line["id"]: line for line in statement.get("has_evidence_lines") or []}
 
     def act_of(line: dict) -> dict:
         return (line.get("contributions") or [{}])[0]
@@ -161,20 +160,20 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
         if item.get("resource"):
             return [item["resource"]]
         if item["type"] == "TextPassage":
-            return [items[d]["resource"] for d in item.get("reportedIn") or [] if d in items and items[d].get("resource")]
+            return [items[d]["resource"] for d in item.get("reported_in") or [] if d in items and items[d].get("resource")]
         return []
 
     def prior(line: dict, act: dict) -> float:
         date = act.get("date")
-        if act.get("methodType") in JUDGEMENT_METHODS:
-            if act.get("agentTrustAtTime") is not None:
-                return float(act["agentTrustAtTime"])
-            level = _valid_at(agents.get(act.get("contributor", ""), {}).get("trustLevels") or [], date, claim_type)
+        if act.get("method_type") in JUDGEMENT_METHODS:
+            if act.get("agent_trust_at_time") is not None:
+                return float(act["agent_trust_at_time"])
+            level = _valid_at(agents.get(act.get("contributor", ""), {}).get("trust_levels") or [], date, claim_type)
             return default_q if level is None else level
         ratings = []
-        for ref in line.get("hasEvidenceItems") or []:
+        for ref in line.get("has_evidence_items") or []:
             for res in sources_of(items.get(ref, {"type": ""})):
-                level = _valid_at(resources.get(res, {}).get("qualityRatings") or [], date, claim_type)
+                level = _valid_at(resources.get(res, {}).get("quality_ratings") or [], date, claim_type)
                 if level is not None:
                     ratings.append(level)
         return max(ratings) if ratings else default_q
@@ -184,7 +183,7 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
     if policy == "REPLACE_INPUTS":
         for line in lines.values():
             if is_valid(line):
-                replaced |= {ref for ref in line.get("hasEvidenceItems") or [] if ref in lines}
+                replaced |= {ref for ref in line.get("has_evidence_items") or [] if ref in lines}
 
     best: dict[str, LineContribution] = {}
     for line_id, line in lines.items():
@@ -194,29 +193,29 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
         if not is_valid(line):
             contrib.state = "invalidated"
             continue
-        if act.get("methodType") == "COMPETING_CLAIM":
-            competitors += [float(items[r]["competitorLogOdds"]) for r in line.get("hasEvidenceItems") or [] if r in items]
+        if act.get("method_type") == "COMPETING_CLAIM":
+            competitors += [float(items[r]["own_log_odds"]) for r in line.get("has_evidence_items") or [] if r in items]
             contrib.state = "competing-claim line"
             continue
         if line_id in replaced:
             contrib.state = "replaced by higher-order line"
             continue
         contrib.c = float(line.get("confidence", 1.0))
-        if contrib.c < floor or line.get("dataQualityFlags"):
+        if contrib.c < floor or line.get("data_quality_flags"):
             contrib.state = "below confidence floor"
             continue
-        if line.get("scoreOfEvidenceProvided") is None:
+        if line.get("score_of_evidence_provided") is None:
             contrib.state = "no strength"
             continue
-        contrib.d = DIRECTION[line["directionOfEvidenceProvided"]]
-        contrib.s = float(line["scoreOfEvidenceProvided"])
-        inputs = [lines[r] for r in line.get("hasEvidenceItems") or [] if r in lines]
-        if inputs and act.get("methodType") in JUDGEMENT_METHODS:
-            cap = max(float(i.get("scoreOfEvidenceProvided") or 0.0) for i in inputs)
+        contrib.d = DIRECTION[line["direction_of_evidence_provided"]]
+        contrib.s = float(line["score_of_evidence_provided"])
+        inputs = [lines[r] for r in line.get("has_evidence_items") or [] if r in lines]
+        if inputs and act.get("method_type") in JUDGEMENT_METHODS:
+            cap = max(float(i.get("score_of_evidence_provided") or 0.0) for i in inputs)
             contrib.s = min(contrib.s, cap)
         contrib.q = prior(line, act)
         contrib.w = contrib.d * contrib.s * contrib.q * contrib.c
-        contrib.cluster = line.get("independenceCluster") or line_id
+        contrib.cluster = line.get("independence_cluster") or line_id
         current = best.get(contrib.cluster)
         if current is None or abs(contrib.w) > abs(current.w):
             if current is not None:
@@ -230,5 +229,5 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
     out.competition = competition_weight(competitors)
     out.l_final = out.l_evidence - out.competition
     out.s = s_from_l(out.l_final)
-    out.band = band_for(out.s, rule.get("strengthBands") or [])
+    out.band = band_for(out.s, rule.get("strength_bands") or [])
     return out

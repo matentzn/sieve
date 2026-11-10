@@ -5,7 +5,7 @@
 id: sieve:pkt/MONDO_0008608-excl-MONDO_0003847
 type: EvidencePacket
 version: "2026-10-20"
-previousVersion: "2022-05-03"
+previous_version: "2022-05-03"
 statement:
   id: sieve:st/MONDO_0008608-excl-MONDO_0003847
   type: NegativeSubclassStatement
@@ -13,116 +13,116 @@ statement:
   predicate: {code: rdfs:subClassOf, label: subClassOf}
   object: MONDO:0003847
   negated: true
-  statementText: Down syndrome is not a subclass of hereditary disease.
-  reviewState: VERIFIED
-  proposingChannel: CURATOR
+  statement_text: Down syndrome is not a subclass of hereditary disease.
+  review_state: VERIFIED
+  proposing_channel: CURATOR
   score: 0.46
   strength: moderate
   direction: supports
-  hasEvidenceLines:
+  has_evidence_lines:
     - id: sieve:el/ds-doid-dispute
       type: SieveEvidenceLine
-      hasEvidenceItems: [sieve:ca/doid-14250-isa-630]
-      directionOfEvidenceProvided: disputes
-      strengthOfEvidenceProvided: moderate
-      scoreOfEvidenceProvided: 0.5
-      computedByRule: sieve:rule/negative-subclass-v1.0
+      has_evidence_items: [sieve:ca/doid-14250-isa-630]
+      direction_of_evidence_provided: disputes
+      strength_of_evidence_provided: moderate
+      score_of_evidence_provided: 0.5
+      computed_by_rule: sieve:rule/negative-subclass-v1.0
       confidence: 1.0
-      confidenceBasis: DETERMINISTIC
-      independenceCluster: infores:omim
-      dateAttached: "2022-05-03"
-      lastConfirmed: "2026-10-01"
-      lastConfirmedAgainst: sieve:release/doid-2026-09-01
+      confidence_basis: DETERMINISTIC
+      independence_cluster: infores:omim
+      date_attached: "2022-05-03"
+      last_confirmed: "2026-10-01"
+      last_confirmed_against: sieve:release/doid-2026-09-01
       contributions:
         - id: sieve:act/ds-doid-concordance
           type: InterpretationActivity
           contributor: sieve:agent/concordance-pipeline
           role: INTERPRETER
           date: "2026-10-20"
-          methodType: COMPUTED_CONCORDANCE
-          specifiedBy: [sieve:method/concordance-workflow]
-          readCoverage: STRUCTURED_RECORD
-          runId: concordance-2026-10-20-r1
+          method_type: COMPUTED_CONCORDANCE
+          specified_by: [sieve:method/concordance-workflow]
+          read_coverage: STRUCTURED_RECORD
+          run_id: concordance-2026-10-20-r1
     - id: sieve:el/ds-curator-judgement
       type: SieveEvidenceLine
-      hasEvidenceItems: [DOID:14250]
-      directionOfEvidenceProvided: supports
-      strengthOfEvidenceProvided: strong
-      scoreOfEvidenceProvided: 0.8
-      computedByRule: sieve:rule/negative-subclass-v1.0
+      has_evidence_items: [DOID:14250]
+      direction_of_evidence_provided: supports
+      strength_of_evidence_provided: strong
+      score_of_evidence_provided: 0.8
+      computed_by_rule: sieve:rule/negative-subclass-v1.0
       contributions:
         - id: sieve:act/ds-curator-judgement
           type: InterpretationActivity
           contributor: orcid:0000-0001-5208-3432
           role: CURATOR
-          agentRoleAtTime: core curator
-          agentTrustAtTime: 0.8
+          agent_role_at_time: core curator
+          agent_trust_at_time: 0.8
           date: "2022-05-03"
-          methodType: EXPERT_JUDGEMENT
-          readCoverage: STRUCTURED_RECORD
+          method_type: EXPERT_JUDGEMENT
+          read_coverage: STRUCTURED_RECORD
           rationale: Trisomy 21 arises de novo in almost all cases; it is genetic but not hereditary.
-  assertionDecisions:
+  assertion_decisions:
     - id: sieve:dec/ds-excl-2022
       type: AssertionDecision
       contributor: orcid:0000-0001-5208-3432
-      agentRoleAtTime: core curator
-      agentTrustAtTime: 0.8
+      agent_role_at_time: core curator
+      agent_trust_at_time: 0.8
       date: "2022-05-03"
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
-      signedPacketVersion: "2022-05-03"
+      signed_packet_version: "2022-05-03"
     - id: sieve:dec/ds-excl-2026
       type: AssertionDecision
       contributor: orcid:0000-0001-5208-3432
       date: "2026-10-20"
       outcome: CONTROVERSIAL
       route: INDIVIDUAL_SIGN_OFF
-      inclusionScore: 0.46
-      scoreBand: moderate
-      aggregationRule: sieve:rule/negative-subclass-v1.0
-      signedPacketVersion: "2026-10-20"
+      inclusion_score: 0.46
+      score_band: moderate
+      aggregation_rule: sieve:rule/negative-subclass-v1.0
+      signed_packet_version: "2026-10-20"
       context: ["https://github.com/monarch-initiative/mondo/issues/6004"]
       rationale: Kept despite DOID's positive subclass.
-concordantAssertions:
+prior_claims:
   - id: sieve:ca/doid-14250-isa-630
-    type: ConcordantAssertion
+    type: SubclassStatement
     subject: DOID:14250
     predicate: {code: rdfs:subClassOf}
     object: DOID:630
-    reportedIn: [DOID:14250]
+    reported_in: [DOID:14250]
     resource: infores:disease-ontology
     groundings:
       - id: sieve:chain/doid-14250
         type: ResolutionChain
-        entitySlot: subject
+        entity_slot: subject
         date: "2026-10-20"
-        chainConfidence: 1.0
+        chain_confidence: 1.0
         steps:
           - id: sieve:step/doid-14250-1
             type: AlignmentStep
             category: GROUNDING
             method: STRUCTURED_FIELD
-            inputValue: DOID:14250
-            outputValue: MONDO:0008608
+            input_value: DOID:14250
+            output_value: MONDO:0008608
             predicate: skos:exactMatch
-            mappingSet: http://purl.obolibrary.org/obo/mondo/mappings/mondo.sssom.tsv
-            mappingSetVersion: "2026-10-01"
-            qualityCategory: grounding_curated
+            mapping_set: http://purl.obolibrary.org/obo/mondo/mappings/mondo.sssom.tsv
+            mapping_set_version: "2026-10-01"
+            quality_category: grounding_curated
             confidence: 1.0
-            confidenceBasis: DETERMINISTIC
-            reviewStatus: CONFIRMED
-externalRecords:
+            confidence_basis: DETERMINISTIC
+            review_status: CONFIRMED
+external_records:
   - id: DOID:14250
     type: ExternalRecord
     label: Down syndrome
     resource: infores:disease-ontology
-    recordMetadata:
-      retrievedFrom: infores:disease-ontology
-      sourceRelease: sieve:release/doid-2026-09-01
-      retrievalDate: "2026-09-15"
-      sourceLabel: Down syndrome
+    record_metadata:
+      retrieved_from: infores:disease-ontology
+      source_release: sieve:release/doid-2026-09-01
+      retrieval_date: "2026-09-15"
+      source_label: Down syndrome
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
-referenceSnapshot:
+reference_snapshot:
   id: sieve:pkt/MONDO_0008608-excl-MONDO_0003847#references
   type: SieveRegistry
   version: '2026-10-20'
@@ -130,63 +130,63 @@ referenceSnapshot:
   - id: infores:disease-ontology
     type: InformationResource
     label: Disease Ontology
-    curiePrefixes:
+    curie_prefixes:
     - DOID
-    defaultRole: PRIMARY
-    derivesContentFrom:
+    default_role: PRIMARY
+    derives_content_from:
     - infores:omim
-    qualityRatings:
+    quality_ratings:
     - level: 0.8
       category: high
-      validFrom: '2026-01-01'
+      valid_from: '2026-01-01'
   - id: infores:omim
     type: InformationResource
     label: OMIM
-    curiePrefixes:
+    curie_prefixes:
     - OMIM
-    defaultRole: PRIMARY
-    qualityRatings:
+    default_role: PRIMARY
+    quality_ratings:
     - level: 0.9
       category: high
-      validFrom: '2026-01-01'
+      valid_from: '2026-01-01'
   releases:
   - id: sieve:release/doid-2026-09-01
     type: SourceRelease
-    ofResource: infores:disease-ontology
+    of_resource: infores:disease-ontology
     version: '2026-09-01'
-    releaseDate: '2026-09-01'
+    release_date: '2026-09-01'
   agents:
   - id: orcid:0000-0001-5208-3432
     type: SieveAgent
     subtype: person
     roles:
     - value: core curator
-      validFrom: '2018-01-01'
-    trustLevels:
+      valid_from: '2018-01-01'
+    trust_levels:
     - value: curator
       level: 0.8
-      validFrom: '2018-01-01'
+      valid_from: '2018-01-01'
   - id: sieve:agent/concordance-pipeline
     type: SieveAgent
     subtype: software
     name: SPO concordance pipeline
-    softwareVersion: 1.4.0
+    software_version: 1.4.0
   methods:
   - id: sieve:method/concordance-workflow
     type: SieveMethod
     version: '1.4'
-  aggregationRules:
+  aggregation_rules:
   - id: sieve:rule/negative-subclass-v1.0
     type: AggregationRule
     version: '1.0'
-    claimType: NegativeSubclassStatement
-    strengthBands:
+    claim_type: NegativeSubclassStatement
+    strength_bands:
     - strong >= 0.8
     - moderate >= 0.4
     - weak < 0.4
-    scalingFactor: 2.0
-    defaultQuality: 0.5
-    stackedLines: CAP_AND_ADD
-    claimPriors:
+    scaling_factor: 2.0
+    default_quality: 0.5
+    stacked_lines: CAP_AND_ADD
+    claim_priors:
     - channel: CURATOR
-      logOdds: 0.5
+      log_odds: 0.5
