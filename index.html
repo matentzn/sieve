@@ -555,6 +555,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="requirements-traceability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -845,87 +873,94 @@
 
 
 <h1 id="sieve-scientific-evidence-evaluation-verification-environment">SIEVE: Scientific Evidence Evaluation &amp; Verification Environment<a class="headerlink" href="#sieve-scientific-evidence-evaluation-verification-environment" title="Permanent link">&para;</a></h1>
-<p>SIEVE records <strong>why we believe an ontology assertion</strong> — and packages that "why"
-so a curator, or a machine, can check it. It is a framework for gathering,
-evaluating, and exporting the evidence for and against ontological claims (such
-as subclass relationships in disease ontologies).</p>
-<p>New here? Start with the <a href="primer/">Primer</a> for a plain-language tour, then come
-back for the quick start below.</p>
+<p>SIEVE records <strong>why Mondo believes a claim</strong>, and packages that "why" so a curator, or
+a machine, can check it. It is an evidence model for ontology claims (subclass
+placements, mappings, synonyms, definitions, gene-disease attributes), defined as a
+profile of the <a href="https://github.com/sepio-framework/sepio-linkml">SEPIO</a> core
+information model and traced requirement by requirement to the Mondo requirements
+collection.</p>
+<p>New here? Start with the <a href="primer/">Primer</a>.</p>
 <h2 id="key-concepts">Key concepts<a class="headerlink" href="#key-concepts" title="Permanent link">&para;</a></h2>
-<p>Everything in SIEVE hangs off one container, the <strong><code>EvidencePacket</code></strong>, which
-bundles four things:</p>
+<p>Everything hangs off one container per claim, the versioned <strong><code>EvidencePacket</code></strong>:</p>
 <ul>
-<li><strong>A statement</strong> — the single claim being judged (<code>SieveStatement</code>: a
-  subject → predicate → object triple, e.g. <em>asthma <code>rdfs:subClassOf</code>
-  respiratory system disorder</em>).</li>
-<li><strong>Evidence lines</strong> — each <code>SieveEvidenceLine</code> is <em>one argument</em> for or against
-  the claim, with a <code>direction_of_evidence_provided</code> (<code>supports</code> / <code>disputes</code> /
-  <code>neutral</code>) and a strength/score.</li>
-<li><strong>Typed evidence items</strong> — inside each line, <code>has_evidence_items[]</code> holds the
-  actual content: a paper (<code>SieveDocument</code>), another ontology
-  (<code>ConcordanceItem</code>), a person's note (<code>AgentContribution</code>), a computation
-  (<code>ComputationalResult</code>), and more. You pick the class with a <code>type:</code> field.</li>
-<li><strong>A verdict</strong> — a <code>status</code> (<code>UNREVIEWED</code> → <code>ACCEPTED</code> / <code>REJECTED</code> /
-  <code>CONTROVERSIAL</code>), an optional synthesis, and the steward (<code>curated_by</code>) who
-  decided.</li>
+<li><strong>A statement</strong>: the claim, as one of ten claim types (<code>SubclassStatement</code>,
+  <code>MappingStatement</code>, <code>SynonymStatement</code>, ...). Subject, predicate and object sit on
+  the statement; <code>negated: true</code> makes a negative claim.</li>
+<li><strong>Evidence items</strong>: the information used as evidence (<code>ExternalRecord</code>,
+  prior claims (claim-type statements), <code>TextPassage</code>, <code>Publication</code>, <code>WebPage</code>,
+  <code>GuidelineDocument</code>, <code>ComputationalScore</code>), in typed lists on the packet.</li>
+<li><strong>Evidence lines</strong>: each <code>SieveEvidenceLine</code> is one judgement that some items
+  support or dispute the claim, with a strength in [0, 1] and the
+  <code>InterpretationActivity</code> that produced it.</li>
+<li><strong>Assertion decisions</strong>: each <code>AssertionDecision</code> records whether the claim was
+  accepted, rejected, kept as controversial or deferred, by whom, by which route, and
+  on which packet version and inclusion score.</li>
 </ul>
 <div class="admonition note">
-<p class="admonition-title">Two levels: lines, then items</p>
-<p>Evidence is nested. A single <em>line</em> of argument can rest on several <em>items</em>
-— "three papers and a clinician all agree" is one supporting line built from
-four items. SIEVE combines the lines into a single <strong>Net Evidence Ratio</strong>
-(<code>sieve.scoring.net_evidence_ratio</code>), between −1 (all against) and +1 (all
-for). The <a href="primer/">Primer</a> walks a worked example.</p>
+<p class="admonition-title">Two levels of judgement, three axes</p>
+<p>Interpreting evidence (lines) and deciding on the claim (decisions) are recorded
+separately. Provenance (where a claim came from), evidence (whether it is
+supported) and data quality (whether the evidence was read correctly) are kept
+apart. The claim type's aggregation rule turns the lines into an <strong>inclusion
+score</strong> S in [-1, 1].</p>
 </div>
-<p>For the field-by-field schema, see the <a href="data-model/">Data Model</a>. For the small
-shared core that other Monarch projects can reuse, see the
+<p>For every field, see the <a href="data-model/">Data Model</a>. For which requirement each part
+answers, see <a href="requirements-traceability/">Requirements Traceability</a>. The small,
+separate kernel for other Monarch projects is described in
 <a href="monarch-evidence/">Minimal Evidence Model</a>.</p>
 <h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Install sieve</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Ingest evidence packets from inbox/</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>sieve<span class="w"> </span>ingest<span class="w"> </span>-I<span class="w"> </span>inbox/
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Run the web interface</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>sieve<span class="w"> </span>run
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Validate a packet against the profile</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>uv<span class="w"> </span>run<span class="w"> </span>linkml-validate<span class="w"> </span>-s<span class="w"> </span>schema/sieve.yaml<span class="w"> </span>-C<span class="w"> </span>EvidencePacket<span class="w"> </span>my_packet.yaml
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Regenerate the Pydantic model and the traceability page after schema edits</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>just<span class="w"> </span>gen-pydantic
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>just<span class="w"> </span>gen-traceability
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Export accepted assertions to RDF</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-I<span class="w"> </span>exports/accepted/<span class="w"> </span>-O<span class="w"> </span>rdf<span class="w"> </span>-o<span class="w"> </span>accepted.ttl
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1"># Validate evidence packets against schema</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-I<span class="w"> </span>inbox/
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Run the profile, traceability and example tests</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/test_profile_schema.py<span class="w"> </span>tests/test_profile_examples.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span>tests/test_profile_checks.py<span class="w"> </span>tests/test_traceability.py
 </code></pre></div>
-<p>See the <a href="cli/">CLI Reference</a> for every command and option.</p>
+<p>linkml-validate needs dates quoted in YAML (see <a href="data-model/#validation">Data Model</a>).
+The fixtures in <code>tests/data/profile/valid/</code> leave dates unquoted, so the CLI rejects
+them as they are; the tests load them with dates kept as strings.</p>
+<div class="admonition warning">
+<p class="admonition-title">Application layer not yet migrated</p>
+<p>The review app, the DuckDB store, ingest, RDF export, scoring and the <code>sieve</code> CLI
+still target the pre-profile model and do not work with the current schema. They
+are being migrated (<code>issues/issue_migrate_app_to_profile.md</code>). The
+<a href="cli/">CLI Reference</a>, <a href="workflows/">Workflows</a> and <a href="api/">Python API</a> pages
+mark which parts this affects.</p>
+</div>
 <h2 id="use-cases">Use cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Disease ontology curation (Mondo, DOID)</li>
-<li>Cross-ontology alignment validation</li>
-<li>Evidence-based ontology quality assurance</li>
-<li>Collaborative multi-curator review workflows</li>
-<li>AI-assisted evidence aggregation and synthesis</li>
+<li>Evidence-based curation of Mondo claims</li>
+<li>Keeping the origin of a claim apart from the evidence for it</li>
+<li>Mapping and cross-ontology alignment review</li>
+<li>Policy-based and batch acceptance with an audit trail</li>
+<li>Recording AI-extracted evidence with the checks a reviewer needs</li>
 </ul>
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="primer/">Primer</a> — plain-language introduction to the model</li>
-<li><a href="monarch-evidence/">Minimal Evidence Model</a> — the reusable microschema and transforms</li>
-<li><a href="data-model/">Data Model</a> — LinkML schema, classes, and slots</li>
-<li><a href="architecture/">Architecture</a> — system design and components</li>
-<li><a href="cli/">CLI Reference</a> — command-line interface</li>
-<li><a href="workflows/">Workflows</a> — usage patterns and recipes</li>
-<li><a href="api/">Python API</a> — module and function reference</li>
+<li><a href="primer/">Primer</a>: plain-language introduction to the model</li>
+<li><a href="monarch-evidence/">Minimal Evidence Model</a>: the separate reusable microschema</li>
+<li><a href="data-model/">Data Model</a>: the profile, module by module</li>
+<li><a href="architecture/">Architecture</a>: schema, checks and application components</li>
+<li><a href="elements/">Schema Reference</a>: generated per-class and per-slot pages</li>
+<li><a href="requirements-traceability/">Requirements Traceability</a>: requirement to schema element</li>
+<li><a href="cli/">CLI Reference</a> and <a href="workflows/">Workflows</a>: commands and recipes</li>
+<li><a href="api/">Python API</a>: module and function reference</li>
+<li><a href="ai-integration/">AI Integration</a>: authoring packets as an AI agent</li>
 </ul>
 <h2 id="technology-stack">Technology stack<a class="headerlink" href="#technology-stack" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Python 3.10+</strong> with LinkML for data modeling and validation</li>
-<li><strong>DuckDB</strong> for local storage (<code>data/sieve.duckdb</code>)</li>
-<li><strong>Streamlit</strong> for the web interface</li>
-<li><strong>RDFLib</strong> for RDF generation</li>
-<li><strong>Typer</strong> for the CLI</li>
+<li><strong>Python 3.10+</strong>, <code>uv</code>, <code>just</code></li>
+<li><strong>LinkML</strong> for the schema, validation and the generated Pydantic model</li>
+<li><strong>DuckDB</strong>, <strong>Streamlit</strong>, <strong>RDFLib</strong> and <strong>Typer</strong> in the (pre-profile) application layer</li>
 </ul>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
-<p>SIEVE is open source and welcomes contributions — issues, pull requests, and
-development guidelines live in the
+<p>Issues and pull requests are welcome in the
 <a href="https://github.com/matentzn/sieve">GitHub repository</a>.</p>
 
 

@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://matentzn.github.io/sieve/cli/">
       
       
-        <link rel="prev" href="../elements/">
+        <link rel="prev" href="../requirements-traceability/">
       
       
         <link rel="next" href="../workflows/">
@@ -444,6 +444,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../requirements-traceability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -583,17 +611,57 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#commands-overview" class="md-nav__link">
+  <a href="#working-commands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Commands Overview
+        Working commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Working commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linkml-validate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        linkml-validate
       
     </span>
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#just-extract-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        just extract-requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
+  <a href="#pre-profile-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-profile commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pre-profile commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#sieve-run" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -603,8 +671,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#sieve-ingest" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -614,8 +682,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#sieve-export" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -625,57 +693,12 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#sieve-validate" class="md-nav__link">
     <span class="md-ellipsis">
       
         sieve validate
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-workflows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common Workflows
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Workflows">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#initial-setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Initial Setup
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#export-after-curation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Export After Curation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cicd-integration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CI/CD Integration
       
     </span>
   </a>
@@ -711,10 +734,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#database-file-not-found" class="md-nav__link">
+  <a href="#cannot-import-name-from-sievedatamodelsieve_models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        "Database file not found"
+        "cannot import name ... from 'sieve.datamodel.sieve_models'"
       
     </span>
   </a>
@@ -947,16 +970,80 @@
 
 
 <h1 id="cli-reference">CLI Reference<a class="headerlink" href="#cli-reference" title="Permanent link">&para;</a></h1>
-<p>SIEVE provides a command-line interface for common operations. All commands are accessed through the <code>sieve</code> command.</p>
+<div class="admonition warning">
+<p class="admonition-title">The <code>sieve</code> CLI targets the pre-profile model</p>
+<p><code>sieve run</code>, <code>ingest</code>, <code>export</code> and <code>validate</code> still target the pre-profile model.
+<code>ingest</code>, <code>export</code> and <code>validate</code> fail at import against the current schema. They
+are being migrated (<code>issues/issue_migrate_app_to_profile.md</code>). Until then, validate
+packets with <code>linkml-validate</code> and <code>sieve.profile_checks</code>, and maintain the
+generated artefacts with the <code>just</code> recipes below.</p>
+</div>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Install in development mode</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Or with uv</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev
 </code></pre></div>
-<h2 id="commands-overview">Commands Overview<a class="headerlink" href="#commands-overview" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sieve<span class="w"> </span>--help
+<h2 id="working-commands">Working commands<a class="headerlink" href="#working-commands" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uv run linkml-validate -s schema/sieve.yaml -C EvidencePacket &lt;file&gt;</code></td>
+<td>Validate a packet against the profile (structure, enums, ranges, class rules)</td>
+</tr>
+<tr>
+<td><code>uv run linkml-validate -s schema/sieve.yaml -C SieveRegistry &lt;file&gt;</code></td>
+<td>Validate a registry of resources, agents, rules and policies</td>
+</tr>
+<tr>
+<td><code>just gen-pydantic</code></td>
+<td>Regenerate <code>src/sieve/datamodel/sieve_models.py</code> from the schema</td>
+</tr>
+<tr>
+<td><code>just gen-traceability</code></td>
+<td>Regenerate <code>docs/requirements-traceability.md</code></td>
+</tr>
+<tr>
+<td><code>just extract-requirements [workbook]</code></td>
+<td>Re-extract <code>requirements/mondo_requirements.tsv</code> from the Mondo requirements workbook</td>
+</tr>
+<tr>
+<td><code>just gen-docs</code></td>
+<td>Regenerate the schema reference in <code>docs/elements/</code></td>
+</tr>
+<tr>
+<td><code>just serve-docs</code></td>
+<td>Regenerate the schema reference and serve the docs locally</td>
+</tr>
+</tbody>
+</table>
+<h3 id="linkml-validate">linkml-validate<a class="headerlink" href="#linkml-validate" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>linkml-validate<span class="w"> </span>-s<span class="w"> </span>schema/sieve.yaml<span class="w"> </span>-C<span class="w"> </span>EvidencePacket<span class="w"> </span>packet.yaml
+</code></pre></div>
+<p>Prints <code>No issues found</code> or one <code>[ERROR]</code> line per problem, and exits 1 on errors.
+It checks required fields, ranges, enums (<code>Direction</code>, <code>ReviewState</code>,
+<code>AssertionRoute</code>, ...), numeric bounds (line <code>score_of_evidence_provided</code> in [0, 1],
+inclusion score in [-1, 1]) and the class rules (policy and provider routes only
+accept and name their policy; batch decisions name batch and review depth; a
+confidence needs a basis). The validator is closed, so unknown fields are errors.</p>
+<p>Quote dates in YAML (<code>date: "2026-10-20"</code>). Unquoted dates are parsed into date
+objects and rejected as "not of type 'string'". Predicate bindings and the
+claim-evidence matrix are not checked here; run <code>sieve.profile_checks.check_packet</code>
+for those (see <a href="../workflows/#2-validate">Workflows</a>).</p>
+<h3 id="just-extract-requirements">just extract-requirements<a class="headerlink" href="#just-extract-requirements" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>just<span class="w"> </span>extract-requirements<span class="w">                                   </span><span class="c1"># ../../notes/evidence/background/mondo-requirements/...</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>just<span class="w"> </span>extract-requirements<span class="w"> </span>/path/to/Mondo_Requirements_Collection_Forms.xlsx
+</code></pre></div>
+<p>Writes one row per requirement (category rows skipped) to
+<code>requirements/mondo_requirements.tsv</code>. <code>tests/test_traceability.py</code> compares the TSV
+with the workbook when the workbook is checked out.</p>
+<hr />
+<h2 id="pre-profile-commands">Pre-profile commands<a class="headerlink" href="#pre-profile-commands" title="Permanent link">&para;</a></h2>
+<p>The rest of this page describes the <code>sieve</code> commands as implemented.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uv<span class="w"> </span>run<span class="w"> </span>sieve<span class="w"> </span>--help
 </code></pre></div>
 <table>
 <thead>
@@ -968,7 +1055,7 @@
 <tbody>
 <tr>
 <td><code>sieve run</code></td>
-<td>Launch the web interface</td>
+<td>Launch the Streamlit web interface</td>
 </tr>
 <tr>
 <td><code>sieve ingest</code></td>
@@ -984,20 +1071,8 @@
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="sieve-run">sieve run<a class="headerlink" href="#sieve-run" title="Permanent link">&para;</a></h2>
-<p>Launch the Streamlit web application for interactive curation.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sieve<span class="w"> </span>run
-</code></pre></div>
-<p>This command starts the Streamlit server and opens the web interface in your browser. The application provides:</p>
-<ul>
-<li>Dashboard with curation statistics</li>
-<li>Record browsing and filtering</li>
-<li>Evidence review interface</li>
-<li>Decision making controls</li>
-<li>Export functionality</li>
-</ul>
-<p><strong>Environment Variables:</strong></p>
+<h3 id="sieve-run">sieve run<a class="headerlink" href="#sieve-run" title="Permanent link">&para;</a></h3>
+<p>Starts the Streamlit app (dashboard, review queue, ingest and export views).</p>
 <table>
 <thead>
 <tr>
@@ -1039,12 +1114,9 @@
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="sieve-ingest">sieve ingest<a class="headerlink" href="#sieve-ingest" title="Permanent link">&para;</a></h2>
-<p>Load YAML evidence packets into the DuckDB database.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sieve<span class="w"> </span>ingest<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<h3 id="sieve-ingest">sieve ingest<a class="headerlink" href="#sieve-ingest" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sieve<span class="w"> </span>ingest<span class="w"> </span><span class="o">[</span>-I<span class="w"> </span>&lt;dir&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--db<span class="w"> </span>&lt;path&gt;<span class="o">]</span>
 </code></pre></div>
-<p><strong>Options:</strong></p>
 <table>
 <thead>
 <tr>
@@ -1069,32 +1141,11 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Ingest from default inbox directory</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>sieve<span class="w"> </span>ingest
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Ingest from specific directory</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>sieve<span class="w"> </span>ingest<span class="w"> </span>-I<span class="w"> </span>/path/to/packets/
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Use custom database path</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>sieve<span class="w"> </span>ingest<span class="w"> </span>-I<span class="w"> </span>inbox/<span class="w"> </span>--db<span class="w"> </span>custom.duckdb
+<p>Recursively finds <code>.yaml</code> / <code>.yml</code> files, validates and upserts each packet into
+DuckDB, computes the Net Evidence Ratio, and reports <code>Ingested N of M packets</code>.</p>
+<h3 id="sieve-export">sieve export<a class="headerlink" href="#sieve-export" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="o">(</span>-i<span class="w"> </span>&lt;file&gt;<span class="w"> </span><span class="p">|</span><span class="w"> </span>-I<span class="w"> </span>&lt;dir&gt;<span class="o">)</span><span class="w"> </span><span class="o">[</span>-o<span class="w"> </span>&lt;out&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>-O<span class="w"> </span>&lt;format&gt;<span class="o">]</span>
 </code></pre></div>
-<p><strong>Output:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Ingested 15 of 18 packets
-</code></pre></div>
-<p><strong>Behavior:</strong></p>
-<ul>
-<li>Recursively finds all <code>.yaml</code> and <code>.yml</code> files in the directory</li>
-<li>Parses and validates each file as an <code>EvidencePacket</code>, then upserts it into DuckDB</li>
-<li>Computes the Net Evidence Ratio and promotes filter columns (subject/predicate/object, status, steward)</li>
-<li>Reports how many packets were ingested out of the total files found</li>
-</ul>
-<hr />
-<h2 id="sieve-export">sieve export<a class="headerlink" href="#sieve-export" title="Permanent link">&para;</a></h2>
-<p>Export evidence packets to various formats.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<p><strong>Options:</strong></p>
 <table>
 <thead>
 <tr>
@@ -1131,217 +1182,66 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Output Formats:</strong></p>
 <table>
 <thead>
 <tr>
 <th>Format</th>
 <th>Description</th>
-<th>File Extension</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>rdf</code>, <code>turtle</code>, <code>ttl</code></td>
-<td>RDF Turtle format</td>
-<td><code>.ttl</code></td>
+<td>RDF Turtle</td>
 </tr>
 <tr>
 <td><code>xml</code>, <code>rdfxml</code></td>
-<td>RDF/XML format</td>
-<td><code>.rdf</code></td>
+<td>RDF/XML</td>
 </tr>
 <tr>
 <td><code>n3</code></td>
-<td>N3 notation</td>
-<td><code>.n3</code></td>
+<td>N3</td>
 </tr>
 <tr>
 <td><code>nt</code>, <code>ntriples</code></td>
 <td>N-Triples</td>
-<td><code>.nt</code></td>
 </tr>
 <tr>
 <td><code>yaml</code></td>
-<td>YAML (passthrough/combine)</td>
-<td><code>.yaml</code></td>
+<td>YAML (combine)</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Export single file to RDF Turtle</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-i<span class="w"> </span>packet.yaml<span class="w"> </span>-O<span class="w"> </span>rdf<span class="w"> </span>-o<span class="w"> </span>output.ttl
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Export directory to RDF</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-I<span class="w"> </span>exports/accepted/<span class="w"> </span>-O<span class="w"> </span>rdf<span class="w"> </span>-o<span class="w"> </span>accepted.ttl
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># Export to RDF/XML</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-i<span class="w"> </span>packet.yaml<span class="w"> </span>-O<span class="w"> </span>xml<span class="w"> </span>-o<span class="w"> </span>output.rdf
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1"># Export to stdout</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-i<span class="w"> </span>packet.yaml<span class="w"> </span>-O<span class="w"> </span>rdf
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="c1"># Combine multiple YAML files</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-I<span class="w"> </span>packets/<span class="w"> </span>-O<span class="w"> </span>yaml<span class="w"> </span>-o<span class="w"> </span>combined.yaml
-</code></pre></div>
-<p><strong>RDF Export Behavior:</strong></p>
-<p>The RDF export creates OWL axiom annotations following OBO conventions:</p>
-<ol>
-<li>
-<p><strong>Status Required</strong>: Only packets with status ACCEPTED, REJECTED, or CONTROVERSIAL are exported. Packets without a status or with UNREVIEWED status generate warnings and are skipped.</p>
-</li>
-<li>
-<p><strong>Status-Specific Properties</strong>:</p>
-</li>
-<li><strong>ACCEPTED</strong>: Adds <code>oboInOwl:source</code> with evidence steward ORCID and sources from accepted supporting evidence</li>
-<li><strong>REJECTED</strong>: Adds <code>IAO:0000233</code> (term tracker item) linking to the evidence packet</li>
-<li>
-<p><strong>CONTROVERSIAL</strong>: Adds <code>rdfs:comment</code> with controversy note and <code>IAO:0000233</code></p>
-</li>
-<li>
-<p><strong>Evidence Sources</strong>: For ACCEPTED packets, evidence items on supporting lines that are themselves <code>rating: ACCEPTED</code> contribute additional <code>oboInOwl:source</code> values, drawn from whichever of these fields the item carries:</p>
-</li>
-<li><code>pmid</code> / <code>doi</code> (e.g. from a <code>SieveDocument</code>)</li>
-<li><code>source_id</code> / <code>source_subject</code> (e.g. from a <code>ConcordanceItem</code>)</li>
-</ol>
-<p><strong>Example RDF Output:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">owl:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2002/07/owl#&gt;</span><span class="w"> </span><span class="p">.</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">rdfs:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span><span class="w"> </span><span class="p">.</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">oboInOwl:</span><span class="w"> </span><span class="nv">&lt;http://www.geneontology.org/formats/oboInOwl#&gt;</span><span class="w"> </span><span class="p">.</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">SEPIO:</span><span class="w"> </span><span class="nv">&lt;http://purl.obolibrary.org/obo/SEPIO_&gt;</span><span class="w"> </span><span class="p">.</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nn">_</span><span class="p">:</span><span class="nt">axiom1</span> <span class="kt">a</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">Axiom</span> <span class="p">;</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedSource</span> <span class="nv">&lt;http://purl.obolibrary.org/obo/MONDO_0004979&gt;</span> <span class="p">;</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedProperty</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subClassOf</span> <span class="p">;</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedTarget</span> <span class="nv">&lt;http://purl.obolibrary.org/obo/MONDO_0005275&gt;</span> <span class="p">;</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="nn">SEPIO</span><span class="p">:</span><span class="nt">0000124</span> <span class="nv">&lt;http://purl.org/np/RA9876543210&gt;</span> <span class="p">;</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    <span class="nn">oboInOwl</span><span class="p">:</span><span class="nt">source</span> <span class="nv">&lt;https://orcid.org/0000-0002-6601-2165&gt;</span> <span class="p">;</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>    <span class="nn">oboInOwl</span><span class="p">:</span><span class="nt">source</span> <span class="s">&quot;PMID:28884740&quot;</span> <span class="p">;</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>    <span class="nn">oboInOwl</span><span class="p">:</span><span class="nt">source</span> <span class="s">&quot;ICD10CM:J45&quot;</span> <span class="p">.</span>
-</code></pre></div>
-<hr />
-<h2 id="sieve-validate">sieve validate<a class="headerlink" href="#sieve-validate" title="Permanent link">&para;</a></h2>
-<p>Validate evidence packets against the LinkML schema.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sieve<span class="w"> </span>validate<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Short</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--input</code></td>
-<td><code>-i</code></td>
-<td>Input YAML file (single packet)</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>--input-dir</code></td>
-<td><code>-I</code></td>
-<td>Input directory containing YAML files</td>
-<td>-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Validate a single file</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-i<span class="w"> </span>packet.yaml
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Validate all files in a directory</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-I<span class="w"> </span>inbox/
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Validate exported packets</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-I<span class="w"> </span>exports/accepted/
-</code></pre></div>
-<p><strong>Output:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>ERROR (inbox/bad_packet.yaml): &#39;statement&#39; is a required property
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Validated 10 file(s); 2 total error(s)
-</code></pre></div>
-<p><strong>Exit Codes:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0</td>
-<td>All files valid</td>
-</tr>
-<tr>
-<td>1</td>
-<td>One or more validation errors</td>
-</tr>
-</tbody>
-</table>
-<p><strong>What is Validated:</strong></p>
-<p>Each file is validated as an <code>EvidencePacket</code> against <code>schema/sieve.yaml</code>:</p>
+<p>RDF export writes an <code>owl:Axiom</code> annotation per decided packet:</p>
 <ul>
-<li>Required fields present (<code>id</code>, <code>statement</code>, <code>status</code>)</li>
-<li>Field types match the schema (strings, numbers, dates)</li>
-<li>Enum values are valid (<code>CurationStatus</code>, <code>direction_of_evidence_provided</code>, item <code>type</code>, etc.)</li>
-<li>Numeric constraints (e.g. <code>0.0 &lt;= score_of_evidence_provided &lt;= 1.0</code>)</li>
-<li>Nested structure: <code>statement</code>, <code>has_evidence_lines</code> → <code>has_evidence_items</code> (each with a valid <code>type</code>)</li>
+<li>only packets with status <code>ACCEPTED</code>, <code>REJECTED</code> or <code>CONTROVERSIAL</code> are exported;
+  others are skipped with a warning;</li>
+<li><code>ACCEPTED</code> adds <code>oboInOwl:source</code> for the steward ORCID and for accepted items on
+  supporting lines;</li>
+<li><code>REJECTED</code> adds <code>IAO:0000233</code> (term tracker item) linking to the packet;</li>
+<li><code>CONTROVERSIAL</code> adds an <code>rdfs:comment</code> and <code>IAO:0000233</code>.</li>
 </ul>
-<hr />
-<h2 id="common-workflows">Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
-<h3 id="initial-setup">Initial Setup<a class="headerlink" href="#initial-setup" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Create inbox directory and add evidence packets</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>inbox/
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>cp<span class="w"> </span>my_packets/*.yaml<span class="w"> </span>inbox/
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1"># Validate before ingesting</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-I<span class="w"> </span>inbox/
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1"># Ingest into database</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>sieve<span class="w"> </span>ingest<span class="w"> </span>-I<span class="w"> </span>inbox/
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="c1"># Launch web interface for review</span>
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>sieve<span class="w"> </span>run
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nn">_</span><span class="p">:</span><span class="nt">axiom1</span> <span class="kt">a</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">Axiom</span> <span class="p">;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedSource</span> <span class="nv">&lt;http://purl.obolibrary.org/obo/MONDO_0004979&gt;</span> <span class="p">;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedProperty</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subClassOf</span> <span class="p">;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedTarget</span> <span class="nv">&lt;http://purl.obolibrary.org/obo/MONDO_0005275&gt;</span> <span class="p">;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="nn">SEPIO</span><span class="p">:</span><span class="nt">0000124</span> <span class="nv">&lt;http://purl.org/np/RA9876543210&gt;</span> <span class="p">;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="nn">oboInOwl</span><span class="p">:</span><span class="nt">source</span> <span class="nv">&lt;https://orcid.org/0000-0002-6601-2165&gt;</span> <span class="p">.</span>
 </code></pre></div>
-<h3 id="export-after-curation">Export After Curation<a class="headerlink" href="#export-after-curation" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Export accepted assertions to RDF</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-I<span class="w"> </span>exports/accepted/<span class="w"> </span>-O<span class="w"> </span>rdf<span class="w"> </span>-o<span class="w"> </span>accepted_axioms.ttl
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Export all curated packets to combined YAML</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-I<span class="w"> </span>exports/<span class="w"> </span>-O<span class="w"> </span>yaml<span class="w"> </span>-o<span class="w"> </span>all_curated.yaml
+<h3 id="sieve-validate">sieve validate<a class="headerlink" href="#sieve-validate" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sieve<span class="w"> </span>validate<span class="w"> </span><span class="o">(</span>-i<span class="w"> </span>&lt;file&gt;<span class="w"> </span><span class="p">|</span><span class="w"> </span>-I<span class="w"> </span>&lt;dir&gt;<span class="o">)</span>
 </code></pre></div>
-<h3 id="cicd-integration">CI/CD Integration<a class="headerlink" href="#cicd-integration" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Validate in CI pipeline (exit code indicates success/failure)</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-I<span class="w"> </span>evidence_packets/
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Validation failed&quot;</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="k">fi</span>
-</code></pre></div>
+<p>Validates each file as an <code>EvidencePacket</code> against <code>schema/sieve.yaml</code>, prints one
+line per error and a summary, and exits 1 on any error. It currently fails at import;
+use <code>linkml-validate</code> as above.</p>
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="no-module-named-sieve">"No module named 'sieve'"<a class="headerlink" href="#no-module-named-sieve" title="Permanent link">&para;</a></h3>
-<p>Ensure the package is installed:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="c1"># or</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-</code></pre></div></p>
-<h3 id="database-file-not-found">"Database file not found"<a class="headerlink" href="#database-file-not-found" title="Permanent link">&para;</a></h3>
-<p>The database is created automatically on first use. Ensure you have write permissions to the <code>data/</code> directory.</p>
+<p>Run <code>uv sync --group dev</code>, and run commands through <code>uv run</code>.</p>
+<h3 id="cannot-import-name-from-sievedatamodelsieve_models">"cannot import name ... from 'sieve.datamodel.sieve_models'"<a class="headerlink" href="#cannot-import-name-from-sievedatamodelsieve_models" title="Permanent link">&para;</a></h3>
+<p>The command is one of the pre-profile ones above.</p>
 <h3 id="orcid-authentication-failed">"ORCID authentication failed"<a class="headerlink" href="#orcid-authentication-failed" title="Permanent link">&para;</a></h3>
-<p>Check that ORCID OAuth credentials are configured:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ORCID_CLIENT_ID</span><span class="o">=</span>your_client_id
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ORCID_CLIENT_SECRET</span><span class="o">=</span>your_client_secret
-</code></pre></div></p>
-<p>Or use development mode:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SIEVE_DEV_MODE</span><span class="o">=</span><span class="nb">true</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>sieve<span class="w"> </span>run
-</code></pre></div></p>
+<p>Check <code>ORCID_CLIENT_ID</code> and <code>ORCID_CLIENT_SECRET</code>, or set <code>SIEVE_DEV_MODE=true</code>.</p>
 
 
 

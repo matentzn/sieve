@@ -216,6 +216,18 @@
   </span>
 </a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../requirements-traceability/">
+<span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+</a>
+</li>
 </ul>
 </nav>
 </li>
@@ -339,11 +351,21 @@
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
 <h1 id="class-utility">Class: Utility<a class="headerlink" href="#class-utility" title="Permanent link">¶</a></h1>
-<p><em>Abstract organizational class grouping classes that act as complex datatypes in the model.</em></p>
+<p><em>An abstract organizational class that groups classes acting as complex datatypes in the model - providing reusable collections of fields that can be plugged into other objects to capture sets of related information.</em></p>
 <p>URI: <a href="https://w3id.org/sieve/Utility">sieve:Utility</a></p>
 <div class="mermaid"> classDiagram
     class Utility
     click Utility href "../Utility/"
+      Utility &lt;|-- TextLocation
+        click TextLocation href "../TextLocation/"
+      Utility &lt;|-- QualityRating
+        click QualityRating href "../QualityRating/"
+      Utility &lt;|-- LevelAssignment
+        click LevelAssignment href "../LevelAssignment/"
+      Utility &lt;|-- AppliedRule
+        click AppliedRule href "../AppliedRule/"
+      Utility &lt;|-- ClaimPrior
+        click ClaimPrior href "../ClaimPrior/"
       Utility &lt;|-- Coding
         click Coding href "../Coding/"
       Utility &lt;|-- Qualifier
@@ -362,6 +384,11 @@
 <h2 id="inheritance">Inheritance<a class="headerlink" href="#inheritance" title="Permanent link">¶</a></h2>
 <ul>
 <li><strong>Utility</strong><ul>
+<li><a href="../TextLocation/">TextLocation</a></li>
+<li><a href="../QualityRating/">QualityRating</a></li>
+<li><a href="../LevelAssignment/">LevelAssignment</a></li>
+<li><a href="../AppliedRule/">AppliedRule</a></li>
+<li><a href="../ClaimPrior/">ClaimPrior</a></li>
 <li><a href="../Coding/">Coding</a></li>
 <li><a href="../Qualifier/">Qualifier</a></li>
 <li><a href="../Expression/">Expression</a></li>
@@ -390,6 +417,10 @@
 </tr>
 </tbody>
 </table>
+<h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">¶</a></h2>
+<ul>
+<li>The Utility class itself is abstract and has no direct attributes. Implementers would always use one of its concrete subtypes with specifically defined fields (e.g. Coding, Expression, Extension).</li>
+</ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information<a class="headerlink" href="#identifier-and-mapping-information" title="Permanent link">¶</a></h2>
 <h3 id="schema-source">Schema Source<a class="headerlink" href="#schema-source" title="Permanent link">¶</a></h3>
 <ul>
@@ -419,17 +450,27 @@
 <h3 id="direct">Direct<a class="headerlink" href="#direct" title="Permanent link">¶</a></h3>
 <details>
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Utility</span>
-<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Abstract organizational class grouping classes that act as complex datatypes</span>
-<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">in the model.</span>
-<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
+<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">An abstract organizational class that groups classes acting as complex</span>
+<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">datatypes in the model - providing reusable collections of fields that can be plugged</span>
+<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">into other objects to capture sets of related information.</span>
+<a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="nt">comments</span><span class="p">:</span>
+<a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The Utility class itself is abstract and has no direct attributes. Implementers</span>
+<a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">would always use one of its concrete subtypes with specifically defined fields (e.g.</span>
+<a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Coding, Expression, Extension).</span>
+<a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
 </code></pre></div>
 </details>
 <h3 id="induced">Induced<a class="headerlink" href="#induced" title="Permanent link">¶</a></h3>
 <details>
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Utility</span>
-<a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Abstract organizational class grouping classes that act as complex datatypes</span>
-<a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">in the model.</span>
-<a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
+<a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">An abstract organizational class that groups classes acting as complex</span>
+<a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">datatypes in the model - providing reusable collections of fields that can be plugged</span>
+<a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">into other objects to capture sets of related information.</span>
+<a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="nt">comments</span><span class="p">:</span>
+<a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The Utility class itself is abstract and has no direct attributes. Implementers</span>
+<a href="#__codelineno-1-7" id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">would always use one of its concrete subtypes with specifically defined fields (e.g.</span>
+<a href="#__codelineno-1-8" id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Coding, Expression, Extension).</span>
+<a href="#__codelineno-1-9" id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
 </code></pre></div>
 </details>
 </article>

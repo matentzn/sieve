@@ -2,734 +2,1454 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://matentzn.github.io/sieve/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/ai-integration/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/api/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/architecture/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/cli/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/data-model/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/monarch-evidence/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/orcid-setup/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/primer/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/requirements-traceability/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/workflows/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/AccessStatus/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Activity/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Agent/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/AgentContribution/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/AgentKind/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/AgentRole/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/AggregationRule/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/AlignmentQuality/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/AlignmentStep/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/AppliedRule/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/AssertionDecision/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/AssertionRoute/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/BatchSignOff/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Boolean/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Characteristic/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/ClaimPrior/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/ClaimType/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Coding/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/ComputationalResult/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/ComputationalScore/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/ConcordanceItem/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/ConfidenceBasis/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Contribution/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/ContributionChannel/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/ContributionType/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/CuratedEvidence/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/CurationActivity/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/CurationDecision/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/CurationStatus/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Curie/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/DataItem/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/DataQualityFlag/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/DataSet/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Date/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/DateOrDatetime/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Datetime/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Decimal/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/DecisionType/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/DecisionOutcome/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/DecisionPolicy/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/DefinitionPredicate/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/DefinitionStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/DerivationType/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/Direction/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/DiseaseAttributePredicate/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/DiseaseAttributeStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/DiseaseKind/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Document/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Double/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Entity/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/EvidenceDirection/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/EntitySlot/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/EvidenceItemType/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/EvidenceItem/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/EvidenceLine/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/EvidencePacket/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/EvidenceStrength/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/EvidenceSynthesis/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/EvidencePacketCollection/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Expression/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Extension/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/ExternalRecord/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Float/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/GuidelineDocument/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/InformationEntity/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/InformationResource/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Integer/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/InterpretationActivity/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/InterpretationMethod/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Jsonpath/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Jsonpointer/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/LevelAssignment/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/LineAction/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/LineStatusChange/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/LineValidity/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/LogOddsBasis/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/MappingDirection/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/MappingPredicate/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/MappingStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/MetaclassPredicate/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/MetaclassStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/Method/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Ncname/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/NegativeSubclassStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Nodeidentifier/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Objectidentifier/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/OriginEvent/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/ProposingChannel/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Proposition/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/Publication/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Qualifier/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/QualityRating/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/ReadCoverage/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/RecordMetadata/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/Score/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/ResolutionChain/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/SieveDataItem/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/ResourceRole/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/SieveDocument/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/RetrievalMetadata/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/SieveEvidenceItem/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/ReviewDepth/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/ReviewState/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SieveAgent/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SieveContribution/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/SieveEvidenceLine/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SieveMethod/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SieveRegistry/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/SieveStatement/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/SieveStudyResult/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/SourceRelease/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Sparqlpath/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/StackingPolicy/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Statement/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/StepStatus/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/String/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/StudyGroup/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/StudyResult/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SubclassPredicate/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SubclassStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SubsetMembershipStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SubsetPredicate/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SynonymPredicate/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/SynonymStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/TermExistencePredicate/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/TermExistenceStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/TextLocation/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/TextPassage/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Time/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/TrustLevel/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/TransformationCategory/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/TransformationMethod/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/UpstreamItem/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Uri/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Uriorcurie/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/Utility/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/ValueSetMembershipStatement/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/ValueSetPredicate/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/VerificationOutcome/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/WebPage/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/acceptance_threshold/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/access_status/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/action/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/activity_type/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/agent_role_at_time/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/agent_trust_at_time/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/agents/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/aggregation_rule/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/aggregation_rules/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/alternative_labels/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/applied_rules/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/approval_date/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/approved_by/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/assertion_decisions/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/batch/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/batches/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/category/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/certainty/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/chain_confidence/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/channel/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/char_end/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/char_start/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/characteristics/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/cited_evidence/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/claim_priors/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/claim_type/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/code/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/content/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/component_data_item/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/contribution_type/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/component_result/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/computational_scores/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/computed_by_rule/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/confidence/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/confidence_basis/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/confidence_floor/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/confidence_interval/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/context/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/contribution_made_to/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/contributions/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/contributor/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/created/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/created_with/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/curated_by/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/curator/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/curator_name/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/curie_prefixes/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/data_items/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/data_quality_flags/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/date/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/date_attached/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/date_authored/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/date_record_created/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/decided_at/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/default_quality/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/decision/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/default_role/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/derivation_type/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/derived_from/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/derived_from_record/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/derives_content_from/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/description/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/direction/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/direction_of_evidence_provided/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/document_version/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/doi/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/eco_code/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/domain/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/eco_label/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/encoding_specifications/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/evidence_item_type/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/entity_slot/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/evidence_synthesis/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/evidence_item_sources/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/evidence_line/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/exclusive/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/exclusivity_rule/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/extension_description/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/extensions/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/external_records/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/filter_query/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/focus/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/generated_by/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/generation_context/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/grounding_checked/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/groundings/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/guidelines/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/has_evidence/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/has_evidence_from_sources/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/has_evidence_items/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/has_evidence_lines/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/has_evidence_of_types/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/id/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/identifier_verified/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/identifiers/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/identity_known/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/inclusion_score/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/independence_cluster/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/information_quality/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/input/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/input_value/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/interpretation/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/is_about/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/is_subset_of/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/issue/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/isbn/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/label/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/last_confirmed/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/last_confirmed_against/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/level/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/license/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/log_odds/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/log_odds_basis/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/log_odds_source_packet/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/maintainer/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/mapping_justification/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/mapping_set/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/mapping_set_version/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/member_count/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/method_id/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/members/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/method_name/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/method/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/method_type/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/methods/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/model_name/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/name/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/negated/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/object/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/object_label/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/object_obsolete_in_source_version/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/packet_id/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/obsolescence_reason/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/obsolete_in_source/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/of_resource/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/origin/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/outcome/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/output/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/output_value/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/own_log_odds/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/packets/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/parameters/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/participants/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/performed_by/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/perspective/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/pmid/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/policies/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/policy/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/predicate/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/preferred/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/previous_version/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/prior_claims/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/proposing_channel/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/proposition/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/proposition_text/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/pull_request/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/publications/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/qualifier/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/quote/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/quality_category/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/quote_location/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/quality_ratings/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/rating/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/quote_verification/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/rationale/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/read_coverage/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/reason/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/reasoning_trace/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/record_identifier/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/record_metadata/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/record_version/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/reference/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/reference_snapshot/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/release_date/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/releases/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/replacement_line/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/reported_in/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/reports_study/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/resource/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/resource_role_override/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/resources/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/result_set/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/retrieval_date/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/retrieved_from/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/review_bands/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/review_date/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/review_depth/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/review_state/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/review_status/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/reviewed_by/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/revoked/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/role/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/roles/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/route/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/run_id/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/scaling_factor/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/scheduled_obsoletion_date/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/scope/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/scope_channels/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/scope_claim_types/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/score/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/score_band/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/score_of_evidence_provided/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/section/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/sieve/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/signed_packet_version/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/software_version/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/sought_disputing_evidence/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/source_data_set/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/source_id/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/source_item/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/source_name/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/source_label/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/source_object/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/source_object_label/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/source_predicate/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/source_predicate_label/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/source_subject/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/source_subject_label/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/source_release/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/source_version/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/sources/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/span_role/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/specified_by/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/spot_check_errors/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/stacked_lines/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/statement/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/statement_text/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/status/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/status_changes/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/steps/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/strength/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/strength_bands/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/strength_of_evidence_provided/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/study_group/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/subject/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/subject_label/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/subject_classification/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/subtype/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/summary/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/supersedes/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/supporting_method_types/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/supporting_methods/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/system/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/system_url/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/system_u_r_l/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/system_version/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/timestamp/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/target_proposition/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/text_location/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/text_passages/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/text_span/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/threshold_passed/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/title/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/trust_level/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/trigger_cue/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/trust_levels/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/type/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/unit/</loc>
-         <lastmod>2026-08-29</lastmod>
-    </url>
-    <url>
-         <loc>https://matentzn.github.io/sieve/elements/updated/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/urls/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
-         <loc>https://matentzn.github.io/sieve/elements/used/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <loc>https://matentzn.github.io/sieve/elements/uses_rules/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/valid_direction/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/valid_from/</loc>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/validity/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/value/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/value_operator/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/values/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/variability_measures/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://matentzn.github.io/sieve/elements/version/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-11-10</lastmod>
+    </url>
+    <url>
+         <loc>https://matentzn.github.io/sieve/elements/web_pages/</loc>
+         <lastmod>2026-11-10</lastmod>
     </url>
 </urlset>

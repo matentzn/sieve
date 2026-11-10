@@ -9,7 +9,7 @@
 <link href="https://matentzn.github.io/sieve/elements/Coding/" rel="canonical"/>
 <link href="../../assets/images/favicon.png" rel="icon"/>
 <meta content="mkdocs-1.6.1, mkdocs-material-9.7.0" name="generator"/>
-<title>Class: Coding - SIEVE</title>
+<title>Class: Coding (Coding) - SIEVE</title>
 <link href="../../assets/stylesheets/main.618322db.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
@@ -24,7 +24,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#class-coding">
+<a class="md-skip" href="#class-coding-coding">
           Skip to content
         </a>
 </div>
@@ -48,7 +48,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              Class: Coding
+              Class: Coding (Coding)
             
           </span>
 </div>
@@ -216,6 +216,18 @@
   </span>
 </a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../requirements-traceability/">
+<span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+</a>
+</li>
 </ul>
 </nav>
 </li>
@@ -338,7 +350,7 @@
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<h1 id="class-coding">Class: Coding<a class="headerlink" href="#class-coding" title="Permanent link">¶</a></h1>
+<h1 id="class-coding-coding">Class: Coding (Coding)<a class="headerlink" href="#class-coding-coding" title="Permanent link">¶</a></h1>
 <p><em>A structured representation of a code for a defined concept in a terminology or code system.</em></p>
 <p>URI: <a href="https://w3id.org/sieve/Coding">sieve:Coding</a></p>
 <div class="mermaid"> classDiagram
@@ -378,13 +390,13 @@
 <tr>
 <td><a href="../code/">code</a></td>
 <td>0..1 <br/> <a href="../String/">String</a></td>
-<td>A symbol uniquely identifying the concept (CURIE format preferred)</td>
+<td>A symbol uniquely identifying the concept, as in a syntax defined by the code...</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../label/">label</a></td>
 <td>0..1 <br/> <a href="../String/">String</a></td>
-<td>The human-readable name for the coded concept</td>
+<td>The human-readable name for the coded concept, as defined by the code system</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -396,7 +408,7 @@
 <tr>
 <td><a href="../system_version/">system_version</a></td>
 <td>0..1 <br/> <a href="../String/">String</a></td>
-<td>Version of the terminology or code system</td>
+<td>Version of the terminology or code system that provided the code</td>
 <td>direct</td>
 </tr>
 </tbody>
@@ -413,56 +425,734 @@
 </thead>
 <tbody>
 <tr>
+<td><a href="../EvidencePacket/">EvidencePacket</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../EvidencePacket/">EvidencePacket</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../EvidencePacket/">EvidencePacket</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../EvidencePacketCollection/">EvidencePacketCollection</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../EvidencePacketCollection/">EvidencePacketCollection</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../EvidencePacketCollection/">EvidencePacketCollection</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveRegistry/">SieveRegistry</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveRegistry/">SieveRegistry</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveRegistry/">SieveRegistry</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveStatement/">SieveStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
 <td><a href="../SieveStatement/">SieveStatement</a></td>
 <td><a href="../predicate/">predicate</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
-<td><a href="../SieveDataItem/">SieveDataItem</a></td>
+<td><a href="../SieveStatement/">SieveStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveStatement/">SieveStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveStatement/">SieveStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubclassStatement/">SubclassStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubclassStatement/">SubclassStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubclassStatement/">SubclassStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubclassStatement/">SubclassStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubclassStatement/">SubclassStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MappingStatement/">MappingStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MappingStatement/">MappingStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MappingStatement/">MappingStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MappingStatement/">MappingStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MappingStatement/">MappingStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../UpstreamItem/">UpstreamItem</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../InformationResource/">InformationResource</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../InformationResource/">InformationResource</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SourceRelease/">SourceRelease</a></td>
 <td><a href="../subtype/">subtype</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
-<td><a href="../SieveDataItem/">SieveDataItem</a></td>
+<td><a href="../SourceRelease/">SourceRelease</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SourceRelease/">SourceRelease</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ExternalRecord/">ExternalRecord</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ExternalRecord/">ExternalRecord</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ExternalRecord/">ExternalRecord</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../TextPassage/">TextPassage</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../TextPassage/">TextPassage</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../TextPassage/">TextPassage</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../TextPassage/">TextPassage</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Publication/">Publication</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Publication/">Publication</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Publication/">Publication</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Publication/">Publication</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../WebPage/">WebPage</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../WebPage/">WebPage</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../WebPage/">WebPage</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../WebPage/">WebPage</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../GuidelineDocument/">GuidelineDocument</a></td>
+<td><a href="../generation_context/">generation_context</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../GuidelineDocument/">GuidelineDocument</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../GuidelineDocument/">GuidelineDocument</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../GuidelineDocument/">GuidelineDocument</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ComputationalScore/">ComputationalScore</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ComputationalScore/">ComputationalScore</a></td>
 <td><a href="../unit/">unit</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
-<td><a href="../SieveDocument/">SieveDocument</a></td>
+<td><a href="../ComputationalScore/">ComputationalScore</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ComputationalScore/">ComputationalScore</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveEvidenceLine/">SieveEvidenceLine</a></td>
 <td><a href="../subtype/">subtype</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
-<td><a href="../ComputationalResult/">ComputationalResult</a></td>
-<td><a href="../subtype/">subtype</a></td>
+<td><a href="../SieveEvidenceLine/">SieveEvidenceLine</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
-<td><a href="../ComputationalResult/">ComputationalResult</a></td>
-<td><a href="../unit/">unit</a></td>
+<td><a href="../SieveEvidenceLine/">SieveEvidenceLine</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
-<td><a href="../CurationActivity/">CurationActivity</a></td>
+<td><a href="../LineStatusChange/">LineStatusChange</a></td>
 <td><a href="../activity_type/">activity_type</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
-<td><a href="../CurationActivity/">CurationActivity</a></td>
+<td><a href="../LineStatusChange/">LineStatusChange</a></td>
 <td><a href="../subtype/">subtype</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
-<td><a href="../Statement/">Statement</a></td>
-<td><a href="../predicate/">predicate</a></td>
+<td><a href="../SieveMethod/">SieveMethod</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveMethod/">SieveMethod</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveMethod/">SieveMethod</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../AggregationRule/">AggregationRule</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../AggregationRule/">AggregationRule</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../AggregationRule/">AggregationRule</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DecisionPolicy/">DecisionPolicy</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DecisionPolicy/">DecisionPolicy</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DecisionPolicy/">DecisionPolicy</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../BatchSignOff/">BatchSignOff</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveContribution/">SieveContribution</a></td>
+<td><a href="../activity_type/">activity_type</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../SieveContribution/">SieveContribution</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../InterpretationActivity/">InterpretationActivity</a></td>
+<td><a href="../activity_type/">activity_type</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../InterpretationActivity/">InterpretationActivity</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../AssertionDecision/">AssertionDecision</a></td>
+<td><a href="../activity_type/">activity_type</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../AssertionDecision/">AssertionDecision</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../OriginEvent/">OriginEvent</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../ResolutionChain/">ResolutionChain</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../AlignmentStep/">AlignmentStep</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../InformationEntity/">InformationEntity</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../InformationEntity/">InformationEntity</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Method/">Method</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Method/">Method</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Method/">Method</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
@@ -473,6 +1163,18 @@
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
+<td><a href="../Document/">Document</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Document/">Document</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
 <td><a href="../DataItem/">DataItem</a></td>
 <td><a href="../subtype/">subtype</a></td>
 <td>range</td>
@@ -485,8 +1187,32 @@
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
+<td><a href="../DataItem/">DataItem</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DataItem/">DataItem</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
 <td><a href="../DataSet/">DataSet</a></td>
 <td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DataSet/">DataSet</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../DataSet/">DataSet</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
 <td>range</td>
 <td><a href="./">Coding</a></td>
 </tr>
@@ -509,6 +1235,66 @@
 <td><a href="./">Coding</a></td>
 </tr>
 <tr>
+<td><a href="../Statement/">Statement</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Statement/">Statement</a></td>
+<td><a href="../subject_classification/">subject_classification</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Statement/">Statement</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../Statement/">Statement</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../StudyResult/">StudyResult</a></td>
+<td><a href="../interpretation/">interpretation</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../StudyResult/">StudyResult</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../StudyResult/">StudyResult</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../EvidenceLine/">EvidenceLine</a></td>
+<td><a href="../subtype/">subtype</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../EvidenceLine/">EvidenceLine</a></td>
+<td><a href="../supporting_method_types/">supporting_method_types</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
+<td><a href="../EvidenceLine/">EvidenceLine</a></td>
+<td><a href="../information_quality/">information_quality</a></td>
+<td>range</td>
+<td><a href="./">Coding</a></td>
+</tr>
+<tr>
 <td><a href="../Proposition/">Proposition</a></td>
 <td><a href="../predicate/">predicate</a></td>
 <td>range</td>
@@ -516,6 +1302,11 @@
 </tr>
 </tbody>
 </table>
+<h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">¶</a></h2>
+<ul>
+<li>Either a code, label, or both must be provided.</li>
+<li>Coding supports use of terms form ontologies/terminologies in structured object that reports id, label, and metadata about system it came from.  follows FHIR approach.  Used in model when implementers are free to create own value sets of terms which get reported within coding objects in SEPIO data. Validation requires additional tooling - as constraints are not defined in schema itself.</li>
+</ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information<a class="headerlink" href="#identifier-and-mapping-information" title="Permanent link">¶</a></h2>
 <h3 id="schema-source">Schema Source<a class="headerlink" href="#schema-source" title="Permanent link">¶</a></h3>
 <ul>
@@ -547,50 +1338,66 @@
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
 <a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A structured representation of a code for a defined concept in a terminology</span>
 <a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">or code system.</span>
-<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
-<a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="nt">is_a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Utility</span>
-<a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="nt">attributes</span><span class="p">:</span>
-<a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">  </span><span class="nt">code</span><span class="p">:</span>
-<a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">code</span>
-<a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A symbol uniquely identifying the concept (CURIE format preferred).</span>
-<a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
-<a href="#__codelineno-0-11" id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a href="#__codelineno-0-12" id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
-<a href="#__codelineno-0-13" id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-0-14" id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a href="#__codelineno-0-15" id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-0-16" id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-0-17" id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="w">  </span><span class="nt">label</span><span class="p">:</span>
-<a href="#__codelineno-0-18" id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">label</span>
-<a href="#__codelineno-0-19" id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The human-readable name for the coded concept.</span>
+<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="nt">comments</span><span class="p">:</span>
+<a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Either a code, label, or both must be provided.</span>
+<a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding supports use of terms form ontologies/terminologies in structured object</span>
+<a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">that reports id, label, and metadata about system it came from.  follows FHIR approach.  Used</span>
+<a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">in model when implementers are free to create own value sets of terms which get</span>
+<a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">reported within coding objects in SEPIO data. Validation requires additional tooling</span>
+<a href="#__codelineno-0-11" id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">- as constraints are not defined in schema itself.</span>
+<a href="#__codelineno-0-12" id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
+<a href="#__codelineno-0-13" id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="nt">is_a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Utility</span>
+<a href="#__codelineno-0-14" id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="nt">attributes</span><span class="p">:</span>
+<a href="#__codelineno-0-15" id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">  </span><span class="nt">code</span><span class="p">:</span>
+<a href="#__codelineno-0-16" id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">code</span>
+<a href="#__codelineno-0-17" id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A symbol uniquely identifying the concept, as in a syntax defined</span>
+<a href="#__codelineno-0-18" id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">by the code system.  CURIE format is preferred where possible (e.g. ‘SO:0000704’</span>
+<a href="#__codelineno-0-19" id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">is the CURIE form of the Sequence Ontology code for 'gene').</span>
 <a href="#__codelineno-0-20" id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
-<a href="#__codelineno-0-21" id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
-<a href="#__codelineno-0-22" id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Entity</span>
+<a href="#__codelineno-0-21" id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a href="#__codelineno-0-22" id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
 <a href="#__codelineno-0-23" id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
 <a href="#__codelineno-0-24" id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
 <a href="#__codelineno-0-25" id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <a href="#__codelineno-0-26" id="__codelineno-0-26" name="__codelineno-0-26"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-0-27" id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">  </span><span class="nt">system</span><span class="p">:</span>
-<a href="#__codelineno-0-28" id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
-<a href="#__codelineno-0-29" id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The terminology/code system that defined the code.</span>
-<a href="#__codelineno-0-30" id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
-<a href="#__codelineno-0-31" id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a href="#__codelineno-0-27" id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">  </span><span class="nt">label</span><span class="p">:</span>
+<a href="#__codelineno-0-28" id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">label</span>
+<a href="#__codelineno-0-29" id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The human-readable name for the coded concept, as defined by the</span>
+<a href="#__codelineno-0-30" id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">code system.</span>
+<a href="#__codelineno-0-31" id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
 <a href="#__codelineno-0-32" id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
-<a href="#__codelineno-0-33" id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-0-34" id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a href="#__codelineno-0-35" id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-0-36" id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-0-37" id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">  </span><span class="nt">system_version</span><span class="p">:</span>
-<a href="#__codelineno-0-38" id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_version</span>
-<a href="#__codelineno-0-39" id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Version of the terminology or code system.</span>
-<a href="#__codelineno-0-40" id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
-<a href="#__codelineno-0-41" id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a href="#__codelineno-0-42" id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
-<a href="#__codelineno-0-43" id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-0-44" id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expression</span>
-<a href="#__codelineno-0-45" id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a href="#__codelineno-0-46" id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-0-47" id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-0-33" id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Entity</span>
+<a href="#__codelineno-0-34" id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-0-35" id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a href="#__codelineno-0-36" id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-0-37" id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-0-38" id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">  </span><span class="nt">system</span><span class="p">:</span>
+<a href="#__codelineno-0-39" id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
+<a href="#__codelineno-0-40" id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The terminology/code system that defined the code.  May be reported</span>
+<a href="#__codelineno-0-41" id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">as a free-text name (e.g. ‘Sequence Ontology’), but it is preferable to provide  a</span>
+<a href="#__codelineno-0-42" id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">uri/url for the system. When the 'code' is reported as a CURIE, the 'system'</span>
+<a href="#__codelineno-0-43" id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">should be reported as the uri that the CURIE's prefix expands to (e.g. 'http://purl.obofoundry.org/so.owl/'</span>
+<a href="#__codelineno-0-44" id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">for the Sequence Ontology).</span>
+<a href="#__codelineno-0-45" id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
+<a href="#__codelineno-0-46" id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a href="#__codelineno-0-47" id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
+<a href="#__codelineno-0-48" id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-0-49" id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a href="#__codelineno-0-50" id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-0-51" id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-0-52" id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="w">  </span><span class="nt">system_version</span><span class="p">:</span>
+<a href="#__codelineno-0-53" id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_version</span>
+<a href="#__codelineno-0-54" id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Version of the terminology or code system that provided the code.</span>
+<a href="#__codelineno-0-55" id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
+<a href="#__codelineno-0-56" id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a href="#__codelineno-0-57" id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="w">    </span><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:systemVersion</span>
+<a href="#__codelineno-0-58" id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
+<a href="#__codelineno-0-59" id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-0-60" id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expression</span>
+<a href="#__codelineno-0-61" id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a href="#__codelineno-0-62" id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-0-63" id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
 </details>
 <h3 id="induced">Induced<a class="headerlink" href="#induced" title="Permanent link">¶</a></h3>
@@ -598,58 +1405,74 @@
 <div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
 <a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A structured representation of a code for a defined concept in a terminology</span>
 <a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">or code system.</span>
-<a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
-<a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="nt">is_a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Utility</span>
-<a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="nt">attributes</span><span class="p">:</span>
-<a href="#__codelineno-1-7" id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="w">  </span><span class="nt">code</span><span class="p">:</span>
-<a href="#__codelineno-1-8" id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">code</span>
-<a href="#__codelineno-1-9" id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A symbol uniquely identifying the concept (CURIE format preferred).</span>
-<a href="#__codelineno-1-10" id="__codelineno-1-10" name="__codelineno-1-10"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
-<a href="#__codelineno-1-11" id="__codelineno-1-11" name="__codelineno-1-11"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a href="#__codelineno-1-12" id="__codelineno-1-12" name="__codelineno-1-12"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">code</span>
-<a href="#__codelineno-1-13" id="__codelineno-1-13" name="__codelineno-1-13"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-1-14" id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
-<a href="#__codelineno-1-15" id="__codelineno-1-15" name="__codelineno-1-15"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-1-16" id="__codelineno-1-16" name="__codelineno-1-16"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a href="#__codelineno-1-17" id="__codelineno-1-17" name="__codelineno-1-17"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-1-18" id="__codelineno-1-18" name="__codelineno-1-18"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-1-19" id="__codelineno-1-19" name="__codelineno-1-19"></a><span class="w">  </span><span class="nt">label</span><span class="p">:</span>
-<a href="#__codelineno-1-20" id="__codelineno-1-20" name="__codelineno-1-20"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">label</span>
-<a href="#__codelineno-1-21" id="__codelineno-1-21" name="__codelineno-1-21"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The human-readable name for the coded concept.</span>
-<a href="#__codelineno-1-22" id="__codelineno-1-22" name="__codelineno-1-22"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
-<a href="#__codelineno-1-23" id="__codelineno-1-23" name="__codelineno-1-23"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">label</span>
-<a href="#__codelineno-1-24" id="__codelineno-1-24" name="__codelineno-1-24"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-1-25" id="__codelineno-1-25" name="__codelineno-1-25"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
-<a href="#__codelineno-1-26" id="__codelineno-1-26" name="__codelineno-1-26"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Entity</span>
-<a href="#__codelineno-1-27" id="__codelineno-1-27" name="__codelineno-1-27"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-1-28" id="__codelineno-1-28" name="__codelineno-1-28"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a href="#__codelineno-1-29" id="__codelineno-1-29" name="__codelineno-1-29"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-1-30" id="__codelineno-1-30" name="__codelineno-1-30"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-1-31" id="__codelineno-1-31" name="__codelineno-1-31"></a><span class="w">  </span><span class="nt">system</span><span class="p">:</span>
-<a href="#__codelineno-1-32" id="__codelineno-1-32" name="__codelineno-1-32"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
-<a href="#__codelineno-1-33" id="__codelineno-1-33" name="__codelineno-1-33"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The terminology/code system that defined the code.</span>
-<a href="#__codelineno-1-34" id="__codelineno-1-34" name="__codelineno-1-34"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
-<a href="#__codelineno-1-35" id="__codelineno-1-35" name="__codelineno-1-35"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a href="#__codelineno-1-36" id="__codelineno-1-36" name="__codelineno-1-36"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
-<a href="#__codelineno-1-37" id="__codelineno-1-37" name="__codelineno-1-37"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-1-38" id="__codelineno-1-38" name="__codelineno-1-38"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
-<a href="#__codelineno-1-39" id="__codelineno-1-39" name="__codelineno-1-39"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-1-40" id="__codelineno-1-40" name="__codelineno-1-40"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a href="#__codelineno-1-41" id="__codelineno-1-41" name="__codelineno-1-41"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-1-42" id="__codelineno-1-42" name="__codelineno-1-42"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-1-43" id="__codelineno-1-43" name="__codelineno-1-43"></a><span class="w">  </span><span class="nt">system_version</span><span class="p">:</span>
-<a href="#__codelineno-1-44" id="__codelineno-1-44" name="__codelineno-1-44"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_version</span>
-<a href="#__codelineno-1-45" id="__codelineno-1-45" name="__codelineno-1-45"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Version of the terminology or code system.</span>
-<a href="#__codelineno-1-46" id="__codelineno-1-46" name="__codelineno-1-46"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
-<a href="#__codelineno-1-47" id="__codelineno-1-47" name="__codelineno-1-47"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a href="#__codelineno-1-48" id="__codelineno-1-48" name="__codelineno-1-48"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_version</span>
-<a href="#__codelineno-1-49" id="__codelineno-1-49" name="__codelineno-1-49"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-1-50" id="__codelineno-1-50" name="__codelineno-1-50"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
-<a href="#__codelineno-1-51" id="__codelineno-1-51" name="__codelineno-1-51"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
-<a href="#__codelineno-1-52" id="__codelineno-1-52" name="__codelineno-1-52"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expression</span>
-<a href="#__codelineno-1-53" id="__codelineno-1-53" name="__codelineno-1-53"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a href="#__codelineno-1-54" id="__codelineno-1-54" name="__codelineno-1-54"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a href="#__codelineno-1-55" id="__codelineno-1-55" name="__codelineno-1-55"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="nt">comments</span><span class="p">:</span>
+<a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Either a code, label, or both must be provided.</span>
+<a href="#__codelineno-1-7" id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding supports use of terms form ontologies/terminologies in structured object</span>
+<a href="#__codelineno-1-8" id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">that reports id, label, and metadata about system it came from.  follows FHIR approach.  Used</span>
+<a href="#__codelineno-1-9" id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">in model when implementers are free to create own value sets of terms which get</span>
+<a href="#__codelineno-1-10" id="__codelineno-1-10" name="__codelineno-1-10"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">reported within coding objects in SEPIO data. Validation requires additional tooling</span>
+<a href="#__codelineno-1-11" id="__codelineno-1-11" name="__codelineno-1-11"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">- as constraints are not defined in schema itself.</span>
+<a href="#__codelineno-1-12" id="__codelineno-1-12" name="__codelineno-1-12"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
+<a href="#__codelineno-1-13" id="__codelineno-1-13" name="__codelineno-1-13"></a><span class="nt">is_a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Utility</span>
+<a href="#__codelineno-1-14" id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="nt">attributes</span><span class="p">:</span>
+<a href="#__codelineno-1-15" id="__codelineno-1-15" name="__codelineno-1-15"></a><span class="w">  </span><span class="nt">code</span><span class="p">:</span>
+<a href="#__codelineno-1-16" id="__codelineno-1-16" name="__codelineno-1-16"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">code</span>
+<a href="#__codelineno-1-17" id="__codelineno-1-17" name="__codelineno-1-17"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A symbol uniquely identifying the concept, as in a syntax defined</span>
+<a href="#__codelineno-1-18" id="__codelineno-1-18" name="__codelineno-1-18"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">by the code system.  CURIE format is preferred where possible (e.g. ‘SO:0000704’</span>
+<a href="#__codelineno-1-19" id="__codelineno-1-19" name="__codelineno-1-19"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">is the CURIE form of the Sequence Ontology code for 'gene').</span>
+<a href="#__codelineno-1-20" id="__codelineno-1-20" name="__codelineno-1-20"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
+<a href="#__codelineno-1-21" id="__codelineno-1-21" name="__codelineno-1-21"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a href="#__codelineno-1-22" id="__codelineno-1-22" name="__codelineno-1-22"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">code</span>
+<a href="#__codelineno-1-23" id="__codelineno-1-23" name="__codelineno-1-23"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-1-24" id="__codelineno-1-24" name="__codelineno-1-24"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
+<a href="#__codelineno-1-25" id="__codelineno-1-25" name="__codelineno-1-25"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-1-26" id="__codelineno-1-26" name="__codelineno-1-26"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a href="#__codelineno-1-27" id="__codelineno-1-27" name="__codelineno-1-27"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-1-28" id="__codelineno-1-28" name="__codelineno-1-28"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-1-29" id="__codelineno-1-29" name="__codelineno-1-29"></a><span class="w">  </span><span class="nt">label</span><span class="p">:</span>
+<a href="#__codelineno-1-30" id="__codelineno-1-30" name="__codelineno-1-30"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">label</span>
+<a href="#__codelineno-1-31" id="__codelineno-1-31" name="__codelineno-1-31"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The human-readable name for the coded concept, as defined by the</span>
+<a href="#__codelineno-1-32" id="__codelineno-1-32" name="__codelineno-1-32"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">code system.</span>
+<a href="#__codelineno-1-33" id="__codelineno-1-33" name="__codelineno-1-33"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
+<a href="#__codelineno-1-34" id="__codelineno-1-34" name="__codelineno-1-34"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">label</span>
+<a href="#__codelineno-1-35" id="__codelineno-1-35" name="__codelineno-1-35"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-1-36" id="__codelineno-1-36" name="__codelineno-1-36"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
+<a href="#__codelineno-1-37" id="__codelineno-1-37" name="__codelineno-1-37"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Entity</span>
+<a href="#__codelineno-1-38" id="__codelineno-1-38" name="__codelineno-1-38"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-1-39" id="__codelineno-1-39" name="__codelineno-1-39"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a href="#__codelineno-1-40" id="__codelineno-1-40" name="__codelineno-1-40"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-1-41" id="__codelineno-1-41" name="__codelineno-1-41"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-1-42" id="__codelineno-1-42" name="__codelineno-1-42"></a><span class="w">  </span><span class="nt">system</span><span class="p">:</span>
+<a href="#__codelineno-1-43" id="__codelineno-1-43" name="__codelineno-1-43"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
+<a href="#__codelineno-1-44" id="__codelineno-1-44" name="__codelineno-1-44"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The terminology/code system that defined the code.  May be reported</span>
+<a href="#__codelineno-1-45" id="__codelineno-1-45" name="__codelineno-1-45"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">as a free-text name (e.g. ‘Sequence Ontology’), but it is preferable to provide  a</span>
+<a href="#__codelineno-1-46" id="__codelineno-1-46" name="__codelineno-1-46"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">uri/url for the system. When the 'code' is reported as a CURIE, the 'system'</span>
+<a href="#__codelineno-1-47" id="__codelineno-1-47" name="__codelineno-1-47"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">should be reported as the uri that the CURIE's prefix expands to (e.g. 'http://purl.obofoundry.org/so.owl/'</span>
+<a href="#__codelineno-1-48" id="__codelineno-1-48" name="__codelineno-1-48"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">for the Sequence Ontology).</span>
+<a href="#__codelineno-1-49" id="__codelineno-1-49" name="__codelineno-1-49"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
+<a href="#__codelineno-1-50" id="__codelineno-1-50" name="__codelineno-1-50"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a href="#__codelineno-1-51" id="__codelineno-1-51" name="__codelineno-1-51"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
+<a href="#__codelineno-1-52" id="__codelineno-1-52" name="__codelineno-1-52"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-1-53" id="__codelineno-1-53" name="__codelineno-1-53"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
+<a href="#__codelineno-1-54" id="__codelineno-1-54" name="__codelineno-1-54"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-1-55" id="__codelineno-1-55" name="__codelineno-1-55"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a href="#__codelineno-1-56" id="__codelineno-1-56" name="__codelineno-1-56"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-1-57" id="__codelineno-1-57" name="__codelineno-1-57"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-1-58" id="__codelineno-1-58" name="__codelineno-1-58"></a><span class="w">  </span><span class="nt">system_version</span><span class="p">:</span>
+<a href="#__codelineno-1-59" id="__codelineno-1-59" name="__codelineno-1-59"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_version</span>
+<a href="#__codelineno-1-60" id="__codelineno-1-60" name="__codelineno-1-60"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Version of the terminology or code system that provided the code.</span>
+<a href="#__codelineno-1-61" id="__codelineno-1-61" name="__codelineno-1-61"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sepio-model</span>
+<a href="#__codelineno-1-62" id="__codelineno-1-62" name="__codelineno-1-62"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a href="#__codelineno-1-63" id="__codelineno-1-63" name="__codelineno-1-63"></a><span class="w">    </span><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:systemVersion</span>
+<a href="#__codelineno-1-64" id="__codelineno-1-64" name="__codelineno-1-64"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_version</span>
+<a href="#__codelineno-1-65" id="__codelineno-1-65" name="__codelineno-1-65"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-1-66" id="__codelineno-1-66" name="__codelineno-1-66"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
+<a href="#__codelineno-1-67" id="__codelineno-1-67" name="__codelineno-1-67"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Coding</span>
+<a href="#__codelineno-1-68" id="__codelineno-1-68" name="__codelineno-1-68"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expression</span>
+<a href="#__codelineno-1-69" id="__codelineno-1-69" name="__codelineno-1-69"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a href="#__codelineno-1-70" id="__codelineno-1-70" name="__codelineno-1-70"></a><span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a href="#__codelineno-1-71" id="__codelineno-1-71" name="__codelineno-1-71"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
 </details>
 </article>

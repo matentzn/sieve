@@ -174,28 +174,28 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#the-statement">
+<a class="md-nav__link" href="#ten-kinds-of-claim">
 <span class="md-ellipsis">
       
-        The statement
+        Ten kinds of claim
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#the-evidence-lines-made-of-items">
+<a class="md-nav__link" href="#two-levels-of-judgement">
 <span class="md-ellipsis">
       
-        The evidence: lines made of items
+        Two levels of judgement
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#kinds-of-evidence">
+<a class="md-nav__link" href="#three-things-that-are-easy-to-confuse">
 <span class="md-ellipsis">
       
-        Kinds of evidence
+        Three things that are easy to confuse
       
     </span>
 </a>
@@ -210,19 +210,10 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#the-workflow">
+<a class="md-nav__link" href="#checking-a-packet">
 <span class="md-ellipsis">
       
-        The workflow
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#what-comes-out">
-<span class="md-ellipsis">
-      
-        What comes out
+        Checking a packet
       
     </span>
 </a>
@@ -304,6 +295,18 @@
     
   
     Schema Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../requirements-traceability/">
+<span class="md-ellipsis">
+    
+  
+    Requirements Traceability
   
 
     
@@ -433,203 +436,235 @@
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
 <h1 id="sieve-in-plain-terms">SIEVE in Plain Terms<a class="headerlink" href="#sieve-in-plain-terms" title="Permanent link">¶</a></h1>
-<p>SIEVE records <strong>why we believe an assertion</strong> — and packages that "why" so a
-curator (or a machine) can check it.</p>
-<p>An <em>assertion</em> is a single claim, like:</p>
+<p>SIEVE records <strong>why Mondo believes a claim</strong>, and packages that "why" so a curator, or
+a machine, can check it.</p>
+<p>A <em>claim</em> is one statement about a Mondo term, for example:</p>
 <blockquote>
-<p>asthma <strong>is a kind of</strong> respiratory system disorder</p>
+<p>Down syndrome is <strong>not</strong> a subclass of hereditary disease</p>
 </blockquote>
-<p>SIEVE wraps that claim together with the evidence for and against it into one
-<strong>evidence packet</strong>:</p>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="nt">statement</span><span class="p">:</span>
-<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="w">  </span><span class="nt">subject</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0004979</span><span class="w">        </span><span class="c1"># asthma</span>
-<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="nt">predicate</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="nv">rdfs</span><span class="p p-Indicator">:</span><span class="nv">subClassOf</span><span class="p p-Indicator">}</span>
-<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="w">  </span><span class="nt">object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0005275</span><span class="w">         </span><span class="c1"># respiratory system disorder</span>
-<a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="nt">has_evidence_lines</span><span class="p">:</span>
-<a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supports</span>
-<a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">    </span><span class="nt">has_evidence_items</span><span class="p">:</span>
-<a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveDocument</span>
-<a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="w">        </span><span class="nt">pmid</span><span class="p">:</span><span class="w"> </span><span class="s">"28884740"</span>
-<a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="w">        </span><span class="nt">quote</span><span class="p">:</span><span class="w"> </span><span class="s">"Asthma</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">heterogeneous</span><span class="nv"> </span><span class="s">disease…</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">chronic</span><span class="nv"> </span><span class="s">airway</span><span class="nv"> </span><span class="s">inflammation."</span>
+<p>SIEVE puts that claim, the evidence for and against it, and the decisions taken on it
+into one <strong>evidence packet</strong>:</p>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:pkt/MONDO_0008608-excl-MONDO_0003847</span>
+<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EvidencePacket</span>
+<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-20"</span>
+<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="nt">statement</span><span class="p">:</span>
+<a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:st/MONDO_0008608-excl-MONDO_0003847</span>
+<a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NegativeSubclassStatement</span>
+<a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">  </span><span class="nt">subject</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0008608</span><span class="w">              </span><span class="c1"># Down syndrome</span>
+<a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="w">  </span><span class="nt">predicate</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="nv">rdfs</span><span class="p p-Indicator">:</span><span class="nv">subClassOf</span><span class="p p-Indicator">}</span>
+<a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="w">  </span><span class="nt">object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0003847</span><span class="w">               </span><span class="c1"># hereditary disease</span>
+<a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="w">  </span><span class="nt">negated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                       </span><span class="c1"># the claim is that it is NOT a subclass</span>
+<a href="#__codelineno-0-11" id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="w">  </span><span class="nt">review_state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VERIFIED</span>
+<a href="#__codelineno-0-12" id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="w">  </span><span class="nt">has_evidence_lines</span><span class="p">:</span>
+<a href="#__codelineno-0-13" id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:el/ds-doid-dispute</span>
+<a href="#__codelineno-0-14" id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveEvidenceLine</span>
+<a href="#__codelineno-0-15" id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">      </span><span class="nt">has_evidence_items</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">sieve</span><span class="p p-Indicator">:</span><span class="nv">ca/doid-14250-isa-630</span><span class="p p-Indicator">]</span>
+<a href="#__codelineno-0-16" id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="w">      </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">disputes</span>
+<a href="#__codelineno-0-17" id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="w">      </span><span class="nt">score_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<a href="#__codelineno-0-18" id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="w">      </span><span class="nt">contributions</span><span class="p">:</span>
+<a href="#__codelineno-0-19" id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:act/ds-doid-concordance</span>
+<a href="#__codelineno-0-20" id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InterpretationActivity</span>
+<a href="#__codelineno-0-21" id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">          </span><span class="nt">contributor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:agent/concordance-pipeline</span>
+<a href="#__codelineno-0-22" id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="w">          </span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-20"</span>
+<a href="#__codelineno-0-23" id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="w">          </span><span class="nt">method_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COMPUTED_CONCORDANCE</span>
+<a href="#__codelineno-0-24" id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="w">          </span><span class="nt">specified_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">sieve</span><span class="p p-Indicator">:</span><span class="nv">method/concordance-workflow</span><span class="p p-Indicator">]</span>
+<a href="#__codelineno-0-25" id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">  </span><span class="nt">assertion_decisions</span><span class="p">:</span>
+<a href="#__codelineno-0-26" id="__codelineno-0-26" name="__codelineno-0-26"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:dec/ds-excl-2026</span>
+<a href="#__codelineno-0-27" id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AssertionDecision</span>
+<a href="#__codelineno-0-28" id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="w">      </span><span class="nt">contributor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orcid:0000-0001-5208-3432</span>
+<a href="#__codelineno-0-29" id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="w">      </span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-20"</span>
+<a href="#__codelineno-0-30" id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="w">      </span><span class="nt">outcome</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTROVERSIAL</span>
+<a href="#__codelineno-0-31" id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="w">      </span><span class="nt">route</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">INDIVIDUAL_SIGN_OFF</span>
+<a href="#__codelineno-0-32" id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="w">      </span><span class="nt">inclusion_score</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.46</span>
+<a href="#__codelineno-0-33" id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">      </span><span class="nt">signed_packet_version</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-20"</span>
+<a href="#__codelineno-0-34" id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="nt">prior_claims</span><span class="p">:</span>
+<a href="#__codelineno-0-35" id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:ca/doid-14250-isa-630</span>
+<a href="#__codelineno-0-36" id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SubclassStatement</span><span class="w">           </span><span class="c1"># a prior claim: DOID's own subclass assertion</span>
+<a href="#__codelineno-0-37" id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="nt">subject</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DOID:14250</span><span class="w">               </span><span class="c1"># Disease Ontology: Down syndrome</span>
+<a href="#__codelineno-0-38" id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="nt">predicate</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="nv">rdfs</span><span class="p p-Indicator">:</span><span class="nv">subClassOf</span><span class="p p-Indicator">}</span>
+<a href="#__codelineno-0-39" id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="w">    </span><span class="nt">object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DOID:630</span><span class="w">                  </span><span class="c1"># genetic disease</span>
+<a href="#__codelineno-0-40" id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="w">    </span><span class="nt">reported_in</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">DOID</span><span class="p p-Indicator">:</span><span class="nv">14250</span><span class="p p-Indicator">]</span>
+<a href="#__codelineno-0-41" id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infores:disease-ontology</span>
 </code></pre></div>
-<p>That is the whole idea. The rest of this page shows what goes in the box.</p>
+<p>Disease Ontology places Down syndrome under its genetic disease class, which grounds to
+Mondo's hereditary disease, so its assertion enters as a <strong>disputing</strong> line. A curator
+looked at it and kept the claim, marked controversial. The rest of this page
+explains the parts.</p>
 <hr/>
 <h2 id="the-shape-of-a-packet">The shape of a packet<a class="headerlink" href="#the-shape-of-a-packet" title="Permanent link">¶</a></h2>
-<p>Every packet has the same three parts: <strong>one statement</strong>, some <strong>evidence
-lines</strong>, and a <strong>verdict</strong>.</p>
 <div class="mermaid">graph TD
-    P[EvidencePacket] --&gt; S[Statement<br/>the claim]
-    P --&gt; L1[Evidence line 1<br/>supports]
-    P --&gt; L2[Evidence line 2<br/>disputes]
-    P --&gt; V[Status + Synthesis<br/>the verdict]
-    L1 --&gt; I1[Item: a paper]
-    L1 --&gt; I2[Item: expert review]
-    L2 --&gt; I3[Item: another ontology]
+    P[EvidencePacket<br/>one claim, versioned] --&gt; S[Statement<br/>the claim]
+    S --&gt; L1[Evidence line<br/>supports]
+    S --&gt; L2[Evidence line<br/>disputes]
+    S --&gt; D[Assertion decisions<br/>the verdicts]
+    S --&gt; O[Origin<br/>where the claim came from]
+    L1 -.-&gt; I1[Item: an OMIM record]
+    L2 -.-&gt; I2[Item: a DOID assertion]
+    P --&gt; I1
+    P --&gt; I2
 </div>
 <ul>
-<li><strong>Statement</strong> — the one claim being judged.</li>
-<li><strong>Evidence line</strong> — <em>one argument</em>, either for or against the claim.</li>
-<li><strong>Evidence item</strong> — <em>one piece of information</em> inside that argument (a paper, a
-  database record, an expert's note, a computation).</li>
-<li><strong>Verdict</strong> — the status (<code>UNREVIEWED</code> → <code>ACCEPTED</code> / <code>REJECTED</code> /
-  <code>CONTROVERSIAL</code>) and an optional plain-language synthesis.</li>
+<li><strong>Statement</strong>: the one claim. Its <code>type</code> says which kind of claim it is.</li>
+<li><strong>Evidence item</strong>: one piece of information (a database record, another source's
+  assertion, a passage from a paper, a computed score). Items sit in typed lists on
+  the packet (<code>external_records</code>, <code>prior_claims</code>, <code>text_passages</code>, ...).</li>
+<li><strong>Evidence line</strong>: one judgement that some items bear on the claim, in one
+  direction, with some strength. Lines point at items by id.</li>
+<li><strong>Assertion decision</strong>: whether the claim goes into Mondo, who decided, and on which
+  packet version.</li>
+<li><strong>Origin</strong>: where the claim was copied or cloned from. That is not the same as
+  evidence for it.</li>
 </ul>
-<blockquote>
-<p><strong>Why two levels (lines <em>and</em> items)?</strong> A single argument can rest on several
-pieces of evidence. "Three papers and a clinician all say the same thing" is
-<em>one</em> line of support built from <em>four</em> items.</p>
-</blockquote>
+<p>Rules, policies, agents and information resources are shared, so they are maintained
+once in a <strong>registry</strong>. Each packet still stands on its own: it carries a frozen
+<code>reference_snapshot</code> of every registry entry it refers to, as of its version.</p>
 <hr/>
-<h2 id="the-statement">The statement<a class="headerlink" href="#the-statement" title="Permanent link">¶</a></h2>
-<p>Subject → predicate → object. Labels are optional but make packets readable.</p>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="nt">statement</span><span class="p">:</span>
-<a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="w">  </span><span class="nt">subject</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0004979</span>
-<a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">  </span><span class="nt">subject_label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asthma</span>
-<a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="w">  </span><span class="nt">predicate</span><span class="p">:</span>
-<a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="w">    </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rdfs:subClassOf</span>
-<a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="w">    </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">subClassOf</span>
-<a href="#__codelineno-1-7" id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="w">  </span><span class="nt">object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0005275</span>
-<a href="#__codelineno-1-8" id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="w">  </span><span class="nt">object_label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">respiratory system disorder</span>
-<a href="#__codelineno-1-9" id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="w">  </span><span class="nt">statement_text</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asthma subClassOf respiratory system disorder</span>
-</code></pre></div>
-<hr/>
-<h2 id="the-evidence-lines-made-of-items">The evidence: lines made of items<a class="headerlink" href="#the-evidence-lines-made-of-items" title="Permanent link">¶</a></h2>
-<p>A line says <strong>which way</strong> the evidence points and <strong>how strongly</strong>; its items
-carry the actual content.</p>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="nt">has_evidence_lines</span><span class="p">:</span>
-<a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supports</span><span class="w">     </span><span class="c1"># supports | disputes | neutral</span>
-<a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="w">    </span><span class="nt">strength_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">strong</span><span class="w">        </span><span class="c1"># strong | moderate | weak</span>
-<a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="w">    </span><span class="nt">score_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span><span class="w">              </span><span class="c1"># 0–1, used for scoring</span>
-<a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="w">    </span><span class="nt">has_evidence_items</span><span class="p">:</span>
-<a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveDocument</span>
-<a href="#__codelineno-2-7" id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="w">        </span><span class="nt">pmid</span><span class="p">:</span><span class="w"> </span><span class="s">"28884740"</span>
-<a href="#__codelineno-2-8" id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="w">        </span><span class="nt">quote</span><span class="p">:</span><span class="w"> </span><span class="s">"Asthma</span><span class="nv"> </span><span class="s">is…</span><span class="nv"> </span><span class="s">characterized</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">chronic</span><span class="nv"> </span><span class="s">airway</span><span class="nv"> </span><span class="s">inflammation."</span>
-<a href="#__codelineno-2-9" id="__codelineno-2-9" name="__codelineno-2-9"></a><span class="w">        </span><span class="nt">rating</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ACCEPTED</span><span class="w">                       </span><span class="c1"># the curator's per-item verdict</span>
-</code></pre></div>
-<hr/>
-<h2 id="kinds-of-evidence">Kinds of evidence<a class="headerlink" href="#kinds-of-evidence" title="Permanent link">¶</a></h2>
-<p>Pick the item <code>type</code> that matches where the evidence comes from. Each example is
-one item you'd drop into a line's <code>has_evidence_items</code>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><input id="__tabbed_1_3" name="__tabbed_1" type="radio"><input id="__tabbed_1_4" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">Another ontology agrees (ConcordanceItem)</label><label for="__tabbed_1_2">A publication (SieveDocument)</label><label for="__tabbed_1_3">A person weighed in (AgentContribution)</label><label for="__tabbed_1_4">A computation (ComputationalResult)</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConcordanceItem</span>
-<a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="w">  </span><span class="nt">source_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ICD-10-CM</span>
-<a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="w">  </span><span class="nt">source_subject</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ICD10CM:J45</span>
-<a href="#__codelineno-3-4" id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="w">  </span><span class="nt">source_object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ICD10CM:J00-J99</span><span class="w">          </span><span class="c1"># "Diseases of the respiratory system"</span>
-<a href="#__codelineno-3-5" id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="w">  </span><span class="nt">mapping_set</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sssom/mappings/mondo-icd10.sssom.tsv</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveDocument</span>
-<a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Pathophysiology of Asthma</span>
-<a href="#__codelineno-4-3" id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="w">  </span><span class="nt">pmid</span><span class="p">:</span><span class="w"> </span><span class="s">"31542051"</span>
-<a href="#__codelineno-4-4" id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="w">  </span><span class="nt">quote</span><span class="p">:</span><span class="w"> </span><span class="s">"Asthma</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">chronic</span><span class="nv"> </span><span class="s">inflammatory</span><span class="nv"> </span><span class="s">disorder</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">airways…"</span>
-<a href="#__codelineno-4-5" id="__codelineno-4-5" name="__codelineno-4-5"></a><span class="w">  </span><span class="nt">quote_location</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Abstract</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-5-1" id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AgentContribution</span>
-<a href="#__codelineno-5-2" id="__codelineno-5-2" name="__codelineno-5-2"></a><span class="w">  </span><span class="nt">contributor</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="nv">orcid</span><span class="p p-Indicator">:</span><span class="nv">0000-0003-4567-8901</span><span class="p p-Indicator">,</span><span class="nt"> name</span><span class="p">:</span><span class="w"> </span><span class="nv">Dr. Sarah Chen</span><span class="p p-Indicator">}</span>
-<a href="#__codelineno-5-3" id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="w">  </span><span class="nt">trust_level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">domain_expert</span><span class="w">                </span><span class="c1"># community | domain_expert | curator | authority</span>
-<a href="#__codelineno-5-4" id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="w">  </span><span class="nt">contribution_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">review</span><span class="w">                 </span><span class="c1"># suggestion | review | decision | provision</span>
-<a href="#__codelineno-5-5" id="__codelineno-5-5" name="__codelineno-5-5"></a><span class="w">  </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">"Confirmed:</span><span class="nv"> </span><span class="s">asthma</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">respiratory</span><span class="nv"> </span><span class="s">disorder."</span>
-<a href="#__codelineno-5-6" id="__codelineno-5-6" name="__codelineno-5-6"></a><span class="w">  </span><span class="nt">reference</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/monarch-initiative/mondo/issues/7890</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-6-1" id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ComputationalResult</span>
-<a href="#__codelineno-6-2" id="__codelineno-6-2" name="__codelineno-6-2"></a><span class="w">  </span><span class="nt">method_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ChatGPT Deep Research</span>
-<a href="#__codelineno-6-3" id="__codelineno-6-3" name="__codelineno-6-3"></a><span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"0.92"</span>
-<a href="#__codelineno-6-4" id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="w">  </span><span class="nt">parameters</span><span class="p">:</span><span class="w"> </span><span class="s">"Analysed</span><span class="nv"> </span><span class="s">47</span><span class="nv"> </span><span class="s">sources;</span><span class="nv"> </span><span class="s">unanimous</span><span class="nv"> </span><span class="s">respiratory</span><span class="nv"> </span><span class="s">classification."</span>
-</code></pre></div>
-</div>
-</div>
-</input></input></input></input></div>
-<p>Any item can also carry a curator <code>rating</code> and an <code>eco_code</code> (an
-<a href="https://www.evidenceontology.org/">Evidence &amp; Conclusion Ontology</a> term saying
-<em>what kind</em> of evidence it is).</p>
-<hr/>
-<h2 id="from-evidence-to-a-score">From evidence to a score<a class="headerlink" href="#from-evidence-to-a-score" title="Permanent link">¶</a></h2>
-<p>Each line pushes the claim up (<strong>supports</strong>), down (<strong>disputes</strong>), or sideways
-(<strong>neutral</strong>), weighted by its score. SIEVE sums these into a single <strong>Net
-Evidence Ratio</strong> between −1 (all against) and +1 (all for):</p>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a>        (sum of SUPPORTING scores) − (sum of DISPUTING scores)
-<a href="#__codelineno-7-2" id="__codelineno-7-2" name="__codelineno-7-2"></a>NER = ─────────────────────────────────────────────────────────
-<a href="#__codelineno-7-3" id="__codelineno-7-3" name="__codelineno-7-3"></a>        (supporting) + (disputing) + (neutral) scores
-</code></pre></div>
-<p>Worked example — three supporting lines, one disputing:</p>
+<h2 id="ten-kinds-of-claim">Ten kinds of claim<a class="headerlink" href="#ten-kinds-of-claim" title="Permanent link">¶</a></h2>
+<p>Each kind of Mondo claim is its own statement class, with its own allowed predicates
+and its own allowed kinds of evidence:</p>
 <table>
 <thead>
 <tr>
-<th>Line</th>
-<th>Direction</th>
-<th>Score</th>
+<th>ID</th>
+<th>Claim type</th>
+<th>Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>ICD-10 concordance</td>
-<td>supports</td>
-<td>0.9</td>
+<td>C001</td>
+<td><code>TermExistenceStatement</code></td>
+<td>the term exists, is obsolete, is replaced by another</td>
 </tr>
 <tr>
-<td>GINA guideline</td>
-<td>supports</td>
-<td>0.95</td>
+<td>C002</td>
+<td><code>DefinitionStatement</code></td>
+<td>the term has this definition</td>
 </tr>
 <tr>
-<td>Expert review</td>
-<td>supports</td>
-<td>0.8</td>
+<td>C003</td>
+<td><code>SynonymStatement</code></td>
+<td>"SPOAN syndrome" is an exact synonym</td>
 </tr>
 <tr>
-<td>Disease Ontology</td>
-<td>disputes</td>
-<td>0.7</td>
+<td>C004</td>
+<td><code>SubclassStatement</code></td>
+<td>asthma is a respiratory system disorder</td>
+</tr>
+<tr>
+<td>C005</td>
+<td><code>NegativeSubclassStatement</code></td>
+<td>Down syndrome is not a hereditary disease</td>
+</tr>
+<tr>
+<td>C006</td>
+<td><code>MappingStatement</code></td>
+<td>MONDO:0008608 <code>skos:exactMatch</code> ICD10CM:Q90</td>
+</tr>
+<tr>
+<td>C007</td>
+<td><code>DiseaseAttributeStatement</code></td>
+<td>cystic fibrosis has material basis in CFTR</td>
+</tr>
+<tr>
+<td>C008</td>
+<td><code>SubsetMembershipStatement</code></td>
+<td>the term is in the GARD rare subset</td>
+</tr>
+<tr>
+<td>C009</td>
+<td><code>MetaclassStatement</code></td>
+<td>the term is a grouping class (candidate)</td>
+</tr>
+<tr>
+<td>C010</td>
+<td><code>ValueSetMembershipStatement</code></td>
+<td>the term is an included title of an OMIM record (candidate)</td>
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-8-1" id="__codelineno-8-1" name="__codelineno-8-1"></a>NER = ((0.9 + 0.95 + 0.8) − 0.7) / (0.9 + 0.95 + 0.8 + 0.7)
-<a href="#__codelineno-8-2" id="__codelineno-8-2" name="__codelineno-8-2"></a>    = 1.95 / 3.35
-<a href="#__codelineno-8-3" id="__codelineno-8-3" name="__codelineno-8-3"></a>    ≈ +0.58
-</code></pre></div>
-<p>A clearly positive score — the evidence leans strongly toward <em>accept</em>.</p>
+<p>A synonym claim cannot use <code>skos:exactMatch</code> as its predicate, and a definition cannot
+cite a computed score as evidence. These rules are checked.</p>
 <hr/>
-<h2 id="the-workflow">The workflow<a class="headerlink" href="#the-workflow" title="Permanent link">¶</a></h2>
-<div class="mermaid">flowchart LR
-    A[Author packets<br/>YAML] --&gt; B[Ingest<br/>validate + store]
-    B --&gt; C[Review<br/>rate items in the UI]
-    C --&gt; D{Decide}
-    D --&gt;|accept| E[Export RDF]
-    D --&gt;|reject / controversial| F[Feedback to source]
-</div>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-9-1" id="__codelineno-9-1" name="__codelineno-9-1"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-I<span class="w"> </span>inbox/examples/<span class="w">      </span><span class="c1"># check packets against the schema</span>
-<a href="#__codelineno-9-2" id="__codelineno-9-2" name="__codelineno-9-2"></a>sieve<span class="w"> </span>ingest<span class="w">   </span>-I<span class="w"> </span>inbox/examples/<span class="w">      </span><span class="c1"># load them into the database</span>
-<a href="#__codelineno-9-3" id="__codelineno-9-3" name="__codelineno-9-3"></a>sieve<span class="w"> </span>run<span class="w">                              </span><span class="c1"># review + decide in the browser</span>
-<a href="#__codelineno-9-4" id="__codelineno-9-4" name="__codelineno-9-4"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w">   </span>-I<span class="w"> </span>inbox/examples/<span class="w"> </span>-O<span class="w"> </span>rdf<span class="w"> </span>-o<span class="w"> </span>accepted.ttl
-</code></pre></div>
+<h2 id="two-levels-of-judgement">Two levels of judgement<a class="headerlink" href="#two-levels-of-judgement" title="Permanent link">¶</a></h2>
+<p>SIEVE keeps two questions apart:</p>
+<ol>
+<li><strong>Does this evidence bear on the claim?</strong> That is an <strong>evidence line</strong>: direction
+   (<code>supports</code> or <code>disputes</code>), strength on a 0-1 scale, and who interpreted it and how
+   (curator, panel, pipeline or AI agent). Lines are never edited. A wrong line is
+   invalidated and replaced, and both stay on record.</li>
+<li><strong>Does the claim go into Mondo?</strong> That is an <strong>assertion decision</strong>: outcome
+   (<code>ACCEPTED</code>, <code>REJECTED</code>, <code>CONTROVERSIAL</code>, <code>DEFERRED</code>), the route (individual
+   sign-off, consensus, batch sign-off, or an automated policy that a human approved),
+   and the packet version and score it was given on.</li>
+</ol>
+<p>Automated routes can only accept. Anything else goes to a person.</p>
 <hr/>
-<h2 id="what-comes-out">What comes out<a class="headerlink" href="#what-comes-out" title="Permanent link">¶</a></h2>
-<p>An accepted packet becomes an <strong>annotated axiom</strong> — the original claim, plus a
-machine-readable trail of who backed it and with what evidence:</p>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-10-1" id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="p">[]</span> <span class="kt">a</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">Axiom</span> <span class="p">;</span>
-<a href="#__codelineno-10-2" id="__codelineno-10-2" name="__codelineno-10-2"></a>   <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedSource</span>   <span class="nn">MONDO</span><span class="p">:</span><span class="nt">0004979</span> <span class="p">;</span>      <span class="c"># asthma</span>
-<a href="#__codelineno-10-3" id="__codelineno-10-3" name="__codelineno-10-3"></a>   <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedProperty</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subClassOf</span> <span class="p">;</span>
-<a href="#__codelineno-10-4" id="__codelineno-10-4" name="__codelineno-10-4"></a>   <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedTarget</span>   <span class="nn">MONDO</span><span class="p">:</span><span class="nt">0005275</span> <span class="p">;</span>      <span class="c"># respiratory system disorder</span>
-<a href="#__codelineno-10-5" id="__codelineno-10-5" name="__codelineno-10-5"></a>   <span class="nn">SEPIO</span><span class="p">:</span><span class="nt">0000124</span>  <span class="err">&lt;…the</span> <span class="err">evidence</span> <span class="err">packet…&gt;</span> <span class="p">;</span>   <span class="c"># "has evidence"</span>
-<a href="#__codelineno-10-6" id="__codelineno-10-6" name="__codelineno-10-6"></a>   <span class="nn">oboInOwl</span><span class="p">:</span><span class="nt">source</span>  <span class="nn">orcid</span><span class="p">:</span><span class="nt">0000-0002-6601-2165</span> <span class="p">,</span>   <span class="c"># the steward</span>
-<a href="#__codelineno-10-7" id="__codelineno-10-7" name="__codelineno-10-7"></a>                    <span class="s">"28884740"</span> <span class="p">.</span>                    <span class="c"># an accepted source</span>
+<h2 id="three-things-that-are-easy-to-confuse">Three things that are easy to confuse<a class="headerlink" href="#three-things-that-are-easy-to-confuse" title="Permanent link">¶</a></h2>
+<table>
+<thead>
+<tr>
+<th>Axis</th>
+<th>Question</th>
+<th>Where it lives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provenance</strong></td>
+<td>Where did this come from, and who did what?</td>
+<td><code>origin</code>, contributions, resolution chains, retrieval metadata</td>
+</tr>
+<tr>
+<td><strong>Evidence</strong></td>
+<td>Does it support or dispute the claim, and how strongly?</td>
+<td>line direction and strength</td>
+</tr>
+<tr>
+<td><strong>Data quality</strong></td>
+<td>Was the evidence read and linked correctly?</td>
+<td>line and step <code>confidence</code>, with its basis</td>
+</tr>
+</tbody>
+</table>
+<p>"This synonym was copied from OMIM in 2019" is provenance. "OMIM still lists it in the
+2026 release" is evidence. "The OMIM id was matched to the Mondo term with certainty
+1.0" is data quality. A low confidence reduces what a line counts for. It never changes
+the line's strength.</p>
+<hr/>
+<h2 id="from-evidence-to-a-score">From evidence to a score<a class="headerlink" href="#from-evidence-to-a-score" title="Permanent link">¶</a></h2>
+<p>The <strong>inclusion score S</strong> is one number between -1 and +1 saying whether the claim
+should be in Mondo. Each claim type has a versioned aggregation rule that computes it:</p>
+<ul>
+<li>each line counts its strength, signed by direction, weighted by the quality of the
+  source and by the confidence it was read correctly;</li>
+<li>lines that echo the same upstream source form one cluster, and only the strongest
+  line in a cluster counts;</li>
+<li>the sum is added to a prior for the claim type and proposing channel, and squashed
+  into [-1, 1].</li>
+</ul>
+<p>In the published worked examples, cystic fibrosis to CFTR (OMIM, an AI-extracted paper
+passage and a ClinGen panel) comes out at S ≈ 0.97, and the Down syndrome claim above,
+with DOID disputing and a curator supporting, at S ≈ 0.46. The score drives the review
+queue. A person signs it off, and the decision records the S it was given on.</p>
+<p>The scoring code for this model is still being written, so the scores in the example
+packets are illustrative.</p>
+<hr/>
+<h2 id="checking-a-packet">Checking a packet<a class="headerlink" href="#checking-a-packet" title="Permanent link">¶</a></h2>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>linkml-validate<span class="w"> </span>-s<span class="w"> </span>schema/sieve.yaml<span class="w"> </span>-C<span class="w"> </span>EvidencePacket<span class="w"> </span>my_packet.yaml
 </code></pre></div>
+<p>then the profile checks in Python (<code>sieve.profile_checks.check_packet</code>). The
+<a href="../workflows/">Workflows</a> page has the details. The review app, ingest and RDF export
+are being moved to this model and do not work with it yet.</p>
 <hr/>
 <h2 id="where-this-comes-from">Where this comes from<a class="headerlink" href="#where-this-comes-from" title="Permanent link">¶</a></h2>
-<p>SIEVE's model is a friendly, focused layer over
-<a href="https://github.com/monarch-initiative/SEPIO-ontology"><strong>SEPIO</strong></a> (the Scientific
-Evidence and Provenance Information Ontology) — the same evidence backbone used
-across Monarch. You author the simple shape above; underneath, every packet is
-valid SEPIO, so evidence means the same thing everywhere.</p>
-<p>For the full field-by-field model, see the <a href="../data-model/">Data Model</a> page and
-<code>SPEC.md</code> in the repository.</p>
+<p>SIEVE is a profile of the <a href="https://github.com/sepio-framework/sepio-linkml">SEPIO</a> core
+information model (Scientific Evidence and Provenance Information Ontology). The core is
+imported unchanged, and every SIEVE class specialises a core class, so a SIEVE packet is
+SEPIO data. The profile was built from Mondo's requirements collection; the
+<a href="../requirements-traceability/">Requirements Traceability</a> page shows which part of the
+model answers which requirement.</p>
+<p>For every field, see the <a href="../data-model/">Data Model</a>.</p>
 </article>
 </div>
 <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>

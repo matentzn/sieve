@@ -213,10 +213,10 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#lifting-into-sieve">
+<a class="md-nav__link" href="#relation-to-the-sieve-profile">
 <span class="md-ellipsis">
       
-        Lifting into sieve
+        Relation to the SIEVE profile
       
     </span>
 </a>
@@ -286,6 +286,18 @@
     
   
     Schema Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../requirements-traceability/">
+<span class="md-ellipsis">
+    
+  
+    Requirements Traceability
   
 
     
@@ -418,15 +430,17 @@
 <p>This page introduces the <strong>minimal evidence microschema</strong> — a small, standalone
 model for "evidence that supports or disputes a claim" that any Monarch project can
 import and reuse — and shows it working on a real record: a DisMech pathophysiology
-assertion for Fanconi Anemia is transformed into the minimal model, then lifted into
-the full <a href="../">sieve</a> model. Every step below is executable:</p>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>just<span class="w"> </span>transform-all<span class="w">      </span><span class="c1"># DisMech -&gt; minimal -&gt; sieve, both outputs validated</span>
+assertion for Fanconi Anemia is transformed into the minimal model.</p>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>just<span class="w"> </span>transform-dismech<span class="w">   </span><span class="c1"># DisMech -&gt; minimal, output validated against schema/minimal.yaml</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Status</p>
 <p>The minimal model is <strong>provisional</strong> pending coordination with the SEPIO project
 (schema <code>id</code> and the enum-to-ontology <code>meaning:</code> IRIs are not yet final). See the
-design spec <code>specs/2026-07-31-minimal-microschema-and-sieve-alignment-design.md</code>.</p>
+design spec <code>specs/2026-07-31-minimal-microschema-and-sieve-alignment-design.md</code>.
+That spec's alignment with the full SIEVE model no longer holds: SIEVE has since
+been rebuilt as a camelCase profile of the SEPIO core, and the two schemas are not
+connected (see <a href="#relation-to-the-sieve-profile">Relation to the SIEVE profile</a>).</p>
 </div>
 <h2 id="why-a-minimal-model">Why a <em>minimal</em> model<a class="headerlink" href="#why-a-minimal-model" title="Permanent link">¶</a></h2>
 <p>Many projects independently model the same thing — a claim, and the evidence for or
@@ -487,12 +501,13 @@ metadata (score, offsets, method) — so the minimal "A" shape stays valid while
 <h2 id="the-transform-in-one-picture">The transform, in one picture<a class="headerlink" href="#the-transform-in-one-picture" title="Permanent link">¶</a></h2>
 <div class="mermaid">flowchart LR
     DM[DisMech record<br/>Fanconi Anemia] --&gt;|"dismech_to_minimal<br/>(linkml-map)"| MIN[minimal<br/>EvidencedClaim]
-    MIN --&gt;|"minimal_to_sieve<br/>(linkml-map)"| SV[sieve<br/>EvidencePacket]
+    MIN --&gt;|"minimal_to_sieve<br/>(linkml-map, pre-profile)"| SV[sieve<br/>EvidencePacket]
     MIN -. validates .-&gt; MS[(schema/minimal.yaml)]
-    SV -. validates .-&gt; SS[(schema/sieve.yaml)]
+    SV -. "fails: pre-profile shape" .-&gt; SS[(schema/sieve.yaml)]
 </div>
 <p>Both hops are <a href="https://linkml.io/linkml-map/">linkml-map</a> transformation specs in
-<code>transform/</code>. The source shape is a vendored snapshot of DisMech's model
+<code>transform/</code>. Only the first works today; the second still targets the pre-profile
+SIEVE model. The source shape is a vendored snapshot of DisMech's model
 (<code>transform/dismech_source.yaml</code>) so the pipeline runs without the DisMech repo
 checked out.</p>
 <h2 id="before-a-dismech-assertion">Before: a DisMech assertion<a class="headerlink" href="#before-a-dismech-assertion" title="Permanent link">¶</a></h2>
@@ -559,37 +574,58 @@ strength <em>and</em> source <em>and</em> document, a curation step may merge th
 line with several <code>has_evidence_items</code> — an <code>EvidenceLine</code> is a line of reasoning,
 not a sentence.</p>
 </div>
-<h2 id="lifting-into-sieve">Lifting into sieve<a class="headerlink" href="#lifting-into-sieve" title="Permanent link">¶</a></h2>
-<p>The full sieve model is a superset. The second transform
-(<code>transform/minimal_to_sieve.transform.yaml</code>) lifts the minimal claim into a sieve
-<code>EvidencePacket</code>: each <code>EvidenceLine</code> becomes a <code>SieveEvidenceLine</code>, and each
-<code>TextSpan</code> becomes a <code>SieveDocument</code> evidence item — the snippet becomes its <code>quote</code>,
-and the <code>Document</code> becomes its <code>pmid</code> + <code>title</code>:</p>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:packet_fanconi_hsc_attrition</span>
-<a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">UNREVIEWED</span>
-<a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="nt">statement</span><span class="p">:</span>
-<a href="#__codelineno-3-4" id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stmt_fanconi_hsc_attrition</span>
-<a href="#__codelineno-3-5" id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveStatement</span>
-<a href="#__codelineno-3-6" id="__codelineno-3-6" name="__codelineno-3-6"></a><span class="w">  </span><span class="nt">statement_text</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Hematopoietic Stem Cell Attrition</span>
-<a href="#__codelineno-3-7" id="__codelineno-3-7" name="__codelineno-3-7"></a><span class="nt">has_evidence_lines</span><span class="p">:</span>
-<a href="#__codelineno-3-8" id="__codelineno-3-8" name="__codelineno-3-8"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">line_pmid38424108</span>
-<a href="#__codelineno-3-9" id="__codelineno-3-9" name="__codelineno-3-9"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveEvidenceLine</span>
-<a href="#__codelineno-3-10" id="__codelineno-3-10" name="__codelineno-3-10"></a><span class="w">    </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supports</span>
-<a href="#__codelineno-3-11" id="__codelineno-3-11" name="__codelineno-3-11"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Demonstrates that inflammatory signaling drives HSC pool deficits in FA ...</span>
-<a href="#__codelineno-3-12" id="__codelineno-3-12" name="__codelineno-3-12"></a><span class="w">    </span><span class="nt">has_evidence_items</span><span class="p">:</span>
-<a href="#__codelineno-3-13" id="__codelineno-3-13" name="__codelineno-3-13"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">doc_38424108</span>
-<a href="#__codelineno-3-14" id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveDocument</span>
-<a href="#__codelineno-3-15" id="__codelineno-3-15" name="__codelineno-3-15"></a><span class="w">        </span><span class="nt">quote</span><span class="p">:</span><span class="w"> </span><span class="s">"proteostasis</span><span class="nv"> </span><span class="s">deregulation</span><span class="nv"> </span><span class="s">itself</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">driven</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">excess</span><span class="nv"> </span><span class="s">sterile</span><span class="nv"> </span><span class="s">inflammatory</span><span class="nv"> </span><span class="s">activity</span><span class="nv"> </span><span class="s">..."</span>
-<a href="#__codelineno-3-16" id="__codelineno-3-16" name="__codelineno-3-16"></a><span class="w">        </span><span class="nt">pmid</span><span class="p">:</span><span class="w"> </span><span class="s">"38424108"</span>
-<a href="#__codelineno-3-17" id="__codelineno-3-17" name="__codelineno-3-17"></a><span class="w">        </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"Deregulated</span><span class="nv"> </span><span class="s">protein</span><span class="nv"> </span><span class="s">homeostasis</span><span class="nv"> </span><span class="s">constrains</span><span class="nv"> </span><span class="s">fetal</span><span class="nv"> </span><span class="s">HSC</span><span class="nv"> </span><span class="s">pool</span><span class="nv"> </span><span class="s">expansion</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">Fanconi</span><span class="nv"> </span><span class="s">anemia."</span>
-<a href="#__codelineno-3-18" id="__codelineno-3-18" name="__codelineno-3-18"></a><span class="w">  </span><span class="c1"># ... second line likewise</span>
-</code></pre></div>
-<p>This output validates against <code>schema/sieve.yaml</code>. The lift shows what the richer model
-adds: <strong>every entity gets an <code>id</code> and a <code>type</code> designator</strong>, and evidence items become
-typed sieve classes (<code>SieveDocument</code>, <code>ConcordanceItem</code>, …) carrying curation slots
-(<code>rating</code>, <code>eco_code</code>). One thing the minimal model has that sieve does not yet: the
-line-level <code>evidence_source</code> axis — that is a held extension (spec phase 4), so it is
-intentionally dropped in the lift for now.</p>
+<h2 id="relation-to-the-sieve-profile">Relation to the SIEVE profile<a class="headerlink" href="#relation-to-the-sieve-profile" title="Permanent link">¶</a></h2>
+<p>The minimal model is currently <strong>not connected</strong> to SIEVE. The SIEVE profile
+(<code>schema/sieve.yaml</code>) imports the canonical SEPIO core unchanged and uses its camelCase
+names. <code>schema/minimal.yaml</code> is unchanged: snake_case, standalone, and aligned with SEPIO
+only through <code>class_uri</code> / <code>slot_uri</code>. A minimal instance is therefore not a valid SIEVE
+packet, and nothing in <code>sieve.yaml</code> refers to <code>minimal.yaml</code>.</p>
+<p>The second transform (<code>transform/minimal_to_sieve.transform.yaml</code>) still emits the
+pre-profile SIEVE shape (<code>SieveDocument</code> items, snake_case slots, <code>status</code>), which the
+profile rejects, so <code>just transform-minimal-to-sieve</code> and <code>just transform-all</code> fail at
+their last validation step. How the two schemas should relate again (a sub-profile of
+the core, a transform as the formal bridge, a camelCase standalone kernel, or no
+separate kernel) is open: <code>issues/issue_minimal_kernel_vs_profile.md</code>.</p>
+<p>For orientation, the nearest counterparts in the profile (not a decided mapping):</p>
+<table>
+<thead>
+<tr>
+<th>Minimal</th>
+<th>SIEVE profile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EvidencedClaim</code></td>
+<td>a claim-type statement (<code>SubclassStatement</code>, <code>DiseaseAttributeStatement</code>, ...) with SPO on the statement, inside a versioned <code>EvidencePacket</code></td>
+</tr>
+<tr>
+<td><code>EvidenceLine</code></td>
+<td><code>SieveEvidenceLine</code>, which also requires the <code>InterpretationActivity</code> that produced it</td>
+</tr>
+<tr>
+<td><code>TextSpan</code>, inlined in the line</td>
+<td><code>TextPassage</code> in the packet's <code>text_passages</code>, referenced from the line by id, with its extraction provenance</td>
+</tr>
+<tr>
+<td><code>Document</code>, inlined via <code>reported_in</code></td>
+<td><code>Publication</code> in the packet's <code>publications</code>, referenced from <code>TextPassage.reported_in</code></td>
+</tr>
+<tr>
+<td><code>Direction</code> (<code>SUPPORTS</code> / <code>REFUTES</code> / <code>NEUTRAL</code>)</td>
+<td><code>Direction</code> (<code>supports</code> / <code>disputes</code>; no neutral)</td>
+</tr>
+<tr>
+<td><code>Strength</code></td>
+<td><code>strength_of_evidence_provided</code> (band) and <code>score_of_evidence_provided</code> (0-1)</td>
+</tr>
+<tr>
+<td><code>evidence_source</code> (ECO branch)</td>
+<td>no direct slot; the nearest is the item's <code>generation_context</code></td>
+</tr>
+</tbody>
+</table>
+<p>See the <a href="../data-model/">Data Model</a> for the profile.</p>
 <h2 id="files">Files<a class="headerlink" href="#files" title="Permanent link">¶</a></h2>
 <table>
 <thead>
@@ -617,7 +653,7 @@ intentionally dropped in the lift for now.</p>
 </tr>
 <tr>
 <td><code>transform/minimal_to_sieve.transform.yaml</code></td>
-<td>minimal → sieve transform</td>
+<td>minimal → sieve transform (pre-profile target, currently fails)</td>
 </tr>
 <tr>
 <td><code>project.justfile</code></td>
@@ -625,7 +661,7 @@ intentionally dropped in the lift for now.</p>
 </tr>
 <tr>
 <td><code>tests/test_transform_dismech.py</code></td>
-<td>runs the pipeline and validates both outputs</td>
+<td>runs the pipeline and validates both outputs (the SIEVE stage currently fails)</td>
 </tr>
 </tbody>
 </table>

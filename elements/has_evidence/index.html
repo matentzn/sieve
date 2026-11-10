@@ -440,6 +440,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../requirements-traceability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -730,8 +758,8 @@
 
 
 <h1 id="slot-has_evidence">Slot: has_evidence<a class="headerlink" href="#slot-has_evidence" title="Permanent link">&para;</a></h1>
-<p><em>A piece of information that contributes to an argument for or against the Statement's proposition. Shortcut bypassing EvidenceLine.</em></p>
-<p>URI: <a href="https://w3id.org/sieve/has_evidence">sieve:has_evidence</a>
+<p><em>A piece of information that represents or contributes to an argument for or against the validity of the Proposition put forth in a Statement. This is a shortcut relation that links a Statement directly to a piece of evidence supporting it, bypassing the Evidence Line class when used data creators do not utilize an Evidence Line object.</em></p>
+<p>URI: <a href="https://example.org/sepio-model/hasEvidence">sepio-model:hasEvidence</a>
 Alias: has_evidence</p>
 <!-- no inheritance hierarchy -->
 
@@ -746,13 +774,68 @@ Alias: has_evidence</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../Statement/">Statement</a></td>
-<td>A claim of purported truth as made by a particular agent</td>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td>C010 (candidate): the term is a member of what an external record covers (e</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td>C008: the term is in a Mondo subset</td>
 <td>no</td>
 </tr>
 <tr>
 <td><a href="../SieveStatement/">SieveStatement</a></td>
-<td>Sieve extension of SEPIO Statement</td>
+<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td>C002: the term has this textual definition</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../SubclassStatement/">SubclassStatement</a></td>
+<td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../MappingStatement/">MappingStatement</a></td>
+<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
+<td>C009 (candidate): the kind of class this term is (grouping, disorder, subtype...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../Statement/">Statement</a></td>
+<td>A claim of purported truth as made by a particular agent, on a particular occ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../TextPassage/">TextPassage</a></td>
+<td>A verbatim passage extracted from a document as a prior claim</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -765,6 +848,15 @@ Alias: has_evidence</p>
 <li>
 <p>Multivalued: True</p>
 </li>
+</ul>
+<h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<ul>
+<li>Evidence is any information that is interpreted in assessing the truth of  the proposition a Statement puts forth as true or false.  A piece of information only becomes evidence when it is interpreted in this way. Different types of information entities can be used and cited as evidence, including direct observation or measurement data, derived statistical calculations, data tables or figures in a publication, conclusions/findings from a particular study, or prior assertions of knowledge  that themselves are based on their own set of evidence.</li>
+</ul>
+</li>
+<li>This is a shortcut relation that links a Statement directly to a piece of evidence supporting it, bypassing the Evidence Line class - to be used data creators cannot or do not wish to create an Evidence Line object.</li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information<a class="headerlink" href="#identifier-and-mapping-information" title="Permanent link">&para;</a></h2>
 <h3 id="schema-source">Schema Source<a class="headerlink" href="#schema-source" title="Permanent link">&para;</a></h3>
@@ -782,7 +874,7 @@ Alias: has_evidence</p>
 <tbody>
 <tr>
 <td>self</td>
-<td>sieve:has_evidence</td>
+<td>sepio-model:hasEvidence</td>
 </tr>
 <tr>
 <td>native</td>
@@ -793,18 +885,33 @@ Alias: has_evidence</p>
 <h2 id="linkml-source">LinkML Source<a class="headerlink" href="#linkml-source" title="Permanent link">&para;</a></h2>
 <details>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">has_evidence</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A piece of information that contributes to an argument for or against</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">the Statement&#39;s proposition. Shortcut bypassing EvidenceLine.</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Informative</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">has_evidence</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A piece of information that represents or contributes to an argument</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">for or against the validity of the Proposition put forth in a Statement. This is</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">a shortcut relation that links a Statement directly to a piece of evidence supporting</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">it, bypassing the Evidence Line class when used data creators do not utilize an</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Evidence Line object.</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nt">comments</span><span class="p">:</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;-</span><span class="nv"> </span><span class="s">Evidence</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">any</span><span class="nv"> </span><span class="s">information</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">interpreted</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">assessing</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">truth</span><span class="nv"> </span><span class="s">of</span><span class="nv">  </span><span class="s">the</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="s">proposition</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">Statement</span><span class="nv"> </span><span class="s">puts</span><span class="nv"> </span><span class="s">forth</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">true</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">false.</span><span class="nv">  </span><span class="s">A</span><span class="nv"> </span><span class="s">piece</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">information</span><span class="nv"> </span><span class="s">only</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="s">becomes</span><span class="nv"> </span><span class="s">evidence</span><span class="nv"> </span><span class="s">when</span><span class="nv"> </span><span class="s">it</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">interpreted</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">this</span><span class="nv"> </span><span class="s">way.</span><span class="nv"> </span><span class="s">Different</span><span class="nv"> </span><span class="s">types</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">information</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="s">entities</span><span class="nv"> </span><span class="s">can</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">used</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">cited</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">evidence,</span><span class="nv"> </span><span class="s">including</span><span class="nv"> </span><span class="s">direct</span><span class="nv"> </span><span class="s">observation</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">measurement</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="s">data,</span><span class="nv"> </span><span class="s">derived</span><span class="nv"> </span><span class="s">statistical</span><span class="nv"> </span><span class="s">calculations,</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">tables</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">figures</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">publication,</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="s">conclusions/findings</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">particular</span><span class="nv"> </span><span class="s">study,</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">prior</span><span class="nv"> </span><span class="s">assertions</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">knowledge</span><span class="nv">  </span><span class="s">that</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="s">themselves</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">their</span><span class="nv"> </span><span class="s">own</span><span class="nv"> </span><span class="s">set</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">evidence.&#39;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">This is a shortcut relation that links a Statement directly to a piece of evidence</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">supporting it, bypassing the Evidence Line class - to be used data creators cannot</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">or do not wish to create an Evidence Line object.</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Informative</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:hasEvidence</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">has_evidence</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 </details>
 

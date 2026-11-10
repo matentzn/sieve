@@ -1,242 +1,131 @@
 
-<!doctype html>
-<html lang="en" class="no-js">
-  <head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      
-        <meta name="description" content="Scientific Evidence Evaluation & Verification Environment">
-      
-      
-      
-        <link rel="canonical" href="https://matentzn.github.io/sieve/data-model/">
-      
-      
-        <link rel="prev" href="../monarch-evidence/">
-      
-      
-        <link rel="next" href="../architecture/">
-      
-      
-        
-      
-      
-      <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
-    
-    
-      
-        <title>Data Model - SIEVE</title>
-      
-    
-    
-      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
-      
-      
+<!DOCTYPE html>
 
-
-    
-    
-      
-    
-    
-      
-        
-        
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
-      
-    
-    
-      <link rel="stylesheet" href="../css/ansi-colours.css">
-    
-      <link rel="stylesheet" href="../css/jupyter-cells.css">
-    
-      <link rel="stylesheet" href="../css/pandas-dataframe.css">
-    
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
-    
-      
-
-    
-    
-  </head>
-  
-  
-    <body dir="ltr">
-  
-    
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
-    <div data-md-component="skip">
-      
-        
-        <a href="#data-model" class="md-skip">
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Scientific Evidence Evaluation &amp; Verification Environment" name="description"/>
+<link href="https://matentzn.github.io/sieve/data-model/" rel="canonical"/>
+<link href="../monarch-evidence/" rel="prev"/>
+<link href="../architecture/" rel="next"/>
+<link href="../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.0" name="generator"/>
+<title>Data Model - SIEVE</title>
+<link href="../assets/stylesheets/main.618322db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../css/ansi-colours.css" rel="stylesheet"/>
+<link href="../css/jupyter-cells.css" rel="stylesheet"/>
+<link href="../css/pandas-dataframe.css" rel="stylesheet"/>
+<script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#data-model">
           Skip to content
         </a>
-      
-    </div>
-    <div data-md-component="announce">
-      
-    </div>
-    
-    
-      
-
-  
-
+</div>
+<div data-md-component="announce">
+</div>
 <header class="md-header md-header--shadow" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="SIEVE" class="md-header__button md-logo" aria-label="SIEVE" data-md-component="logo">
-      
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
-
-    </a>
-    <label class="md-header__button md-icon" for="__drawer">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
-    </label>
-    <div class="md-header__title" data-md-component="header-title">
-      <div class="md-header__ellipsis">
-        <div class="md-header__topic">
-          <span class="md-ellipsis">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="SIEVE" class="md-header__button md-logo" data-md-component="logo" href=".." title="SIEVE">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
             SIEVE
           </span>
-        </div>
-        <div class="md-header__topic" data-md-component="header-topic">
-          <span class="md-ellipsis">
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
             
               Data Model
             
           </span>
-        </div>
-      </div>
-    </div>
-    
-    
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
-    
-    
-    
-      
-      
-        <label class="md-header__button md-icon" for="__search">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        </label>
-        <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </nav>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
+</div>
+</div>
+</div>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
+<ol class="md-search-result__list" role="presentation"></ol>
 </div>
-      
-    
-    
-      <div class="md-header__source">
-        <a href="https://github.com/matentzn/sieve" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
-  </div>
-  <div class="md-source__repository">
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/matentzn/sieve" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
     matentzn/sieve
   </div>
 </a>
-      </div>
-    
-  </nav>
-  
+</div>
+</nav>
 </header>
-    
-    <div class="md-container" data-md-component="container">
-      
-      
-        
-          
-        
-      
-      <main class="md-main" data-md-component="main">
-        <div class="md-main__inner md-grid">
-          
-            
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-
-
-  
-
-<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
-  <label class="md-nav__title" for="__drawer">
-    <a href=".." title="SIEVE" class="md-nav__button md-logo" aria-label="SIEVE" data-md-component="logo">
-      
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
-
-    </a>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--integrated" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="SIEVE" class="md-nav__button md-logo" data-md-component="logo" href=".." title="SIEVE">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
     SIEVE
   </label>
-  
-    <div class="md-nav__source">
-      <a href="https://github.com/matentzn/sieve" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
-  </div>
-  <div class="md-source__repository">
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/matentzn/sieve" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
     matentzn/sieve
   </div>
 </a>
-    </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="..">
+<span class="md-ellipsis">
     
   
     Home
@@ -244,26 +133,11 @@
 
     
   </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../primer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../primer/">
+<span class="md-ellipsis">
     
   
     Primer
@@ -271,26 +145,11 @@
 
     
   </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../monarch-evidence/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../monarch-evidence/">
+<span class="md-ellipsis">
     
   
     Minimal Evidence Model
@@ -298,44 +157,12 @@
 
     
   </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+<span class="md-ellipsis">
     
   
     Model Reference
@@ -343,44 +170,22 @@
 
     
   </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
             
   
     Model Reference
   
 
           </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
     
   
     Data Model
@@ -388,17 +193,10 @@
 
     
   </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
     
   
     Data Model
@@ -406,434 +204,149 @@
 
     
   </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#the-shape-of-the-data">
+<span class="md-ellipsis">
       
-        <li class="md-nav__item">
-  <a href="#the-shape-at-a-glance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The shape at a glance
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#evidencepacket" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EvidencePacket
+        The shape of the data
       
     </span>
-  </a>
-  
+</a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sepio-design-modules">
+<span class="md-ellipsis">
       
-        <li class="md-nav__item">
-  <a href="#sievestatement" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SieveStatement
+        SEPIO design modules
       
     </span>
-  </a>
-  
-</li>
+</a>
+<nav aria-label="SEPIO design modules" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#statement">
+<span class="md-ellipsis">
       
-        <li class="md-nav__item">
-  <a href="#evidence-lines-and-items-two-levels" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Evidence: lines and items (two levels)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Evidence: lines and items (two levels)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sieveevidenceline" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SieveEvidenceLine
+        Statement
       
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#evidence-items">
+<span class="md-ellipsis">
       
-        <li class="md-nav__item">
-  <a href="#the-six-evidence-items" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The six evidence items
+        Evidence items
       
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="The six evidence items">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sievedocument" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#evidence-lines">
+<span class="md-ellipsis">
       
-        SieveDocument
+        Evidence lines
       
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#concordanceitem" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#provenance">
+<span class="md-ellipsis">
       
-        ConcordanceItem
+        Provenance
       
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#agentcontribution" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#record-metadata">
+<span class="md-ellipsis">
       
-        AgentContribution
+        Record metadata
       
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#computationalresult" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#utilities">
+<span class="md-ellipsis">
       
-        ComputationalResult
+        Utilities
       
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#sievedataitem" class="md-nav__link">
-    <span class="md-ellipsis">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#two-levels-of-judgement">
+<span class="md-ellipsis">
       
-        SieveDataItem
+        Two levels of judgement
       
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#sievestudyresult" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#three-axes-provenance-evidence-data-quality">
+<span class="md-ellipsis">
       
-        SieveStudyResult
+        Three axes: provenance, evidence, data quality
       
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#the-inclusion-score">
+<span class="md-ellipsis">
       
-        <li class="md-nav__item">
-  <a href="#curatedevidence" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CuratedEvidence
+        The inclusion score
       
     </span>
-  </a>
-  
+</a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#validation">
+<span class="md-ellipsis">
       
-        <li class="md-nav__item">
-  <a href="#the-type-discriminator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The type discriminator
+        Validation
       
     </span>
-  </a>
-  
+</a>
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#enums" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Enums
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Enums">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#curationstatus" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CurationStatus
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#decisiontype" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DecisionType
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#evidencedirection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EvidenceDirection
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#evidencestrength" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EvidenceStrength
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#trustlevel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TrustLevel
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#contributionchannel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ContributionChannel
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#contributiontype" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ContributionType
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#evidenceitemtype" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EvidenceItemType
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#provenance-and-synthesis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Provenance and synthesis
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Provenance and synthesis">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#agent-provenance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Agent (provenance)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#curationactivity" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CurationActivity
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#evidencesynthesis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EvidenceSynthesis
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#score" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Score
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#coding" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Coding
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#curationdecision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CurationDecision
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#storage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Storage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#a-complete-example" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#a-complete-example">
+<span class="md-ellipsis">
       
         A complete example
       
     </span>
-  </a>
-  
+</a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#coming-from-the-pre-profile-model">
+<span class="md-ellipsis">
       
-        <li class="md-nav__item">
-  <a href="#full-generated-reference-and-sepio-alignment" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Full generated reference and SEPIO alignment
+        Coming from the pre-profile model
       
     </span>
-  </a>
-  
+</a>
 </li>
-      
-    </ul>
-  
+</ul>
 </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../architecture/">
+<span class="md-ellipsis">
     
   
     Architecture
@@ -841,27 +354,11 @@
 
     
   </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../elements/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../elements/">
+<span class="md-ellipsis">
     
   
     Schema Reference
@@ -869,52 +366,27 @@
 
     
   </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../requirements-traceability/">
+<span class="md-ellipsis">
+    
   
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
+    Requirements Traceability
   
 
     
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+<span class="md-ellipsis">
     
   
     User Guide
@@ -922,35 +394,21 @@
 
     
   </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
             
   
     User Guide
   
 
           </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cli/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../cli/">
+<span class="md-ellipsis">
     
   
     CLI Reference
@@ -958,27 +416,11 @@
 
     
   </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../workflows/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../workflows/">
+<span class="md-ellipsis">
     
   
     Workflows
@@ -986,27 +428,11 @@
 
     
   </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../orcid-setup/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orcid-setup/">
+<span class="md-ellipsis">
     
   
     ORCID Setup
@@ -1014,52 +440,15 @@
 
     
   </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+<span class="md-ellipsis">
     
   
     Developer Guide
@@ -1067,35 +456,21 @@
 
     
   </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
-            <span class="md-nav__icon md-icon"></span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
             
   
     Developer Guide
   
 
           </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../api/">
+<span class="md-ellipsis">
     
   
     Python API
@@ -1103,27 +478,11 @@
 
     
   </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../ai-integration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ai-integration/">
+<span class="md-ellipsis">
     
   
     AI Integration
@@ -1131,143 +490,134 @@
 
     
   </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-  </ul>
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-          
-          
-            <div class="md-content" data-md-component="content">
-              
-              <article class="md-content__inner md-typeset">
-                
-                  
-
-
-  
-  
-
-
-<h1 id="data-model">Data Model<a class="headerlink" href="#data-model" title="Permanent link">&para;</a></h1>
-<p>This is the field-by-field reference for the SIEVE evidence model. For the
-concepts and the <em>why</em>, read the <a href="../primer/">Primer</a> first; this page is what the
-Primer and <a href="../ai-integration/">AI Integration</a> pages link to for detail.</p>
-<p>SIEVE is defined in two LinkML schemas:</p>
-<ul>
-<li><code>schema/sieve.yaml</code> — the canonical SIEVE model (<code>id: https://w3id.org/sieve</code>).</li>
-<li><code>schema/sepio_classes.yaml</code> — a trimmed <a href="https://github.com/monarch-initiative/SEPIO-ontology">SEPIO</a>
-  base that SIEVE imports.</li>
+</a>
+</li>
 </ul>
-<p>Every SIEVE class extends a SEPIO class, so a SIEVE packet is also valid SEPIO.
-All field names are <code>snake_case</code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Everything here is auto-generated too</p>
-<p>The exhaustive per-class and per-slot pages live under the
-<a href="../elements/">Schema Reference</a>. This page is the curated tour; that one
-is the generated source of truth.</p>
+</nav>
+</li>
+</ul>
+</nav>
 </div>
-<h2 id="the-shape-at-a-glance">The shape at a glance<a class="headerlink" href="#the-shape-at-a-glance" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>EvidencePacket                       (tree root)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── statement            → SieveStatement          subject–predicate–object
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── has_evidence_lines[] → SieveEvidenceLine        one argument each
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│     └── has_evidence_items[] → six item types     one piece of info each
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>├── evidence_synthesis   → EvidenceSynthesis         the reasoned verdict
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>└── curated_by           → CurationActivity          who reviewed it
-</code></pre></div>
-<p>An entity in SEPIO always carries <code>id</code> and <code>type</code>. In SIEVE, authors set <code>type:</code>
-on the statement, each evidence line, and each evidence item so the loader can
-dispatch to the right class (see <a href="#the-type-discriminator">The <code>type</code> discriminator</a>).</p>
-<hr />
-<h2 id="evidencepacket">EvidencePacket<a class="headerlink" href="#evidencepacket" title="Permanent link">&para;</a></h2>
-<p>The tree root: one statement, its evidence lines, and the verdict.</p>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="data-model">Data Model<a class="headerlink" href="#data-model" title="Permanent link">¶</a></h1>
+<p>This is the reference for the SIEVE evidence model. For the concepts in plain
+terms, read the <a href="../primer/">Primer</a> first.</p>
+<p>SIEVE is a <strong>profile of the SEPIO core information model</strong>, in two LinkML files:</p>
+<ul>
+<li><code>schema/sepio_core.yaml</code>: the canonical SEPIO core, copied unchanged from
+  <a href="https://github.com/sepio-framework/sepio-linkml">sepio-linkml</a> (commit <code>8c2c233</code>)
+  and pinned by hash in <code>tests/test_profile_schema.py</code>.</li>
+<li><code>schema/sieve.yaml</code>: the profile (<code>id: https://w3id.org/sieve</code>). It imports the
+  core, and every class in it specialises a core class. Inherited slots keep or narrow
+  their core range. Nothing in the core is redefined.</li>
+</ul>
+<p>Names follow the core's camelCase. The profile was built from the Mondo requirements
+collection: each class, slot and enum value that realises a requirement carries the
+requirement ID in <code>annotations.requirements</code>, and the decision-log IDs behind it in
+<code>annotations.decisions</code>. The requirement-by-requirement mapping is on the
+<a href="../requirements-traceability/">Requirements Traceability</a> page, generated from those
+annotations.</p>
+<div class="admonition note">
+<p class="admonition-title">Generated reference</p>
+<p>Every class, slot and enum has a generated page under the
+<a href="../elements/">Schema Reference</a>. This page is the guided tour.</p>
+</div>
+<h2 id="the-shape-of-the-data">The shape of the data<a class="headerlink" href="#the-shape-of-the-data" title="Permanent link">¶</a></h2>
+<ul>
+<li><strong>One <code>EvidencePacket</code> per claim.</strong> A packet (is_a <code>DataSet</code>) holds one claim-type
+  statement, the evidence items its lines refer to, and a required <code>version</code>. A
+  change to its lines, items or score makes a new version (<code>previous_version</code> points
+  back). Packets are never deleted: a rejected claim stays on record with its
+  evidence and decisions.</li>
+<li><strong>Lines live on the statement, items live on the packet.</strong> Evidence lines are
+  inlined under <code>statement.has_evidence_lines</code>. Evidence items sit in typed lists on
+  the packet (<code>external_records</code>, <code>prior_claims</code>, <code>text_passages</code>,
+  <code>publications</code>, <code>web_pages</code>, <code>guidelines</code>, <code>computational_scores</code>), and lines refer
+  to them by id.</li>
+<li><strong>Shared reference data is maintained in a <code>SieveRegistry</code>.</strong> Information resources,
+  source releases, agents, methods, aggregation rules, decision policies and batch
+  sign-offs are maintained once there.</li>
+<li><strong>A packet is self-contained.</strong> Its required <code>reference_snapshot</code> (a <code>SieveRegistry</code>) holds a
+  frozen copy, as of the packet version, of every registry entry the packet references.
+  Every reference must resolve inside the packet (<code>UNRESOLVED_REFERENCE</code> in
+  <code>sieve.profile_checks</code>), so revising the registry never changes how an existing packet
+  version reads (D-049, D-051, D-060).</li>
+<li><strong>Released artefacts</strong> are <code>EvidencePacketCollection</code>s. Encoding provenance (which
+  pipeline serialised the dump, with which export rules) is recorded there, never
+  per claim.</li>
+<li>Every entity carries <code>id</code> and <code>type</code>. <code>type</code> is the type designator, so a loader or
+  validator knows which claim type, item class or activity it is looking at.</li>
+</ul>
+<div class="mermaid">flowchart TD
+    P["EvidencePacket<br/>id, version"] --&gt; S["Statement (one claim type)<br/>subject, predicate, object, negated"]
+    S --&gt; L["SieveEvidenceLine<br/>direction, strength, score"]
+    L --&gt; IA["InterpretationActivity<br/>who, when, how"]
+    S --&gt; D["AssertionDecision<br/>outcome, route, S, packet version"]
+    S --&gt; O["OriginEvent<br/>copied / cloned / inspired by"]
+    P --&gt; I["typed item lists<br/>external_records, prior_claims,<br/>text_passages, publications, ..."]
+    L -. "has_evidence_items (ids)" .-&gt; I
+    R[("SieveRegistry<br/>resources, releases, agents,<br/>methods, rules, policies, batches")]
+    L -. "computed_by_rule" .-&gt; R
+    D -. "policy, batch, aggregation_rule" .-&gt; R
+</div>
+<h2 id="sepio-design-modules">SEPIO design modules<a class="headerlink" href="#sepio-design-modules" title="Permanent link">¶</a></h2>
+<p>The core names no modules, so the profile groups its classes into six, following the
+core's class groups. Each requirement is assigned to one module in
+<code>requirements/traceability.yaml</code>.</p>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Req</th>
-<th>Description</th>
+<th>Module</th>
+<th>SEPIO core classes</th>
+<th>Profile classes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>id</code></td>
-<td>uriorcurie</td>
-<td>Yes</td>
-<td>Unique identifier for this packet (the identifier slot).</td>
-</tr>
-<tr>
 <td><code>statement</code></td>
-<td><a href="#sievestatement">SieveStatement</a></td>
-<td>Yes</td>
-<td>The assertion being curated.</td>
+<td>Statement, Proposition, Qualifier</td>
+<td><code>SieveStatement</code> and the ten claim types</td>
 </tr>
 <tr>
-<td><code>status</code></td>
-<td><a href="#curationstatus">CurationStatus</a></td>
-<td>Yes</td>
-<td>Workflow status. Defaults to <code>UNREVIEWED</code>.</td>
+<td><code>evidence-item</code></td>
+<td>InformationEntity, Document, DataItem, DataSet, StudyResult</td>
+<td><code>ExternalRecord</code>, <code>TextPassage</code>, <code>Publication</code>, <code>WebPage</code>, <code>GuidelineDocument</code>, <code>ComputationalScore</code>, <code>InformationResource</code>, <code>SourceRelease</code>, <code>EvidencePacket</code></td>
 </tr>
 <tr>
-<td><code>has_evidence_lines</code></td>
-<td><a href="#sieveevidenceline">SieveEvidenceLine</a>[]</td>
-<td>No</td>
-<td>Evidence lines supporting or disputing the statement.</td>
+<td><code>evidence-line</code></td>
+<td>EvidenceLine</td>
+<td><code>SieveEvidenceLine</code>, <code>LineStatusChange</code></td>
 </tr>
 <tr>
-<td><code>evidence_synthesis</code></td>
-<td><a href="#evidencesynthesis">EvidenceSynthesis</a></td>
-<td>No</td>
-<td>Reasoned synthesis of the evidence.</td>
+<td><code>provenance</code></td>
+<td>Activity, Contribution, Agent, Method</td>
+<td><code>SieveAgent</code>, <code>SieveMethod</code>, <code>AggregationRule</code>, <code>DecisionPolicy</code>, <code>BatchSignOff</code>, <code>SieveContribution</code>, <code>InterpretationActivity</code>, <code>AssertionDecision</code>, <code>OriginEvent</code>, <code>ResolutionChain</code>, <code>AlignmentStep</code></td>
 </tr>
 <tr>
-<td><code>curated_by</code></td>
-<td><a href="#curationactivity">CurationActivity</a></td>
-<td>No</td>
-<td>The activity that reviewed/approved the packet.</td>
+<td><code>record-metadata</code></td>
+<td>RecordMetadata</td>
+<td><code>RetrievalMetadata</code></td>
 </tr>
 <tr>
-<td><code>created</code></td>
-<td>date</td>
-<td>No</td>
-<td>When the packet was created.</td>
-</tr>
-<tr>
-<td><code>updated</code></td>
-<td>date</td>
-<td>No</td>
-<td>When the packet was last updated.</td>
+<td><code>utility</code></td>
+<td>Coding, Extension, Qualifier</td>
+<td><code>TextLocation</code>, <code>QualityRating</code>, <code>LevelAssignment</code>, <code>AppliedRule</code></td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="sievestatement">SieveStatement<a class="headerlink" href="#sievestatement" title="Permanent link">&para;</a></h2>
-<p><code>is_a</code> SEPIO <strong>Statement</strong>. A subject–predicate–object assertion. SIEVE adds two
-label slots; everything else is inherited from SEPIO Statement.</p>
+<h3 id="statement">Statement<a class="headerlink" href="#statement" title="Permanent link">¶</a></h3>
+<p><code>SieveStatement</code> (abstract, is_a <code>Statement</code>) is a Mondo claim as an identified,
+reified statement. Subject, predicate and object sit directly on the statement. There
+are no <code>Proposition</code> objects: the core <code>proposition</code> slot is inherited but unused, and
+concordance and dispute are matched on subject, predicate, object and <code>negated</code>.</p>
 <table>
 <thead>
 <tr>
 <th>Field</th>
-<th>Type</th>
+<th>Range</th>
 <th>Req</th>
 <th>Description</th>
 </tr>
@@ -1275,62 +625,256 @@ label slots; everything else is inherited from SEPIO Statement.</p>
 <tbody>
 <tr>
 <td><code>subject</code></td>
-<td>string</td>
-<td>No</td>
-<td>Subject entity (CURIE, e.g. <code>MONDO:0004979</code>). <em>(from Statement)</em></td>
+<td>uriorcurie</td>
+<td>Yes</td>
+<td>The Mondo term the claim is about.</td>
 </tr>
 <tr>
 <td><code>predicate</code></td>
-<td><a href="#coding">Coding</a></td>
-<td>No</td>
-<td>The relationship, as a structured code. <em>(from Statement)</em></td>
+<td>Coding</td>
+<td>Yes</td>
+<td>The relation. Each claim type binds it to a value set.</td>
 </tr>
 <tr>
 <td><code>object</code></td>
-<td>string</td>
+<td>string / uriorcurie</td>
+<td>Yes</td>
+<td>Term, text or value, depending on the claim type.</td>
+</tr>
+<tr>
+<td><code>negated</code></td>
+<td>boolean</td>
 <td>No</td>
-<td>Object entity (CURIE). <em>(from Statement)</em></td>
+<td>The claim is that subject-predicate-object does <strong>not</strong> hold. Default false.</td>
 </tr>
 <tr>
 <td><code>statement_text</code></td>
 <td>string</td>
 <td>No</td>
-<td>Natural-language rendering of the claim. <em>(from Statement)</em></td>
+<td>Human-readable rendering of the claim.</td>
 </tr>
 <tr>
-<td><code>subject_label</code></td>
-<td>string</td>
-<td>No</td>
-<td>Human-readable label for the subject.</td>
+<td><code>review_state</code></td>
+<td>ReviewState</td>
+<td>Yes</td>
+<td><code>NOT_VERIFIED</code> (default), <code>PENDING_REVIEW</code>, <code>VERIFIED</code>. Workflow state, distinct from the decision outcome.</td>
 </tr>
 <tr>
-<td><code>object_label</code></td>
+<td><code>proposing_channel</code></td>
+<td>ProposingChannel</td>
+<td>No</td>
+<td>Who proposed the claim (curator, source ingest, lexical pipeline, AI agent, ...). Selects the claim prior.</td>
+</tr>
+<tr>
+<td><code>has_evidence_lines</code></td>
+<td>SieveEvidenceLine[]</td>
+<td>No</td>
+<td>The evidence lines, inlined.</td>
+</tr>
+<tr>
+<td><code>has_evidence</code></td>
+<td>ids</td>
+<td>No</td>
+<td>Direct claim-to-item links with no interpretation.</td>
+</tr>
+<tr>
+<td><code>has_evidence_from_sources</code></td>
+<td>InformationResource ids</td>
+<td>No</td>
+<td>Source-level attribution without a record id (e.g. MONDO:DOID).</td>
+</tr>
+<tr>
+<td><code>origin</code></td>
+<td>OriginEvent[]</td>
+<td>No</td>
+<td>Where the claim was copied, cloned or adapted from.</td>
+</tr>
+<tr>
+<td><code>assertion_decisions</code></td>
+<td>AssertionDecision[]</td>
+<td>No</td>
+<td>Decision history, oldest first.</td>
+</tr>
+<tr>
+<td><code>contributions</code></td>
+<td>SieveContribution[]</td>
+<td>No</td>
+<td>Non-asserting roles: provider, stakeholder, endorser.</td>
+</tr>
+<tr>
+<td><code>score</code></td>
+<td>float, [-1, 1]</td>
+<td>No</td>
+<td>The current inclusion score S.</td>
+</tr>
+<tr>
+<td><code>strength</code></td>
 <td>string</td>
 <td>No</td>
-<td>Human-readable label for the object.</td>
+<td>The band of S, as declared by the rule that computed it.</td>
+</tr>
+<tr>
+<td><code>direction</code></td>
+<td>Direction</td>
+<td>No</td>
+<td>The sign of S.</td>
 </tr>
 </tbody>
 </table>
-<p>Statement also inherits SEPIO scoring/qualifier slots (<code>direction</code>, <code>strength</code>,
-<code>score</code>, <code>qualifier</code>, <code>proposition</code>), but SIEVE keeps scoring on the evidence
-lines, not here.</p>
-<div class="admonition note">
-<p class="admonition-title">Evidence lives on the packet, not the statement</p>
-<p>SEPIO Statement <em>can</em> hold <code>has_evidence_lines</code>, but SIEVE keeps them on the
-<code>EvidencePacket</code> container. Do not nest evidence under <code>statement</code>.</p>
-</div>
-<hr />
-<h2 id="evidence-lines-and-items-two-levels">Evidence: lines and items (two levels)<a class="headerlink" href="#evidence-lines-and-items-two-levels" title="Permanent link">&para;</a></h2>
-<p>A <strong>line</strong> is one argument and says which way it points and how strongly; its
-<strong>items</strong> carry the actual content. "Three papers and a clinician agree" is <em>one</em>
-supporting line built from <em>four</em> items.</p>
-<h3 id="sieveevidenceline">SieveEvidenceLine<a class="headerlink" href="#sieveevidenceline" title="Permanent link">&para;</a></h3>
-<p><code>is_a</code> SEPIO <strong>EvidenceLine</strong>. SIEVE adds nothing; it inherits everything.</p>
+<p>Each concrete subclass is one claim type. It binds <code>predicate</code> to its value set
+(<code>bindings</code>) and lists the evidence-item classes it accepts in a <code>permitted_evidence</code>
+annotation (the claim-evidence matrix).</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Class</th>
+<th>Predicates</th>
+<th>Permitted evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C001</td>
+<td><code>TermExistenceStatement</code></td>
+<td><code>rdf:type</code>, <code>owl:deprecated</code>, <code>IAO:0100001</code>, <code>oboInOwl:consider</code></td>
+<td>ExternalRecord, prior claim, Publication, GuidelineDocument</td>
+</tr>
+<tr>
+<td>C002</td>
+<td><code>DefinitionStatement</code></td>
+<td><code>IAO:0000115</code></td>
+<td>Publication, WebPage</td>
+</tr>
+<tr>
+<td>C003</td>
+<td><code>SynonymStatement</code></td>
+<td><code>oboInOwl:has{Exact,Related,Narrow,Broad}Synonym</code></td>
+<td>ExternalRecord, prior claim, TextPassage, Publication, WebPage, ComputationalScore</td>
+</tr>
+<tr>
+<td>C004</td>
+<td><code>SubclassStatement</code></td>
+<td><code>rdfs:subClassOf</code>, <code>owl:equivalentClass</code></td>
+<td>ExternalRecord, prior claim, TextPassage, Publication, WebPage, GuidelineDocument</td>
+</tr>
+<tr>
+<td>C005</td>
+<td><code>NegativeSubclassStatement</code></td>
+<td>as C004, with <code>negated: true</code></td>
+<td>ExternalRecord, prior claim, Publication</td>
+</tr>
+<tr>
+<td>C006</td>
+<td><code>MappingStatement</code></td>
+<td><code>skos:exactMatch</code>, <code>broadMatch</code>, <code>narrowMatch</code>, <code>relatedMatch</code></td>
+<td>ExternalRecord, prior claim, ComputationalScore</td>
+</tr>
+<tr>
+<td>C007</td>
+<td><code>DiseaseAttributeStatement</code></td>
+<td><code>RO:0004003</code>, <code>RO:0000053</code>, <code>RO:0004029</code>, <code>RO:0004026</code>, <code>RO:0014001</code>, <code>RO:0002162</code>, <code>mondoRel:predisposes_towards</code></td>
+<td>ExternalRecord, prior claim, TextPassage, Publication, WebPage, GuidelineDocument</td>
+</tr>
+<tr>
+<td>C008</td>
+<td><code>SubsetMembershipStatement</code></td>
+<td><code>oboInOwl:inSubset</code></td>
+<td>ExternalRecord, prior claim</td>
+</tr>
+<tr>
+<td>C009</td>
+<td><code>MetaclassStatement</code> (candidate)</td>
+<td><code>sieve:isKindOfClass</code>; object is a <code>DiseaseKind</code></td>
+<td>ExternalRecord, prior claim</td>
+</tr>
+<tr>
+<td>C010</td>
+<td><code>ValueSetMembershipStatement</code> (candidate)</td>
+<td><code>sieve:memberOfRecordScope</code></td>
+<td>ExternalRecord, prior claim</td>
+</tr>
+</tbody>
+</table>
+<p>Some claim types add qualifiers: <code>obsolescence_reason</code> and <code>scheduled_obsoletion_date</code>
+on C001; <code>preferred</code>, <code>valid_direction</code> and <code>object_obsolete_in_source_version</code> on C006.
+C004 represents a logical definition as one statement per <code>intersection_of</code> element.
+C009 and C010 use <code>sieve:</code> placeholder IRIs for their predicates.</p>
+<h3 id="evidence-items">Evidence items<a class="headerlink" href="#evidence-items" title="Permanent link">¶</a></h3>
+<p>An evidence item is the information interpreted as evidence. Whether an item is
+<strong>evidence</strong> (corroboration) or <strong>origin</strong> depends on where it is referenced: from an
+evidence line, or from <code>statement.origin</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Core parent</th>
+<th>Packet list</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ExternalRecord</code></td>
+<td>InformationEntity</td>
+<td><code>external_records</code></td>
+<td>A record in an external database or terminology (<code>DOID:14250</code>, <code>OMIM:219700</code>), as read from a release. Requires <code>resource</code> and <code>record_metadata</code>; <code>obsolete_in_source</code> flags obsolete records.</td>
+</tr>
+<tr>
+<td>any claim type (e.g. <code>SubclassStatement</code>)</td>
+<td>Statement</td>
+<td><code>prior_claims</code></td>
+<td>A prior claim a source makes, in its own identifiers (<code>DOID:14250 is_a DOID:630</code>), typed by what it claims, never by its role. <code>reported_in</code> names the record; <code>groundings</code> records how each id was resolved to Mondo; <code>own_log_odds</code> is set when a competing-claim line cites it (D-069).</td>
+</tr>
+<tr>
+<td><code>TextPassage</code></td>
+<td>Statement</td>
+<td><code>text_passages</code></td>
+<td>A verbatim passage (<code>statement_text</code>) from a document (<code>reported_in</code>). Created in the Mondo ecosystem, so it requires its extraction <code>contributions</code> and a <code>quote_verification</code> outcome.</td>
+</tr>
+<tr>
+<td><code>Publication</code></td>
+<td>Document</td>
+<td><code>publications</code></td>
+<td>A PMID, DOI or ISBN. Publications sharing a <code>reports_study</code> key are not independent.</td>
+</tr>
+<tr>
+<td><code>WebPage</code></td>
+<td>Document</td>
+<td><code>web_pages</code></td>
+<td>A non-scholarly page (GARD, MedlinePlus, Wikipedia). GitHub issues are not web-page evidence: they go in a contribution's <code>context</code>.</td>
+</tr>
+<tr>
+<td><code>GuidelineDocument</code></td>
+<td>Document</td>
+<td><code>guidelines</code></td>
+<td>A guideline or consensus document.</td>
+</tr>
+<tr>
+<td><code>ComputationalScore</code></td>
+<td>DataItem</td>
+<td><code>computational_scores</code></td>
+<td>A computed score (lexical match, Boomer, AI score): <code>value</code>, the method in <code>specified_by</code>, <code>software_version</code>, <code>parameters</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Two mixins supply the shared slots. <code>EvidenceItem</code> marks everything a line can point at
+(including lines themselves, for higher-order lines). <code>UpstreamItem</code> marks items made
+outside Mondo and adds <code>resource</code>, <code>generation_context</code> (study type or curation basis;
+<code>sieve:basis_unknown</code> when the source does not say) and <code>resource_role_override</code>.</p>
+<p>The registry describes sources as a whole. An <code>InformationResource</code> has a
+<code>default_role</code> (<code>PRIMARY</code> or <code>AGGREGATOR</code>), <code>derives_content_from</code> (dependence between
+sources) and dated <code>quality_ratings</code>. A <code>SourceRelease</code> is one versioned snapshot of a
+resource.</p>
+<h3 id="evidence-lines">Evidence lines<a class="headerlink" href="#evidence-lines" title="Permanent link">¶</a></h3>
+<p><code>SieveEvidenceLine</code> (is_a <code>EvidenceLine</code>) is one evidentiary judgement: these items
+bear on the enclosing claim, in this direction, with this strength. Its target is always
+the enclosing statement, so the core <code>target_proposition</code> is unused.</p>
 <table>
 <thead>
 <tr>
 <th>Field</th>
-<th>Type</th>
+<th>Range</th>
 <th>Req</th>
 <th>Description</th>
 </tr>
@@ -1338,1086 +882,425 @@ supporting line built from <em>four</em> items.</p>
 <tbody>
 <tr>
 <td><code>has_evidence_items</code></td>
-<td><a href="#the-six-evidence-items">InformationEntity</a>[]</td>
+<td>ids</td>
 <td>No</td>
-<td>The evidence items in this argument.</td>
+<td>Items (or other lines) this line interprets.</td>
 </tr>
 <tr>
 <td><code>direction_of_evidence_provided</code></td>
-<td>string</td>
-<td>No</td>
-<td><code>supports</code>, <code>disputes</code>, or <code>neutral</code> (see <a href="#evidencedirection">EvidenceDirection</a>).</td>
+<td>Direction</td>
+<td>Yes</td>
+<td><code>supports</code> or <code>disputes</code>. There is no neutral.</td>
 </tr>
 <tr>
 <td><code>strength_of_evidence_provided</code></td>
 <td>string</td>
 <td>No</td>
-<td>Qualitative strength: <code>strong</code>, <code>moderate</code>, <code>weak</code> (see <a href="#evidencestrength">EvidenceStrength</a>).</td>
+<td>Categorical band, from the rule's <code>strength_bands</code>.</td>
 </tr>
 <tr>
 <td><code>score_of_evidence_provided</code></td>
-<td>float</td>
+<td>float, [0, 1]</td>
 <td>No</td>
-<td>Quantitative strength, 0–1. Used by the <a href="../primer/#from-evidence-to-a-score">Net Evidence Ratio</a>.</td>
+<td>Strength on the shared 0-1 scale. Direction is not carried by the sign.</td>
+</tr>
+<tr>
+<td><code>contributions</code></td>
+<td>InterpretationActivity[]</td>
+<td>Yes</td>
+<td>The interpretation act. A collective act is one contribution with <code>participants</code>.</td>
+</tr>
+<tr>
+<td><code>computed_by_rule</code></td>
+<td>AggregationRule id</td>
+<td>No</td>
+<td>Required for rule-based lines (profile check).</td>
+</tr>
+<tr>
+<td><code>confidence</code>, <code>confidence_basis</code></td>
+<td>float [0, 1], ConfidenceBasis</td>
+<td>No</td>
+<td>Data quality. A confidence requires a basis (class rule).</td>
+</tr>
+<tr>
+<td><code>data_quality_flags</code></td>
+<td>DataQualityFlag[]</td>
+<td>No</td>
+<td>Failure flags that gate the line (<code>QUOTE_NOT_FOUND</code>, <code>SUSPECTED_HALLUCINATION</code>, ...).</td>
+</tr>
+<tr>
+<td><code>independence_cluster</code></td>
+<td>string</td>
+<td>No</td>
+<td>Cluster assigned by the rule. Only the strongest line per cluster counts.</td>
+</tr>
+<tr>
+<td><code>validity</code>, <code>status_changes</code>, <code>supersedes</code></td>
+<td>LineValidity, LineStatusChange[], ids</td>
+<td>No</td>
+<td>Invalidation and supersession history.</td>
+</tr>
+<tr>
+<td><code>date_attached</code>, <code>last_confirmed</code>, <code>last_confirmed_against</code></td>
+<td>date, date, SourceRelease id</td>
+<td>No</td>
+<td>When the evidence was attached and last confirmed against a release.</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="the-six-evidence-items">The six evidence items<a class="headerlink" href="#the-six-evidence-items" title="Permanent link">&para;</a></h2>
-<p>Every evidence item descends from SEPIO <strong>InformationEntity</strong> and carries the
-<a href="#curatedevidence">CuratedEvidence</a> mixin. Pick the class that matches where the
-evidence comes from and set <code>type:</code> accordingly.</p>
-<p>All items inherit the InformationEntity provenance slots: <code>is_about</code>,
-<code>contributions</code>, <code>date_authored</code>, <code>specified_by</code>, <code>derived_from</code>, <code>reported_in</code>,
-<code>sources</code>, <code>record_metadata</code>, plus <code>id</code>/<code>type</code>/<code>label</code>/<code>description</code> from Entity.</p>
-<h3 id="sievedocument">SieveDocument<a class="headerlink" href="#sievedocument" title="Permanent link">&para;</a></h3>
-<p><code>is_a</code> SEPIO <strong>Document</strong>. A publication or written source, with a pinned quote.</p>
+<p>Lines are <strong>immutable</strong>. A misreading is corrected by a new line that <code>supersedes</code> the
+old one. The old line becomes <code>INVALIDATED</code>, stays on record and is excluded from the
+score. A <code>LineStatusChange</code> records who invalidated, superseded or accepted a line, when
+and why. That is also where a reviewer's verdict on an AI's line goes.</p>
+<h3 id="provenance">Provenance<a class="headerlink" href="#provenance" title="Permanent link">¶</a></h3>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>quote</code></td>
-<td>string</td>
-<td>Relevant verbatim quote from the document.</td>
-</tr>
-<tr>
-<td><code>quote_location</code></td>
-<td>string</td>
-<td>Where the quote is (page, section, figure).</td>
-</tr>
-<tr>
-<td><code>title</code></td>
-<td>string</td>
-<td>Document title. <em>(from Document)</em></td>
-</tr>
-<tr>
-<td><code>pmid</code></td>
-<td>string</td>
-<td>PubMed identifier. <em>(from Document)</em></td>
-</tr>
-<tr>
-<td><code>doi</code></td>
-<td>string</td>
-<td>Digital Object Identifier. <em>(from Document)</em></td>
-</tr>
-<tr>
-<td><code>subtype</code></td>
-<td><a href="#coding">Coding</a>, <code>urls</code>[]</td>
-<td>Document kind and retrieval URLs. <em>(from Document)</em></td>
-</tr>
-</tbody>
-</table>
-<h3 id="concordanceitem">ConcordanceItem<a class="headerlink" href="#concordanceitem" title="Permanent link">&para;</a></h3>
-<p><code>is_a</code> SieveEvidenceItem. Evidence that another knowledge source (ontology,
-terminology, database) contains a <em>concordant</em> assertion.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>source_name</code></td>
-<td>string</td>
-<td>Human-readable source name (e.g. "Disease Ontology").</td>
-</tr>
-<tr>
-<td><code>source_id</code></td>
-<td>uriorcurie</td>
-<td>Identifier of the concordant source.</td>
-</tr>
-<tr>
-<td><code>source_version</code></td>
-<td>string</td>
-<td>Version/release of the source.</td>
-</tr>
-<tr>
-<td><code>source_subject</code></td>
-<td>uriorcurie</td>
-<td>Subject of the concordant assertion in the source.</td>
-</tr>
-<tr>
-<td><code>source_subject_label</code></td>
-<td>string</td>
-<td>Label of that subject.</td>
-</tr>
-<tr>
-<td><code>source_predicate</code></td>
-<td>uriorcurie</td>
-<td>Predicate in the concordant assertion.</td>
-</tr>
-<tr>
-<td><code>source_predicate_label</code></td>
-<td>string</td>
-<td>Label of that predicate.</td>
-</tr>
-<tr>
-<td><code>source_object</code></td>
-<td>uriorcurie</td>
-<td>Object of the concordant assertion.</td>
-</tr>
-<tr>
-<td><code>source_object_label</code></td>
-<td>string</td>
-<td>Label of that object.</td>
-</tr>
-<tr>
-<td><code>mapping_justification</code></td>
-<td>uriorcurie</td>
-<td>How entities were mapped (SSSOM vocabulary, e.g. <code>semapv:LexicalMatching</code>).</td>
-</tr>
-<tr>
-<td><code>mapping_set</code></td>
-<td>uri</td>
-<td>SSSOM mapping-set the concordance was drawn from.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="agentcontribution">AgentContribution<a class="headerlink" href="#agentcontribution" title="Permanent link">&para;</a></h3>
-<p><code>is_a</code> SieveEvidenceItem. Any human or organizational input. Captures three
-orthogonal scoring dimensions: <em>who</em> (trust), <em>how</em> (channel), <em>what</em> (type).</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>contributor</code></td>
-<td><a href="#agent-provenance">Agent</a></td>
-<td>The person or organization who contributed.</td>
-</tr>
-<tr>
-<td><code>trust_level</code></td>
-<td><a href="#trustlevel">TrustLevel</a></td>
-<td>Authority assigned to the contributor.</td>
-</tr>
-<tr>
-<td><code>channel</code></td>
-<td><a href="#contributionchannel">ContributionChannel</a></td>
-<td>How the contribution was submitted.</td>
-</tr>
-<tr>
-<td><code>contribution_type</code></td>
-<td><a href="#contributiontype">ContributionType</a></td>
-<td>Nature of the contribution (suggestion, review, …).</td>
-</tr>
-<tr>
-<td><code>reference</code></td>
-<td>uriorcurie</td>
-<td>Traceability link (issue, email thread, submission ID).</td>
-</tr>
-<tr>
-<td><code>content</code></td>
-<td>string</td>
-<td>What the contributor actually said/provided.</td>
-</tr>
-<tr>
-<td><code>date</code></td>
-<td>string</td>
-<td>When it was made (ISO 8601 string).</td>
-</tr>
-</tbody>
-</table>
-<h3 id="computationalresult">ComputationalResult<a class="headerlink" href="#computationalresult" title="Permanent link">&para;</a></h3>
-<p><code>is_a</code> SEPIO <strong>DataItem</strong>. Output of a method or algorithm. The computed
-score/result goes in the inherited <code>value</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>method_name</code></td>
-<td>string</td>
-<td>Human-readable method name.</td>
-</tr>
-<tr>
-<td><code>method_id</code></td>
-<td>uriorcurie</td>
-<td>Method identifier (e.g. an OBI term).</td>
-</tr>
-<tr>
-<td><code>parameters</code></td>
-<td>string</td>
-<td>Parameters (JSON string or <code>key=value</code>).</td>
-</tr>
-<tr>
-<td><code>software_version</code></td>
-<td>string</td>
-<td>Version of the software/tool.</td>
-</tr>
-<tr>
-<td><code>value</code></td>
-<td>string</td>
-<td>The primary result, e.g. a confidence score. <em>(from DataItem)</em></td>
-</tr>
-<tr>
-<td><code>subtype</code></td>
-<td><a href="#coding">Coding</a></td>
-<td>Categorizes the computation. <em>(from DataItem)</em></td>
-</tr>
-</tbody>
-</table>
-<h3 id="sievedataitem">SieveDataItem<a class="headerlink" href="#sievedataitem" title="Permanent link">&para;</a></h3>
-<p><code>is_a</code> SEPIO <strong>DataItem</strong>. A single data point, when no richer item type fits.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>value</code></td>
-<td>string</td>
-<td>The data value (required by DataItem). <em>(from DataItem)</em></td>
-</tr>
-<tr>
-<td><code>subtype</code>, <code>unit</code></td>
-<td><a href="#coding">Coding</a></td>
-<td>Data type and unit of measure. <em>(from DataItem)</em></td>
-</tr>
-</tbody>
-</table>
-<h3 id="sievestudyresult">SieveStudyResult<a class="headerlink" href="#sievestudyresult" title="Permanent link">&para;</a></h3>
-<p><code>is_a</code> SEPIO <strong>StudyResult</strong>. Results from a single study.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>focus</code></td>
-<td>string</td>
-<td>The subject/experimental unit. <em>(from StudyResult)</em></td>
-</tr>
-<tr>
-<td><code>data_items</code></td>
-<td><a href="#sievedataitem">DataItem</a>[]</td>
-<td>Data items in the result. <em>(from StudyResult)</em></td>
-</tr>
-<tr>
-<td><code>source_data_set</code></td>
-<td>DataSet[]</td>
-<td>Larger dataset it derives from. <em>(from StudyResult)</em></td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="curatedevidence">CuratedEvidence<a class="headerlink" href="#curatedevidence" title="Permanent link">&para;</a></h2>
-<p>A <strong>mixin</strong> applied to every evidence item above. It grafts SIEVE's
-curation-workflow slots (a per-item verdict and an explicit ECO hook) onto the
-otherwise SEPIO-pure items. It is SIEVE-specific, not SEPIO.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>rating</code></td>
-<td><a href="#curationstatus">CurationStatus</a></td>
-<td>The evidence steward's verdict on this individual item.</td>
-</tr>
-<tr>
-<td><code>eco_code</code></td>
-<td>uriorcurie</td>
-<td><a href="https://www.evidenceontology.org/">Evidence &amp; Conclusion Ontology</a> term for the item.</td>
-</tr>
-<tr>
-<td><code>eco_label</code></td>
-<td>string</td>
-<td>Human-readable label of the ECO term.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="the-type-discriminator">The <code>type</code> discriminator<a class="headerlink" href="#the-type-discriminator" title="Permanent link">&para;</a></h2>
-<p>SIEVE evidence items are a union of InformationEntity subclasses. Pydantic's
-base-class deserialization would drop subclass fields, so the loader
-(<code>src/sieve/datamodel/loaders.py</code>) dispatches each item to its concrete class by
-its <code>type:</code> value <strong>before</strong> validating. Authors must therefore set <code>type:</code> on
-the statement, every evidence line, and every evidence item.</p>
-<table>
-<thead>
-<tr>
-<th><code>type:</code> value</th>
 <th>Class</th>
+<th>is_a</th>
+<th>Role</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>SieveStatement</code></td>
-<td>statement</td>
+<td><code>SieveAgent</code></td>
+<td>Agent</td>
+<td>A person (ORCID), organisation or group, or software. Dated <code>roles</code> and <code>trust_levels</code>; <code>software_version</code> and <code>model_name</code> for software; <code>members</code> for panels.</td>
 </tr>
 <tr>
-<td><code>SieveEvidenceLine</code></td>
-<td>evidence line</td>
+<td><code>SieveMethod</code></td>
+<td>Method</td>
+<td>A versioned method: guideline, workflow, prompt version, export rule set.</td>
+</tr>
+<tr>
+<td><code>AggregationRule</code></td>
+<td>SieveMethod</td>
+<td>Per claim type: line strengths, <code>strength_bands</code>, <code>confidence_floor</code>. Computes S.</td>
+</tr>
+<tr>
+<td><code>DecisionPolicy</code></td>
+<td>SieveMethod</td>
+<td>A human-approved procedure under which an automated system may accept claims: scope, <code>acceptance_threshold</code>, pinned rules. It can only accept.</td>
+</tr>
+<tr>
+<td><code>BatchSignOff</code></td>
+<td>Activity</td>
+<td>A one-off curator approval of a filtered result set: re-runnable <code>filter_query</code>, frozen <code>result_set</code> of <code>packet@version</code>, <code>review_bands</code>.</td>
+</tr>
+<tr>
+<td><code>SieveContribution</code></td>
+<td>Contribution</td>
+<td>An agent's act, with <code>role</code>, <code>participants</code>, and <code>agent_role_at_time</code> / <code>agent_trust_at_time</code> snapshotted as of the act; <code>context</code> (issue, PR, call), <code>run_id</code>, <code>perspective</code>.</td>
+</tr>
+<tr>
+<td><code>InterpretationActivity</code></td>
+<td>SieveContribution</td>
+<td>The act behind a line: <code>date</code>, <code>method_type</code>, <code>read_coverage</code>, <code>access_status</code>, and the checks an AI act records (<code>identifier_verified</code>, <code>grounding_checked</code>, <code>sought_disputing_evidence</code>, <code>reasoning_trace</code>).</td>
+</tr>
+<tr>
+<td><code>AssertionDecision</code></td>
+<td>SieveContribution</td>
+<td>The decision on the claim (see <a href="#two-levels-of-judgement">below</a>).</td>
+</tr>
+<tr>
+<td><code>OriginEvent</code></td>
+<td>Activity</td>
+<td>How the claim entered Mondo: <code>derivation_type</code> (<code>CLONED_FROM</code>, <code>COPIED_FROM</code>, <code>INSPIRED_BY</code>), <code>source_item</code>, <code>source_label</code>, <code>source_release</code>, pipeline and date.</td>
+</tr>
+<tr>
+<td><code>ResolutionChain</code></td>
+<td>Activity</td>
+<td>How a source id or mention was resolved to the target id: ordered <code>steps</code> for one <code>entity_slot</code>, with <code>chain_confidence</code>.</td>
+</tr>
+<tr>
+<td><code>AlignmentStep</code></td>
+<td>Activity</td>
+<td>One extraction, translation, grounding or normalisation step: <code>input_value</code>, <code>output_value</code>, <code>method</code>, <code>quality_category</code>, <code>confidence</code> + basis, mapping set and version, <code>review_status</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="record-metadata">Record metadata<a class="headerlink" href="#record-metadata" title="Permanent link">¶</a></h3>
+<p><code>RetrievalMetadata</code> (is_a <code>RecordMetadata</code>) says where and when a concrete record was
+read: <code>retrieved_from</code> (resource), <code>source_release</code> or <code>source_version</code>, <code>retrieval_date</code>
+and the source's own label at the time (<code>source_label</code>). It is required on
+<code>ExternalRecord</code>. <code>EvidencePacketCollection.record_metadata</code> carries artefact-level
+encoding provenance.</p>
+<h3 id="utilities">Utilities<a class="headerlink" href="#utilities" title="Permanent link">¶</a></h3>
+<p>The core <code>Coding</code> (<code>code</code>, <code>label</code>, <code>system</code>, <code>system_version</code>) types the predicate and
+generation context. The profile adds <code>TextLocation</code> (section, character offsets),
+<code>QualityRating</code> (dated level, optionally per claim type), <code>LevelAssignment</code> (dated role
+or trust level, optionally per domain) and <code>AppliedRule</code> (a named alignment rule with its
+certainty).</p>
+<h2 id="two-levels-of-judgement">Two levels of judgement<a class="headerlink" href="#two-levels-of-judgement" title="Permanent link">¶</a></h2>
+<p>SIEVE keeps two judgements apart:</p>
+<ol>
+<li><strong>Evidence line</strong>: does this item bear on the claim, which way, how strongly? Made
+   by an interpreter (curator, panel, pipeline, AI agent), recorded with its
+   <code>InterpretationActivity</code>, immutable once made.</li>
+<li><strong><code>AssertionDecision</code></strong>: does the claim go into Mondo? Made over all lines, and
+   recorded with what it was given on.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>outcome</code></td>
+<td><code>ACCEPTED</code>, <code>REJECTED</code>, <code>CONTROVERSIAL</code>, <code>DEFERRED</code>.</td>
+</tr>
+<tr>
+<td><code>route</code></td>
+<td><code>INDIVIDUAL_SIGN_OFF</code>, <code>CONSENSUS_SIGN_OFF</code>, <code>DELEGATED_POLICY</code>, <code>PROVIDER_AUTHORITY</code>, <code>BATCH_SIGN_OFF</code>.</td>
+</tr>
+<tr>
+<td><code>inclusion_score</code>, <code>score_band</code>, <code>aggregation_rule</code></td>
+<td>S at decision time, its band, and the rule version that computed it.</td>
+</tr>
+<tr>
+<td><code>signed_packet_version</code></td>
+<td>The packet version decided on. A later version re-queues the claim.</td>
+</tr>
+<tr>
+<td><code>policy</code>, <code>threshold_passed</code></td>
+<td>For policy routes.</td>
+</tr>
+<tr>
+<td><code>batch</code>, <code>review_depth</code></td>
+<td>For batch sign-offs. A <code>NONE</code>-depth approval adds no evidence.</td>
+</tr>
+<tr>
+<td><code>evidence_line</code></td>
+<td>The expert line this decision contributed, if any.</td>
+</tr>
+<tr>
+<td><code>contributor</code>, <code>date</code>, <code>rationale</code>, <code>context</code></td>
+<td>Who decided, when, why, where.</td>
+</tr>
+</tbody>
+</table>
+<p>Every claim rests on a human decision, made per claim (sign-off, consensus, batch) or
+per policy. Class rules enforce that automated routes (<code>DELEGATED_POLICY</code>,
+<code>PROVIDER_AUTHORITY</code>) can only accept and must name their policy, and that a batch
+decision names its batch and review depth. Decisions accumulate: claims are
+re-evaluated when rules, policies or evidence change.</p>
+<h2 id="three-axes-provenance-evidence-data-quality">Three axes: provenance, evidence, data quality<a class="headerlink" href="#three-axes-provenance-evidence-data-quality" title="Permanent link">¶</a></h2>
+<p>Three questions are recorded separately, so one cannot stand in for another:</p>
+<ul>
+<li><strong>Provenance</strong>: where did this come from, and who did what? <code>OriginEvent</code>,
+  <code>ResolutionChain</code>, contributions and retrieval metadata. "Cloned from OMIM" is
+  origin, not evidence that the term is right.</li>
+<li><strong>Evidence</strong>: does it support or dispute the claim, and how strongly? Line
+  <code>direction_of_evidence_provided</code> and <code>score_of_evidence_provided</code> in [0, 1].</li>
+<li><strong>Data quality</strong>: was the evidence read and linked correctly? SEPIO <code>confidence</code> on
+  lines and alignment steps, with a required <code>confidence_basis</code> (<code>MEASURED</code>,
+  <code>DETERMINISTIC</code>, <code>PRIOR</code>). Confidence gates or discounts a line. It never rewrites
+  the line's strength.</li>
+</ul>
+<h2 id="the-inclusion-score">The inclusion score<a class="headerlink" href="#the-inclusion-score" title="Permanent link">¶</a></h2>
+<p><code>statement.score</code> is the <strong>inclusion score S</strong> in [-1, 1]: one number saying whether
+the claim should be in Mondo. The claim type's <code>AggregationRule</code> computes it (decision
+D-063):</p>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>w_i = d_i * s_i * q_i * c_i     direction (+1/-1), strength, source prior, confidence
+<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>one line per independence cluster (the strongest)
+<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a>L   = L0 + k * sum(w_i)          L0 = claim prior (claim type + proposing channel)
+<a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a>S   = tanh(L / 2)                = 2 * P(true) - 1
+</code></pre></div>
+<p>Lines whose confidence is below the rule's <code>confidence_floor</code> are excluded. Above it,
+confidence discounts the line, so a misread contributes nothing rather than negative
+evidence. <code>statement.strength</code> is the band of S and <code>statement.direction</code> its sign.
+S is computed, not asserted: a signer's view goes in as an expert line, not as an edit
+to S. The S that a decision was given on is copied to <code>AssertionDecision.inclusion_score</code>.</p>
+<p>The scoring code has not been written for this model yet. The values in the example
+packets are illustrative (see <code>issues/issue_migrate_app_to_profile.md</code>).</p>
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">¶</a></h2>
+<p>Two layers check a packet.</p>
+<p><strong>linkml-validate</strong> checks ranges, enums, cardinality and the class rules:</p>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>linkml-validate<span class="w"> </span>-s<span class="w"> </span>schema/sieve.yaml<span class="w"> </span>-C<span class="w"> </span>EvidencePacket<span class="w"> </span>packet.yaml
+<a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a>uv<span class="w"> </span>run<span class="w"> </span>linkml-validate<span class="w"> </span>-s<span class="w"> </span>schema/sieve.yaml<span class="w"> </span>-C<span class="w"> </span>SieveRegistry<span class="w"> </span>registry.yaml
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Quote dates in YAML</p>
+<p>linkml-validate parses unquoted YAML dates (<code>date: 2026-10-20</code>) into date objects,
+which the generated JSON Schema rejects. Quote them (<code>date: "2026-10-20"</code>) or
+validate a JSON copy. The test suite loads YAML with dates kept as strings.</p>
+</div>
+<p><strong><code>sieve.profile_checks.check_packet</code></strong> covers what linkml-validate cannot: predicate
+bindings, the claim-evidence matrix, dangling references, read coverage on
+document-based lines, methods on AI and rule-based lines, chain contiguity,
+supersession and blind approvals. It also reports WARNING states that need a person
+(obsolete-to-obsolete mappings, definitions with no source, read coverage not
+recorded). Every issue names the requirement it enforces. See the <a href="../api/#sieveprofile_checks">Python API</a>.</p>
+<h2 id="a-complete-example">A complete example<a class="headerlink" href="#a-complete-example" title="Permanent link">¶</a></h2>
+<p>A mapping claim accepted in a batch sign-off, adapted from
+<code>tests/data/profile/valid/c006_down_syndrome_icd10cm_batch.yaml</code>. The ids <code>sieve:rule/...</code>,
+<code>sieve:batch/...</code>, <code>sieve:release/...</code> and <code>infores:...</code> resolve in the packet's own
+<code>reference_snapshot</code>, a frozen copy of the entries in the registry
+(<code>tests/data/profile/registry.yaml</code>). The snapshot is left out of the excerpt below.</p>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:pkt/MONDO_0008608-exact-ICD10CM_Q90</span>
+<a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EvidencePacket</span>
+<a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-25"</span>
+<a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="nt">statement</span><span class="p">:</span>
+<a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:st/MONDO_0008608-exact-ICD10CM_Q90</span>
+<a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MappingStatement</span>
+<a href="#__codelineno-2-7" id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="w">  </span><span class="nt">subject</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0008608</span>
+<a href="#__codelineno-2-8" id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="w">  </span><span class="nt">predicate</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="nv">skos</span><span class="p p-Indicator">:</span><span class="nv">exactMatch</span><span class="p p-Indicator">}</span>
+<a href="#__codelineno-2-9" id="__codelineno-2-9" name="__codelineno-2-9"></a><span class="w">  </span><span class="nt">object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ICD10CM:Q90</span>
+<a href="#__codelineno-2-10" id="__codelineno-2-10" name="__codelineno-2-10"></a><span class="w">  </span><span class="nt">preferred</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a href="#__codelineno-2-11" id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="w">  </span><span class="nt">valid_direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BOTH</span>
+<a href="#__codelineno-2-12" id="__codelineno-2-12" name="__codelineno-2-12"></a><span class="w">  </span><span class="nt">review_state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VERIFIED</span>
+<a href="#__codelineno-2-13" id="__codelineno-2-13" name="__codelineno-2-13"></a><span class="w">  </span><span class="nt">proposing_channel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LEXICAL_PIPELINE</span>
+<a href="#__codelineno-2-14" id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="w">  </span><span class="nt">score</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.93</span>
+<a href="#__codelineno-2-15" id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="w">  </span><span class="nt">strength</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">strong</span>
+<a href="#__codelineno-2-16" id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="w">  </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supports</span>
+<a href="#__codelineno-2-17" id="__codelineno-2-17" name="__codelineno-2-17"></a><span class="w">  </span><span class="nt">has_evidence_lines</span><span class="p">:</span>
+<a href="#__codelineno-2-18" id="__codelineno-2-18" name="__codelineno-2-18"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:el/q90-lexical</span>
+<a href="#__codelineno-2-19" id="__codelineno-2-19" name="__codelineno-2-19"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveEvidenceLine</span>
+<a href="#__codelineno-2-20" id="__codelineno-2-20" name="__codelineno-2-20"></a><span class="w">      </span><span class="nt">has_evidence_items</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">sieve</span><span class="p p-Indicator">:</span><span class="nv">score/q90-lexical</span><span class="p p-Indicator">]</span>
+<a href="#__codelineno-2-21" id="__codelineno-2-21" name="__codelineno-2-21"></a><span class="w">      </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supports</span>
+<a href="#__codelineno-2-22" id="__codelineno-2-22" name="__codelineno-2-22"></a><span class="w">      </span><span class="nt">strength_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">weak</span>
+<a href="#__codelineno-2-23" id="__codelineno-2-23" name="__codelineno-2-23"></a><span class="w">      </span><span class="nt">score_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span>
+<a href="#__codelineno-2-24" id="__codelineno-2-24" name="__codelineno-2-24"></a><span class="w">      </span><span class="nt">computed_by_rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:rule/mapping-v1.0</span>
+<a href="#__codelineno-2-25" id="__codelineno-2-25" name="__codelineno-2-25"></a><span class="w">      </span><span class="nt">contributions</span><span class="p">:</span>
+<a href="#__codelineno-2-26" id="__codelineno-2-26" name="__codelineno-2-26"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:act/q90-lexical</span>
+<a href="#__codelineno-2-27" id="__codelineno-2-27" name="__codelineno-2-27"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InterpretationActivity</span>
+<a href="#__codelineno-2-28" id="__codelineno-2-28" name="__codelineno-2-28"></a><span class="w">          </span><span class="nt">contributor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:agent/concordance-pipeline</span>
+<a href="#__codelineno-2-29" id="__codelineno-2-29" name="__codelineno-2-29"></a><span class="w">          </span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-24"</span>
+<a href="#__codelineno-2-30" id="__codelineno-2-30" name="__codelineno-2-30"></a><span class="w">          </span><span class="nt">method_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RULE_BASED_STRENGTH</span>
+<a href="#__codelineno-2-31" id="__codelineno-2-31" name="__codelineno-2-31"></a><span class="w">          </span><span class="nt">specified_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">sieve</span><span class="p p-Indicator">:</span><span class="nv">method/mondo-mapping-guide</span><span class="p p-Indicator">]</span>
+<a href="#__codelineno-2-32" id="__codelineno-2-32" name="__codelineno-2-32"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:el/q90-record</span>
+<a href="#__codelineno-2-33" id="__codelineno-2-33" name="__codelineno-2-33"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveEvidenceLine</span>
+<a href="#__codelineno-2-34" id="__codelineno-2-34" name="__codelineno-2-34"></a><span class="w">      </span><span class="nt">has_evidence_items</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ICD10CM</span><span class="p p-Indicator">:</span><span class="nv">Q90</span><span class="p p-Indicator">]</span>
+<a href="#__codelineno-2-35" id="__codelineno-2-35" name="__codelineno-2-35"></a><span class="w">      </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supports</span>
+<a href="#__codelineno-2-36" id="__codelineno-2-36" name="__codelineno-2-36"></a><span class="w">      </span><span class="nt">strength_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">strong</span>
+<a href="#__codelineno-2-37" id="__codelineno-2-37" name="__codelineno-2-37"></a><span class="w">      </span><span class="nt">score_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span>
+<a href="#__codelineno-2-38" id="__codelineno-2-38" name="__codelineno-2-38"></a><span class="w">      </span><span class="nt">computed_by_rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:rule/mapping-v1.0</span>
+<a href="#__codelineno-2-39" id="__codelineno-2-39" name="__codelineno-2-39"></a><span class="w">      </span><span class="nt">contributions</span><span class="p">:</span>
+<a href="#__codelineno-2-40" id="__codelineno-2-40" name="__codelineno-2-40"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:act/q90-record</span>
+<a href="#__codelineno-2-41" id="__codelineno-2-41" name="__codelineno-2-41"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InterpretationActivity</span>
+<a href="#__codelineno-2-42" id="__codelineno-2-42" name="__codelineno-2-42"></a><span class="w">          </span><span class="nt">contributor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orcid:0000-0001-5208-3432</span>
+<a href="#__codelineno-2-43" id="__codelineno-2-43" name="__codelineno-2-43"></a><span class="w">          </span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-25"</span>
+<a href="#__codelineno-2-44" id="__codelineno-2-44" name="__codelineno-2-44"></a><span class="w">          </span><span class="nt">method_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EXPERT_JUDGEMENT</span>
+<a href="#__codelineno-2-45" id="__codelineno-2-45" name="__codelineno-2-45"></a><span class="w">          </span><span class="nt">specified_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">sieve</span><span class="p p-Indicator">:</span><span class="nv">method/mondo-mapping-guide</span><span class="p p-Indicator">]</span>
+<a href="#__codelineno-2-46" id="__codelineno-2-46" name="__codelineno-2-46"></a><span class="w">          </span><span class="nt">read_coverage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">STRUCTURED_RECORD</span>
+<a href="#__codelineno-2-47" id="__codelineno-2-47" name="__codelineno-2-47"></a><span class="w">  </span><span class="nt">assertion_decisions</span><span class="p">:</span>
+<a href="#__codelineno-2-48" id="__codelineno-2-48" name="__codelineno-2-48"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:dec/q90-batch</span>
+<a href="#__codelineno-2-49" id="__codelineno-2-49" name="__codelineno-2-49"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AssertionDecision</span>
+<a href="#__codelineno-2-50" id="__codelineno-2-50" name="__codelineno-2-50"></a><span class="w">      </span><span class="nt">contributor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">orcid:0000-0001-5208-3432</span>
+<a href="#__codelineno-2-51" id="__codelineno-2-51" name="__codelineno-2-51"></a><span class="w">      </span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-25"</span>
+<a href="#__codelineno-2-52" id="__codelineno-2-52" name="__codelineno-2-52"></a><span class="w">      </span><span class="nt">outcome</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ACCEPTED</span>
+<a href="#__codelineno-2-53" id="__codelineno-2-53" name="__codelineno-2-53"></a><span class="w">      </span><span class="nt">route</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BATCH_SIGN_OFF</span>
+<a href="#__codelineno-2-54" id="__codelineno-2-54" name="__codelineno-2-54"></a><span class="w">      </span><span class="nt">batch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:batch/mappings-2026-10-25</span>
+<a href="#__codelineno-2-55" id="__codelineno-2-55" name="__codelineno-2-55"></a><span class="w">      </span><span class="nt">review_depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EYEBALLED</span>
+<a href="#__codelineno-2-56" id="__codelineno-2-56" name="__codelineno-2-56"></a><span class="w">      </span><span class="nt">inclusion_score</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.93</span>
+<a href="#__codelineno-2-57" id="__codelineno-2-57" name="__codelineno-2-57"></a><span class="w">      </span><span class="nt">score_band</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">strong</span>
+<a href="#__codelineno-2-58" id="__codelineno-2-58" name="__codelineno-2-58"></a><span class="w">      </span><span class="nt">aggregation_rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:rule/mapping-v1.0</span>
+<a href="#__codelineno-2-59" id="__codelineno-2-59" name="__codelineno-2-59"></a><span class="w">      </span><span class="nt">signed_packet_version</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-25"</span>
+<a href="#__codelineno-2-60" id="__codelineno-2-60" name="__codelineno-2-60"></a><span class="nt">external_records</span><span class="p">:</span>
+<a href="#__codelineno-2-61" id="__codelineno-2-61" name="__codelineno-2-61"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ICD10CM:Q90</span>
+<a href="#__codelineno-2-62" id="__codelineno-2-62" name="__codelineno-2-62"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ExternalRecord</span>
+<a href="#__codelineno-2-63" id="__codelineno-2-63" name="__codelineno-2-63"></a><span class="w">    </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Down syndrome</span>
+<a href="#__codelineno-2-64" id="__codelineno-2-64" name="__codelineno-2-64"></a><span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infores:icd10cm</span>
+<a href="#__codelineno-2-65" id="__codelineno-2-65" name="__codelineno-2-65"></a><span class="w">    </span><span class="nt">record_metadata</span><span class="p">:</span>
+<a href="#__codelineno-2-66" id="__codelineno-2-66" name="__codelineno-2-66"></a><span class="w">      </span><span class="nt">retrieved_from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infores:icd10cm</span>
+<a href="#__codelineno-2-67" id="__codelineno-2-67" name="__codelineno-2-67"></a><span class="w">      </span><span class="nt">source_release</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:release/icd10cm-2026</span>
+<a href="#__codelineno-2-68" id="__codelineno-2-68" name="__codelineno-2-68"></a><span class="w">      </span><span class="nt">retrieval_date</span><span class="p">:</span><span class="w"> </span><span class="s">"2026-10-01"</span>
+<a href="#__codelineno-2-69" id="__codelineno-2-69" name="__codelineno-2-69"></a><span class="w">      </span><span class="nt">source_label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Down syndrome</span>
+<a href="#__codelineno-2-70" id="__codelineno-2-70" name="__codelineno-2-70"></a><span class="nt">computational_scores</span><span class="p">:</span>
+<a href="#__codelineno-2-71" id="__codelineno-2-71" name="__codelineno-2-71"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:score/q90-lexical</span>
+<a href="#__codelineno-2-72" id="__codelineno-2-72" name="__codelineno-2-72"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ComputationalScore</span>
+<a href="#__codelineno-2-73" id="__codelineno-2-73" name="__codelineno-2-73"></a><span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"0.97"</span>
+<a href="#__codelineno-2-74" id="__codelineno-2-74" name="__codelineno-2-74"></a><span class="w">    </span><span class="nt">specified_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">sieve</span><span class="p p-Indicator">:</span><span class="nv">method/lexmatch</span><span class="p p-Indicator">]</span>
+<a href="#__codelineno-2-75" id="__codelineno-2-75" name="__codelineno-2-75"></a><span class="w">    </span><span class="nt">software_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">oak-0.6</span>
+<a href="#__codelineno-2-76" id="__codelineno-2-76" name="__codelineno-2-76"></a><span class="w">    </span><span class="nt">parameters</span><span class="p">:</span><span class="w"> </span><span class="s">"normalize=true"</span>
+</code></pre></div>
+<p>The other examples in <code>tests/data/profile/valid/</code> cover a synonym accepted under a
+policy (C003), a negative subclass claim with disputing evidence (C005) and a
+gene-disease claim with an AI-extracted passage and a panel sign-off (C007). More
+packets are in <code>inbox/examples/</code>.</p>
+<h2 id="coming-from-the-pre-profile-model">Coming from the pre-profile model<a class="headerlink" href="#coming-from-the-pre-profile-model" title="Permanent link">¶</a></h2>
+<p>The earlier snake_case model (<code>sepio_classes.yaml</code>, <code>status</code>, <code>ConcordanceItem</code>, ...)
+is gone. Roughly:</p>
+<table>
+<thead>
+<tr>
+<th>Before</th>
+<th>Now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code>, <code>CurationDecision</code></td>
+<td><code>statement.review_state</code> + <code>statement.assertion_decisions</code></td>
+</tr>
+<tr>
+<td>items inlined in lines</td>
+<td>items in typed packet lists, referenced by id</td>
 </tr>
 <tr>
 <td><code>ConcordanceItem</code></td>
-<td>ConcordanceItem</td>
+<td>a prior claim, e.g. <code>SynonymStatement</code> (the claim) + <code>ExternalRecord</code> (the record)</td>
 </tr>
 <tr>
-<td><code>AgentContribution</code></td>
-<td>AgentContribution</td>
-</tr>
-<tr>
-<td><code>ComputationalResult</code></td>
-<td>ComputationalResult</td>
-</tr>
-<tr>
-<td><code>SieveDocument</code> (or alias <code>Document</code>)</td>
-<td>SieveDocument</td>
-</tr>
-<tr>
-<td><code>SieveDataItem</code> (or alias <code>DataItem</code>)</td>
-<td>SieveDataItem</td>
-</tr>
-<tr>
-<td><code>SieveStudyResult</code> (or alias <code>StudyResult</code>)</td>
-<td>SieveStudyResult</td>
-</tr>
-</tbody>
-</table>
-<p><code>SieveEvidenceItem</code> also defines an <code>evidence_item_type</code> slot ranged on
-<a href="#evidenceitemtype">EvidenceItemType</a> for explicit polymorphism, but the loader
-dispatches on <code>type:</code>.</p>
-<hr />
-<h2 id="enums">Enums<a class="headerlink" href="#enums" title="Permanent link">&para;</a></h2>
-<h3 id="curationstatus">CurationStatus<a class="headerlink" href="#curationstatus" title="Permanent link">&para;</a></h3>
-<p>Workflow status of a packet, and per-item <code>rating</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>UNREVIEWED</code></td>
-<td>Not yet reviewed (default).</td>
-</tr>
-<tr>
-<td><code>ACCEPTED</code></td>
-<td>Accepted as valid.</td>
-</tr>
-<tr>
-<td><code>REJECTED</code></td>
-<td>Rejected as invalid.</td>
-</tr>
-<tr>
-<td><code>CONTROVERSIAL</code></td>
-<td>Conflicting evidence, needs discussion.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="decisiontype">DecisionType<a class="headerlink" href="#decisiontype" title="Permanent link">&para;</a></h3>
-<p>A curator's decision on a packet (used by <a href="#curationdecision">CurationDecision</a>).</p>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>ACCEPT</code></td>
-<td>Accept the assertion.</td>
-</tr>
-<tr>
-<td><code>REJECT</code></td>
-<td>Reject the assertion.</td>
-</tr>
-<tr>
-<td><code>CONTROVERSIAL</code></td>
-<td>Mark controversial for further discussion.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="evidencedirection">EvidenceDirection<a class="headerlink" href="#evidencedirection" title="Permanent link">&para;</a></h3>
-<p>Direction of an evidence line (<code>direction_of_evidence_provided</code>) and the synthesis.</p>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>supports</code></td>
-<td>Evidence supports the statement.</td>
-</tr>
-<tr>
-<td><code>disputes</code></td>
-<td>Evidence disputes the statement.</td>
-</tr>
-<tr>
-<td><code>neutral</code></td>
-<td>Evidence is neutral.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="evidencestrength">EvidenceStrength<a class="headerlink" href="#evidencestrength" title="Permanent link">&para;</a></h3>
-<p>Qualitative strength of an evidence line (<code>strength_of_evidence_provided</code>).</p>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>strong</code></td>
-<td>Strong evidence.</td>
-</tr>
-<tr>
-<td><code>moderate</code></td>
-<td>Moderate evidence.</td>
-</tr>
-<tr>
-<td><code>weak</code></td>
-<td>Weak evidence.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="trustlevel">TrustLevel<a class="headerlink" href="#trustlevel" title="Permanent link">&para;</a></h3>
-<p>Authority of an <code>AgentContribution</code> contributor. Key scoring dimension.</p>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>community</code></td>
-<td>General community member, unknown credentials.</td>
-</tr>
-<tr>
-<td><code>domain_expert</code></td>
-<td>Trusted member with established reputation.</td>
-</tr>
-<tr>
-<td><code>curator</code></td>
-<td>Official curator with domain expertise and training.</td>
-</tr>
-<tr>
-<td><code>authority</code></td>
-<td>Authoritative source (official organization, standards body).</td>
-</tr>
-</tbody>
-</table>
-<h3 id="contributionchannel">ContributionChannel<a class="headerlink" href="#contributionchannel" title="Permanent link">&para;</a></h3>
-<p>How an <code>AgentContribution</code> was submitted. Affects traceability.</p>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>issue_tracker</code></td>
-<td>Public issue tracker (GitHub, GitLab). High traceability.</td>
-</tr>
-<tr>
-<td><code>personal_communication</code></td>
-<td>Private email/conversation. Low traceability.</td>
-</tr>
-<tr>
-<td><code>direct_submission</code></td>
-<td>Formal submission to the project. Highest traceability.</td>
-</tr>
-<tr>
-<td><code>public_forum</code></td>
-<td>Public mailing list or forum. Medium-high traceability.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="contributiontype">ContributionType<a class="headerlink" href="#contributiontype" title="Permanent link">&para;</a></h3>
-<p>Nature of an <code>AgentContribution</code>. Affects evidence weight.</p>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>suggestion</code></td>
-<td>Proposal without formal commitment. Lowest weight.</td>
-</tr>
-<tr>
-<td><code>review</code></td>
-<td>Assessment of existing content. Medium weight.</td>
-</tr>
-<tr>
-<td><code>decision</code></td>
-<td>Formal decision or determination. High weight.</td>
-</tr>
-<tr>
-<td><code>provision</code></td>
-<td>Direct provision from an authoritative source. Highest weight.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="evidenceitemtype">EvidenceItemType<a class="headerlink" href="#evidenceitemtype" title="Permanent link">&para;</a></h3>
-<p>Optional polymorphism tag on <code>SieveEvidenceItem.evidence_item_type</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>Maps to</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>DataItem</code></td>
-<td>SieveDataItem</td>
-</tr>
-<tr>
-<td><code>Document</code></td>
-<td>SieveDocument</td>
-</tr>
-<tr>
-<td><code>StudyResult</code></td>
-<td>SieveStudyResult</td>
-</tr>
-<tr>
-<td><code>ConcordanceItem</code></td>
-<td>ConcordanceItem</td>
+<td><code>SieveDocument</code> with <code>quote</code></td>
+<td><code>Publication</code> / <code>WebPage</code> / <code>GuidelineDocument</code>, plus <code>TextPassage</code> for the quote</td>
 </tr>
 <tr>
 <td><code>ComputationalResult</code></td>
-<td>ComputationalResult</td>
+<td><code>ComputationalScore</code></td>
 </tr>
 <tr>
 <td><code>AgentContribution</code></td>
-<td>AgentContribution</td>
+<td>an expert line with its <code>InterpretationActivity</code>, or a <code>SieveContribution</code></td>
+</tr>
+<tr>
+<td>item <code>rating</code></td>
+<td><code>LineStatusChange</code> on the line</td>
+</tr>
+<tr>
+<td><code>neutral</code> direction</td>
+<td>removed: lines support or dispute</td>
+</tr>
+<tr>
+<td>Net Evidence Ratio</td>
+<td>inclusion score S</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="provenance-and-synthesis">Provenance and synthesis<a class="headerlink" href="#provenance-and-synthesis" title="Permanent link">&para;</a></h2>
-<h3 id="agent-provenance">Agent (provenance)<a class="headerlink" href="#agent-provenance" title="Permanent link">&para;</a></h3>
-<p>SEPIO <strong>Agent</strong> — an autonomous actor (person, organization, software).</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>id</code></td>
-<td>string</td>
-<td>Identifier, e.g. an ORCID. <em>(from Entity)</em></td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>string</td>
-<td>Given name of the agent.</td>
-</tr>
-<tr>
-<td><code>subtype</code></td>
-<td>string</td>
-<td>Kind of agent (person, organization, software).</td>
-</tr>
-</tbody>
-</table>
-<h3 id="curationactivity">CurationActivity<a class="headerlink" href="#curationactivity" title="Permanent link">&para;</a></h3>
-<p><code>is_a</code> SEPIO <strong>Contribution</strong>. Work done by an agent (human or AI) during
-curation. Referenced from the packet's <code>curated_by</code> and the synthesis's
-<code>generated_by</code>; the DuckDB steward column is derived from its <code>contributor.id</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>contributor</code></td>
-<td><a href="#agent-provenance">Agent</a></td>
-<td>Who did the work. <em>(from Contribution)</em></td>
-</tr>
-<tr>
-<td><code>activity_type</code></td>
-<td><a href="#coding">Coding</a>[]</td>
-<td>Role/type of activity. <em>(from Contribution)</em></td>
-</tr>
-<tr>
-<td><code>date</code></td>
-<td>string</td>
-<td>Date completed (ISO 8601 string). <em>(from Activity)</em></td>
-</tr>
-<tr>
-<td><code>performed_by</code></td>
-<td><a href="#agent-provenance">Agent</a>[]</td>
-<td>Agents who executed the activity. <em>(from Activity)</em></td>
-</tr>
-<tr>
-<td><code>timestamp</code></td>
-<td>datetime</td>
-<td>When performed (datetime precision).</td>
-</tr>
-<tr>
-<td><code>used</code></td>
-<td>string[]</td>
-<td>Inputs used (prompt versions, tools).</td>
-</tr>
-<tr>
-<td><code>pull_request</code></td>
-<td>uriorcurie</td>
-<td>Associated GitHub PR URL.</td>
-</tr>
-<tr>
-<td><code>issue</code></td>
-<td>uriorcurie</td>
-<td>Associated GitHub issue URL.</td>
-</tr>
-<tr>
-<td><code>created_with</code></td>
-<td>uriorcurie</td>
-<td>Tool/software used (e.g. a Protégé URI).</td>
-</tr>
-</tbody>
-</table>
-<h3 id="evidencesynthesis">EvidenceSynthesis<a class="headerlink" href="#evidencesynthesis" title="Permanent link">&para;</a></h3>
-<p>The reasoned verdict over all evidence lines.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Req</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>summary</code></td>
-<td>string</td>
-<td>Yes</td>
-<td>Textual explanation of the conclusion.</td>
-</tr>
-<tr>
-<td><code>score</code></td>
-<td><a href="#score">Score</a></td>
-<td>No</td>
-<td>Aggregated score.</td>
-</tr>
-<tr>
-<td><code>direction</code></td>
-<td><a href="#evidencedirection">EvidenceDirection</a></td>
-<td>No</td>
-<td>Overall direction — supports/disputes/neutral.</td>
-</tr>
-<tr>
-<td><code>cited_evidence</code></td>
-<td>string[]</td>
-<td>No</td>
-<td>IDs of evidence lines cited in the synthesis.</td>
-</tr>
-<tr>
-<td><code>generated_by</code></td>
-<td><a href="#curationactivity">CurationActivity</a></td>
-<td>No</td>
-<td>The activity that produced the synthesis.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="score">Score<a class="headerlink" href="#score" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Req</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>value</code></td>
-<td>float</td>
-<td>Yes</td>
-<td>Numeric score value.</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>string</td>
-<td>No</td>
-<td>How the score was computed.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="coding">Coding<a class="headerlink" href="#coding" title="Permanent link">&para;</a></h3>
-<p>SEPIO <strong>Coding</strong> — a structured code, used for <code>predicate</code> and <code>subtype</code> slots.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>code</code></td>
-<td>string</td>
-<td>The code (CURIE preferred, e.g. <code>rdfs:subClassOf</code>).</td>
-</tr>
-<tr>
-<td><code>label</code></td>
-<td>string</td>
-<td>Human-readable name of the concept.</td>
-</tr>
-<tr>
-<td><code>system</code></td>
-<td>string</td>
-<td>Terminology/code system that defined the code.</td>
-</tr>
-<tr>
-<td><code>system_version</code></td>
-<td>string</td>
-<td>Version of that system.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="curationdecision">CurationDecision<a class="headerlink" href="#curationdecision" title="Permanent link">&para;</a></h3>
-<p>A standalone audit record of one curator decision on a packet. One row per
-decision, preserving history — richer than the single <code>curated_by</code> activity.
-SIEVE-specific; stored in its own DuckDB table.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Req</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>id</code></td>
-<td>string</td>
-<td>Yes</td>
-<td>Decision identifier.</td>
-</tr>
-<tr>
-<td><code>packet_id</code></td>
-<td>uriorcurie</td>
-<td>Yes</td>
-<td>The <code>EvidencePacket.id</code> this applies to.</td>
-</tr>
-<tr>
-<td><code>curator</code></td>
-<td>uriorcurie</td>
-<td>Yes</td>
-<td>ORCID of the deciding curator.</td>
-</tr>
-<tr>
-<td><code>curator_name</code></td>
-<td>string</td>
-<td>No</td>
-<td>Curator display name.</td>
-</tr>
-<tr>
-<td><code>decision</code></td>
-<td><a href="#decisiontype">DecisionType</a></td>
-<td>Yes</td>
-<td>The decision.</td>
-</tr>
-<tr>
-<td><code>rationale</code></td>
-<td>string</td>
-<td>No</td>
-<td>Explanation (required for rejections).</td>
-</tr>
-<tr>
-<td><code>certainty</code></td>
-<td>float</td>
-<td>No</td>
-<td>Confidence in the decision, 0–1.</td>
-</tr>
-<tr>
-<td><code>decided_at</code></td>
-<td>datetime</td>
-<td>Yes</td>
-<td>When the decision was made.</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="storage">Storage<a class="headerlink" href="#storage" title="Permanent link">&para;</a></h2>
-<p>Packets are stored in DuckDB (<code>src/sieve/store.py</code>). The full packet is kept as
-JSON with a few columns promoted for querying.</p>
-<p><strong><code>evidence_packets</code></strong> — one row per packet:</p>
-<table>
-<thead>
-<tr>
-<th>Column</th>
-<th>Type</th>
-<th>Source</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>id</code></td>
-<td>VARCHAR (PK)</td>
-<td><code>packet.id</code></td>
-</tr>
-<tr>
-<td><code>subject_id</code></td>
-<td>VARCHAR</td>
-<td><code>statement.subject</code></td>
-</tr>
-<tr>
-<td><code>predicate</code></td>
-<td>VARCHAR</td>
-<td><code>statement.predicate.code</code></td>
-</tr>
-<tr>
-<td><code>object_id</code></td>
-<td>VARCHAR</td>
-<td><code>statement.object</code></td>
-</tr>
-<tr>
-<td><code>status</code></td>
-<td>VARCHAR</td>
-<td><code>packet.status</code></td>
-</tr>
-<tr>
-<td><code>evidence_score</code></td>
-<td>DOUBLE</td>
-<td>computed Net Evidence Ratio</td>
-</tr>
-<tr>
-<td><code>evidence_steward</code></td>
-<td>VARCHAR</td>
-<td><code>curated_by.contributor.id</code></td>
-</tr>
-<tr>
-<td><code>created</code></td>
-<td>VARCHAR</td>
-<td><code>packet.created</code></td>
-</tr>
-<tr>
-<td><code>updated</code></td>
-<td>VARCHAR</td>
-<td><code>packet.updated</code></td>
-</tr>
-<tr>
-<td><code>packet_json</code></td>
-<td>JSON</td>
-<td>full packet (<code>serialize_as_any</code>, so polymorphic item fields survive)</td>
-</tr>
-</tbody>
-</table>
-<p><strong><code>packet_decisions</code></strong> — one row per <a href="#curationdecision">CurationDecision</a>:</p>
-<table>
-<thead>
-<tr>
-<th>Column</th>
-<th>Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>id</code></td>
-<td>VARCHAR (PK)</td>
-</tr>
-<tr>
-<td><code>packet_id</code></td>
-<td>VARCHAR</td>
-</tr>
-<tr>
-<td><code>curator</code></td>
-<td>VARCHAR</td>
-</tr>
-<tr>
-<td><code>curator_name</code></td>
-<td>VARCHAR</td>
-</tr>
-<tr>
-<td><code>decision</code></td>
-<td>VARCHAR</td>
-</tr>
-<tr>
-<td><code>rationale</code></td>
-<td>VARCHAR</td>
-</tr>
-<tr>
-<td><code>certainty</code></td>
-<td>DOUBLE</td>
-</tr>
-<tr>
-<td><code>decided_at</code></td>
-<td>VARCHAR</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="a-complete-example">A complete example<a class="headerlink" href="#a-complete-example" title="Permanent link">&para;</a></h2>
-<p>A minimal, valid packet (from <code>tests/data/valid/example_packet.yaml</code>). Note the
-<code>type:</code> on the statement, the line, and every item.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:pkt_asthma_0001</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">UNREVIEWED</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nt">statement</span><span class="p">:</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stmt_asthma_0001</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveStatement</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">subject</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0004979</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">subject_label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asthma</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">predicate</span><span class="p">:</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rdfs:subClassOf</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">subClassOf</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="nt">object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0005275</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="nt">object_label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">respiratory system disorder</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="nt">statement_text</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asthma subClassOf respiratory system disorder</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="nt">has_evidence_lines</span><span class="p">:</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">line_0001</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveEvidenceLine</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supports</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="nt">strength_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">strong</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">    </span><span class="nt">score_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span>
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">    </span><span class="nt">has_evidence_items</span><span class="p">:</span>
-<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ev_concordance_0001</span>
-<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConcordanceItem</span>
-<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">        </span><span class="nt">source_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Disease Ontology</span>
-<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">        </span><span class="nt">source_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DOID:2841</span>
-<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">        </span><span class="nt">rating</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ACCEPTED</span>
-<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">        </span><span class="nt">eco_code</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ECO:0000269</span>
-<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ev_document_0001</span>
-<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveDocument</span>
-<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="w">        </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Example study</span>
-<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="w">        </span><span class="nt">pmid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;12345678&quot;</span>
-<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="w">        </span><span class="nt">quote</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asthma is a chronic respiratory disease</span>
-<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="w">        </span><span class="nt">rating</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ACCEPTED</span>
-</code></pre></div>
-<p>Validate and ingest:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-I<span class="w"> </span>inbox/examples/
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sieve<span class="w"> </span>ingest<span class="w">   </span>-I<span class="w"> </span>inbox/examples/
-</code></pre></div>
-<hr />
-<h2 id="full-generated-reference-and-sepio-alignment">Full generated reference and SEPIO alignment<a class="headerlink" href="#full-generated-reference-and-sepio-alignment" title="Permanent link">&para;</a></h2>
-<p>For the exhaustive, auto-generated per-class and per-slot documentation — every
-inherited slot, range, and cardinality — see the <a href="../elements/">Schema Reference</a>.</p>
-<p>Because each SIEVE class <code>is_a</code> a SEPIO class (<code>SieveStatement</code> → <code>Statement</code>,
-<code>SieveEvidenceLine</code> → <code>EvidenceLine</code>, the six items → <code>InformationEntity</code>, …),
-every packet carries SEPIO semantics through the generated <code>class_uri</code>/<code>slot_uri</code>
-mappings. That is what lets an accepted packet export as valid SEPIO RDF, so
-evidence means the same thing across Monarch. See the <a href="../primer/">Primer</a> for the
-end-to-end story.</p>
-
-
-
-
-
-
-
-
-
-
-
-
-                
-              </article>
-            </div>
-          
-          
-  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
-
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
-        </div>
-        
-      </main>
-      
-        <footer class="md-footer">
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-copyright">
+</div>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
   
   
     Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
       Material for MkDocs
     </a>
-  
 </div>
-      
-        
 <div class="md-social">
-  
-    
-    
-    
-    
-      
-      
-    
-    <a href="https://github.com/matentzn/sieve" target="_blank" rel="noopener" title="github.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
-    </a>
-  
+<a class="md-social__link" href="https://github.com/matentzn/sieve" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</a>
 </div>
-      
-    </div>
-  </div>
+</div>
+</div>
 </footer>
-      
-    </div>
-    <div class="md-dialog" data-md-component="dialog">
-      <div class="md-dialog__inner md-typeset"></div>
-    </div>
-    
-    
-    
-      
-      
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.sections", "navigation.expand", "toc.integrate"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
-    
-    
-      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
-      
-    
-  </body>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.sections", "navigation.expand", "toc.integrate"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@11.4.1/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
 </html>

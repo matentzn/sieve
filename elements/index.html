@@ -16,7 +16,7 @@
         <link rel="prev" href="../architecture/">
       
       
-        <link rel="next" href="../cli/">
+        <link rel="next" href="../requirements-traceability/">
       
       
         
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sieve-evidence-packets-for-assertion-curation" class="md-skip">
+        <a href="#sieve-a-sepio-profile-for-evidence-based-curation-of-mondo-claims" class="md-skip">
           Skip to content
         </a>
       
@@ -546,6 +546,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../requirements-traceability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -835,13 +863,25 @@
   
 
 
-<h1 id="sieve-evidence-packets-for-assertion-curation">Sieve - Evidence Packets for Assertion Curation<a class="headerlink" href="#sieve-evidence-packets-for-assertion-curation" title="Permanent link">&para;</a></h1>
-<p>A model for evidence-based curation of semantic assertions
-(ontology axioms, knowledge graph triples, etc.).</p>
-<p>Core concept: An EvidencePacket bundles a statement with evidence
-supporting or disputing it, plus curation workflow status.</p>
-<p>Evidence model aligned with SEPIO (Scientific Evidence and Provenance
-Information Ontology).</p>
+<h1 id="sieve-a-sepio-profile-for-evidence-based-curation-of-mondo-claims">SIEVE - a SEPIO profile for evidence-based curation of Mondo claims<a class="headerlink" href="#sieve-a-sepio-profile-for-evidence-based-curation-of-mondo-claims" title="Permanent link">&para;</a></h1>
+<p>SIEVE is a profile of the SEPIO core information model (schema/sepio_core.yaml,
+imported unchanged). Every class here specialises a SEPIO core class. Every
+inherited slot keeps or narrows its core range. Nothing in the core is redefined.</p>
+<p>The profile is driven by the Mondo requirements collection
+(requirements/mondo_requirements.tsv). Each class, slot, enum and permissible value
+that realises a requirement carries it in <code>annotations.requirements</code>
+(space-separated requirement IDs) and, where a modelling decision lies behind it,
+in <code>annotations.decisions</code> (Mondo decision-log IDs). requirements/traceability.yaml
+assigns every requirement to a SEPIO design module and a disposition.
+tests/test_traceability.py keeps both sides consistent.</p>
+<p>Shape of the data: one EvidencePacket per claim. It holds one claim-type
+Statement (view B of D-041: identified, reified statement objects), the evidence
+items its lines refer to, and a version. Rules, policies, agents and information
+resources are shared reference data held in a SieveRegistry.</p>
+<p>Profile conventions: names follow the core's camelCase. Narrowed core slots are
+declared via slot_usage. Value sets for Coding-typed core slots are declared as
+<code>bindings</code> and enforced by sieve.profile_checks, because linkml-validate does not
+enforce bindings.</p>
 <p>URI: https://w3id.org/sieve</p>
 <p>Name: sieve</p>
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Permanent link">&para;</a></h2>
@@ -854,32 +894,56 @@ Information Ontology).</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="CuratedEvidence/">CuratedEvidence</a></td>
-<td>Curation-workflow slots grafted onto every Sieve evidence item: a steward's p...</td>
-</tr>
-<tr>
-<td><a href="CurationDecision/">CurationDecision</a></td>
-<td>A curator's decision on an EvidencePacket</td>
-</tr>
-<tr>
 <td><a href="Entity/">Entity</a></td>
 <td>Anything that exists, has existed, or will exist</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Activity/">Activity</a></td>
-<td>An action or set of actions performed by an agent, occurring over a period of...</td>
+<td>An action or set of actions performed by an agent, that occurs over a period ...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="AlignmentStep/">AlignmentStep</a></td>
+<td>One extraction, translation, grounding or normalisation step</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="BatchSignOff/">BatchSignOff</a></td>
+<td>A one-off curator approval of a filtered result set, with banded review depth</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Contribution/">Contribution</a></td>
 <td>An action or actions taken by a particular agent in the creation, modificatio...</td>
 </tr>
 <tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="CurationActivity/">CurationActivity</a></td>
-<td>Sieve extension of SEPIO Contribution</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="LineStatusChange/">LineStatusChange</a></td>
+<td>A record that a line was invalidated, superseded, or accepted unchanged by a ...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveContribution/">SieveContribution</a></td>
+<td>An agent's contribution to a claim, line or record, with the agent's role and...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="AssertionDecision/">AssertionDecision</a></td>
+<td>The overall decision that puts a claim into Mondo (or keeps it out)</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="InterpretationActivity/">InterpretationActivity</a></td>
+<td>The act of interpreting evidence as a line: who (human with perspective, or A...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="OriginEvent/">OriginEvent</a></td>
+<td>The event by which a claim (or term) entered Mondo from an upstream item: whi...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ResolutionChain/">ResolutionChain</a></td>
+<td>How a source mention or id was resolved to the target id: an ordered, contigu...</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Agent/">Agent</a></td>
 <td>An autonomous actor (person, organization, or software agent) that bears some...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveAgent/">SieveAgent</a></td>
+<td>A person (ORCID), organisation or group (e</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="InformationEntity/">InformationEntity</a></td>
@@ -890,24 +954,44 @@ Information Ontology).</p>
 <td>An Information Entity representing an individual piece of data, generated or ...</td>
 </tr>
 <tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ComputationalResult/">ComputationalResult</a></td>
-<td>Evidence from a computational method or algorithm</td>
-</tr>
-<tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveDataItem/">SieveDataItem</a></td>
-<td>Sieve extension of SEPIO DataItem</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ComputationalScore/">ComputationalScore</a></td>
+<td>A computed score used as machine evidence: lexical match, Boomer probability,...</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="DataSet/">DataSet</a></td>
-<td>A collection of related data items organized together in a common format</td>
+<td>A collection of related data items or records that are organized together in ...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="EvidencePacket/">EvidencePacket</a></td>
+<td>One claim, the evidence it rests on, and a version</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="EvidencePacketCollection/">EvidencePacketCollection</a></td>
+<td>A released artefact holding many packets, e</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveRegistry/">SieveRegistry</a></td>
+<td>Shared reference data, maintained once and referenced by id from packets: inf...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SourceRelease/">SourceRelease</a></td>
+<td>A specific release of an information resource, as ingested via a preprocessed...</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Document/">Document</a></td>
-<td>A collection of information in text-based or graphic human-readable form, int...</td>
+<td>A collection of information, usually in a text-based or graphic human-readabl...</td>
 </tr>
 <tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveDocument/">SieveDocument</a></td>
-<td>Sieve extension of SEPIO Document</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="GuidelineDocument/">GuidelineDocument</a></td>
+<td>A guideline or consensus document (e</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Publication/">Publication</a></td>
+<td>A scientific publication (PMID, DOI, ISBN)</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="WebPage/">WebPage</a></td>
+<td>A non-scholarly web page (GARD, MedlinePlus, Wikipedia, patient organisations...</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="EvidenceLine/">EvidenceLine</a></td>
@@ -915,35 +999,87 @@ Information Ontology).</p>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveEvidenceLine/">SieveEvidenceLine</a></td>
-<td>Sieve extension of SEPIO EvidenceLine</td>
+<td>One evidentiary judgement: these items bear on the enclosing claim in this di...</td>
 </tr>
 <tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveEvidenceItem/">SieveEvidenceItem</a></td>
-<td>Base class for Sieve-specific evidence items</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ExternalRecord/">ExternalRecord</a></td>
+<td>A record in an external database or terminology (DOID:0110413, OMIM:219700, I...</td>
 </tr>
 <tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="AgentContribution/">AgentContribution</a></td>
-<td>Evidence from any human or organizational contribution</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="InformationResource/">InformationResource</a></td>
+<td>A registry entry for a source as a whole (OMIM, Orphanet, Disease Ontology, W...</td>
 </tr>
 <tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ConcordanceItem/">ConcordanceItem</a></td>
-<td>Evidence from concordance with another knowledge source (ontology, database, ...</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Method/">Method</a></td>
+<td>A set of instructions that specify how to achieve some objective</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveMethod/">SieveMethod</a></td>
+<td>A versioned, identifiable method: a guideline or SOP, an extraction or alignm...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="AggregationRule/">AggregationRule</a></td>
+<td>The versioned rule that turns a claim type's evidence lines into strengths an...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="DecisionPolicy/">DecisionPolicy</a></td>
+<td>A human-authored, human-approved decision procedure that an automated system ...</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Statement/">Statement</a></td>
-<td>A claim of purported truth as made by a particular agent</td>
+<td>A claim of purported truth as made by a particular agent, on a particular occ...</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveStatement/">SieveStatement</a></td>
-<td>Sieve extension of SEPIO Statement</td>
+<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="DefinitionStatement/">DefinitionStatement</a></td>
+<td>C002: the term has this textual definition</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="MappingStatement/">MappingStatement</a></td>
+<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="MetaclassStatement/">MetaclassStatement</a></td>
+<td>C009 (candidate): the kind of class this term is (grouping, disorder, subtype...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SubclassStatement/">SubclassStatement</a></td>
+<td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td>C008: the term is in a Mondo subset</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SynonymStatement/">SynonymStatement</a></td>
+<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="TermExistenceStatement/">TermExistenceStatement</a></td>
+<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td>C010 (candidate): the term is a member of what an external record covers (e</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="TextPassage/">TextPassage</a></td>
+<td>A verbatim passage extracted from a document as a prior claim</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="StudyResult/">StudyResult</a></td>
 <td>A collection of data items from a single study that pertain to a particular s...</td>
-</tr>
-<tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="SieveStudyResult/">SieveStudyResult</a></td>
-<td>Sieve extension of SEPIO StudyResult</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Proposition/">Proposition</a></td>
@@ -951,27 +1087,31 @@ Information Ontology).</p>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="StudyGroup/">StudyGroup</a></td>
-<td>A collection of individuals or specimens selected for analysis based on share...</td>
+<td>A collection of individuals or specimens from the same taxonomic class, selec...</td>
 </tr>
 <tr>
-<td><a href="EvidencePacket/">EvidencePacket</a></td>
-<td>A bundle containing a statement (assertion) along with evidence lines support...</td>
+<td><a href="EvidenceItem/">EvidenceItem</a></td>
+<td>Marker mixin for everything an evidence line (or has_evidence) may point at: ...</td>
 </tr>
 <tr>
-<td><a href="EvidenceSynthesis/">EvidenceSynthesis</a></td>
-<td>Synthesis of evidence with reasoning and overall assessment</td>
-</tr>
-<tr>
-<td><a href="Score/">Score</a></td>
-<td>A score with value and description</td>
+<td><a href="UpstreamItem/">UpstreamItem</a></td>
+<td>An evidence item produced outside the Mondo ecosystem (a paper, an OMIM recor...</td>
 </tr>
 <tr>
 <td><a href="Utility/">Utility</a></td>
-<td>Abstract organizational class grouping classes that act as complex datatypes ...</td>
+<td>An abstract organizational class that groups classes acting as complex dataty...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="AppliedRule/">AppliedRule</a></td>
+<td>A named preprocessing / alignment rule applied in a step, with its own certai...</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Characteristic/">Characteristic</a></td>
-<td>A name-value pair describing a trait or role of an individual member of a Stu...</td>
+<td>An object holding a name-value pair used to describe a trait or role of an in...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ClaimPrior/">ClaimPrior</a></td>
+<td>A claim prior L0 for one proposing channel (D-063 Q3)</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Coding/">Coding</a></td>
@@ -979,19 +1119,35 @@ Information Ontology).</p>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Expression/">Expression</a></td>
-<td>A label representing a systematic expression for an entity, generated by form...</td>
+<td>A structure for labels representing systematic expressions that describe an e...</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Extension/">Extension</a></td>
-<td>A data structure that allows custom attributes to be defined for an Entity</td>
+<td>A data structure that allows custom attributes to be defined for an Entity, t...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="LevelAssignment/">LevelAssignment</a></td>
+<td>A dated role, expertise or trust assignment of an agent, possibly limited to ...</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Qualifier/">Qualifier</a></td>
-<td>A key-value object capturing additional information that extends or refines t...</td>
+<td>A key-value object used to capture additional piece of information that exten...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="QualityRating/">QualityRating</a></td>
+<td>A dated quality rating of a resource, as the q factor of its lines</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="RecordMetadata/">RecordMetadata</a></td>
-<td>Provenance metadata about a serialized data record or object in a dataset</td>
+<td>A reusable structure that encapsulates provenance metadata about a serialized...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="RetrievalMetadata/">RetrievalMetadata</a></td>
+<td>Where and when a concrete record was read: the resource, the release (or vers...</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="TextLocation/">TextLocation</a></td>
+<td>Location of a span in a document</td>
 </tr>
 </tbody>
 </table>
@@ -1005,40 +1161,148 @@ Information Ontology).</p>
 </thead>
 <tbody>
 <tr>
+<td><a href="acceptance_threshold/">acceptance_threshold</a></td>
+<td>Minimum inclusion score S for automatic acceptance</td>
+</tr>
+<tr>
+<td><a href="access_status/">access_status</a></td>
+<td>Access status of the document</td>
+</tr>
+<tr>
+<td><a href="action/">action</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="activity_type/">activity_type</a></td>
 <td>The specific type of activity performed or role played by an agent in making ...</td>
+</tr>
+<tr>
+<td><a href="agent_role_at_time/">agent_role_at_time</a></td>
+<td>The contributor's role / expertise level as of the act</td>
+</tr>
+<tr>
+<td><a href="agent_trust_at_time/">agent_trust_at_time</a></td>
+<td>The contributor's trust level as of the act</td>
+</tr>
+<tr>
+<td><a href="agents/">agents</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="aggregation_rule/">aggregation_rule</a></td>
+<td>The rule version that computed S</td>
+</tr>
+<tr>
+<td><a href="aggregation_rules/">aggregation_rules</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="alternative_labels/">alternative_labels</a></td>
 <td>Alternative name(s) for the Entity</td>
 </tr>
 <tr>
+<td><a href="applied_rules/">applied_rules</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="approval_date/">approval_date</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="approved_by/">approved_by</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="assertion_decisions/">assertion_decisions</a></td>
+<td>The decision history: every sign-off, policy-based acceptance, batch approval...</td>
+</tr>
+<tr>
+<td><a href="batch/">batch</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="batches/">batches</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="category/">category</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="certainty/">certainty</a></td>
-<td>Curator's confidence in this decision (0-1)</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="chain_confidence/">chain_confidence</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="channel/">channel</a></td>
-<td>How the contribution was communicated/submitted</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="char_end/">char_end</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="char_start/">char_start</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="characteristics/">characteristics</a></td>
-<td>Features shared by all members</td>
+<td>A feature or role shared by all members of the StudyGroup, representing a cri...</td>
 </tr>
 <tr>
-<td><a href="cited_evidence/">cited_evidence</a></td>
-<td>IDs of evidence lines cited in the synthesis</td>
+<td><a href="claim_priors/">claim_priors</a></td>
+<td>L0 per proposing channel for this claim type (D-063 Q3)</td>
+</tr>
+<tr>
+<td><a href="claim_type/">claim_type</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="code/">code</a></td>
-<td>A symbol uniquely identifying the concept (CURIE format preferred)</td>
+<td>A symbol uniquely identifying the concept, as in a syntax defined by the code...</td>
 </tr>
 <tr>
-<td><a href="content/">content</a></td>
-<td>The actual content of the contribution (what they said/provided)</td>
+<td><a href="component_data_item/">component_data_item</a></td>
+<td>A more foundational data item that is a logical component of a compound data ...</td>
 </tr>
 <tr>
-<td><a href="contribution_type/">contribution_type</a></td>
-<td>The nature of the contribution (suggestion, review, decision, etc</td>
+<td><a href="component_result/">component_result</a></td>
+<td>Another StudyResult comprised of data items about the same focus as its paren...</td>
+</tr>
+<tr>
+<td><a href="computational_scores/">computational_scores</a></td>
+<td>Computed scores (lexical match, Boomer, AI scores) referenced as evidence</td>
+</tr>
+<tr>
+<td><a href="computed_by_rule/">computed_by_rule</a></td>
+<td>The per-claim-type rule (and version) that assigned the strength</td>
+</tr>
+<tr>
+<td><a href="confidence/">confidence</a></td>
+<td>Data quality (SEPIO confidence): the probability that the evidence was read a...</td>
+</tr>
+<tr>
+<td><a href="confidence_basis/">confidence_basis</a></td>
+<td>Required whenever confidence is given</td>
+</tr>
+<tr>
+<td><a href="confidence_floor/">confidence_floor</a></td>
+<td>Lines with confidence below the floor are excluded outright</td>
+</tr>
+<tr>
+<td><a href="confidence_interval/">confidence_interval</a></td>
+<td>A measure of the probability that a parameter of interest will fall within a ...</td>
+</tr>
+<tr>
+<td><a href="context/">context</a></td>
+<td>Where the act happened: the GitHub issue / PR, the curation call or panel mee...</td>
+</tr>
+<tr>
+<td><a href="contribution_made_to/">contribution_made_to</a></td>
+<td>The artifact toward which the contribution was made</td>
 </tr>
 <tr>
 <td><a href="contributions/">contributions</a></td>
@@ -1046,195 +1310,387 @@ Information Ontology).</p>
 </tr>
 <tr>
 <td><a href="contributor/">contributor</a></td>
-<td>The agent (person or organization) who made the contribution</td>
+<td>The Agent that made the contribution</td>
 </tr>
 <tr>
-<td><a href="created/">created</a></td>
-<td>When this packet was created</td>
-</tr>
-<tr>
-<td><a href="created_with/">created_with</a></td>
-<td>Tool or software used (e</td>
-</tr>
-<tr>
-<td><a href="curated_by/">curated_by</a></td>
-<td>The curation activity that reviewed/approved this packet</td>
-</tr>
-<tr>
-<td><a href="curator/">curator</a></td>
-<td>ORCID of the deciding curator</td>
-</tr>
-<tr>
-<td><a href="curator_name/">curator_name</a></td>
-<td></td>
+<td><a href="curie_prefixes/">curie_prefixes</a></td>
+<td>CURIE prefixes whose records belong to this resource</td>
 </tr>
 <tr>
 <td><a href="data_items/">data_items</a></td>
-<td>Data items included in the StudyResult</td>
+<td>One or more data items that are included in the StudyResult because it pertai...</td>
+</tr>
+<tr>
+<td><a href="data_quality_flags/">data_quality_flags</a></td>
+<td>Failure flags that gate the line (e</td>
 </tr>
 <tr>
 <td><a href="date/">date</a></td>
-<td>When the contribution was made (ISO 8601 string)</td>
+<td>The date that the Activity was completed</td>
+</tr>
+<tr>
+<td><a href="date_attached/">date_attached</a></td>
+<td>When the evidence was first attached to the claim</td>
 </tr>
 <tr>
 <td><a href="date_authored/">date_authored</a></td>
-<td>When the information content was generated</td>
+<td>Indicates when the information content expressed in the Information Entity wa...</td>
 </tr>
 <tr>
 <td><a href="date_record_created/">date_record_created</a></td>
 <td>The date the record was initially created</td>
 </tr>
 <tr>
-<td><a href="decided_at/">decided_at</a></td>
-<td></td>
+<td><a href="default_quality/">default_quality</a></td>
+<td>q for a line whose sources carry no quality rating, or whose interpreter has ...</td>
 </tr>
 <tr>
-<td><a href="decision/">decision</a></td>
+<td><a href="default_role/">default_role</a></td>
+<td>Primary or aggregator by default</td>
+</tr>
+<tr>
+<td><a href="derivation_type/">derivation_type</a></td>
 <td></td>
 </tr>
 <tr>
 <td><a href="derived_from/">derived_from</a></td>
-<td>Another Information Entity from which this one is derived</td>
+<td>Another Information Entity from which this Information Entity is derived, in ...</td>
 </tr>
 <tr>
 <td><a href="derived_from_record/">derived_from_record</a></td>
-<td>Another data record from which this was derived</td>
+<td>Another data record from which the record described here was derived, through...</td>
+</tr>
+<tr>
+<td><a href="derives_content_from/">derives_content_from</a></td>
+<td>Resources this one takes content from (DOID from OMIM; EFO from Orphanet; EFO...</td>
 </tr>
 <tr>
 <td><a href="description/">description</a></td>
-<td>Explanation of how the score was computed</td>
+<td>A free text description of the Entity</td>
 </tr>
 <tr>
 <td><a href="direction/">direction</a></td>
-<td>Overall direction - supports or disputes</td>
+<td>A term indicating whether the Statement supports, disputes, or remains neutra...</td>
 </tr>
 <tr>
 <td><a href="direction_of_evidence_provided/">direction_of_evidence_provided</a></td>
-<td>The direction of support toward its target Proposition (supports, disputes, n...</td>
+<td>The direction of support that the Evidence Line is determined to provide towa...</td>
+</tr>
+<tr>
+<td><a href="document_version/">document_version</a></td>
+<td>The version of the document the passage was extracted from</td>
 </tr>
 <tr>
 <td><a href="doi/">doi</a></td>
-<td>A Digital Object Identifier for the document</td>
+<td>A `Digital Object Identifier &lt;https://www</td>
 </tr>
 <tr>
-<td><a href="eco_code/">eco_code</a></td>
-<td>Evidence &amp; Conclusion Ontology (ECO) term for this evidence item</td>
+<td><a href="domain/">domain</a></td>
+<td></td>
 </tr>
 <tr>
-<td><a href="eco_label/">eco_label</a></td>
-<td>Human-readable label of the ECO term</td>
+<td><a href="encoding_specifications/">encoding_specifications</a></td>
+<td>The meaning-changing transforms this artefact was produced with (SKOS/SSSOM e...</td>
 </tr>
 <tr>
-<td><a href="evidence_item_type/">evidence_item_type</a></td>
-<td>Type of evidence item (for polymorphism)</td>
+<td><a href="entity_slot/">entity_slot</a></td>
+<td>Which entity of the assertion this chain grounds</td>
 </tr>
 <tr>
-<td><a href="evidence_synthesis/">evidence_synthesis</a></td>
-<td>Synthesis of the evidence with reasoning</td>
+<td><a href="evidence_item_sources/">evidence_item_sources</a></td>
+<td>An information resource (e</td>
+</tr>
+<tr>
+<td><a href="evidence_line/">evidence_line</a></td>
+<td>The expert line this decision contributed, if any (provisional)</td>
+</tr>
+<tr>
+<td><a href="exclusive/">exclusive</a></td>
+<td>Whether claims of this type are mutually exclusive, so a competing-claim line...</td>
+</tr>
+<tr>
+<td><a href="exclusivity_rule/">exclusivity_rule</a></td>
+<td>The exclusivity criterion in words, versioned with the rule (D-069)</td>
 </tr>
 <tr>
 <td><a href="extension_description/">extension_description</a></td>
-<td>Description of the extension element's intended meaning and use</td>
+<td>A free text description of the intended meaning and use of the extension elem...</td>
 </tr>
 <tr>
 <td><a href="extensions/">extensions</a></td>
 <td>A list of extensions to the Entity, that allow for capture of information not...</td>
 </tr>
 <tr>
-<td><a href="focus/">focus</a></td>
-<td>A specific subject or experimental unit the data is about</td>
+<td><a href="external_records/">external_records</a></td>
+<td>External database / terminology records referenced as evidence or origin</td>
 </tr>
 <tr>
-<td><a href="generated_by/">generated_by</a></td>
-<td>The activity that generated this synthesis</td>
+<td><a href="filter_query/">filter_query</a></td>
+<td>Machine-readable, re-runnable query over packet contents</td>
+</tr>
+<tr>
+<td><a href="focus/">focus</a></td>
+<td>A specific subject or experimental unit in a Study, that data in the StudyRes...</td>
+</tr>
+<tr>
+<td><a href="generation_context/">generation_context</a></td>
+<td>What kind of study, observation or curation basis produced the item (PubMed p...</td>
+</tr>
+<tr>
+<td><a href="grounding_checked/">grounding_checked</a></td>
+<td>The entities in the evidence map to the claim's actual terms (AI acts)</td>
+</tr>
+<tr>
+<td><a href="groundings/">groundings</a></td>
+<td>For a prior claim made in a source's own identifiers, one resolution chain pe...</td>
+</tr>
+<tr>
+<td><a href="guidelines/">guidelines</a></td>
+<td>Guideline / consensus documents referenced as evidence</td>
 </tr>
 <tr>
 <td><a href="has_evidence/">has_evidence</a></td>
-<td>A piece of information that contributes to an argument for or against the Sta...</td>
+<td>A piece of information that represents or contributes to an argument for or a...</td>
+</tr>
+<tr>
+<td><a href="has_evidence_from_sources/">has_evidence_from_sources</a></td>
+<td>An Information Entity (typically a publication, dataset, or database) that pr...</td>
 </tr>
 <tr>
 <td><a href="has_evidence_items/">has_evidence_items</a></td>
-<td>Individual pieces of information evaluated as evidence in building this argum...</td>
+<td>An individual piece of information that was evaluated as evidence in building...</td>
 </tr>
 <tr>
 <td><a href="has_evidence_lines/">has_evidence_lines</a></td>
-<td>Evidence lines supporting or disputing the statement</td>
+<td>An evidence-based argument that supports or disputes the validity of the prop...</td>
+</tr>
+<tr>
+<td><a href="has_evidence_of_types/">has_evidence_of_types</a></td>
+<td>A term describing a type of evidence used to assess the validity of Statement...</td>
 </tr>
 <tr>
 <td><a href="id/">id</a></td>
-<td>Unique identifier for this evidence packet</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="identifier_verified/">identifier_verified</a></td>
+<td>The cited identifier resolves and is about the topic (AI acts)</td>
 </tr>
 <tr>
 <td><a href="identifiers/">identifiers</a></td>
-<td>Globally-unique business identifiers or accession numbers for the entity</td>
+<td>A globally-unique 'business' identifier or accession number for the real-worl...</td>
+</tr>
+<tr>
+<td><a href="identity_known/">identity_known</a></td>
+<td>False for an unknown human interpreter: a person whose identity was not recor...</td>
+</tr>
+<tr>
+<td><a href="inclusion_score/">inclusion_score</a></td>
+<td>S at decision time</td>
+</tr>
+<tr>
+<td><a href="independence_cluster/">independence_cluster</a></td>
+<td>The independence cluster the aggregation rule assigned the line to</td>
+</tr>
+<tr>
+<td><a href="information_quality/">information_quality</a></td>
+<td>A qualitative term indicating the scientific rigor or reliability with which ...</td>
+</tr>
+<tr>
+<td><a href="input/">input</a></td>
+<td>An entity that was input into the Activity (could be material or information)</td>
+</tr>
+<tr>
+<td><a href="input_value/">input_value</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="interpretation/">interpretation</a></td>
+<td>The outcome of an interpretation of lower-level data item(s) in a StudyResult...</td>
 </tr>
 <tr>
 <td><a href="is_about/">is_about</a></td>
-<td>An entity or concept that the information entity describes/is about</td>
+<td>An entity or concept in the world that the information entity describes/is ab...</td>
 </tr>
 <tr>
 <td><a href="is_subset_of/">is_subset_of</a></td>
-<td>A larger StudyGroup of which this is a subset</td>
+<td>A larger StudyGroup of which this StudyGroup represents a subset</td>
 </tr>
 <tr>
-<td><a href="issue/">issue</a></td>
-<td>GitHub issue URL associated with this activity</td>
+<td><a href="isbn/">isbn</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="label/">label</a></td>
 <td>A primary name for the Entity</td>
 </tr>
 <tr>
+<td><a href="last_confirmed/">last_confirmed</a></td>
+<td>When the evidence was last confirmed against a source release</td>
+</tr>
+<tr>
+<td><a href="last_confirmed_against/">last_confirmed_against</a></td>
+<td>The release the evidence was last confirmed against</td>
+</tr>
+<tr>
+<td><a href="level/">level</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="license/">license</a></td>
+<td>A specific license that dictates legal permissions for how a document can be ...</td>
+</tr>
+<tr>
+<td><a href="log_odds/">log_odds</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="log_odds_basis/">log_odds_basis</a></td>
+<td>Where own_log_odds comes from</td>
+</tr>
+<tr>
+<td><a href="log_odds_source_packet/">log_odds_source_packet</a></td>
+<td>"packet-id@version" own_log_odds was taken from</td>
+</tr>
+<tr>
+<td><a href="maintainer/">maintainer</a></td>
+<td>The organisation responsible for the resource</td>
+</tr>
+<tr>
 <td><a href="mapping_justification/">mapping_justification</a></td>
-<td>How entities were mapped between sources (e</td>
+<td>SSSOM / semapv mapping justification</td>
 </tr>
 <tr>
 <td><a href="mapping_set/">mapping_set</a></td>
-<td>SSSOM mapping-set URI the concordance was drawn from</td>
+<td>The mapping set the step used</td>
+</tr>
+<tr>
+<td><a href="mapping_set_version/">mapping_set_version</a></td>
+<td>Frozen version of the mapping set</td>
 </tr>
 <tr>
 <td><a href="member_count/">member_count</a></td>
-<td>Total number of members in the StudyGroup</td>
+<td>The total number of individual members in the StudyGroup</td>
 </tr>
 <tr>
-<td><a href="method_id/">method_id</a></td>
-<td>Identifier for the method (e</td>
+<td><a href="members/">members</a></td>
+<td>Members of a group agent (expert panel)</td>
 </tr>
 <tr>
-<td><a href="method_name/">method_name</a></td>
-<td>Human-readable name of the computational method</td>
+<td><a href="method/">method</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="method_type/">method_type</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="methods/">methods</a></td>
+<td>Guidelines, workflows, export rule sets</td>
+</tr>
+<tr>
+<td><a href="model_name/">model_name</a></td>
+<td>LLM model identifier (AI agents)</td>
 </tr>
 <tr>
 <td><a href="name/">name</a></td>
-<td>The given name of the Agent</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="negated/">negated</a></td>
+<td>Negative polarity: the claim is that subject-predicate-object does NOT hold</td>
 </tr>
 <tr>
 <td><a href="object/">object</a></td>
 <td>An Entity or concept that is related to the subject of a Statement via its pr...</td>
 </tr>
 <tr>
-<td><a href="object_label/">object_label</a></td>
-<td>Human-readable label for the object</td>
+<td><a href="object_obsolete_in_source_version/">object_obsolete_in_source_version</a></td>
+<td>The source release in which the object term is obsolete</td>
 </tr>
 <tr>
-<td><a href="packet_id/">packet_id</a></td>
-<td>Reference to the EvidencePacket</td>
+<td><a href="obsolescence_reason/">obsolescence_reason</a></td>
+<td>Reason for obsoletion (OMO term, e</td>
+</tr>
+<tr>
+<td><a href="obsolete_in_source/">obsolete_in_source</a></td>
+<td>The record is obsolete in the release it was read from</td>
+</tr>
+<tr>
+<td><a href="of_resource/">of_resource</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="origin/">origin</a></td>
+<td>Provenance of origin: where the claim (or term) was copied, cloned or adapted...</td>
+</tr>
+<tr>
+<td><a href="outcome/">outcome</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="output/">output</a></td>
+<td>An entity that was output from the Activity (could be material or information...</td>
+</tr>
+<tr>
+<td><a href="output_value/">output_value</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="own_log_odds/">own_log_odds</a></td>
+<td>The claim's log-odds L from its own evidence only, frozen at this packet vers...</td>
+</tr>
+<tr>
+<td><a href="packets/">packets</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="parameters/">parameters</a></td>
-<td>Method parameters (as JSON string or key=value format)</td>
+<td>Method parameters (key=value or JSON)</td>
+</tr>
+<tr>
+<td><a href="participants/">participants</a></td>
+<td>Participants of a collective act; the contributor may be the group agent</td>
 </tr>
 <tr>
 <td><a href="performed_by/">performed_by</a></td>
 <td>An Agent who participated in executing the Activity</td>
 </tr>
 <tr>
+<td><a href="perspective/">perspective</a></td>
+<td>Perspective / use context of a human contributor (clinical, research, a commu...</td>
+</tr>
+<tr>
 <td><a href="pmid/">pmid</a></td>
-<td>A PubMed unique identifier for the document</td>
+<td>A `PubMed unique identifier &lt;https://en</td>
+</tr>
+<tr>
+<td><a href="policies/">policies</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="policy/">policy</a></td>
+<td>The policy (and version) under which an automated decision was taken</td>
 </tr>
 <tr>
 <td><a href="predicate/">predicate</a></td>
-<td>The relationship declared to hold between the subject and the object of the S...</td>
+<td>Mapping predicate of a grounding / normalisation step (e</td>
+</tr>
+<tr>
+<td><a href="preferred/">preferred</a></td>
+<td>Preferred among this term's exact matches into the same source (formerly MOND...</td>
+</tr>
+<tr>
+<td><a href="previous_version/">previous_version</a></td>
+<td>The packet version this snapshot supersedes</td>
+</tr>
+<tr>
+<td><a href="prior_claims/">prior_claims</a></td>
+<td>Structured claims made by sources (or by Mondo elsewhere), each typed by what...</td>
+</tr>
+<tr>
+<td><a href="proposing_channel/">proposing_channel</a></td>
+<td>The channel that proposed the claim</td>
 </tr>
 <tr>
 <td><a href="proposition/">proposition</a></td>
@@ -1242,171 +1698,335 @@ Information Ontology).</p>
 </tr>
 <tr>
 <td><a href="proposition_text/">proposition_text</a></td>
-<td>A natural-language expression of the Proposition's meaning</td>
+<td>A natural-language expression of the Proposition's meaning (i</td>
 </tr>
 <tr>
-<td><a href="pull_request/">pull_request</a></td>
-<td>GitHub pull request URL associated with this activity</td>
+<td><a href="publications/">publications</a></td>
+<td>Scientific publications referenced as evidence or origin</td>
 </tr>
 <tr>
 <td><a href="qualifier/">qualifier</a></td>
 <td>An additional piece of information that extends or refines the meaning of a S...</td>
 </tr>
 <tr>
-<td><a href="quote/">quote</a></td>
-<td>Relevant quote from the document</td>
+<td><a href="quality_category/">quality_category</a></td>
+<td></td>
 </tr>
 <tr>
-<td><a href="quote_location/">quote_location</a></td>
-<td>Location of quote (page, section, figure)</td>
+<td><a href="quality_ratings/">quality_ratings</a></td>
+<td>Dated quality ratings, maintained once per resource</td>
 </tr>
 <tr>
-<td><a href="rating/">rating</a></td>
-<td>The evidence steward's verdict on this individual evidence item</td>
+<td><a href="quote_verification/">quote_verification</a></td>
+<td>Whether the quote was machine-verified to occur verbatim in the source</td>
 </tr>
 <tr>
 <td><a href="rationale/">rationale</a></td>
-<td>Explanation for the decision (required for rejections)</td>
+<td>Optional free-text rationale (1-2 sentences)</td>
+</tr>
+<tr>
+<td><a href="read_coverage/">read_coverage</a></td>
+<td>How much of the document was looked at</td>
+</tr>
+<tr>
+<td><a href="reason/">reason</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="reasoning_trace/">reasoning_trace</a></td>
+<td>Link to an external reasoning trace</td>
 </tr>
 <tr>
 <td><a href="record_identifier/">record_identifier</a></td>
-<td>The identifier of the record</td>
+<td>The identifier of the record described in the RecordMetadata object (required...</td>
 </tr>
 <tr>
 <td><a href="record_metadata/">record_metadata</a></td>
-<td>Provenance metadata about a specific concrete record of information</td>
+<td>Provenance metadata about a specific concrete record of information as encode...</td>
 </tr>
 <tr>
 <td><a href="record_version/">record_version</a></td>
-<td>The version number of the record</td>
+<td>The version number of the record-level artifact the object describes</td>
 </tr>
 <tr>
-<td><a href="reference/">reference</a></td>
-<td>URL or identifier for traceability (issue tracker link, email thread, submiss...</td>
+<td><a href="reference_snapshot/">reference_snapshot</a></td>
+<td>A frozen copy, as of this packet version, of every registry entry the packet ...</td>
+</tr>
+<tr>
+<td><a href="release_date/">release_date</a></td>
+<td>Indicates when a version of a DataSet was formally released</td>
+</tr>
+<tr>
+<td><a href="releases/">releases</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="replacement_line/">replacement_line</a></td>
+<td>The new line that corrects this one (action SUPERSEDED)</td>
 </tr>
 <tr>
 <td><a href="reported_in/">reported_in</a></td>
 <td>A document in which the Information Entity is reported</td>
 </tr>
 <tr>
+<td><a href="reports_study/">reports_study</a></td>
+<td>Key of the underlying study, family or cohort</td>
+</tr>
+<tr>
+<td><a href="resource/">resource</a></td>
+<td>The information resource the item belongs to, explicit rather than inferred f...</td>
+</tr>
+<tr>
+<td><a href="resource_role_override/">resource_role_override</a></td>
+<td>Overrides the resource's default primary / aggregator role for this item (e</td>
+</tr>
+<tr>
+<td><a href="resources/">resources</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="result_set/">result_set</a></td>
+<td>Frozen result set as "packet-id@version" entries</td>
+</tr>
+<tr>
+<td><a href="retrieval_date/">retrieval_date</a></td>
+<td>Date read (date accessed, for web pages)</td>
+</tr>
+<tr>
+<td><a href="retrieved_from/">retrieved_from</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="review_bands/">review_bands</a></td>
+<td>Score bands with their review depth, e</td>
+</tr>
+<tr>
+<td><a href="review_date/">review_date</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="review_depth/">review_depth</a></td>
+<td>How closely this claim was looked at</td>
+</tr>
+<tr>
+<td><a href="review_state/">review_state</a></td>
+<td>Where the claim is in the curation workflow (distinct from the decision outco...</td>
+</tr>
+<tr>
+<td><a href="review_status/">review_status</a></td>
+<td>Absent means MACHINE (not reviewed)</td>
+</tr>
+<tr>
+<td><a href="reviewed_by/">reviewed_by</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="revoked/">revoked</a></td>
+<td>A revoked policy triggers re-evaluation of every claim it decided</td>
+</tr>
+<tr>
+<td><a href="role/">role</a></td>
+<td>The role played (curator, provider, stakeholder, endorser, extractor,</td>
+</tr>
+<tr>
+<td><a href="roles/">roles</a></td>
+<td>Dated role / expertise assignments, possibly per domain</td>
+</tr>
+<tr>
+<td><a href="route/">route</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="run_id/">run_id</a></td>
+<td>Identifier of the automated run that performed the act</td>
+</tr>
+<tr>
+<td><a href="scaling_factor/">scaling_factor</a></td>
+<td>k in L = L0 + k * sum(w)</td>
+</tr>
+<tr>
+<td><a href="scheduled_obsoletion_date/">scheduled_obsoletion_date</a></td>
+<td>Announced date of a scheduled obsoletion</td>
+</tr>
+<tr>
+<td><a href="scope/">scope</a></td>
+<td>Claim types the rating applies to (a source can be strong for synonyms, weak ...</td>
+</tr>
+<tr>
+<td><a href="scope_channels/">scope_channels</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="scope_claim_types/">scope_claim_types</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="score/">score</a></td>
-<td>Aggregated score from the evidence</td>
+<td>A quantitative score that indicates the strength of a Proposition's validity ...</td>
+</tr>
+<tr>
+<td><a href="score_band/">score_band</a></td>
+<td>Band of S at decision time, from the rule's strength_bands</td>
 </tr>
 <tr>
 <td><a href="score_of_evidence_provided/">score_of_evidence_provided</a></td>
-<td>A quantitative score indicating the strength of support</td>
+<td>A quantitative score indicating the strength of support that an Evidence Line...</td>
+</tr>
+<tr>
+<td><a href="section/">section</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="signed_packet_version/">signed_packet_version</a></td>
+<td>The packet version the decision was given on</td>
 </tr>
 <tr>
 <td><a href="software_version/">software_version</a></td>
-<td>Version of software/tool used</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="sought_disputing_evidence/">sought_disputing_evidence</a></td>
+<td>Search scope included disputing evidence (experimental)</td>
 </tr>
 <tr>
 <td><a href="source_data_set/">source_data_set</a></td>
-<td>A larger DataSet from which this content was derived</td>
+<td>A larger DataSet from which the content of the StudyResult was derived</td>
 </tr>
 <tr>
-<td><a href="source_id/">source_id</a></td>
-<td>Identifier of the concordant source (e</td>
+<td><a href="source_item/">source_item</a></td>
+<td>The upstream item (ExternalRecord, Publication, WebPage) the claim came from</td>
 </tr>
 <tr>
-<td><a href="source_name/">source_name</a></td>
-<td>Human-readable name of the concordant source (e</td>
+<td><a href="source_label/">source_label</a></td>
+<td>The source's own label at attachment time</td>
 </tr>
 <tr>
-<td><a href="source_object/">source_object</a></td>
-<td>Object of the concordant assertion in the source</td>
-</tr>
-<tr>
-<td><a href="source_object_label/">source_object_label</a></td>
-<td>Human-readable label of the object in the source</td>
-</tr>
-<tr>
-<td><a href="source_predicate/">source_predicate</a></td>
-<td>Predicate/relationship in the concordant assertion</td>
-</tr>
-<tr>
-<td><a href="source_predicate_label/">source_predicate_label</a></td>
-<td>Human-readable label of the predicate in the source</td>
-</tr>
-<tr>
-<td><a href="source_subject/">source_subject</a></td>
-<td>Subject of the concordant assertion in the source</td>
-</tr>
-<tr>
-<td><a href="source_subject_label/">source_subject_label</a></td>
-<td>Human-readable label of the subject in the source</td>
+<td><a href="source_release/">source_release</a></td>
+<td>The release the claim was copied from</td>
 </tr>
 <tr>
 <td><a href="source_version/">source_version</a></td>
-<td>Version/release of the concordant source</td>
+<td>Release / version string, when no SourceRelease is registered</td>
 </tr>
 <tr>
 <td><a href="sources/">sources</a></td>
-<td>A document or other information resource in which the information entity, or ...</td>
+<td>A document or other informtion resource in which the information entity, or e...</td>
+</tr>
+<tr>
+<td><a href="span_role/">span_role</a></td>
+<td>Role of the span (MeDIC TextSpanRoleEnum, e</td>
 </tr>
 <tr>
 <td><a href="specified_by/">specified_by</a></td>
 <td>A specification that describes all or part of the process that led to creatio...</td>
 </tr>
 <tr>
+<td><a href="spot_check_errors/">spot_check_errors</a></td>
+<td>Errors found in the spot-check sample (feeds calibration of S)</td>
+</tr>
+<tr>
+<td><a href="stacked_lines/">stacked_lines</a></td>
+<td>How a higher-order line and the lines it rests on count together</td>
+</tr>
+<tr>
 <td><a href="statement/">statement</a></td>
-<td>The statement/assertion being curated</td>
+<td>The claim this packet is about</td>
 </tr>
 <tr>
 <td><a href="statement_text/">statement_text</a></td>
 <td>A natural-language expression of what a Statement asserts to be true</td>
 </tr>
 <tr>
-<td><a href="status/">status</a></td>
-<td>Current curation workflow status</td>
+<td><a href="status_changes/">status_changes</a></td>
+<td>Invalidations and supersessions, with who, when and why</td>
+</tr>
+<tr>
+<td><a href="steps/">steps</a></td>
+<td>Ordered steps; step n's output is step n+1's input (profile check)</td>
 </tr>
 <tr>
 <td><a href="strength/">strength</a></td>
-<td>The strength of a Proposition's assessment in the direction indicated</td>
+<td>A term used to report the strength of a Proposition's assessment in the direc...</td>
+</tr>
+<tr>
+<td><a href="strength_bands/">strength_bands</a></td>
+<td>Ordered categorical bands with their cut-offs, e</td>
 </tr>
 <tr>
 <td><a href="strength_of_evidence_provided/">strength_of_evidence_provided</a></td>
-<td>The qualitative strength of support for or against its target Proposition</td>
+<td>The strength of support that an Evidence Line is determined to provide for or...</td>
+</tr>
+<tr>
+<td><a href="study_group/">study_group</a></td>
+<td>A description of a specific group or population of subjects interrogated in t...</td>
 </tr>
 <tr>
 <td><a href="subject/">subject</a></td>
 <td>The Entity or concept about which the Statement is made</td>
 </tr>
 <tr>
-<td><a href="subject_label/">subject_label</a></td>
-<td>Human-readable label for the subject</td>
+<td><a href="subject_classification/">subject_classification</a></td>
+<td>A single term or phrase summarizing the outcome of direction and strength ass...</td>
 </tr>
 <tr>
 <td><a href="subtype/">subtype</a></td>
-<td>A specific type of document (e</td>
+<td>A specific type of method that a Method instance represents (e</td>
 </tr>
 <tr>
-<td><a href="summary/">summary</a></td>
-<td>Textual summary explaining the conclusion</td>
+<td><a href="supersedes/">supersedes</a></td>
+<td>Lines this one corrects (they must be invalidated)</td>
+</tr>
+<tr>
+<td><a href="supporting_method_types/">supporting_method_types</a></td>
+<td>Types of methodological approaches that were executed to directly or indirect...</td>
+</tr>
+<tr>
+<td><a href="supporting_methods/">supporting_methods</a></td>
+<td>Specific methods that were executed to directly or indirectly support creatio...</td>
 </tr>
 <tr>
 <td><a href="system/">system</a></td>
 <td>The terminology/code system that defined the code</td>
 </tr>
 <tr>
-<td><a href="system_url/">system_url</a></td>
+<td><a href="system_u_r_l/">system_u_r_l</a></td>
 <td>A URL for the nomenclature system</td>
 </tr>
 <tr>
 <td><a href="system_version/">system_version</a></td>
-<td>Version of the terminology or code system</td>
+<td>Version of the terminology or code system that provided the code</td>
 </tr>
 <tr>
-<td><a href="timestamp/">timestamp</a></td>
-<td>When the activity was performed (datetime precision)</td>
+<td><a href="target_proposition/">target_proposition</a></td>
+<td>The possible fact against which evidence items contained in an Evidence Line ...</td>
+</tr>
+<tr>
+<td><a href="text_location/">text_location</a></td>
+<td>Exact location (section, character offsets)</td>
+</tr>
+<tr>
+<td><a href="text_passages/">text_passages</a></td>
+<td>Text passages extracted from documents (records created in the Mondo ecosyste...</td>
+</tr>
+<tr>
+<td><a href="text_span/">text_span</a></td>
+<td>Span anchoring for text sources</td>
+</tr>
+<tr>
+<td><a href="threshold_passed/">threshold_passed</a></td>
+<td>The policy threshold S passed</td>
 </tr>
 <tr>
 <td><a href="title/">title</a></td>
 <td>The official title given to the document by its authors</td>
 </tr>
 <tr>
-<td><a href="trust_level/">trust_level</a></td>
-<td>Level of trust/authority assigned to the contributor</td>
+<td><a href="trigger_cue/">trigger_cue</a></td>
+<td>The verbatim words that establish a relation (assertion layer)</td>
+</tr>
+<tr>
+<td><a href="trust_levels/">trust_levels</a></td>
+<td>Dated trust levels (humans by role and expertise, AI agents by track record o...</td>
 </tr>
 <tr>
 <td><a href="type/">type</a></td>
@@ -1414,31 +2034,51 @@ Information Ontology).</p>
 </tr>
 <tr>
 <td><a href="unit/">unit</a></td>
-<td>A unit of measure for the value</td>
-</tr>
-<tr>
-<td><a href="updated/">updated</a></td>
-<td>When this packet was last updated</td>
+<td>A unit of measure for the value (e</td>
 </tr>
 <tr>
 <td><a href="urls/">urls</a></td>
-<td>URLs from which the Document content can be retrieved</td>
+<td>The URL/web address from which the Method can be retrieved</td>
 </tr>
 <tr>
-<td><a href="used/">used</a></td>
-<td>Inputs used by this activity (e</td>
+<td><a href="uses_rules/">uses_rules</a></td>
+<td>The rule versions the policy pins</td>
+</tr>
+<tr>
+<td><a href="valid_direction/">valid_direction</a></td>
+<td>The direction(s) in which the mapping may be used for translation</td>
+</tr>
+<tr>
+<td><a href="valid_from/">valid_from</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="validity/">validity</a></td>
+<td>Absent means VALID</td>
 </tr>
 <tr>
 <td><a href="value/">value</a></td>
-<td>The numeric score value</td>
+<td>The role / category, or the numeric level as a string</td>
+</tr>
+<tr>
+<td><a href="value_operator/">value_operator</a></td>
+<td>An operation that defines how to logically interpret a set of more than one C...</td>
 </tr>
 <tr>
 <td><a href="values/">values</a></td>
-<td>The specific value(s) of the trait</td>
+<td>The specific value(s) that the indicated traitor role  holds in all populatio...</td>
+</tr>
+<tr>
+<td><a href="variability_measures/">variability_measures</a></td>
+<td>A statistical score describing the variability inherent in a data item repres...</td>
 </tr>
 <tr>
 <td><a href="version/">version</a></td>
-<td>The version of the DataSet</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="web_pages/">web_pages</a></td>
+<td>Non-scholarly web pages referenced as evidence or origin</td>
 </tr>
 </tbody>
 </table>
@@ -1452,36 +2092,152 @@ Information Ontology).</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="ContributionChannel/">ContributionChannel</a></td>
-<td>How a contribution was communicated or submitted</td>
+<td><a href="AccessStatus/">AccessStatus</a></td>
+<td></td>
 </tr>
 <tr>
-<td><a href="ContributionType/">ContributionType</a></td>
-<td>The nature/type of a contribution</td>
+<td><a href="AgentKind/">AgentKind</a></td>
+<td>The core Agent</td>
 </tr>
 <tr>
-<td><a href="CurationStatus/">CurationStatus</a></td>
-<td>Workflow status of the curation</td>
+<td><a href="AgentRole/">AgentRole</a></td>
+<td></td>
 </tr>
 <tr>
-<td><a href="DecisionType/">DecisionType</a></td>
-<td>A curator's decision on an assertion</td>
+<td><a href="AlignmentQuality/">AlignmentQuality</a></td>
+<td>MeDIC per-step quality categories (grounding, extraction, normalisation)</td>
 </tr>
 <tr>
-<td><a href="EvidenceDirection/">EvidenceDirection</a></td>
-<td>Direction of evidence support</td>
+<td><a href="AssertionRoute/">AssertionRoute</a></td>
+<td></td>
 </tr>
 <tr>
-<td><a href="EvidenceItemType/">EvidenceItemType</a></td>
-<td>Type of evidence item</td>
+<td><a href="ClaimType/">ClaimType</a></td>
+<td>The Mondo claim types, named by their profile class</td>
 </tr>
 <tr>
-<td><a href="EvidenceStrength/">EvidenceStrength</a></td>
-<td>Qualitative strength of evidence</td>
+<td><a href="ConfidenceBasis/">ConfidenceBasis</a></td>
+<td></td>
 </tr>
 <tr>
-<td><a href="TrustLevel/">TrustLevel</a></td>
-<td>Level of trust/authority assigned to a contributor</td>
+<td><a href="DataQualityFlag/">DataQualityFlag</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="DecisionOutcome/">DecisionOutcome</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="DefinitionPredicate/">DefinitionPredicate</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="DerivationType/">DerivationType</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="Direction/">Direction</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="DiseaseAttributePredicate/">DiseaseAttributePredicate</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="DiseaseKind/">DiseaseKind</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="EntitySlot/">EntitySlot</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="InterpretationMethod/">InterpretationMethod</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="LineAction/">LineAction</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="LineValidity/">LineValidity</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="LogOddsBasis/">LogOddsBasis</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="MappingDirection/">MappingDirection</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="MappingPredicate/">MappingPredicate</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="MetaclassPredicate/">MetaclassPredicate</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="ProposingChannel/">ProposingChannel</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="ReadCoverage/">ReadCoverage</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="ResourceRole/">ResourceRole</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="ReviewDepth/">ReviewDepth</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="ReviewState/">ReviewState</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="StackingPolicy/">StackingPolicy</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="StepStatus/">StepStatus</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="SubclassPredicate/">SubclassPredicate</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="SubsetPredicate/">SubsetPredicate</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="SynonymPredicate/">SynonymPredicate</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="TermExistencePredicate/">TermExistencePredicate</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="TransformationCategory/">TransformationCategory</a></td>
+<td>MeDIC TransformationCategory (provisional)</td>
+</tr>
+<tr>
+<td><a href="TransformationMethod/">TransformationMethod</a></td>
+<td>MeDIC TransformationMethod (provisional)</td>
+</tr>
+<tr>
+<td><a href="ValueSetPredicate/">ValueSetPredicate</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="VerificationOutcome/">VerificationOutcome</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>

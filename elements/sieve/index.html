@@ -440,6 +440,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../requirements-traceability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -730,12 +758,24 @@
 
 
 <h1 id="sieve">sieve<a class="headerlink" href="#sieve" title="Permanent link">&para;</a></h1>
-<p>A model for evidence-based curation of semantic assertions
-(ontology axioms, knowledge graph triples, etc.).</p>
-<p>Core concept: An EvidencePacket bundles a statement with evidence
-supporting or disputing it, plus curation workflow status.</p>
-<p>Evidence model aligned with SEPIO (Scientific Evidence and Provenance
-Information Ontology).</p>
+<p>SIEVE is a profile of the SEPIO core information model (schema/sepio_core.yaml,
+imported unchanged). Every class here specialises a SEPIO core class. Every
+inherited slot keeps or narrows its core range. Nothing in the core is redefined.</p>
+<p>The profile is driven by the Mondo requirements collection
+(requirements/mondo_requirements.tsv). Each class, slot, enum and permissible value
+that realises a requirement carries it in <code>annotations.requirements</code>
+(space-separated requirement IDs) and, where a modelling decision lies behind it,
+in <code>annotations.decisions</code> (Mondo decision-log IDs). requirements/traceability.yaml
+assigns every requirement to a SEPIO design module and a disposition.
+tests/test_traceability.py keeps both sides consistent.</p>
+<p>Shape of the data: one EvidencePacket per claim. It holds one claim-type
+Statement (view B of D-041: identified, reified statement objects), the evidence
+items its lines refer to, and a version. Rules, policies, agents and information
+resources are shared reference data held in a SieveRegistry.</p>
+<p>Profile conventions: names follow the core's camelCase. Narrowed core slots are
+declared via slot_usage. Value sets for Coding-typed core slots are declared as
+<code>bindings</code> and enforced by sieve.profile_checks, because linkml-validate does not
+enforce bindings.</p>
 <p>URI: https://w3id.org/sieve</p>
 
 

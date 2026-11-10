@@ -440,6 +440,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../requirements-traceability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -731,7 +759,7 @@
 
 <h1 id="slot-performed_by">Slot: performed_by<a class="headerlink" href="#slot-performed_by" title="Permanent link">&para;</a></h1>
 <p><em>An Agent who participated in executing the Activity.</em></p>
-<p>URI: <a href="https://w3id.org/sieve/performed_by">sieve:performed_by</a>
+<p>URI: <a href="https://example.org/sepio-model/performedBy">sepio-model:performedBy</a>
 Alias: performed_by</p>
 <!-- no inheritance hierarchy -->
 
@@ -746,19 +774,54 @@ Alias: performed_by</p>
 </thead>
 <tbody>
 <tr>
+<td><a href="../Activity/">Activity</a></td>
+<td>An action or set of actions performed by an agent, that occurs over a period ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../AlignmentStep/">AlignmentStep</a></td>
+<td>One extraction, translation, grounding or normalisation step</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../InterpretationActivity/">InterpretationActivity</a></td>
+<td>The act of interpreting evidence as a line: who (human with perspective, or A...</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../Contribution/">Contribution</a></td>
 <td>An action or actions taken by a particular agent in the creation, modificatio...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../Activity/">Activity</a></td>
-<td>An action or set of actions performed by an agent, occurring over a period of...</td>
+<td><a href="../ResolutionChain/">ResolutionChain</a></td>
+<td>How a source mention or id was resolved to the target id: an ordered, contigu...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../CurationActivity/">CurationActivity</a></td>
-<td>Sieve extension of SEPIO Contribution</td>
+<td><a href="../LineStatusChange/">LineStatusChange</a></td>
+<td>A record that a line was invalidated, superseded, or accepted unchanged by a ...</td>
 <td>no</td>
+</tr>
+<tr>
+<td><a href="../AssertionDecision/">AssertionDecision</a></td>
+<td>The overall decision that puts a claim into Mondo (or keeps it out)</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../SieveContribution/">SieveContribution</a></td>
+<td>An agent's contribution to a claim, line or record, with the agent's role and...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../BatchSignOff/">BatchSignOff</a></td>
+<td>A one-off curator approval of a filtered result set, with banded review depth</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../OriginEvent/">OriginEvent</a></td>
+<td>The event by which a claim (or term) entered Mondo from an upstream item: whi...</td>
+<td>yes</td>
 </tr>
 </tbody>
 </table>
@@ -787,7 +850,7 @@ Alias: performed_by</p>
 <tbody>
 <tr>
 <td>self</td>
-<td>sieve:performed_by</td>
+<td>sepio-model:performedBy</td>
 </tr>
 <tr>
 <td>native</td>
@@ -802,13 +865,14 @@ Alias: performed_by</p>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Draft</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">performed_by</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Activity</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Activity</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Agent</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:performedBy</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">performed_by</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Activity</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Activity</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Agent</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 </details>
 

@@ -440,6 +440,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../requirements-traceability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -730,6 +758,7 @@
 
 
 <h1 id="slot-direction">Slot: direction<a class="headerlink" href="#slot-direction" title="Permanent link">&para;</a></h1>
+<p><em>A term indicating whether the Statement supports, disputes, or remains neutral w.r.t. the validity of the Proposition it evaluates.</em></p>
 <p>URI: <a href="https://w3id.org/sieve/direction">sieve:direction</a>
 Alias: direction</p>
 <!-- no inheritance hierarchy -->
@@ -745,18 +774,68 @@ Alias: direction</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../Statement/">Statement</a></td>
-<td>A claim of purported truth as made by a particular agent</td>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td>C010 (candidate): the term is a member of what an external record covers (e</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td>C008: the term is in a Mondo subset</td>
 <td>no</td>
 </tr>
 <tr>
 <td><a href="../SieveStatement/">SieveStatement</a></td>
-<td>Sieve extension of SEPIO Statement</td>
+<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td>C002: the term has this textual definition</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../EvidenceSynthesis/">EvidenceSynthesis</a></td>
-<td>Synthesis of evidence with reasoning and overall assessment</td>
+<td><a href="../SubclassStatement/">SubclassStatement</a></td>
+<td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../MappingStatement/">MappingStatement</a></td>
+<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
+<td>C009 (candidate): the kind of class this term is (grouping, disorder, subtype...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../Statement/">Statement</a></td>
+<td>A claim of purported truth as made by a particular agent, on a particular occ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../TextPassage/">TextPassage</a></td>
+<td>A verbatim passage extracted from a document as a prior claim</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -765,7 +844,15 @@ Alias: direction</p>
 <ul>
 <li>Range: <a href="../String/">String</a></li>
 </ul>
+<h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Statements put forth a Proposition that expresses some possible fact about the world, and may provide an assessment of this proposition's validity (i.e. how likely it is to be true or false based on evaluated evidence). The semantics of the Proposition are captured in the 'subject',  'predicate', 'object', and optional 'qualifier' attributes. An assessment of the Proposition's validity can be captured using 'direction', 'strength', and 'score' attributes. The 'direction'  attribute is used to indicate whether the Statement's Proposition is <em>supported</em> by the agent's assessment (when evidence favors its validity), is <em>disputed</em> by the agent's assessment (when evidence argues against its validity), or remains <em>neutral</em> (when conflicting or insufficient evidence exists to assert one direction or the other).  (Enumerated values = 'supports', 'disputes', 'neutral').</li>
+</ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information<a class="headerlink" href="#identifier-and-mapping-information" title="Permanent link">&para;</a></h2>
+<h3 id="schema-source">Schema Source<a class="headerlink" href="#schema-source" title="Permanent link">&para;</a></h3>
+<ul>
+<li>from schema: https://w3id.org/sieve</li>
+</ul>
 <h2 id="mappings">Mappings<a class="headerlink" href="#mappings" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -788,11 +875,30 @@ Alias: direction</p>
 <h2 id="linkml-source">LinkML Source<a class="headerlink" href="#linkml-source" title="Permanent link">&para;</a></h2>
 <details>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">direction</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">direction</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EvidenceSynthesis</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A term indicating whether the Statement supports, disputes, or remains</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">neutral w.r.t. the validity of the Proposition it evaluates.</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">comments</span><span class="p">:</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statements put forth a Proposition that expresses some possible fact about the world,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">and may provide an assessment of this proposition&#39;s validity (i.e. how likely it</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">is to be true or false based on evaluated evidence). The semantics of the Proposition</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">are captured in the &#39;subject&#39;,  &#39;predicate&#39;, &#39;object&#39;, and optional &#39;qualifier&#39;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">attributes. An assessment of the Proposition&#39;s validity can be captured using &#39;direction&#39;,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">&#39;strength&#39;, and &#39;score&#39; attributes. The &#39;direction&#39;  attribute is used to indicate</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">whether the Statement&#39;s Proposition is *supported* by the agent&#39;s assessment (when</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">evidence favors its validity), is *disputed* by the agent&#39;s assessment (when evidence</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">argues against its validity), or remains *neutral* (when conflicting or insufficient</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">evidence exists to assert one direction or the other).  (Enumerated values = &#39;supports&#39;,</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">&#39;disputes&#39;, &#39;neutral&#39;).</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Draft</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">direction</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
 </details>
 

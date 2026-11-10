@@ -440,6 +440,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../requirements-traceability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -730,6 +758,7 @@
 
 
 <h1 id="slot-date">Slot: date<a class="headerlink" href="#slot-date" title="Permanent link">&para;</a></h1>
+<p><em>The date that the Activity was completed.</em></p>
 <p>URI: <a href="https://w3id.org/sieve/date">sieve:date</a>
 Alias: date</p>
 <!-- no inheritance hierarchy -->
@@ -745,9 +774,19 @@ Alias: date</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../AgentContribution/">AgentContribution</a></td>
-<td>Evidence from any human or organizational contribution</td>
+<td><a href="../Activity/">Activity</a></td>
+<td>An action or set of actions performed by an agent, that occurs over a period ...</td>
 <td>no</td>
+</tr>
+<tr>
+<td><a href="../AlignmentStep/">AlignmentStep</a></td>
+<td>One extraction, translation, grounding or normalisation step</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../InterpretationActivity/">InterpretationActivity</a></td>
+<td>The act of interpreting evidence as a line: who (human with perspective, or A...</td>
+<td>yes</td>
 </tr>
 <tr>
 <td><a href="../Contribution/">Contribution</a></td>
@@ -755,20 +794,40 @@ Alias: date</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../Activity/">Activity</a></td>
-<td>An action or set of actions performed by an agent, occurring over a period of...</td>
+<td><a href="../ResolutionChain/">ResolutionChain</a></td>
+<td>How a source mention or id was resolved to the target id: an ordered, contigu...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../LineStatusChange/">LineStatusChange</a></td>
+<td>A record that a line was invalidated, superseded, or accepted unchanged by a ...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../AssertionDecision/">AssertionDecision</a></td>
+<td>The overall decision that puts a claim into Mondo (or keeps it out)</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../SieveContribution/">SieveContribution</a></td>
+<td>An agent's contribution to a claim, line or record, with the agent's role and...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../CurationActivity/">CurationActivity</a></td>
-<td>Sieve extension of SEPIO Contribution</td>
-<td>no</td>
+<td><a href="../BatchSignOff/">BatchSignOff</a></td>
+<td>A one-off curator approval of a filtered result set, with banded review depth</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../OriginEvent/">OriginEvent</a></td>
+<td>The event by which a claim (or term) entered Mondo from an upstream item: whi...</td>
+<td>yes</td>
 </tr>
 </tbody>
 </table>
 <h2 id="properties">Properties<a class="headerlink" href="#properties" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Range: <a href="../String/">String</a></li>
+<li>Range: <a href="./">date</a></li>
 </ul>
 <h2 id="usages">Usages<a class="headerlink" href="#usages" title="Permanent link">&para;</a></h2>
 <table>
@@ -782,20 +841,124 @@ Alias: date</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../EvidencePacket/">EvidencePacket</a></td>
-<td><a href="../created/">created</a></td>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td><a href="../scheduled_obsoletion_date/">scheduled_obsoletion_date</a></td>
 <td>range</td>
 <td><a href="./">date</a></td>
 </tr>
 <tr>
-<td><a href="../EvidencePacket/">EvidencePacket</a></td>
-<td><a href="../updated/">updated</a></td>
+<td><a href="../SieveEvidenceLine/">SieveEvidenceLine</a></td>
+<td><a href="../date_attached/">date_attached</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../SieveEvidenceLine/">SieveEvidenceLine</a></td>
+<td><a href="../last_confirmed/">last_confirmed</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../LineStatusChange/">LineStatusChange</a></td>
+<td><a href="./">date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../DecisionPolicy/">DecisionPolicy</a></td>
+<td><a href="../approval_date/">approval_date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../BatchSignOff/">BatchSignOff</a></td>
+<td><a href="./">date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../SieveContribution/">SieveContribution</a></td>
+<td><a href="./">date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../InterpretationActivity/">InterpretationActivity</a></td>
+<td><a href="./">date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../AssertionDecision/">AssertionDecision</a></td>
+<td><a href="./">date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../OriginEvent/">OriginEvent</a></td>
+<td><a href="./">date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../ResolutionChain/">ResolutionChain</a></td>
+<td><a href="./">date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../AlignmentStep/">AlignmentStep</a></td>
+<td><a href="../review_date/">review_date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../AlignmentStep/">AlignmentStep</a></td>
+<td><a href="./">date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../RetrievalMetadata/">RetrievalMetadata</a></td>
+<td><a href="../retrieval_date/">retrieval_date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../QualityRating/">QualityRating</a></td>
+<td><a href="../valid_from/">valid_from</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../LevelAssignment/">LevelAssignment</a></td>
+<td><a href="../valid_from/">valid_from</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../Activity/">Activity</a></td>
+<td><a href="./">date</a></td>
+<td>range</td>
+<td><a href="./">date</a></td>
+</tr>
+<tr>
+<td><a href="../Contribution/">Contribution</a></td>
+<td><a href="./">date</a></td>
 <td>range</td>
 <td><a href="./">date</a></td>
 </tr>
 </tbody>
 </table>
+<h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h2>
+<ul>
+<li>By convention, populate this attribute with the date the activity was completed (e.g.  in cases where the activity spans multiple days). The date SHOULD be formatted as a date string in ISO format "YYYY-MM-DD".</li>
+</ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information<a class="headerlink" href="#identifier-and-mapping-information" title="Permanent link">&para;</a></h2>
+<h3 id="schema-source">Schema Source<a class="headerlink" href="#schema-source" title="Permanent link">&para;</a></h3>
+<ul>
+<li>from schema: https://w3id.org/sieve</li>
+</ul>
 <h2 id="mappings">Mappings<a class="headerlink" href="#mappings" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -818,11 +981,21 @@ Alias: date</p>
 <h2 id="linkml-source">LinkML Source<a class="headerlink" href="#linkml-source" title="Permanent link">&para;</a></h2>
 <details>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">date</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">date</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AgentContribution</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Activity</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The date that the Activity was completed.</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">comments</span><span class="p">:</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">By convention, populate this attribute with the date the activity was completed</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">(e.g.  in cases where the activity spans multiple days). The date SHOULD be formatted</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">as a date string in ISO format &quot;YYYY-MM-DD&quot;.</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Draft</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">date</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Activity</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Activity</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">date</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
 </details>
 

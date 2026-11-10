@@ -233,83 +233,47 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#modules">
+<a class="md-nav__link" href="#schema-and-model-working">
 <span class="md-ellipsis">
       
-        Modules
+        Schema and model (working)
       
     </span>
 </a>
-<nav aria-label="Modules" class="md-nav">
+<nav aria-label="Schema and model (working)" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#datamodel-the-model">
+<a class="md-nav__link" href="#schema">
 <span class="md-ellipsis">
       
-        datamodel/ — the model
+        schema/
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#packet_ingestpy-yaml-in">
+<a class="md-nav__link" href="#datamodel">
 <span class="md-ellipsis">
       
-        packet_ingest.py — YAML in
+        datamodel/
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#storepy-the-duckdb-store">
+<a class="md-nav__link" href="#profile_checkspy">
 <span class="md-ellipsis">
       
-        store.py — the DuckDB store
+        profile_checks.py
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#scoringpy-net-evidence-ratio">
+<a class="md-nav__link" href="#traceabilitypy-and-requirements">
 <span class="md-ellipsis">
       
-        scoring.py — Net Evidence Ratio
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#clipy-typer-cli">
-<span class="md-ellipsis">
-      
-        cli.py — Typer CLI
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#apppy-streamlit-review-ui">
-<span class="md-ellipsis">
-      
-        app.py — Streamlit review UI
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#authpy-orcid-authentication">
-<span class="md-ellipsis">
-      
-        auth.py — ORCID authentication
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#packet_exportpy-rdf-and-yaml-out">
-<span class="md-ellipsis">
-      
-        packet_export.py — RDF and YAML out
+        traceability.py and requirements/
       
     </span>
 </a>
@@ -318,50 +282,10 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#data-flow">
+<a class="md-nav__link" href="#application-layer-pre-profile">
 <span class="md-ellipsis">
       
-        Data flow
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#storage-schema">
-<span class="md-ellipsis">
-      
-        Storage schema
-      
-    </span>
-</a>
-<nav aria-label="Storage schema" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#evidence_packets">
-<span class="md-ellipsis">
-      
-        evidence_packets
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#packet_decisions">
-<span class="md-ellipsis">
-      
-        packet_decisions
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#rdf-export">
-<span class="md-ellipsis">
-      
-        RDF export
+        Application layer (pre-profile)
       
     </span>
 </a>
@@ -384,6 +308,18 @@
     
   
     Schema Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../requirements-traceability/">
+<span class="md-ellipsis">
+    
+  
+    Requirements Traceability
   
 
     
@@ -513,288 +449,138 @@
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
 <h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">¶</a></h1>
-<p>SIEVE turns YAML <strong>evidence packets</strong> into curated, machine-readable axioms. This
-page describes how the running system is put together: the modules, how they
-talk to a DuckDB store, and how a packet flows from authoring to RDF export. For
-the packet shape itself, start with the <a href="../primer/">Primer</a>; for the
-field-by-field model, see the <a href="../data-model/">Data Model</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Application layer not yet migrated</p>
+<p>The schema, the generated model, the profile checks and the traceability tooling
+below work with the current profile. The application layer (<code>app.py</code>,
+<code>scoring.py</code>, <code>store.py</code>, <code>datamodel/loaders.py</code>, <code>packet_ingest.py</code>,
+<code>packet_export.py</code>, <code>cli.py</code> and the LinkML-Map transforms) still targets the
+pre-profile model and is broken: it imports classes that no longer exist. It is
+being migrated (<code>issues/issue_migrate_app_to_profile.md</code>). Its description is kept
+here as a record of what it does.</p>
+</div>
+<p>For the packet shape, start with the <a href="../primer/">Primer</a>; for every field, see the
+<a href="../data-model/">Data Model</a>.</p>
 <h2 id="the-pieces">The pieces<a class="headerlink" href="#the-pieces" title="Permanent link">¶</a></h2>
+<div class="mermaid">flowchart LR
+    CORE[schema/sepio_core.yaml<br/>SEPIO core, unchanged] --&gt; PROF[schema/sieve.yaml<br/>SIEVE profile]
+    REQ[requirements/<br/>mondo_requirements.tsv<br/>traceability.yaml] --&gt; TRACE[sieve.traceability]
+    PROF --&gt; TRACE
+    TRACE --&gt; MD[docs/requirements-traceability.md]
+    PROF --&gt; GEN[sieve.datamodel.codegen] --&gt; PYD[datamodel/sieve_models.py]
+    PROF --&gt; LV[linkml-validate]
+    PROF --&gt; PC[sieve.profile_checks]
+    PKT[packet YAML / JSON] --&gt; LV
+    PKT --&gt; PC
+    PYD -.-&gt; APP[application layer<br/>pre-profile, being migrated]
+</div>
+<h2 id="schema-and-model-working">Schema and model (working)<a class="headerlink" href="#schema-and-model-working" title="Permanent link">¶</a></h2>
+<h3 id="schema"><code>schema/</code><a class="headerlink" href="#schema" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong><code>sepio_core.yaml</code></strong>: a byte-identical copy of the SEPIO core from sepio-linkml
+  (commit <code>8c2c233</code>). <code>tests/test_profile_schema.py</code> pins its hash, so it cannot be
+  edited by accident.</li>
+<li><strong><code>sieve.yaml</code></strong>: the profile. It imports <code>linkml:types</code> and <code>sepio_core</code>, and every
+  class specialises a core class. Narrowed core slots are declared in <code>slot_usage</code>.
+  Predicate value sets are declared as <code>bindings</code>, and the claim-evidence matrix as a
+  <code>permitted_evidence</code> annotation on each claim type.</li>
+<li><strong><code>minimal.yaml</code></strong>: the separate minimal microschema (see
+  <a href="../monarch-evidence/">Minimal Evidence Model</a>). It is not imported by the profile.</li>
+</ul>
+<h3 id="datamodel"><code>datamodel/</code><a class="headerlink" href="#datamodel" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong><code>sieve_models.py</code></strong>: Pydantic v2 classes generated from <code>schema/sieve.yaml</code>.
+  Regenerate with <code>just gen-pydantic</code>; <code>tests/test_profile_schema.py</code> fails if the
+  checked-in file is stale.</li>
+<li><strong><code>codegen.py</code></strong>: wraps the LinkML Pydantic generator. The core's <code>Activity.date</code>
+  slot shadows the <code>date</code> type in generated code on Python 3.10, so the generator
+  output refers to the type through an alias instead of patching the core.</li>
+<li><strong><code>__init__.py</code></strong>: re-exports the packet, claim-type, item, line, provenance and
+  registry classes.</li>
+</ul>
+<p>The <code>type</code> slot is a type designator throughout, so
+<code>EvidencePacket.model_validate(data)</code> instantiates the concrete claim type and item
+classes without a custom loader.</p>
+<h3 id="profile_checkspy"><code>profile_checks.py</code><a class="headerlink" href="#profile_checkspy" title="Permanent link">¶</a></h3>
+<p><code>check_packet(packet)</code> runs the checks LinkML validation cannot express: predicate
+bindings, the claim-evidence matrix, dangling item references, read coverage and
+methods on AI and rule-based lines, resolution-chain contiguity, supersession, blind
+approvals, and WARNING states. It works on the packet as a plain dict, and every
+<code>Issue</code> names the requirement it enforces.</p>
+<h3 id="traceabilitypy-and-requirements"><code>traceability.py</code> and <code>requirements/</code><a class="headerlink" href="#traceabilitypy-and-requirements" title="Permanent link">¶</a></h3>
+<ul>
+<li><code>requirements/mondo_requirements.tsv</code>: the requirement rows, extracted from the
+  Mondo requirements workbook by <code>scripts/extract_requirements.py</code>
+  (<code>just extract-requirements</code>).</li>
+<li><code>requirements/traceability.yaml</code>: per requirement, its SEPIO design module,
+  disposition (<code>modelled</code>, <code>negative_constraint</code>, <code>not_desired</code>, <code>out_of_scope</code>),
+  decisions and rationale.</li>
+<li><code>sieve.traceability</code> joins those with the <code>annotations.requirements</code> on schema
+  elements and renders <code>docs/requirements-traceability.md</code>
+  (<code>scripts/render_traceability.py</code>, <code>just gen-traceability</code>).</li>
+<li><code>tests/test_traceability.py</code> keeps the three consistent, including that the rendered
+  page is current.</li>
+</ul>
+<h2 id="application-layer-pre-profile">Application layer (pre-profile)<a class="headerlink" href="#application-layer-pre-profile" title="Permanent link">¶</a></h2>
 <div class="mermaid">flowchart LR
     Y[YAML packets<br/>inbox/] --&gt; ING[packet_ingest<br/>validate + load]
     ING --&gt; DB[(DuckDB<br/>PacketStore)]
     DB --&gt; UI[app.py<br/>Streamlit review]
     UI --&gt;|rate items,<br/>record decisions| DB
     DB --&gt; EXP[packet_export<br/>RDF / YAML]
-    EXP --&gt; OUT[accepted.ttl<br/>owl:Axiom annotations]
-    CLI[cli.py<br/>Typer] -.-&gt; ING
+    CLI[cli.py] -.-&gt; ING
     CLI -.-&gt; EXP
     AUTH[auth.py<br/>ORCID] -.-&gt; UI
     SCORE[scoring.py<br/>NER] -.-&gt; DB
-    SCORE -.-&gt; UI
-    LOAD[datamodel/loaders<br/>polymorphic load] -.-&gt; ING
-    LOAD -.-&gt; DB
 </div>
-<p>Everything is built on the generated Pydantic model in
-<code>datamodel/sieve_models.py</code>. Ingest, storage, the UI and export all pass the
-same <code>EvidencePacket</code> objects around.</p>
-<h2 id="modules">Modules<a class="headerlink" href="#modules" title="Permanent link">¶</a></h2>
-<h3 id="datamodel-the-model"><code>datamodel/</code> — the model<a class="headerlink" href="#datamodel-the-model" title="Permanent link">¶</a></h3>
 <ul>
-<li><strong><code>sieve_models.py</code></strong> — Pydantic classes generated from <code>schema/sieve.yaml</code>
-  (<code>EvidencePacket</code>, <code>SieveStatement</code>, <code>SieveEvidenceLine</code>, the evidence-item
-  subclasses <code>ConcordanceItem</code> / <code>SieveDocument</code> / <code>SieveDataItem</code> /
-  <code>SieveStudyResult</code> / <code>ComputationalResult</code> / <code>AgentContribution</code>,
-  <code>CurationDecision</code>, <code>DecisionType</code>, and supporting types). Re-exported from
-  <code>datamodel/__init__.py</code>.</li>
-<li><strong><code>loaders.py</code></strong> — polymorphic loading. Evidence items are a union of
-  <code>InformationEntity</code> subclasses, and validating them through the base class
-  drops subclass-specific fields. <code>load_packet(path)</code> / <code>packet_from_dict(data)</code>
-  dispatch each item to its concrete class via the <code>type:</code> discriminator
-  (<code>EVIDENCE_ITEM_TYPES</code>, which also aliases the bare <code>Document</code> / <code>DataItem</code> /
-  <code>StudyResult</code> names) before validating the whole packet.</li>
+<li><strong><code>datamodel/loaders.py</code></strong>: <code>load_packet(path)</code> / <code>packet_from_dict(data)</code> dispatched
+  inlined evidence items to concrete classes by <code>type:</code> (<code>EVIDENCE_ITEM_TYPES</code>). The
+  profile's type designators make this unnecessary; the module currently fails at
+  import.</li>
+<li><strong><code>packet_ingest.py</code></strong>: <code>validate_packet_dict(data)</code>, <code>ingest_packet_file(path,
+  store)</code>, <code>ingest_packet_directory(path, store)</code>.</li>
+<li><strong><code>store.py</code></strong>: <code>PacketStore</code>, a DuckDB store (default <code>data/sieve.duckdb</code>) holding
+  each packet as JSON plus promoted columns (<code>evidence_packets</code>) and a decision log
+  (<code>packet_decisions</code>). Methods: <code>insert_packet</code>, <code>get_packet</code>, <code>list_packets</code>,
+  <code>get_stats</code>, <code>update_status</code>, <code>set_item_rating</code>, <code>record_decision</code>,
+  <code>get_decisions</code>.</li>
+<li><strong><code>scoring.py</code></strong>: <code>net_evidence_ratio(packet)</code>, (S+ - S-) / (S+ + S- + S0) over line
+  weights. To be replaced by the inclusion score S computed from the claim type's
+  <code>AggregationRule</code>.</li>
+<li><strong><code>cli.py</code></strong>: Typer CLI with <code>run</code>, <code>ingest</code>, <code>validate</code>, <code>export</code> (see
+  <a href="../cli/">CLI Reference</a>).</li>
+<li><strong><code>app.py</code></strong>: Streamlit app with Dashboard, Review Queue (per-item accept / reject,
+  packet decisions), Ingest and Export views.</li>
+<li><strong><code>auth.py</code></strong>: ORCID OAuth with a <code>curators.yaml</code> allow-list; <code>SIEVE_DEV_MODE=true</code>
+  bypasses login. It does not depend on the data model.</li>
+<li><strong><code>packet_export.py</code></strong>: <code>packet_to_yaml</code>, <code>export_packets_to_yaml</code>,
+  <code>packet_to_rdf</code>, <code>export_packets_to_rdf</code>. RDF export wrote an <code>owl:Axiom</code> reifying
+  the statement, linked to the packet by <code>SEPIO:0000124</code>, with <code>oboInOwl:source</code>
+  annotations for accepted packets and <code>IAO:0000233</code> for rejected and controversial
+  ones.</li>
+<li><strong><code>transform/</code></strong>: LinkML-Map specs for DisMech → minimal → SIEVE. The second hop
+  emits the pre-profile shape (see <a href="../monarch-evidence/">Minimal Evidence Model</a>).</li>
 </ul>
-<h3 id="packet_ingestpy-yaml-in"><code>packet_ingest.py</code> — YAML in<a class="headerlink" href="#packet_ingestpy-yaml-in" title="Permanent link">¶</a></h3>
-<ul>
-<li><code>validate_packet_dict(data)</code> validates a packet dict against the merged LinkML
-  schema (<code>schema/sieve.yaml</code> with imports resolved) and returns the list of
-  validation results (empty means valid).</li>
-<li><code>ingest_packet_file(path, store)</code> loads one YAML packet (via <code>load_packet</code>)
-  and inserts it.</li>
-<li><code>ingest_packet_directory(path, store)</code> walks <code>**/*.yaml</code> / <code>**/*.yml</code>,
-  ingesting each and returning per-file stats (<code>files</code>, <code>success</code>, <code>errors</code>,
-  <code>error_details</code>).</li>
-</ul>
-<h3 id="storepy-the-duckdb-store"><code>store.py</code> — the DuckDB store<a class="headerlink" href="#storepy-the-duckdb-store" title="Permanent link">¶</a></h3>
-<p><code>PacketStore</code> wraps a DuckDB connection (default <code>data/sieve.duckdb</code>,
-<code>:memory:</code> for tests) and owns the schema. It stores the full packet as JSON
-plus a handful of promoted columns for querying:</p>
-<ul>
-<li><code>insert_packet(packet)</code> — upsert; recomputes <code>evidence_score</code> (NER) and the
-  steward, and serializes the packet with <code>serialize_as_any=True</code> so polymorphic
-  items keep their subclass fields.</li>
-<li><code>get_packet(id)</code> — reload an <code>EvidencePacket</code> from stored JSON (through the
-  polymorphic loader).</li>
-<li><code>list_packets(status=None)</code> — promoted columns for the queue/dashboard.</li>
-<li><code>get_stats()</code> — packet counts grouped by status.</li>
-<li><code>update_status(id, status)</code> — set status on the packet and re-store.</li>
-<li><code>set_item_rating(id, item_id, rating)</code> — set a single evidence item's steward
-  rating (<code>ACCEPTED</code> / <code>REJECTED</code>) by item id.</li>
-<li><code>record_decision(decision)</code> / <code>get_decisions(id)</code> — append a
-  <code>CurationDecision</code> and read the history (newest first).</li>
-</ul>
-<h3 id="scoringpy-net-evidence-ratio"><code>scoring.py</code> — Net Evidence Ratio<a class="headerlink" href="#scoringpy-net-evidence-ratio" title="Permanent link">¶</a></h3>
-<p><code>net_evidence_ratio(packet)</code> collapses the evidence lines into one number in
-<code>[-1, +1]</code>. Each line contributes a weight — its explicit
-<code>score_of_evidence_provided</code>, else a value mapped from
-<code>strength_of_evidence_provided</code> (<code>strong</code>=1.0, <code>moderate</code>=0.6, <code>weak</code>=0.3), else
-1.0 (<code>line_score</code>). Lines are bucketed by <code>direction_of_evidence_provided</code>:</p>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>        S+ (supports)  −  S− (disputes)
-<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>NER = ─────────────────────────────────────
-<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a>        S+  +  S−  +  S0 (neutral / other)
-</code></pre></div>
-<p>(0.0 when there are no lines.) The store persists this as <code>evidence_score</code>; the
-UI shows it live.</p>
-<h3 id="clipy-typer-cli"><code>cli.py</code> — Typer CLI<a class="headerlink" href="#clipy-typer-cli" title="Permanent link">¶</a></h3>
-<p>Four commands:</p>
-<ul>
-<li><code>sieve run</code> — launch the Streamlit app (<code>streamlit run src/sieve/app.py</code>).</li>
-<li><code>sieve ingest -I &lt;dir&gt; [--db &lt;path&gt;]</code> — ingest a directory into the store.</li>
-<li><code>sieve validate (-i &lt;file&gt; | -I &lt;dir&gt;)</code> — validate against the schema; exits
-  non-zero on any errors.</li>
-<li><code>sieve export (-i &lt;file&gt; | -I &lt;dir&gt;) [-o &lt;out&gt;] [-O &lt;format&gt;]</code> — export loaded
-  packets. <code>-O</code> accepts RDF flavours (<code>rdf</code>/<code>turtle</code>/<code>ttl</code>, <code>xml</code>, <code>n3</code>, <code>nt</code>)
-  or <code>yaml</code>.</li>
-</ul>
-<h3 id="apppy-streamlit-review-ui"><code>app.py</code> — Streamlit review UI<a class="headerlink" href="#apppy-streamlit-review-ui" title="Permanent link">¶</a></h3>
-<p>A single-page app with a sidebar (live stats, ORCID login) and four views:</p>
-<ul>
-<li><strong>Dashboard</strong> — packet counts by status.</li>
-<li><strong>Review Queue</strong> — pick a status, open a packet, and see its statement,
-  evidence lines/items, and NER. Authorized curators get per-item <strong>Accept
-  item</strong> / <strong>Reject item</strong> buttons (<code>set_item_rating</code>) and an
-  <strong>Accept / Reject / Controversial</strong> decision panel that writes a
-  <code>CurationDecision</code> (<code>record_decision</code>) and updates the packet status
-  (<code>update_status</code>).</li>
-<li><strong>Ingest</strong> — ingest a directory through the UI.</li>
-<li><strong>Export</strong> — serialize the <code>ACCEPTED</code> packets to Turtle.</li>
-</ul>
-<h3 id="authpy-orcid-authentication"><code>auth.py</code> — ORCID authentication<a class="headerlink" href="#authpy-orcid-authentication" title="Permanent link">¶</a></h3>
-<p>ORCID OAuth 2.0 (sandbox or production, selected by config) with an authorized-
-curator allowlist read from <code>curators.yaml</code> (roles <code>admin</code> / <code>curator</code>).
-<code>is_authorized_curator</code> / <code>get_curator_info</code> gate the write controls in the UI;
-<code>SIEVE_DEV_MODE=true</code> bypasses login and records decisions as a placeholder
-curator. Secrets come from Streamlit secrets or the environment.</p>
-<h3 id="packet_exportpy-rdf-and-yaml-out"><code>packet_export.py</code> — RDF and YAML out<a class="headerlink" href="#packet_exportpy-rdf-and-yaml-out" title="Permanent link">¶</a></h3>
-<ul>
-<li><code>export_packets_to_yaml(packets, path)</code> / <code>packet_to_yaml(packet)</code> — round-trip
-  YAML (again with <code>serialize_as_any=True</code>).</li>
-<li><code>packet_to_rdf(packet, graph=None)</code> / <code>export_packets_to_rdf(packets, path,
-  format)</code> — emit OWL axiom annotations (see below).</li>
-</ul>
-<h2 id="data-flow">Data flow<a class="headerlink" href="#data-flow" title="Permanent link">¶</a></h2>
-<p><strong>Ingest.</strong> <code>sieve ingest</code> (or the UI) walks a directory, loads each YAML file
-into an <code>EvidencePacket</code> through the polymorphic loader, and calls
-<code>store.insert_packet</code>, which computes the NER and writes JSON + promoted columns
-to DuckDB.</p>
-<p><strong>Review.</strong> The Streamlit app reads packets from the store, shows statement,
-evidence and NER, and lets an authorized curator rate individual items and
-record a decision. Ratings and decisions are written straight back to the store,
-and the packet's status moves <code>UNREVIEWED → ACCEPTED / REJECTED / CONTROVERSIAL</code>.</p>
-<p><strong>Export.</strong> <code>sieve export</code> loads packets (from files) and serializes them to RDF
-or YAML. The UI export view pulls the <code>ACCEPTED</code> packets from the store and
-serializes them to Turtle.</p>
-<h2 id="storage-schema">Storage schema<a class="headerlink" href="#storage-schema" title="Permanent link">¶</a></h2>
-<p>Two tables, created on connect by <code>PacketStore._init_schema</code>.</p>
-<h3 id="evidence_packets"><code>evidence_packets</code><a class="headerlink" href="#evidence_packets" title="Permanent link">¶</a></h3>
-<table>
-<thead>
-<tr>
-<th>Column</th>
-<th>Type</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>id</code></td>
-<td>VARCHAR (PK)</td>
-<td>Packet id</td>
-</tr>
-<tr>
-<td><code>subject_id</code></td>
-<td>VARCHAR</td>
-<td>Statement subject CURIE</td>
-</tr>
-<tr>
-<td><code>predicate</code></td>
-<td>VARCHAR</td>
-<td>Statement predicate <code>code</code></td>
-</tr>
-<tr>
-<td><code>object_id</code></td>
-<td>VARCHAR</td>
-<td>Statement object CURIE</td>
-</tr>
-<tr>
-<td><code>status</code></td>
-<td>VARCHAR</td>
-<td><code>UNREVIEWED</code> / <code>ACCEPTED</code> / <code>REJECTED</code> / <code>CONTROVERSIAL</code></td>
-</tr>
-<tr>
-<td><code>evidence_score</code></td>
-<td>DOUBLE</td>
-<td>NER, recomputed on every insert</td>
-</tr>
-<tr>
-<td><code>evidence_steward</code></td>
-<td>VARCHAR</td>
-<td>Steward id from <code>curated_by.contributor</code></td>
-</tr>
-<tr>
-<td><code>created</code></td>
-<td>VARCHAR</td>
-<td></td>
-</tr>
-<tr>
-<td><code>updated</code></td>
-<td>VARCHAR</td>
-<td></td>
-</tr>
-<tr>
-<td><code>packet_json</code></td>
-<td>JSON</td>
-<td>Full serialized packet (source of truth for reload)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="packet_decisions"><code>packet_decisions</code><a class="headerlink" href="#packet_decisions" title="Permanent link">¶</a></h3>
-<table>
-<thead>
-<tr>
-<th>Column</th>
-<th>Type</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>id</code></td>
-<td>VARCHAR (PK)</td>
-<td>Decision id</td>
-</tr>
-<tr>
-<td><code>packet_id</code></td>
-<td>VARCHAR</td>
-<td>The packet decided on</td>
-</tr>
-<tr>
-<td><code>curator</code></td>
-<td>VARCHAR</td>
-<td>Curator ORCID</td>
-</tr>
-<tr>
-<td><code>curator_name</code></td>
-<td>VARCHAR</td>
-<td></td>
-</tr>
-<tr>
-<td><code>decision</code></td>
-<td>VARCHAR</td>
-<td><code>ACCEPT</code> / <code>REJECT</code> / <code>CONTROVERSIAL</code></td>
-</tr>
-<tr>
-<td><code>rationale</code></td>
-<td>VARCHAR</td>
-<td>Optional</td>
-</tr>
-<tr>
-<td><code>certainty</code></td>
-<td>DOUBLE</td>
-<td>Optional confidence</td>
-</tr>
-<tr>
-<td><code>decided_at</code></td>
-<td>VARCHAR</td>
-<td>Timestamp</td>
-</tr>
-</tbody>
-</table>
-<p>The full packet lives in <code>packet_json</code>; the other columns are promoted copies
-for filtering and listing, refreshed whenever the packet is re-inserted.</p>
-<h2 id="rdf-export">RDF export<a class="headerlink" href="#rdf-export" title="Permanent link">¶</a></h2>
-<p><code>packet_to_rdf</code> emits an <code>owl:Axiom</code> reifying the statement, annotated with the
-evidence. Only reviewed packets produce triples — a packet whose status is not
-one of <code>ACCEPTED</code> / <code>REJECTED</code> / <code>CONTROVERSIAL</code> is skipped with a warning.
-CURIEs are expanded to full URIs via the OBO converter (<code>curies</code>), with special
-handling for <code>orcid:</code>, <code>rdfs:</code>, <code>owl:</code> and already-expanded URLs.</p>
-<div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="p">[]</span> <span class="kt">a</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">Axiom</span> <span class="p">;</span>
-<a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a>   <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedSource</span>   <span class="nv">&lt;subject&gt;</span> <span class="p">;</span>
-<a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a>   <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedProperty</span> <span class="nv">&lt;predicate&gt;</span> <span class="p">;</span>      <span class="c"># defaults to rdfs:subClassOf</span>
-<a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a>   <span class="nn">owl</span><span class="p">:</span><span class="nt">annotatedTarget</span>   <span class="nv">&lt;object&gt;</span> <span class="p">;</span>
-<a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a>   <span class="nn">SEPIO</span><span class="p">:</span><span class="nt">0000124</span>         <span class="nv">&lt;packet_uri&gt;</span> <span class="p">.</span>      <span class="c"># "has evidence"</span>
-</code></pre></div>
-<p>Status then adds provenance:</p>
-<ul>
-<li><strong>ACCEPTED</strong> — <code>oboInOwl:source</code> with the steward ORCID, plus one
-  <code>oboInOwl:source</code> per accepted item source. Those sources come from
-  <strong>ACCEPTED-rated items on supporting lines only</strong> (<code>_accepted_item_sources</code>):
-  their <code>pmid</code> / <code>doi</code> / <code>source_id</code> / <code>source_subject</code>, and any contributor id.</li>
-<li><strong>REJECTED</strong> — <code>IAO:0000233</code> (term-tracker item) pointing at the packet, plus
-  the steward <code>oboInOwl:source</code>.</li>
-<li><strong>CONTROVERSIAL</strong> — an <code>rdfs:comment</code> flagging the controversy, <code>IAO:0000233</code>,
-  and the steward <code>oboInOwl:source</code>.</li>
-</ul>
+<p>The migration maps the old flow onto the profile: packet <code>status</code> becomes
+<code>review_state</code> plus <code>assertion_decisions</code>, <code>CurationDecision</code> becomes
+<code>AssertionDecision</code>, per-item ratings become <code>LineStatusChange</code>s, and the Net Evidence
+Ratio becomes the inclusion score.</p>
 <h2 id="design-notes">Design notes<a class="headerlink" href="#design-notes" title="Permanent link">¶</a></h2>
 <ul>
-<li><strong>DuckDB</strong> — embedded, single-file, no server; native JSON so the whole packet
-  can live in one column with promoted columns for queries.</li>
-<li><strong>Full-JSON storage</strong> — <code>packet_json</code> is the source of truth; the flat columns
-  are derived and rebuilt on every insert, so the model schema can evolve without
-  a migration.</li>
-<li><strong>LinkML + generated Pydantic</strong> — the schema (<code>schema/sieve.yaml</code>) drives both
-  validation and the runtime model, keeping the two in step.</li>
-<li><strong>YAML packets</strong> — human-readable, diff-friendly, and easy to keep under
-  version control alongside ontology work.</li>
+<li><strong>Canonical core, unchanged.</strong> The profile narrows the core and never redefines it,
+  so a SIEVE packet is SEPIO data and core updates can be taken by replacing one file.</li>
+<li><strong>Traceability next to the model.</strong> Requirement IDs sit on the schema elements that
+  realise them, so the mapping cannot drift from the model; tests enforce both
+  directions.</li>
+<li><strong>Two validation layers.</strong> JSON Schema (via linkml-validate) for structure and class
+  rules; <code>profile_checks</code> for anything that reads inside a Coding or across
+  references.</li>
+<li><strong>One packet per claim, versioned.</strong> Decisions name the packet version they were
+  given on, so a change in evidence re-queues the claim instead of silently inheriting
+  an old sign-off.</li>
+<li><strong>YAML packets</strong>: human-readable, diff-friendly, and easy to keep under version
+  control next to ontology work.</li>
 </ul>
 </article>
 </div>

@@ -442,6 +442,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../requirements-traceability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -754,10 +782,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#choosing-an-item-type" class="md-nav__link">
+  <a href="#what-the-profile-asks-of-ai-evidence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Choosing an item type:
+        What the profile asks of AI evidence
       
     </span>
   </a>
@@ -765,10 +793,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#direction-strength-score" class="md-nav__link">
+  <a href="#an-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Direction, strength, score
+        An example
       
     </span>
   </a>
@@ -776,10 +804,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-minimal-valid-packet" class="md-nav__link">
+  <a href="#what-happens-to-your-lines" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A minimal valid packet
+        What happens to your lines
       
     </span>
   </a>
@@ -845,136 +873,209 @@
 
 
 <h1 id="authoring-packets-as-an-ai-agent">Authoring Packets as an AI Agent<a class="headerlink" href="#authoring-packets-as-an-ai-agent" title="Permanent link">&para;</a></h1>
-<p>This page is for AI agents (LLMs, autonomous pipelines) that <strong>produce evidence
-packets</strong> for SIEVE. It covers only the AI-specific parts: how to author a valid
-packet and how to exercise judgment honestly.</p>
-<p>It deliberately does <strong>not</strong> re-teach the data model. Read these first:</p>
+<p>This page is for AI agents (LLMs, autonomous pipelines) that <strong>produce evidence</strong> for
+SIEVE. It covers only the AI-specific parts: what an agent records, and which checks
+it must report honestly.</p>
+<p>It does not re-teach the data model. Read these first:</p>
 <ul>
-<li><a href="../primer/">SIEVE in Plain Terms</a> — the concepts (statement, evidence lines,
-  items, verdict).</li>
-<li><a href="../data-model/">Data Model</a> — the authoritative, field-by-field reference.</li>
+<li><a href="../primer/">SIEVE in Plain Terms</a>: claims, items, lines, decisions.</li>
+<li><a href="../data-model/">Data Model</a>: every class and field.</li>
 </ul>
 <h2 id="what-you-produce">What you produce<a class="headerlink" href="#what-you-produce" title="Permanent link">&para;</a></h2>
-<p>An AI agent's output is a single <strong>valid <code>EvidencePacket</code> YAML</strong> in the current
-SEPIO/SIEVE shape: one <code>statement</code>, a list of <code>has_evidence_lines</code>, and each line
-a list of <code>has_evidence_items</code>. Every item carries a <code>type:</code> discriminator that
-says which kind of evidence it is. Leave <code>status: UNREVIEWED</code> — a human makes the
-final decision.</p>
-<p>See <a href="../data-model/">Data Model</a> for every field; this page assumes you already
-know the shape.</p>
-<h2 id="choosing-an-item-type">Choosing an item <code>type:</code><a class="headerlink" href="#choosing-an-item-type" title="Permanent link">&para;</a></h2>
-<p>Every evidence item <strong>must</strong> have a <code>type:</code>. Pick from these six:</p>
+<p>An agent's output is one <code>EvidencePacket</code> per claim, in the profile shape (camelCase,
+<code>id</code> and <code>type</code> on every entity). An agent typically contributes three things:</p>
+<ul>
+<li><strong>evidence items it created</strong>: a <code>TextPassage</code> with the verbatim quote it
+  extracted, plus the <code>Publication</code> / <code>WebPage</code> / <code>GuidelineDocument</code> it came from;</li>
+<li><strong>evidence lines</strong>: its interpretation of those items, each with an
+  <code>InterpretationActivity</code> of <code>method_type: LLM_JUDGEMENT</code>;</li>
+<li><strong>groundings</strong>: <code>ResolutionChain</code>s recording how mentions in the passage were
+  resolved to Mondo, HGNC or other ids, step by step.</li>
+</ul>
+<p>An agent does <strong>not</strong> write <code>assertion_decisions</code> and does not set the inclusion score.
+Decisions are made by a person, or by a policy runner acting under a human-approved
+<code>DecisionPolicy</code>. Leave <code>review_state: NOT_VERIFIED</code>, and set
+<code>proposing_channel: AI_AGENT</code> when the agent proposed the claim.</p>
+<h2 id="what-the-profile-asks-of-ai-evidence">What the profile asks of AI evidence<a class="headerlink" href="#what-the-profile-asks-of-ai-evidence" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th><code>type:</code></th>
-<th>Use when the evidence is…</th>
+<th>Where</th>
+<th>Field</th>
+<th>What to record</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>SieveDocument</code></td>
-<td>a publication, guideline, or textbook you can quote (<code>pmid</code>, <code>title</code>, <code>quote</code>, <code>quote_location</code>).</td>
+<td><code>TextPassage</code></td>
+<td><code>statement_text</code></td>
+<td>The quote, verbatim.</td>
 </tr>
 <tr>
-<td><code>ConcordanceItem</code></td>
-<td>another ontology, terminology, or database that already makes the aligned assertion.</td>
+<td></td>
+<td><code>reported_in</code>, <code>document_version</code>, <code>text_location</code></td>
+<td>Which document and version, and where (section, character offsets).</td>
 </tr>
 <tr>
-<td><code>AgentContribution</code></td>
-<td>a person or organization who weighed in (expert review, curator note, community suggestion).</td>
+<td></td>
+<td><code>quote_verification</code></td>
+<td><code>VERIFIED</code> only if a machine check found the quote in the source; otherwise <code>NOT_CHECKED</code> or <code>FAILED</code>.</td>
 </tr>
 <tr>
-<td><code>ComputationalResult</code></td>
-<td>the output of a method or algorithm — including your own analysis (<code>method_name</code>, <code>value</code>, <code>parameters</code>).</td>
+<td></td>
+<td><code>contributions</code></td>
+<td>The extraction act: <code>contributor</code>, <code>role: EXTRACTOR</code>, <code>date</code>, <code>specified_by</code> (prompt or workflow version), <code>run_id</code>. Required.</td>
 </tr>
 <tr>
-<td><code>SieveDataItem</code></td>
-<td>a raw data record that stands as evidence on its own.</td>
+<td><code>InterpretationActivity</code></td>
+<td><code>method_type</code></td>
+<td><code>LLM_JUDGEMENT</code>.</td>
 </tr>
 <tr>
-<td><code>SieveStudyResult</code></td>
-<td>a reported result from a study or experiment.</td>
+<td></td>
+<td><code>specified_by</code></td>
+<td>The prompt or workflow version. Required for AI lines.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>read_coverage</code>, <code>access_status</code></td>
+<td>How much of the document was read (<code>TITLE_ONLY</code>, <code>ABSTRACT_ONLY</code>, <code>SECTIONS</code>, <code>FULL_TEXT</code>) and whether it was open. Required on document-based lines.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>identifier_verified</code>, <code>grounding_checked</code></td>
+<td>Whether the cited id resolves and is about the topic, and whether the entities map to the claim's actual terms.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>sought_disputing_evidence</code></td>
+<td>Whether the search looked for evidence against the claim.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>reasoning_trace</code></td>
+<td>A link to the trace. The trace itself is not stored.</td>
+</tr>
+<tr>
+<td><code>SieveEvidenceLine</code></td>
+<td><code>confidence</code>, <code>confidence_basis</code></td>
+<td>The probability the evidence was read and linked correctly, and its basis (usually <code>PRIOR</code> for a pinned model version, <code>MEASURED</code> if a scorer evaluated this input). A confidence without a basis fails validation.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>data_quality_flags</code></td>
+<td>Flag known failures (<code>QUOTE_NOT_FOUND</code>, <code>IDENTIFIER_UNRESOLVED</code>, <code>MISGROUNDED</code>, <code>SUSPECTED_HALLUCINATION</code>).</td>
+</tr>
+<tr>
+<td><code>SieveAgent</code> (registry)</td>
+<td><code>software_version</code>, <code>model_name</code>, <code>trust_levels</code></td>
+<td>The agent's version and model. Trust is maintained by the registry, from the agent's record of accepted and invalidated lines.</td>
 </tr>
 </tbody>
 </table>
-<p>When your own analysis <em>is</em> the evidence, use <code>ComputationalResult</code> and name the
-method honestly — do not dress an LLM summary up as a <code>SieveDocument</code>.</p>
-<h2 id="direction-strength-score">Direction, strength, score<a class="headerlink" href="#direction-strength-score" title="Permanent link">&para;</a></h2>
-<p>Each <strong>evidence line</strong> declares which way it points and how strongly. Set these
-on the line, not the item:</p>
-<ul>
-<li><code>direction_of_evidence_provided</code>: <code>supports</code> | <code>disputes</code> | <code>neutral</code>
-  (lowercase). Add a line with <code>disputes</code> when evidence points against the
-  statement — do not silently drop it.</li>
-<li><code>strength_of_evidence_provided</code>: <code>strong</code> | <code>moderate</code> | <code>weak</code> — your
-  qualitative read of the argument.</li>
-<li><code>score_of_evidence_provided</code>: a number in <code>0–1</code> used for scoring. Be
-  conservative; reserve values near <code>1.0</code> for direct, unambiguous evidence.</li>
-</ul>
-<p>Set these to reflect the <em>evidence</em>, not your eagerness for a particular verdict.
-An item may also carry an optional curator <code>rating</code> and an <code>eco_code</code>.</p>
-<h2 id="a-minimal-valid-packet">A minimal valid packet<a class="headerlink" href="#a-minimal-valid-packet" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:pkt_asthma_0001</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">UNREVIEWED</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">statement</span><span class="p">:</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stmt_asthma_0001</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveStatement</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">subject</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0004979</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nt">subject_label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asthma</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nt">predicate</span><span class="p">:</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rdfs:subClassOf</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">subClassOf</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="nt">object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0005275</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nt">object_label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">respiratory system disorder</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="nt">statement_text</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asthma subClassOf respiratory system disorder</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nt">has_evidence_lines</span><span class="p">:</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">line_0001</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveEvidenceLine</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supports</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="nt">strength_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">strong</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="nt">score_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="nt">has_evidence_items</span><span class="p">:</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ev_concordance_0001</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConcordanceItem</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">        </span><span class="nt">source_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Disease Ontology</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">        </span><span class="nt">source_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DOID:2841</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">        </span><span class="nt">rating</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ACCEPTED</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">        </span><span class="nt">eco_code</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ECO:0000269</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ev_document_0001</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveDocument</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">        </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Example study</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">        </span><span class="nt">pmid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;12345678&quot;</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">        </span><span class="nt">quote</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asthma is a chronic respiratory disease</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="w">        </span><span class="nt">rating</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ACCEPTED</span>
+<p>Confidence is data quality, not evidence strength. Put your read of how strongly the
+evidence bears on the claim in <code>score_of_evidence_provided</code>, and your read of whether you
+extracted and grounded it correctly in <code>confidence</code>.</p>
+<h2 id="an-example">An example<a class="headerlink" href="#an-example" title="Permanent link">&para;</a></h2>
+<p>Adapted from <code>tests/data/profile/valid/c007_cf_cftr_panel.yaml</code> (the passage text is
+illustrative):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:pkt/MONDO_0009061-gene-HGNC_1884</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EvidencePacket</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2026-10-10&quot;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">statement</span><span class="p">:</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:st/MONDO_0009061-gene-HGNC_1884</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DiseaseAttributeStatement</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nt">subject</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MONDO:0009061</span><span class="w">              </span><span class="c1"># cystic fibrosis</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nt">predicate</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="nv">RO</span><span class="p p-Indicator">:</span><span class="nv">0004003</span><span class="p p-Indicator">,</span><span class="nt"> label</span><span class="p">:</span><span class="w"> </span><span class="nv">has material basis in germline mutation in</span><span class="p p-Indicator">}</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="nt">object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HGNC:1884</span><span class="w">                   </span><span class="c1"># CFTR</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="nt">review_state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NOT_VERIFIED</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="nt">proposing_channel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AI_AGENT</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nt">has_evidence_lines</span><span class="p">:</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:el/cf-passage</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveEvidenceLine</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">      </span><span class="nt">has_evidence_items</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">sieve</span><span class="p p-Indicator">:</span><span class="nv">tp/pmid-20301428-1</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">      </span><span class="nt">direction_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supports</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">      </span><span class="nt">score_of_evidence_provided</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">      </span><span class="nt">confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.85</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">      </span><span class="nt">confidence_basis</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PRIOR</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">      </span><span class="nt">contributions</span><span class="p">:</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:act/cf-passage</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InterpretationActivity</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">          </span><span class="nt">contributor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:agent/mondo-ai-extractor</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">          </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">INTERPRETER</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">          </span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2026-10-10&quot;</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">          </span><span class="nt">method_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LLM_JUDGEMENT</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">          </span><span class="nt">specified_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">sieve</span><span class="p p-Indicator">:</span><span class="nv">method/evidence-extraction-prompt</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">          </span><span class="nt">read_coverage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FULL_TEXT</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">          </span><span class="nt">access_status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OPEN_ACCESS</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">          </span><span class="nt">identifier_verified</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VERIFIED</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">          </span><span class="nt">grounding_checked</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VERIFIED</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="w">          </span><span class="nt">sought_disputing_evidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="w">          </span><span class="nt">run_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mondo-ai-evidence-2026-10-10-r7</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="nt">text_passages</span><span class="p">:</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:tp/pmid-20301428-1</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TextPassage</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="w">    </span><span class="nt">statement_text</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Illustrative</span><span class="nv"> </span><span class="s">passage:</span><span class="nv"> </span><span class="s">cystic</span><span class="nv"> </span><span class="s">fibrosis</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">caused</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">pathogenic</span><span class="nv"> </span><span class="s">variants</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">CFTR.&quot;</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="w">    </span><span class="nt">reported_in</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">PMID</span><span class="p p-Indicator">:</span><span class="nv">20301428</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="w">    </span><span class="nt">document_version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01&quot;</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a><span class="w">    </span><span class="nt">text_location</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">section</span><span class="p">:</span><span class="w"> </span><span class="nv">Molecular Genetics</span><span class="p p-Indicator">,</span><span class="nt"> char_start</span><span class="p">:</span><span class="w"> </span><span class="nv">1200</span><span class="p p-Indicator">,</span><span class="nt"> char_end</span><span class="p">:</span><span class="w"> </span><span class="nv">1278</span><span class="p p-Indicator">}</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a><span class="w">    </span><span class="nt">quote_verification</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NOT_CHECKED</span><span class="w">    </span><span class="c1"># VERIFIED only after a machine check</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="w">    </span><span class="nt">contributions</span><span class="p">:</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:act/tp-extraction</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveContribution</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a><span class="w">        </span><span class="nt">contributor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sieve:agent/mondo-ai-extractor</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a><span class="w">        </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EXTRACTOR</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a><span class="w">        </span><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2026-10-10&quot;</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a><span class="w">        </span><span class="nt">specified_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">sieve</span><span class="p p-Indicator">:</span><span class="nv">method/evidence-extraction-prompt</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a><span class="w">        </span><span class="nt">run_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mondo-ai-evidence-2026-10-10-r7</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a><span class="nt">publications</span><span class="p">:</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PMID:20301428</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Publication</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a><span class="w">    </span><span class="nt">pmid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;20301428&quot;</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a><span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">infores:pubmed</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a><span class="w">    </span><span class="nt">generation_context</span><span class="p">:</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;PT:review&quot;</span><span class="p p-Indicator">,</span><span class="nt"> label</span><span class="p">:</span><span class="w"> </span><span class="nv">Review</span><span class="p p-Indicator">}</span>
 </code></pre></div>
-<p>Every entity (<code>statement</code>, each line, each item) needs an <code>id</code> and a <code>type</code>.</p>
+<p>The full test file adds the resolution chain for "CFTR" (an LLM extraction step, then
+a lexical grounding step to <code>HGNC:1884</code>), an OMIM concordance line, a reviewer's
+<code>LineStatusChange</code> accepting the AI line unchanged, and a panel's decision.</p>
+<h2 id="what-happens-to-your-lines">What happens to your lines<a class="headerlink" href="#what-happens-to-your-lines" title="Permanent link">&para;</a></h2>
+<p>A reviewer either accepts a line unchanged, or invalidates it, or writes a corrected
+line that supersedes it. Your line is never edited. Each outcome is recorded as a
+<code>LineStatusChange</code> and counts towards your agent's trust level.</p>
 <h2 id="validating-your-output">Validating your output<a class="headerlink" href="#validating-your-output" title="Permanent link">&para;</a></h2>
-<p>Write packets to a directory and run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-I<span class="w"> </span>inbox/examples/<span class="w">      </span><span class="c1"># validate every packet in a directory</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sieve<span class="w"> </span>validate<span class="w"> </span>-i<span class="w"> </span>my_packet.yaml<span class="w">       </span><span class="c1"># validate one file</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>linkml-validate<span class="w"> </span>-s<span class="w"> </span>schema/sieve.yaml<span class="w"> </span>-C<span class="w"> </span>EvidencePacket<span class="w"> </span>my_packet.yaml
 </code></pre></div>
-<p><code>validate</code> reports each file as <code>OK</code> or lists the schema errors and exits
-non-zero if anything fails. Always validate before handing packets off.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.profile_checks</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_packet</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">issues</span> <span class="o">=</span> <span class="n">check_packet</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;my_packet.yaml&quot;</span><span class="p">)))</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">issues</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">severity</span> <span class="o">==</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">]</span>
+</code></pre></div>
+<p>Quote dates in YAML for linkml-validate. <code>check_packet</code> catches what JSON Schema cannot,
+including a document-based line without <code>read_coverage</code> / <code>access_status</code>, an AI line
+without <code>specified_by</code>, a predicate outside the claim type's value set, evidence the
+claim type does not permit, and references to items that are not in the packet. Fix
+every ERROR before handing a packet off.</p>
 <h2 id="do-dont">DO / DON'T<a class="headerlink" href="#do-dont" title="Permanent link">&para;</a></h2>
 <p><strong>DO</strong></p>
 <ul>
-<li>Set a <code>type:</code> on every evidence item and an <code>id</code> + <code>type</code> on every entity.</li>
-<li>Quote source text <strong>verbatim</strong> in <code>SieveDocument.quote</code>.</li>
-<li>Cite real, resolvable identifiers (real <code>PMID</code>s, real ontology CURIEs).</li>
-<li>Add a <code>disputes</code> line when the evidence genuinely cuts against the statement.</li>
-<li>Leave <code>status: UNREVIEWED</code> and let a human decide.</li>
+<li>Quote source text <strong>verbatim</strong>, with its location and the document version.</li>
+<li>Cite real, resolvable identifiers, and say whether you checked them.</li>
+<li>Add a <code>disputes</code> line when the evidence cuts against the claim.</li>
+<li>Record how much of the document you actually read.</li>
+<li>State a confidence only with its basis.</li>
 </ul>
 <p><strong>DON'T</strong></p>
 <ul>
-<li>Don't fabricate references, PMIDs, or concordances that don't exist.</li>
-<li>Don't overstate — inflated <code>strength</code>/<code>score</code> values are worse than honest weak
-  ones.</li>
-<li>Don't use the deleted flat model (<code>assertion</code>, flat <code>evidence[]</code>,
-  <code>evidence_type</code>, <code>direction: CONTRADICTS</code>, <code>evidence_strength</code>). The current
-  shape is <code>statement</code> + <code>has_evidence_lines</code> → <code>has_evidence_items</code> with <code>type:</code>.</li>
-<li>Don't pass your own LLM analysis off as a publication — use
-  <code>ComputationalResult</code>.</li>
+<li>Don't fabricate references, PMIDs, quotes or concordances.</li>
+<li>Don't set <code>quote_verification: VERIFIED</code> or <code>identifier_verified: VERIFIED</code> without a
+  machine check.</li>
+<li>Don't write <code>assertion_decisions</code>, <code>review_state: VERIFIED</code> or the statement <code>score</code>.</li>
+<li>Don't fold data quality into strength: a shaky extraction gets a low <code>confidence</code>,
+  not a low <code>score_of_evidence_provided</code>.</li>
+<li>Don't use the pre-profile shape (<code>status</code>, <code>has_evidence_lines</code>, <code>SieveDocument</code>,
+  <code>ComputationalResult</code>, items inlined in lines).</li>
 </ul>
 
 
