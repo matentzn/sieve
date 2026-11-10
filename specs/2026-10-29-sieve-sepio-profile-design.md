@@ -66,7 +66,7 @@ under two constraints:
   `reported_in`, not of the claim. The curation slots of a claim (`review_state`,
   `assertion_decisions`, `origin`, `proposing_channel`, `has_evidence_lines`, `score`)
   belong to the packet's own claim only (`PRIOR_CLAIM_CURATION`, `REVIEW_STATE`); predicate
-  bindings apply to prior claims as well. See `issues/issue_prior_claims_by_claim_type.md`.
+  bindings apply to prior claims as well. See matentzn/sieve#13.
 - **Competing claims (D-069, 2026-11-03).** A competitor is a prior claim carrying its
   log-odds from its own evidence (`own_log_odds`, `log_odds_basis`), frozen into the
   packet. All live competitors enter through ONE disputing line whose act has
