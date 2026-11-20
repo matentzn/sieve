@@ -21,6 +21,10 @@ Only the strongest line per independence cluster counts (D-046). Then::
 
 How a higher-order line and its inputs count is the rule's ``stacked_lines`` policy:
 CAP_AND_ADD (both count, the higher-order line capped) or REPLACE_INPUTS.
+
+Only the statement's own lines are scored. A higher-order line nests full copies of
+the lines it reads; those copies are matched to the statement's lines by id, so the
+same line never counts twice.
 """
 
 import math
@@ -28,15 +32,6 @@ from dataclasses import dataclass, field
 from typing import Any
 
 JUDGEMENT_METHODS = {"EXPERT_JUDGEMENT", "CONSENSUS_PANEL", "LLM_JUDGEMENT"}
-ITEM_LISTS = (
-    "external_records",
-    "prior_claims",
-    "text_passages",
-    "publications",
-    "web_pages",
-    "guidelines",
-    "computational_scores",
-)
 DIRECTION = {"supports": 1, "disputes": -1}
 
 
@@ -145,7 +140,6 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
         k=float(rule.get("scaling_factor", 1.0)),
     )
 
-    items = {i["id"]: i for key in ITEM_LISTS for i in packet.get(key) or []}
     agents = {a["id"]: a for a in snapshot.get("agents") or []}
     resources = {r["id"]: r for r in snapshot.get("resources") or []}
     lines = {line["id"]: line for line in statement.get("has_evidence_lines") or []}
@@ -156,11 +150,15 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
     def is_valid(line: dict) -> bool:
         return line.get("validity", "VALID") != "INVALIDATED"
 
+    def input_lines(line: dict) -> list[dict]:
+        """The statement's lines a higher-order line reads (its nested copies, matched by id)."""
+        return [lines[i["id"]] for i in line.get("has_evidence_items") or [] if i["type"] == "SieveEvidenceLine" and i["id"] in lines]
+
     def sources_of(item: dict) -> list[str]:
         if item.get("resource"):
             return [item["resource"]]
         if item["type"] == "TextPassage":
-            return [items[d]["resource"] for d in item.get("reported_in") or [] if d in items and items[d].get("resource")]
+            return [d["resource"] for d in item.get("reported_in") or [] if d.get("resource")]
         return []
 
     def prior(line: dict, act: dict) -> float:
@@ -171,8 +169,8 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
             level = _valid_at(agents.get(act.get("contributor", ""), {}).get("trust_levels") or [], date, claim_type)
             return default_q if level is None else level
         ratings = []
-        for ref in line.get("has_evidence_items") or []:
-            for res in sources_of(items.get(ref, {"type": ""})):
+        for item in line.get("has_evidence_items") or []:
+            for res in sources_of(item):
                 level = _valid_at(resources.get(res, {}).get("quality_ratings") or [], date, claim_type)
                 if level is not None:
                     ratings.append(level)
@@ -183,7 +181,7 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
     if policy == "REPLACE_INPUTS":
         for line in lines.values():
             if is_valid(line):
-                replaced |= {ref for ref in line.get("has_evidence_items") or [] if ref in lines}
+                replaced |= {i["id"] for i in input_lines(line)}
 
     best: dict[str, LineContribution] = {}
     for line_id, line in lines.items():
@@ -194,7 +192,7 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
             contrib.state = "invalidated"
             continue
         if act.get("method_type") == "COMPETING_CLAIM":
-            competitors += [float(items[r]["own_log_odds"]) for r in line.get("has_evidence_items") or [] if r in items]
+            competitors += [float(i["own_log_odds"]) for i in line.get("has_evidence_items") or [] if i.get("own_log_odds") is not None]
             contrib.state = "competing-claim line"
             continue
         if line_id in replaced:
@@ -209,7 +207,7 @@ def score_packet(packet: dict[str, Any]) -> ScoreBreakdown:
             continue
         contrib.d = DIRECTION[line["direction_of_evidence_provided"]]
         contrib.s = float(line["score_of_evidence_provided"])
-        inputs = [lines[r] for r in line.get("has_evidence_items") or [] if r in lines]
+        inputs = input_lines(line)
         if inputs and act.get("method_type") in JUDGEMENT_METHODS:
             cap = max(float(i.get("score_of_evidence_provided") or 0.0) for i in inputs)
             contrib.s = min(contrib.s, cap)

@@ -13,7 +13,14 @@ statement:
   has_evidence_lines:
     - id: sieve:el/bad_0001
       type: SieveEvidenceLine
-      has_evidence_items: [DOID:2841]
+      has_evidence_items:
+        - id: DOID:2841
+          type: ExternalRecord
+          label: asthma
+          resource: infores:disease-ontology
+          record_metadata:
+            retrieved_from: infores:disease-ontology
+            retrieval_date: "2026-10-30"
       direction_of_evidence_provided: supports
       score_of_evidence_provided: 1.5   # invalid: maximum is 1
       contributions:
@@ -23,14 +30,6 @@ statement:
           date: "2026-10-30"
           method_type: EXPERT_JUDGEMENT
           read_coverage: STRUCTURED_RECORD
-external_records:
-  - id: DOID:2841
-    type: ExternalRecord
-    label: asthma
-    resource: infores:disease-ontology
-    record_metadata:
-      retrieved_from: infores:disease-ontology
-      retrieval_date: "2026-10-30"
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: sieve:pkt_bad_0001#references

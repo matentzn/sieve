@@ -8,6 +8,7 @@ from linkml.validator import Validator
 from linkml.validator.plugins import JsonschemaValidationPlugin
 from linkml_runtime.utils.schemaview import SchemaView
 
+from sieve.packet_items import find_item
 from sieve.traceability import SCHEMA
 from tests.profile_support import load_yaml
 
@@ -106,10 +107,10 @@ def test_line_confidence_needs_basis(validator, c005):
 
 
 def test_step_confidence_needs_basis(validator, c005):
-    claim = c005["prior_claims"][0]
+    claim = find_item(c005, "sieve:ca/doid-14250-isa-630")
     del claim["groundings"][0]["steps"][0]["confidence_basis"]
     assert _errors(validator, c005)
-    # Prior claims are polymorphic in the packet; validate against the concrete type for the reason.
+    # Nested items are polymorphic; validate against the concrete type for the reason.
     assert any("confidence_basis" in e for e in _errors(validator, claim, claim["type"]))
 
 
@@ -141,21 +142,37 @@ def test_human_rejection_allowed(validator, c005):
 def test_text_passage_requires_creation_provenance(validator):
     """PROV.EI.EXECUTION / D-057: created records carry who / when / how."""
     packet = _load(DATA / "valid" / "c007_cf_cftr_panel.yaml")
-    del packet["text_passages"][0]["contributions"]
-    assert any("contributions" in e for e in _errors(validator, packet))
+    passage = find_item(packet, "sieve:tp/pmid-20301428-1")
+    del passage["contributions"]
+    assert _errors(validator, packet)
+    assert any("contributions" in e for e in _errors(validator, passage, "TextPassage"))
 
 
 def test_external_record_requires_retrieval_metadata(validator, c005):
     """PROV.EI.RETRIEVAL_SOURCE / D-055: when and from which release a record was read."""
-    del c005["external_records"][0]["record_metadata"]
-    assert any("record_metadata" in e for e in _errors(validator, c005))
+    record = find_item(c005, "DOID:14250")
+    del record["record_metadata"]
+    assert _errors(validator, c005)
+    assert any("record_metadata" in e for e in _errors(validator, record, "ExternalRecord"))
 
 
 def test_text_passage_derives_from_its_document_by_id(validator):
-    """EINT.GROUPING / D-057: a passage states its dependence on the source document."""
+    """EINT.GROUPING / D-057: a passage states its dependence on the source document by id."""
     packet = _load(DATA / "valid" / "c007_cf_cftr_panel.yaml")
-    packet["text_passages"][0]["derived_from"] = ["PMID:20301428"]
+    find_item(packet, "sieve:tp/pmid-20301428-1")["derived_from"] = ["PMID:20301428"]
     assert _errors(validator, packet) == []
+
+
+def test_evidence_items_are_not_ids(validator, c005):
+    """Evidence is nested: an id in place of an item is rejected."""
+    c005["statement"]["has_evidence_lines"][0]["has_evidence_items"] = ["sieve:ca/doid-14250-isa-630"]
+    assert _errors(validator, c005)
+
+
+def test_packet_has_no_item_lists(validator, c005):
+    """Items live inside the lines that use them; there are no packet-level item lists."""
+    c005["external_records"] = [find_item(c005, "DOID:14250")]
+    assert _errors(validator, c005)
 
 
 def test_packet_requires_reference_snapshot(validator, c005):

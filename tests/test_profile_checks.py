@@ -1,9 +1,11 @@
 """Profile constraints that LinkML validation cannot express (sieve.profile_checks)."""
 
+import copy
 from pathlib import Path
 
 import pytest
 
+from sieve.packet_items import find_item, item_copies
 from sieve.profile_checks import check_packet
 from tests.test_profile_examples import _load
 
@@ -48,22 +50,54 @@ def test_predicate_must_come_from_claim_type_value_set(c007):
 
 def test_evidence_type_must_be_permitted_for_claim_type(c005):
     """MATRIX.C005: text passages are not evidence for a negative subclass claim."""
-    c005["text_passages"] = [
-        {"id": "sieve:tp/x", "type": "TextPassage", "statement_text": "x", "reported_in": ["PMID:1"]}
-    ]
-    c005["statement"]["has_evidence_lines"][0]["has_evidence_items"] = ["sieve:tp/x"]
+    passage = {"id": "sieve:tp/x", "type": "TextPassage", "statement_text": "x",
+               "reported_in": [{"id": "PMID:1", "type": "Publication"}]}
+    c005["statement"]["has_evidence_lines"][0]["has_evidence_items"] = [passage]
     assert "EVIDENCE_NOT_PERMITTED" in _codes(c005, "ERROR")
 
 
-def test_dangling_evidence_reference(c005):
-    c005["statement"]["has_evidence_lines"][0]["has_evidence_items"] = ["DOID:999999"]
+def test_items_are_nested_in_full(c005):
+    """Evidence is nested: a line carries its items, not their ids."""
+    item = c005["statement"]["has_evidence_lines"][0]["has_evidence_items"][0]
+    assert isinstance(item, dict) and item["type"] == "SubclassStatement"
+    assert isinstance(item["reported_in"][0], dict)
+
+
+def test_nested_item_must_be_an_evidence_item(c005):
+    """Only evidence-item classes (records, claims, passages, documents, scores, lines) nest as evidence."""
+    resource = {"id": "infores:omim", "type": "InformationResource", "default_role": "PRIMARY"}
+    c005["statement"]["has_evidence_lines"][0]["has_evidence_items"].append(resource)
+    assert "NOT_AN_EVIDENCE_ITEM" in _codes(c005, "ERROR")
+
+
+def test_copies_with_one_id_must_be_identical(c003):
+    """Copies of an item share its id and must not drift apart (D-052)."""
+    copies = item_copies(c003)["OMIM:609541"]
+    assert len(copies) > 1
+    copies[-1]["label"] = "a drifted label"
+    issues = [i for i in check_packet(c003) if i.code == "COPY_DIVERGENCE"]
+    assert issues and issues[0].severity == "ERROR"
+    assert "OMIM:609541" in issues[0].message
+
+
+def test_id_links_must_resolve(c005):
+    """Links that stay ids (supersedes, replacement_line, derived_from, evidence_line) resolve inside the packet."""
+    c005["statement"]["has_evidence_lines"][0]["supersedes"] = ["sieve:el/not-in-packet"]
     assert "DANGLING_REFERENCE" in _codes(c005, "ERROR")
 
 
-def test_higher_order_line_may_reference_a_line(c005):
-    """EINT.STACKING: a line can interpret other lines."""
+def test_derived_from_resolves_to_a_nested_document(c007):
+    passage = find_item(c007, "sieve:tp/pmid-20301428-1")
+    passage["derived_from"] = ["PMID:404"]
+    assert "DANGLING_REFERENCE" in _codes(c007, "ERROR")
+
+
+def test_higher_order_line_nests_the_lines_it_reads(c005):
+    """EINT.STACKING: a line can interpret other lines, carried as full copies."""
     lines = c005["statement"]["has_evidence_lines"]
-    lines.append({**lines[1], "id": "sieve:el/stack", "has_evidence_items": [lines[0]["id"], lines[1]["id"]]})
+    stack = {**copy.deepcopy(lines[1]), "id": "sieve:el/stack",
+             "has_evidence_items": [copy.deepcopy(lines[0]), copy.deepcopy(lines[1])]}
+    lines.append(stack)
     assert _codes(c005, "ERROR") == set()
 
 
@@ -140,7 +174,7 @@ def test_rule_based_line_needs_its_rule(c007):
 
 def test_resolution_chain_is_contiguous(c007):
     """PROV.SA.EXECUTION: step n output = step n+1 input."""
-    c007["text_passages"][0]["groundings"][0]["steps"][1]["input_value"] = "CFTR gene"
+    find_item(c007, "sieve:tp/pmid-20301428-1")["groundings"][0]["steps"][1]["input_value"] = "CFTR gene"
     assert "CHAIN_CONTIGUITY" in _codes(c007, "ERROR")
 
 
@@ -245,15 +279,18 @@ def test_sign_off_by_unknown_human_warns(c005):
     assert "UNKNOWN_HUMAN_DECISION" in _codes(c005, "WARNING")
 
 
+DOID_CLAIM = "sieve:ca/doid-14250-isa-630"
+
+
 def test_prior_claim_is_typed_by_what_it_claims(c005):
-    """A source's subclass assertion is a SubclassStatement, held in prior_claims."""
-    assert c005["prior_claims"][0]["type"] == "SubclassStatement"
+    """A source's subclass assertion is a SubclassStatement, nested in the line that cites it."""
+    assert find_item(c005, DOID_CLAIM)["type"] == "SubclassStatement"
     assert _codes(c005, "ERROR") == set()
 
 
 def test_prior_claim_cannot_carry_curation(c005):
     """Review state, decisions, lines and score belong to the packet's own claim."""
-    c005["prior_claims"][0]["review_state"] = "VERIFIED"
+    find_item(c005, DOID_CLAIM)["review_state"] = "VERIFIED"
     assert "PRIOR_CLAIM_CURATION" in _codes(c005, "ERROR")
 
 
@@ -264,12 +301,11 @@ def test_packet_claim_needs_review_state(c005):
 
 def test_prior_claim_predicate_binding(c005):
     """Predicate value sets apply to prior claims as to the packet's own claim."""
-    c005["prior_claims"][0]["predicate"] = {"code": "skos:exactMatch"}
+    find_item(c005, DOID_CLAIM)["predicate"] = {"code": "skos:exactMatch"}
     assert "PREDICATE_BINDING" in _codes(c005, "ERROR")
 
 
 def test_competitor_needs_its_own_log_odds(mds):
     """D-069: a claim cited by the competing-claim line carries its own log-odds."""
-    competitor = next(c for c in mds["prior_claims"] if c["id"] == "sieve:cc/mds-mtdna-depletion")
-    del competitor["own_log_odds"]
+    del find_item(mds, "sieve:cc/mds-mtdna-depletion")["own_log_odds"]
     assert "COMPETING_CLAIM_LINE" in _codes(mds, "ERROR")

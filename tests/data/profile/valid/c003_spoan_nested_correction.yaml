@@ -1,0 +1,296 @@
+# C003: MONDO:0012297 has exact synonym 'SPOAN'. The nested-evidence walkthrough packet
+# (design spec, "Evidence nested, copies keep their id"). The passage and publication are
+# illustrative. It shows:
+#   1. every nested copy keeps its id (COPY_DIVERGENCE fails if two copies with one id differ);
+#   2. reported_in / source_item / has_evidence_items are nested; derived_from, supersedes and
+#      replacement_line stay plain ids;
+#   3. registry entries (agents, methods, rules, releases, resources) stay ids into reference_snapshot;
+#   4. an AI misreading kept on record as INVALIDATED, the curator's correction citing the same
+#      passage, and a synthesis line carrying full copies of the lines it read.
+# Markers: "# copy n of X" = a duplicated evidence object; "# -> snapshot" = an id resolved in reference_snapshot.
+id: sieve:pkt/MONDO_0012297-syn-SPOAN-abbrev
+type: EvidencePacket
+version: "2026-11-11"
+statement:
+  id: sieve:st/MONDO_0012297-syn-SPOAN-abbrev
+  type: SynonymStatement
+  subject: MONDO:0012297
+  predicate: {code: oboInOwl:hasExactSynonym}
+  object: SPOAN
+  review_state: PENDING_REVIEW
+  proposing_channel: SOURCE_INGEST
+  origin:
+    - id: sieve:origin/spoan-omim
+      type: OriginEvent
+      derivation_type: COPIED_FROM
+      source_item:                                   # copy 1 of OMIM:609541 (D-030: here it is the origin)
+        id: OMIM:609541
+        type: ExternalRecord
+        resource: infores:omim                       # -> snapshot
+        record_metadata:
+          retrieved_from: infores:omim               # -> snapshot
+          source_release: sieve:release/omim-2026-10-01   # -> snapshot
+          retrieval_date: "2026-10-02"
+      source_release: sieve:release/omim-2019-04-30  # -> snapshot
+      date: "2019-05-02"
+
+  has_evidence_lines:
+
+    # Line 1: computed concordance with OMIM's own synonym assertion
+    - id: sieve:el/omim-concordance
+      type: SieveEvidenceLine
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 0.9
+      computed_by_rule: sieve:rule/synonym-v1.1      # -> snapshot
+      contributions:
+        - id: sieve:act/omim-concordance
+          type: InterpretationActivity
+          contributor: sieve:agent/concordance-pipeline   # -> snapshot
+          date: "2026-10-20"
+          method_type: COMPUTED_CONCORDANCE
+          specified_by: [sieve:method/concordance-workflow]   # -> snapshot
+          read_coverage: STRUCTURED_RECORD
+      has_evidence_items:
+        - id: sieve:ca/omim-609541-spoan             # copy 1 of the OMIM prior claim
+          type: SynonymStatement
+          subject: OMIM:609541
+          predicate: {code: oboInOwl:hasExactSynonym}
+          object: SPOAN
+          resource: infores:omim                     # -> snapshot
+          reported_in:
+            - id: OMIM:609541                        # copy 2 of OMIM:609541 (here it is evidence)
+              type: ExternalRecord
+              resource: infores:omim
+              record_metadata:
+                retrieved_from: infores:omim
+                source_release: sieve:release/omim-2026-10-01
+                retrieval_date: "2026-10-02"
+          groundings:
+            - id: sieve:chain/omim-609541
+              type: ResolutionChain
+              entity_slot: subject
+              steps:
+                - id: sieve:step/omim-609541-1
+                  type: AlignmentStep
+                  category: GROUNDING
+                  method: SOURCE_ASSERTED
+                  input_value: OMIM:609541
+                  output_value: MONDO:0012297
+                  mapping_set_version: "2026-10-01"
+
+    # Line 2: AI misread the passage as disputing the name; kept, invalidated (D-052)
+    - id: sieve:el/ai-reading-v1
+      type: SieveEvidenceLine
+      direction_of_evidence_provided: disputes
+      score_of_evidence_provided: 0.6
+      validity: INVALIDATED
+      contributions:
+        - id: sieve:act/ai-reading-v1
+          type: InterpretationActivity
+          contributor: sieve:agent/mondo-ai-extractor     # -> snapshot
+          date: "2026-10-21"
+          method_type: LLM_JUDGEMENT
+          specified_by: [sieve:method/evidence-extraction-prompt]   # -> snapshot
+          read_coverage: ABSTRACT_ONLY
+          access_status: NOT_RECORDED
+      status_changes:
+        - id: sieve:lsc/ai-reading-v1
+          type: LineStatusChange
+          contributor: orcid:0000-0001-5208-3432     # -> snapshot
+          date: "2026-10-22"
+          action: SUPERSEDED
+          replacement_line: sieve:el/curator-reading # stays an id: a line cannot contain its replacement
+          reason: The passage uses the name; it does not reject it.
+      has_evidence_items:
+        - id: sieve:tp/cohort-p2                     # copy 1 of the passage
+          type: TextPassage
+          statement_text: "Illustrative passage: patients with SPOAN syndrome presented with ..."
+          quote_verification: VERIFIED
+          derived_from: [sieve:pub/spoan-cohort-example]   # stays an id: the document is nested under reported_in
+          reported_in:
+            - id: sieve:pub/spoan-cohort-example     # copy 1 of the publication
+              type: Publication
+              title: Illustrative cohort study of SPOAN syndrome
+              resource: infores:pubmed               # -> snapshot
+              generation_context: [{code: "PT:cohort", label: Cohort study}]
+          contributions:
+            - id: sieve:act/tp-extraction
+              type: SieveContribution
+              contributor: sieve:agent/mondo-ai-extractor
+              role: EXTRACTOR
+              date: "2026-10-21"
+              specified_by: [sieve:method/evidence-extraction-prompt]
+
+    # Line 3: curator correction, citing the SAME passage (same id; COPY_DIVERGENCE keeps it identical)
+    - id: sieve:el/curator-reading
+      type: SieveEvidenceLine
+      supersedes: [sieve:el/ai-reading-v1]           # stays an id
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 0.6
+      contributions:
+        - id: sieve:act/curator-reading
+          type: InterpretationActivity
+          contributor: orcid:0000-0001-5208-3432     # -> snapshot
+          date: "2026-10-22"
+          method_type: EXPERT_JUDGEMENT
+          read_coverage: FULL_TEXT
+          access_status: OPEN_ACCESS
+      has_evidence_items:
+        - id: sieve:tp/cohort-p2                     # copy 2 of the passage
+          type: TextPassage
+          statement_text: "Illustrative passage: patients with SPOAN syndrome presented with ..."
+          quote_verification: VERIFIED
+          derived_from: [sieve:pub/spoan-cohort-example]
+          reported_in:
+            - id: sieve:pub/spoan-cohort-example     # copy 2 of the publication
+              type: Publication
+              title: Illustrative cohort study of SPOAN syndrome
+              resource: infores:pubmed
+              generation_context: [{code: "PT:cohort", label: Cohort study}]
+          contributions:
+            - id: sieve:act/tp-extraction
+              type: SieveContribution
+              contributor: sieve:agent/mondo-ai-extractor
+              role: EXTRACTOR
+              date: "2026-10-21"
+              specified_by: [sieve:method/evidence-extraction-prompt]
+
+    # Line 4: AI synthesis over lines 1 and 3 (EINT.STACKING): both lines are nested in full
+    - id: sieve:el/synthesis
+      type: SieveEvidenceLine
+      direction_of_evidence_provided: supports
+      score_of_evidence_provided: 0.85
+      confidence: 0.9
+      confidence_basis: PRIOR
+      contributions:
+        - id: sieve:act/synthesis
+          type: InterpretationActivity
+          contributor: sieve:agent/mondo-ai-extractor
+          date: "2026-10-23"
+          method_type: LLM_JUDGEMENT
+          specified_by: [sieve:method/evidence-extraction-prompt]
+      has_evidence_items:
+        - id: sieve:el/omim-concordance              # copy 2 of line 1 ...
+          type: SieveEvidenceLine
+          direction_of_evidence_provided: supports
+          score_of_evidence_provided: 0.9
+          computed_by_rule: sieve:rule/synonym-v1.1
+          contributions:
+            - id: sieve:act/omim-concordance
+              type: InterpretationActivity
+              contributor: sieve:agent/concordance-pipeline
+              date: "2026-10-20"
+              method_type: COMPUTED_CONCORDANCE
+              specified_by: [sieve:method/concordance-workflow]
+              read_coverage: STRUCTURED_RECORD
+          has_evidence_items:
+            - id: sieve:ca/omim-609541-spoan         # ... with copy 2 of the prior claim
+              type: SynonymStatement
+              subject: OMIM:609541
+              predicate: {code: oboInOwl:hasExactSynonym}
+              object: SPOAN
+              resource: infores:omim
+              reported_in:
+                - id: OMIM:609541                    # copy 3 of OMIM:609541
+                  type: ExternalRecord
+                  resource: infores:omim
+                  record_metadata:
+                    retrieved_from: infores:omim
+                    source_release: sieve:release/omim-2026-10-01
+                    retrieval_date: "2026-10-02"
+              groundings:
+                - id: sieve:chain/omim-609541
+                  type: ResolutionChain
+                  entity_slot: subject
+                  steps:
+                    - id: sieve:step/omim-609541-1
+                      type: AlignmentStep
+                      category: GROUNDING
+                      method: SOURCE_ASSERTED
+                      input_value: OMIM:609541
+                      output_value: MONDO:0012297
+                      mapping_set_version: "2026-10-01"
+        - id: sieve:el/curator-reading               # copy 2 of line 3 ...
+          type: SieveEvidenceLine
+          supersedes: [sieve:el/ai-reading-v1]
+          direction_of_evidence_provided: supports
+          score_of_evidence_provided: 0.6
+          contributions:
+            - id: sieve:act/curator-reading
+              type: InterpretationActivity
+              contributor: orcid:0000-0001-5208-3432
+              date: "2026-10-22"
+              method_type: EXPERT_JUDGEMENT
+              read_coverage: FULL_TEXT
+              access_status: OPEN_ACCESS
+          has_evidence_items:
+            - id: sieve:tp/cohort-p2                 # ... with copy 3 of the passage
+              type: TextPassage
+              statement_text: "Illustrative passage: patients with SPOAN syndrome presented with ..."
+              quote_verification: VERIFIED
+              derived_from: [sieve:pub/spoan-cohort-example]
+              reported_in:
+                - id: sieve:pub/spoan-cohort-example # copy 3 of the publication
+                  type: Publication
+                  title: Illustrative cohort study of SPOAN syndrome
+                  resource: infores:pubmed
+                  generation_context: [{code: "PT:cohort", label: Cohort study}]
+              contributions:
+                - id: sieve:act/tp-extraction
+                  type: SieveContribution
+                  contributor: sieve:agent/mondo-ai-extractor
+                  role: EXTRACTOR
+                  date: "2026-10-21"
+                  specified_by: [sieve:method/evidence-extraction-prompt]
+
+# No typed item lists (external_records, prior_claims, text_passages, publications, ...): every
+# evidence object lives where it is used. Only the registry stays referenced (point 3).
+reference_snapshot:
+  id: sieve:pkt/MONDO_0012297-syn-SPOAN-abbrev#references
+  type: SieveRegistry
+  version: "2026-11-11"
+  resources:
+    - id: infores:omim
+      type: InformationResource
+      label: OMIM
+      curie_prefixes: [OMIM]
+      default_role: PRIMARY
+      quality_ratings:
+        - {level: 0.9, category: high, valid_from: "2026-01-01"}
+    - id: infores:pubmed
+      type: InformationResource
+      label: PubMed
+      curie_prefixes: [PMID]
+      default_role: PRIMARY
+  releases:
+    - {id: sieve:release/omim-2019-04-30, type: SourceRelease, of_resource: infores:omim, version: "2019-04-30"}
+    - {id: sieve:release/omim-2026-10-01, type: SourceRelease, of_resource: infores:omim, version: "2026-10-01",
+       release_date: "2026-10-01"}
+  agents:
+    - id: orcid:0000-0001-5208-3432
+      type: SieveAgent
+      subtype: person
+      roles: [{value: core curator, valid_from: "2018-01-01"}]
+      trust_levels: [{value: curator, level: 0.8, valid_from: "2018-01-01"}]
+    - id: sieve:agent/concordance-pipeline
+      type: SieveAgent
+      subtype: software
+      name: SPO concordance pipeline
+      software_version: 1.4.0
+    - id: sieve:agent/mondo-ai-extractor
+      type: SieveAgent
+      subtype: software
+      name: mondo-ai evidence agent
+      software_version: 0.9.2
+      model_name: example-llm-2026-06
+      trust_levels: [{value: ai-agent, level: 0.7, valid_from: "2026-06-01"}]
+  methods:
+    - {id: sieve:method/concordance-workflow, type: SieveMethod, version: "1.4"}
+    - {id: sieve:method/evidence-extraction-prompt, type: SieveMethod, version: "2026-09"}
+  aggregation_rules:
+    - id: sieve:rule/synonym-v1.1
+      type: AggregationRule
+      version: "1.1"
+      claim_type: SynonymStatement
+      strength_bands: [strong >= 0.8, moderate >= 0.4, weak < 0.4]
+      confidence_floor: 0.3

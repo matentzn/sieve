@@ -16,7 +16,30 @@ statement:
   has_evidence_lines:
     - id: sieve:el/asthma_0001
       type: SieveEvidenceLine
-      has_evidence_items: [DOID:2841, sieve:tp/asthma_0001]
+      has_evidence_items:
+        - id: DOID:2841
+          type: ExternalRecord
+          label: asthma
+          resource: infores:disease-ontology
+          record_metadata:
+            retrieved_from: infores:disease-ontology
+            retrieval_date: "2026-10-30"
+        - id: sieve:tp/asthma_0001
+          type: TextPassage
+          statement_text: asthma is a chronic respiratory disease
+          reported_in:
+            - id: PMID:12345678
+              type: Publication
+              title: Example study
+              pmid: "12345678"
+              resource: infores:pubmed
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-asthma_0001
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2026-10-30"
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: strong
       score_of_evidence_provided: 0.9
@@ -29,32 +52,6 @@ statement:
           method_type: EXPERT_JUDGEMENT
           read_coverage: ABSTRACT_ONLY
           access_status: OPEN_ACCESS
-external_records:
-  - id: DOID:2841
-    type: ExternalRecord
-    label: asthma
-    resource: infores:disease-ontology
-    record_metadata:
-      retrieved_from: infores:disease-ontology
-      retrieval_date: "2026-10-30"
-text_passages:
-  - id: sieve:tp/asthma_0001
-    type: TextPassage
-    statement_text: asthma is a chronic respiratory disease
-    reported_in: [PMID:12345678]
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-asthma_0001
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2026-10-30"
-publications:
-  - id: PMID:12345678
-    type: Publication
-    title: Example study
-    pmid: "12345678"
-    resource: infores:pubmed
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: sieve:pkt_asthma_0001#references

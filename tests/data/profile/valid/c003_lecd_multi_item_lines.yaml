@@ -3,8 +3,9 @@
 #   - line A groups three prior claims (SynonymStatements by OMIM, Orphanet, DOID) into ONE argument;
 #   - line B mixes item types: an ExternalRecord plus a ComputationalScore;
 #   - line C is a higher-order line whose items are lines A and B.
-# Lines reference items by id; the items themselves live once in the packet's typed
-# lists. Line granularity (one item per line vs grouped) is parked (D-046); both are valid.
+# Each line carries its items in full; line C carries full copies of lines A and B, and
+# the copies keep their ids. Line granularity (one item per line vs grouped) is parked
+# (D-046); both are valid.
 # Ids other than the MONDO / OMIM / Orphanet / DOID CURIEs are illustrative.
 id: sieve:pkt/MONDO_0010425-syn-LECD
 type: EvidencePacket
@@ -23,9 +24,51 @@ statement:
       type: SieveEvidenceLine
       description: Three sources carry the synonym; assessed together as one concordance argument.
       has_evidence_items:
-        - sieve:ca/omim-620763-lecd
-        - sieve:ca/orphanet-98955-lecd
-        - sieve:ca/doid-0060450-lecd
+        - id: sieve:ca/omim-620763-lecd
+          type: SynonymStatement
+          subject: OMIM:620763
+          predicate: {code: oboInOwl:hasExactSynonym}
+          object: LECD
+          reported_in:
+            - id: OMIM:620763
+              type: ExternalRecord
+              label: corneal dystrophy, lisch epithelial
+              resource: infores:omim
+              record_metadata:
+                retrieved_from: infores:omim
+                source_release: sieve:release/omim-2026-10-01
+                retrieval_date: "2026-10-02"
+          resource: infores:omim
+        - id: sieve:ca/orphanet-98955-lecd
+          type: SynonymStatement
+          subject: Orphanet:98955
+          predicate: {code: oboInOwl:hasExactSynonym}
+          object: LECD
+          reported_in:
+            - id: Orphanet:98955
+              type: ExternalRecord
+              label: Lisch epithelial corneal dystrophy
+              resource: infores:orphanet
+              record_metadata:
+                retrieved_from: infores:orphanet
+                source_version: "2026-07"
+                retrieval_date: "2026-10-02"
+          resource: infores:orphanet
+        - id: sieve:ca/doid-0060450-lecd
+          type: SynonymStatement
+          subject: DOID:0060450
+          predicate: {code: oboInOwl:hasExactSynonym}
+          object: LECD
+          reported_in:
+            - id: DOID:0060450
+              type: ExternalRecord
+              label: Lisch epithelial corneal dystrophy
+              resource: infores:disease-ontology
+              record_metadata:
+                retrieved_from: infores:disease-ontology
+                source_release: sieve:release/doid-2026-09-01
+                retrieval_date: "2026-10-02"
+          resource: infores:disease-ontology
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: strong
       score_of_evidence_provided: 0.85
@@ -43,8 +86,19 @@ statement:
       type: SieveEvidenceLine
       description: The OMIM record and a lexical match score, read together as one argument.
       has_evidence_items:
-        - OMIM:620763
-        - sieve:score/lecd-lexical
+        - id: OMIM:620763
+          type: ExternalRecord
+          label: corneal dystrophy, lisch epithelial
+          resource: infores:omim
+          record_metadata:
+            retrieved_from: infores:omim
+            source_release: sieve:release/omim-2026-10-01
+            retrieval_date: "2026-10-02"
+        - id: sieve:score/lecd-lexical
+          type: ComputationalScore
+          value: "1.0"
+          specified_by: [sieve:method/lexmatch]
+          parameters: "match=exact_synonym"
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: weak
       score_of_evidence_provided: 0.3
@@ -62,8 +116,98 @@ statement:
       type: SieveEvidenceLine
       description: Higher-order line; its items are the two lines above.
       has_evidence_items:
-        - sieve:el/lecd-concordance
-        - sieve:el/lecd-label-match
+        - id: sieve:el/lecd-concordance
+          type: SieveEvidenceLine
+          description: Three sources carry the synonym; assessed together as one concordance argument.
+          has_evidence_items:
+            - id: sieve:ca/omim-620763-lecd
+              type: SynonymStatement
+              subject: OMIM:620763
+              predicate: {code: oboInOwl:hasExactSynonym}
+              object: LECD
+              reported_in:
+                - id: OMIM:620763
+                  type: ExternalRecord
+                  label: corneal dystrophy, lisch epithelial
+                  resource: infores:omim
+                  record_metadata:
+                    retrieved_from: infores:omim
+                    source_release: sieve:release/omim-2026-10-01
+                    retrieval_date: "2026-10-02"
+              resource: infores:omim
+            - id: sieve:ca/orphanet-98955-lecd
+              type: SynonymStatement
+              subject: Orphanet:98955
+              predicate: {code: oboInOwl:hasExactSynonym}
+              object: LECD
+              reported_in:
+                - id: Orphanet:98955
+                  type: ExternalRecord
+                  label: Lisch epithelial corneal dystrophy
+                  resource: infores:orphanet
+                  record_metadata:
+                    retrieved_from: infores:orphanet
+                    source_version: "2026-07"
+                    retrieval_date: "2026-10-02"
+              resource: infores:orphanet
+            - id: sieve:ca/doid-0060450-lecd
+              type: SynonymStatement
+              subject: DOID:0060450
+              predicate: {code: oboInOwl:hasExactSynonym}
+              object: LECD
+              reported_in:
+                - id: DOID:0060450
+                  type: ExternalRecord
+                  label: Lisch epithelial corneal dystrophy
+                  resource: infores:disease-ontology
+                  record_metadata:
+                    retrieved_from: infores:disease-ontology
+                    source_release: sieve:release/doid-2026-09-01
+                    retrieval_date: "2026-10-02"
+              resource: infores:disease-ontology
+          direction_of_evidence_provided: supports
+          strength_of_evidence_provided: strong
+          score_of_evidence_provided: 0.85
+          computed_by_rule: sieve:rule/synonym-v1.1
+          independence_cluster: infores:omim
+          contributions:
+            - id: sieve:act/lecd-concordance
+              type: InterpretationActivity
+              contributor: sieve:agent/concordance-pipeline
+              date: "2026-10-31"
+              method_type: RULE_BASED_STRENGTH
+              specified_by: [sieve:method/concordance-workflow]
+              read_coverage: STRUCTURED_RECORD
+        - id: sieve:el/lecd-label-match
+          type: SieveEvidenceLine
+          description: The OMIM record and a lexical match score, read together as one argument.
+          has_evidence_items:
+            - id: OMIM:620763
+              type: ExternalRecord
+              label: corneal dystrophy, lisch epithelial
+              resource: infores:omim
+              record_metadata:
+                retrieved_from: infores:omim
+                source_release: sieve:release/omim-2026-10-01
+                retrieval_date: "2026-10-02"
+            - id: sieve:score/lecd-lexical
+              type: ComputationalScore
+              value: "1.0"
+              specified_by: [sieve:method/lexmatch]
+              parameters: "match=exact_synonym"
+          direction_of_evidence_provided: supports
+          strength_of_evidence_provided: weak
+          score_of_evidence_provided: 0.3
+          computed_by_rule: sieve:rule/synonym-v1.1
+          independence_cluster: infores:omim
+          contributions:
+            - id: sieve:act/lecd-label-match
+              type: InterpretationActivity
+              contributor: sieve:agent/concordance-pipeline
+              date: "2026-10-31"
+              method_type: RULE_BASED_STRENGTH
+              specified_by: [sieve:method/concordance-workflow]
+              read_coverage: STRUCTURED_RECORD
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: strong
       score_of_evidence_provided: 0.8
@@ -76,59 +220,6 @@ statement:
           date: "2026-10-31"
           method_type: LLM_JUDGEMENT
           specified_by: [sieve:method/evidence-extraction-prompt]
-prior_claims:
-  - id: sieve:ca/omim-620763-lecd
-    type: SynonymStatement
-    subject: OMIM:620763
-    predicate: {code: oboInOwl:hasExactSynonym}
-    object: LECD
-    reported_in: [OMIM:620763]
-    resource: infores:omim
-  - id: sieve:ca/orphanet-98955-lecd
-    type: SynonymStatement
-    subject: Orphanet:98955
-    predicate: {code: oboInOwl:hasExactSynonym}
-    object: LECD
-    reported_in: [Orphanet:98955]
-    resource: infores:orphanet
-  - id: sieve:ca/doid-0060450-lecd
-    type: SynonymStatement
-    subject: DOID:0060450
-    predicate: {code: oboInOwl:hasExactSynonym}
-    object: LECD
-    reported_in: [DOID:0060450]
-    resource: infores:disease-ontology
-external_records:
-  - id: OMIM:620763
-    type: ExternalRecord
-    label: corneal dystrophy, lisch epithelial
-    resource: infores:omim
-    record_metadata:
-      retrieved_from: infores:omim
-      source_release: sieve:release/omim-2026-10-01
-      retrieval_date: "2026-10-02"
-  - id: Orphanet:98955
-    type: ExternalRecord
-    label: Lisch epithelial corneal dystrophy
-    resource: infores:orphanet
-    record_metadata:
-      retrieved_from: infores:orphanet
-      source_version: "2026-07"
-      retrieval_date: "2026-10-02"
-  - id: DOID:0060450
-    type: ExternalRecord
-    label: Lisch epithelial corneal dystrophy
-    resource: infores:disease-ontology
-    record_metadata:
-      retrieved_from: infores:disease-ontology
-      source_release: sieve:release/doid-2026-09-01
-      retrieval_date: "2026-10-02"
-computational_scores:
-  - id: sieve:score/lecd-lexical
-    type: ComputationalScore
-    value: "1.0"
-    specified_by: [sieve:method/lexmatch]
-    parameters: "match=exact_synonym"
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: sieve:pkt/MONDO_0010425-syn-LECD#references

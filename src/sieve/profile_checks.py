@@ -6,6 +6,8 @@ Coding, follow references between packet objects, or depend on the claim type:
 
 - predicate value sets, declared as ``bindings`` on each claim type's ``predicate``;
 - the claim-evidence matrix, declared as the ``permitted_evidence`` annotation;
+- nested evidence: copies of an item share its id and must be identical, and the
+  links that stay ids (supersedes, derived_from, ...) resolve inside the packet;
 - read coverage on document-based lines, methods on AI and rule-based lines;
 - resolution-chain contiguity, supersession, blind approvals;
 - competing claims (D-069): one disputing line per claim, only for exclusive claim
@@ -23,19 +25,11 @@ from typing import Any, Iterator, Literal
 
 from linkml_runtime.utils.schemaview import SchemaView
 
+from sieve.packet_items import item_copies, items_by_id, iter_items
 from sieve.traceability import SCHEMA
 
 Severity = Literal["ERROR", "WARNING"]
 
-ITEM_LISTS = (
-    "external_records",
-    "prior_claims",
-    "text_passages",
-    "publications",
-    "web_pages",
-    "guidelines",
-    "computational_scores",
-)
 DOCUMENT_CLASSES = {"Publication", "WebPage", "GuidelineDocument", "TextPassage"}
 AUTOMATED_METHODS = {"LLM_JUDGEMENT", "RULE_BASED_STRENGTH"}
 # Slots that only the packet's own claim may carry, never a prior claim.
@@ -95,11 +89,6 @@ def _evidence_form(item_type: str) -> str:
     return "SieveStatement" if item_type in _claim_types() else item_type
 
 
-def _items(packet: dict) -> dict[str, dict]:
-    """Index every evidence item in the packet by id."""
-    return {item["id"]: item for key in ITEM_LISTS for item in packet.get(key) or []}
-
-
 def _claim_requirement(sv: SchemaView, claim_type: str) -> str:
     """The CT requirement (C00N) a claim-type class realises."""
     annotations = sv.get_class(claim_type).annotations or {}
@@ -137,20 +126,22 @@ def _check_statement(sv: SchemaView, statement: dict, obsolete_terms: set[str]) 
             yield Issue("ERROR", "BLIND_APPROVAL_EVIDENCE", f"{decision['id']}: a no-look approval adds no evidence", "PROV.ASSERTION.METHOD_TYPES")
 
 
+def _lines(items: dict[str, dict]) -> dict[str, dict]:
+    """Every evidence line in the packet: the statement's lines and those nested in higher-order lines."""
+    return {i: item for i, item in items.items() if item["type"] == "SieveEvidenceLine"}
+
+
 def _check_lines(sv: SchemaView, statement: dict, items: dict[str, dict]) -> Iterator[Issue]:
     claim_type = statement["type"]
-    lines = {line["id"]: line for line in statement.get("has_evidence_lines") or []}
+    lines = _lines(items)
     permitted = permitted_evidence(sv, claim_type)
     matrix_req = "MATRIX." + _claim_requirement(sv, claim_type)
     for line in lines.values():
         referenced = []
-        for ref in line.get("has_evidence_items") or []:
-            if ref in lines:
+        for item in line.get("has_evidence_items") or []:
+            item_type = item["type"]
+            if item_type == "SieveEvidenceLine":
                 continue  # higher-order line (EINT.STACKING)
-            if ref not in items:
-                yield Issue("ERROR", "DANGLING_REFERENCE", f"{line['id']} references unknown item {ref}", "EINT.REQUIRED")
-                continue
-            item_type = items[ref]["type"]
             referenced.append(_evidence_form(item_type))
             if _evidence_form(item_type) not in permitted:
                 yield Issue("ERROR", "EVIDENCE_NOT_PERMITTED", f"{item_type} is not evidence for {claim_type}", matrix_req)
@@ -177,13 +168,55 @@ def _check_lines(sv: SchemaView, statement: dict, items: dict[str, dict]) -> Ite
                 yield Issue("ERROR", "SUPERSEDED_NOT_INVALIDATED", f"{old} is superseded by {line['id']} but still VALID", "EINT.FLAT_COLLAPSE")
 
 
-def _chains(packet: dict) -> Iterator[dict]:
-    for item in _items(packet).values():
+@lru_cache(maxsize=1)
+def _evidence_item_classes() -> frozenset[str]:
+    """Classes that use the EvidenceItem mixin (and their descendants)."""
+    return frozenset(_schema_view().class_descendants("EvidenceItem"))
+
+
+def _check_item_types(packet: dict) -> Iterator[Issue]:
+    """Nested evidence slots keep the core range InformationEntity; only evidence items may nest there."""
+    for item in iter_items(packet):
+        if item["type"] not in _evidence_item_classes():
+            yield Issue("ERROR", "NOT_AN_EVIDENCE_ITEM", f"{item['id']}: a {item['type']} is not an evidence item", "EINT.REQUIRED")
+
+
+def _check_copies(packet: dict) -> Iterator[Issue]:
+    """Copies of a nested item share its id and must be identical (D-052: no drift)."""
+    for item_id, copies in item_copies(packet).items():
+        if any(c != copies[0] for c in copies[1:]):
+            yield Issue("ERROR", "COPY_DIVERGENCE", f"{item_id}: its {len(copies)} copies are not identical", "EINT.REQUIRED")
+
+
+def _id_links(packet: dict, items: dict[str, dict]) -> Iterator[tuple[str, str]]:
+    """Yield (where, id) for every link that stays an id rather than a nested item."""
+    statement = packet["statement"]
+    for decision in statement.get("assertion_decisions") or []:
+        if decision.get("evidence_line"):
+            yield f"{decision['id']}.evidence_line", decision["evidence_line"]
+    for item_id, item in items.items():
+        for slot in ("supersedes", "derived_from"):
+            for ref in item.get(slot) or []:
+                if isinstance(ref, str):
+                    yield f"{item_id}.{slot}", ref
+        for change in item.get("status_changes") or []:
+            if change.get("replacement_line"):
+                yield f"{change['id']}.replacement_line", change["replacement_line"]
+
+
+def _check_id_links(packet: dict, items: dict[str, dict]) -> Iterator[Issue]:
+    for where, ref in _id_links(packet, items):
+        if ref not in items:
+            yield Issue("ERROR", "DANGLING_REFERENCE", f"{where}: {ref} is not an item or line in the packet", "EINT.REQUIRED")
+
+
+def _chains(items: dict[str, dict]) -> Iterator[dict]:
+    for item in items.values():
         yield from item.get("groundings") or []
 
 
-def _check_chains(packet: dict) -> Iterator[Issue]:
-    for chain in _chains(packet):
+def _check_chains(items: dict[str, dict]) -> Iterator[Issue]:
+    for chain in _chains(items):
         steps = chain.get("steps") or []
         for before, after in zip(steps, steps[1:]):
             if before["output_value"] != after["input_value"]:
@@ -253,7 +286,7 @@ def _check_self_contained(sv: SchemaView, packet: dict) -> Iterator[Issue]:
 AUTOMATED_ROUTES = {"DELEGATED_POLICY", "PROVIDER_AUTHORITY"}
 
 
-def _check_competing_claims(packet: dict, items: dict[str, dict]) -> Iterator[Issue]:
+def _check_competing_claims(packet: dict) -> Iterator[Issue]:
     """D-069: one disputing competing-claim line, only for exclusive claim types."""
     statement = packet["statement"]
     lines = statement.get("has_evidence_lines") or []
@@ -267,10 +300,9 @@ def _check_competing_claims(packet: dict, items: dict[str, dict]) -> Iterator[Is
     for line in competing:
         if line["direction_of_evidence_provided"] != "disputes":
             yield Issue("ERROR", "COMPETING_CLAIM_LINE", f"{line['id']}: a competing-claim line disputes", "EINT.CONTRADICTION")
-        for ref in line.get("has_evidence_items") or []:
-            item = items.get(ref, {})
+        for item in line.get("has_evidence_items") or []:
             if item.get("type") not in _claim_types() or item.get("own_log_odds") is None or not item.get("log_odds_basis"):
-                yield Issue("ERROR", "COMPETING_CLAIM_LINE", f"{line['id']}: {ref} must be a prior claim with own_log_odds and log_odds_basis", "EINT.CONTRADICTION")
+                yield Issue("ERROR", "COMPETING_CLAIM_LINE", f"{line['id']}: {item['id']} must be a prior claim with own_log_odds and log_odds_basis", "EINT.CONTRADICTION")
     if competing:
         rules = [
             r for r in (packet.get("reference_snapshot") or {}).get("aggregation_rules") or []
@@ -297,11 +329,11 @@ def _check_agents(packet: dict) -> Iterator[Issue]:
             yield Issue("WARNING", "UNKNOWN_HUMAN_DECISION", f"{decision['id']}: signed off by a person of unknown identity", "PROV.ASSERTION.AGENT")
 
 
-def _check_prior_claims(sv: SchemaView, packet: dict) -> Iterator[Issue]:
+def _check_prior_claims(sv: SchemaView, packet: dict, items: dict[str, dict]) -> Iterator[Issue]:
     """Prior claims are claims, not curation records; the packet's own claim is curated."""
     if not packet["statement"].get("review_state"):
         yield Issue("ERROR", "REVIEW_STATE", "the packet's own claim needs a review_state", "C006")
-    for claim in packet.get("prior_claims") or []:
+    for claim in (item for item in items.values() if item["type"] in _claim_types()):
         carried = [s for s in CURATION_SLOTS if claim.get(s) not in (None, [], "")]
         if carried:
             yield Issue("ERROR", "PRIOR_CLAIM_CURATION", f"{claim['id']}: curation slots {carried} belong to the packet's own claim", "EI.PRIOR_CLAIM.DIRECT_STRUCTURED")
@@ -321,11 +353,15 @@ def check_packet(packet: dict[str, Any], obsolete_terms: set[str] | frozenset[st
     """
     sv = _schema_view()
     statement = packet["statement"]
+    items = items_by_id(packet)
     issues = list(_check_statement(sv, statement, set(obsolete_terms)))
-    issues += _check_lines(sv, statement, _items(packet))
-    issues += _check_chains(packet)
+    issues += _check_item_types(packet)
+    issues += _check_copies(packet)
+    issues += _check_id_links(packet, items)
+    issues += _check_lines(sv, statement, items)
+    issues += _check_chains(items)
     issues += _check_self_contained(sv, packet)
-    issues += _check_competing_claims(packet, _items(packet))
+    issues += _check_competing_claims(packet)
     issues += _check_agents(packet)
-    issues += _check_prior_claims(sv, packet)
+    issues += _check_prior_claims(sv, packet, items)
     return issues

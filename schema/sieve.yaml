@@ -3,9 +3,10 @@ id: https://w3id.org/sieve
 name: sieve
 title: SIEVE - a SEPIO profile for evidence-based curation of Mondo claims
 description: |-
-  SIEVE is a profile of the SEPIO core information model (schema/sepio_core.yaml,
-  imported unchanged). Every class here specialises a SEPIO core class. Every
-  inherited slot keeps or narrows its core range. Nothing in the core is redefined.
+  SIEVE is a profile of the SEPIO core information model (schema/sepio_core.yaml, a
+  byte-identical copy of sepio-linkml's sepio_classes.yaml). Every class here
+  specialises a SEPIO core class. Every inherited slot keeps or narrows its core
+  range. Nothing in the core is redefined.
 
   The profile is driven by the Mondo requirements collection
   (requirements/mondo_requirements.tsv). Each class, slot, enum and permissible value
@@ -16,12 +17,15 @@ description: |-
   tests/test_traceability.py keeps both sides consistent.
 
   Shape of the data: one EvidencePacket per claim. It holds one claim-type
-  Statement (view B of D-041: identified, reified statement objects), the evidence
-  items its lines refer to, and a version. Rules, policies, agents and information
-  resources are shared reference data held in a SieveRegistry.
+  Statement (view B of D-041: identified, reified statement objects), a version,
+  and a frozen reference_snapshot. Evidence is nested: each line carries its items
+  in full, each claim or passage the record or document it is reported in. An item
+  used in several places is copied under the same id, and the copies must be
+  identical (profile check). Rules, policies, agents and information resources are
+  reference data, held in the snapshot and referenced by id.
 
-  Profile conventions: names follow the core's camelCase. Narrowed core slots are
-  declared via slot_usage. Value sets for Coding-typed core slots are declared as
+  Profile conventions: slots are snake_case, classes CamelCase, as in the core.
+  Narrowed core slots are declared via slot_usage. Value sets for Coding-typed core slots are declared as
   `bindings` and enforced by sieve.profile_checks, because linkml-validate does not
   enforce bindings.
 license: Apache Software License 2.0
@@ -74,8 +78,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
       version:
         required: true
         description: >-
@@ -110,48 +112,6 @@ classes:
         annotations:
           requirements: PROV.ASSERTION.METHODS PROV.INTERP.AGENT PROV.EI.QUALITY
           decisions: D-049 D-051 D-060
-      external_records:
-        range: ExternalRecord
-        multivalued: true
-        inlined_as_list: true
-        description: External database / terminology records referenced as evidence or origin.
-      prior_claims:
-        range: SieveStatement
-        multivalued: true
-        inlined_as_list: true
-        description: >-
-          Structured claims made by sources (or by Mondo elsewhere), each typed by
-          what it claims: a DOID subclass assertion is a SubclassStatement, an OMIM
-          synonym a SynonymStatement. Whether one supports, disputes or competes is
-          decided by the line that cites it, never by its type.
-        annotations:
-          requirements: EI.PRIOR_CLAIM.DIRECT_STRUCTURED
-          decisions: D-004 D-061 D-069
-      text_passages:
-        range: TextPassage
-        multivalued: true
-        inlined_as_list: true
-        description: Text passages extracted from documents (records created in the Mondo ecosystem).
-      publications:
-        range: Publication
-        multivalued: true
-        inlined_as_list: true
-        description: Scientific publications referenced as evidence or origin.
-      web_pages:
-        range: WebPage
-        multivalued: true
-        inlined_as_list: true
-        description: Non-scholarly web pages referenced as evidence or origin.
-      guidelines:
-        range: GuidelineDocument
-        multivalued: true
-        inlined_as_list: true
-        description: Guideline / consensus documents referenced as evidence.
-      computational_scores:
-        range: ComputationalScore
-        multivalued: true
-        inlined_as_list: true
-        description: Computed scores (lexical match, Boomer, AI scores) referenced as evidence.
 
   EvidencePacketCollection:
     is_a: DataSet
@@ -165,8 +125,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
       record_metadata:
         description: >-
           Artefact-level encoding provenance: record_identifier = where the artefact
@@ -211,8 +169,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
     attributes:
       resources:
         range: InformationResource
@@ -257,8 +213,10 @@ classes:
     description: >-
       A claim as an identified SEPIO Statement, typed by what it claims (one subclass
       per claim type). The same classes serve the packet's own Mondo claim and the
-      prior claims other sources make (packet.prior_claims): a claim's type never
-      encodes the role it plays as evidence. Curation slots (review_state,
+      prior claims other sources make, nested as items of the lines that cite them: a
+      DOID subclass assertion is a SubclassStatement, an OMIM synonym a
+      SynonymStatement. A claim's type never encodes the role it plays as evidence;
+      whether it supports, disputes or competes is set by the line that cites it. Curation slots (review_state,
       assertion_decisions, origin, proposing_channel, has_evidence_lines, score) belong to
       the packet's own claim only; a profile check rejects them on prior claims.
       SPO sits directly on the Statement. There are no Proposition objects. Each concrete subclass is one claim
@@ -280,8 +238,6 @@ classes:
         annotations:
           requirements: CS.REIFIED_OBJECT
           decisions: D-018
-      type:
-        designates_type: true
       proposition:
         description: >-
           Not used by this profile. SPO sits on the Statement, and concordance and
@@ -338,11 +294,11 @@ classes:
           requirements: EINT.REQUIRED
           decisions: D-045
       has_evidence:
-        range: EvidenceItem
-        inlined: false
+        range: InformationEntity
+        inlined_as_list: true
         description: >-
           Direct claim-to-item links with no interpretation (lightweight consumption).
-          The values are ids of items in the packet.
+          The items are nested in full, like the items of a line.
         annotations:
           requirements: EINT.DIRECT_EVIDENCE
           decisions: D-037 D-041
@@ -355,10 +311,12 @@ classes:
           requirements: EINT.SOURCE_ONLY
           decisions: D-025
       reported_in:
-        range: EvidenceItem
-        description: For a prior claim, the record or document that makes it.
+        range: InformationEntity
+        inlined_as_list: true
+        description: For a prior claim, the record or document that makes it, nested in full.
         annotations:
           requirements: EI.PRIOR_CLAIM.DIRECT_STRUCTURED
+          decisions: D-004 D-061 D-069
       contributions:
         range: SieveContribution
         inlined_as_list: true
@@ -715,11 +673,17 @@ classes:
   EvidenceItem:
     mixin: true
     description: >-
-      Marker mixin for everything an evidence line (or has_evidence) may point at:
-      each evidence-item class, and SieveEvidenceLine itself (higher-order lines).
-      References are by id. The items live in the packet's typed lists.
+      Marker mixin for everything an evidence line may hold: each evidence-item
+      class, and SieveEvidenceLine itself (higher-order lines). Items are nested in
+      full where they are used. An item used in several places is copied, keeping its
+      id, so the copies can be recognised as one item; copies with the same id must
+      be identical (profile check COPY_DIVERGENCE). The nesting slots keep the core
+      range InformationEntity, because JSON Schema generation cannot expand a mixin
+      into the classes that use it; the profile check NOT_AN_EVIDENCE_ITEM restricts
+      them to classes with this mixin.
     annotations:
-      requirements: EINT.STACKING
+      requirements: EINT.STACKING EINT.GROUPING
+      decisions: D-046 D-052
     attributes:
       id:
         identifier: true
@@ -779,8 +743,6 @@ classes:
       id:
         identifier: true
         description: Resource identifier, preferably an infores CURIE.
-      type:
-        designates_type: true
     attributes:
       curie_prefixes:
         range: string
@@ -832,8 +794,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
       version:
         required: true
     attributes:
@@ -858,8 +818,6 @@ classes:
       id:
         identifier: true
         description: The record's CURIE.
-      type:
-        designates_type: true
       label:
         description: The record's label as read (original name), so label drift can trigger re-review.
         annotations:
@@ -904,8 +862,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
       statement_text:
         required: true
         description: The verbatim quote.
@@ -913,9 +869,10 @@ classes:
           requirements: EI.PRIOR_CLAIM.DIRECT_TEXT
           decisions: D-050
       reported_in:
-        range: EvidenceItem
+        range: InformationEntity
         required: true
-        description: The document (Publication / WebPage / GuidelineDocument) the passage comes from.
+        inlined_as_list: true
+        description: The document (Publication / WebPage / GuidelineDocument) the passage comes from, nested in full.
         annotations:
           requirements: PROV.EI.EXECUTION
       derived_from:
@@ -923,7 +880,8 @@ classes:
         inlined: false
         description: >-
           Id of the source document, stated as dependence (the passage is not
-          independent of it).
+          independent of it). An id, not a copy: the document itself is nested under
+          reported_in.
         annotations:
           requirements: EINT.GROUPING
           decisions: D-046 D-057
@@ -978,8 +936,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
       date_authored:
         description: Publication date.
         annotations:
@@ -1025,8 +981,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
       urls:
         required: true
       record_metadata:
@@ -1048,8 +1002,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
 
   ComputationalScore:
     is_a: DataItem
@@ -1066,8 +1018,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
       specified_by:
         description: The method / tool that computed the score.
     attributes:
@@ -1098,19 +1048,19 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
       target_proposition:
         description: Not used. The target is always the enclosing Statement.
         annotations:
           requirements: RCS.STRUCTURED_PROPOSITION
           decisions: D-042
       has_evidence_items:
-        range: EvidenceItem
-        inlined: false
+        range: InformationEntity
+        inlined_as_list: true
         description: >-
-          Ids of the items this line interprets: packet items, or other lines for
-          higher-order lines. No maximum: granularity is parked (D-046).
+          The items this line interprets, nested in full: prior claims, records,
+          passages, documents, scores, or other lines for higher-order lines. An item
+          that several lines use is copied into each under the same id. No maximum:
+          granularity is parked (D-046).
         annotations:
           requirements: EINT.GRANULARITY EINT.STACKING
           decisions: D-046
@@ -1177,7 +1127,8 @@ classes:
       supersedes:
         range: SieveEvidenceLine
         multivalued: true
-        description: Lines this one corrects (they must be invalidated).
+        inlined: false
+        description: Ids of the lines this one corrects (they must be invalidated).
         annotations:
           decisions: D-052
       confidence:
@@ -1250,8 +1201,6 @@ classes:
       requirements: EINT.FLAT_COLLAPSE
       decisions: D-050 D-052
     slot_usage:
-      type:
-        designates_type: true
       contributor:
         range: SieveAgent
         required: true
@@ -1265,7 +1214,8 @@ classes:
         range: string
       replacement_line:
         range: SieveEvidenceLine
-        description: The new line that corrects this one (action SUPERSEDED).
+        inlined: false
+        description: Id of the new line that corrects this one (action SUPERSEDED).
 
   # ===========================================================================
   # Module: provenance
@@ -1284,8 +1234,6 @@ classes:
       id:
         identifier: true
         description: ORCID for persons (handles are not accepted, D-026), infores / URL otherwise.
-      type:
-        designates_type: true
       subtype:
         range: AgentKind
         required: true
@@ -1346,8 +1294,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
     attributes:
       version:
         range: string
@@ -1480,8 +1426,6 @@ classes:
     slot_usage:
       id:
         identifier: true
-      type:
-        designates_type: true
       performed_by:
         range: SieveAgent
         required: true
@@ -1515,8 +1459,6 @@ classes:
       requirements: PROV.INTERP.AGENT PROV.ASSERTION.AGENT PROV.INTERP.LOCATION PROV.ASSERTION.LOCATION
       decisions: D-002 D-034 D-046 D-049 D-051
     slot_usage:
-      type:
-        designates_type: true
       contributor:
         range: SieveAgent
         required: true
@@ -1772,8 +1714,6 @@ classes:
       requirements: PROV.RETRIEVAL.AGENT PROV.RETRIEVAL.SOURCE_SYSTEM PROV.RETRIEVAL.DATE PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
       decisions: D-030 D-031 D-067
     slot_usage:
-      type:
-        designates_type: true
       performed_by:
         range: SieveAgent
         description: The pipeline (kBOOM merge, mondo-ingest slurp, provider sync, mondo-ai harvesting) or curator.
@@ -1795,9 +1735,10 @@ classes:
         annotations:
           decisions: D-030 D-031
       source_item:
-        range: EvidenceItem
+        range: InformationEntity
         required: true
-        description: The upstream item (ExternalRecord, Publication, WebPage) the claim came from.
+        inlined: true
+        description: The upstream item (ExternalRecord, Publication, WebPage) the claim came from, nested in full.
         annotations:
           requirements: PROV.RETRIEVAL.ORIGINAL_NAMES_IDS
       source_label:
@@ -1823,8 +1764,6 @@ classes:
       requirements: PROV.SA.EXECUTION PROV.SA.DATE PROV.SA.METHODS
       decisions: D-061 D-062
     slot_usage:
-      type:
-        designates_type: true
       date:
         description: Timestamp of the run that computed the chain.
         annotations:
@@ -1868,8 +1807,6 @@ classes:
       requirements: PROV.SA.AGENT PROV.SA.METHOD_TYPES PROV.SA.METHODS PROV.SA.EXECUTION PROV.SA.DATE PROV.SA.CONFIDENCE_CATEGORY PROV.SA.CONFIDENCE_SCORE PROV.SA.REVIEW
       decisions: D-061 D-062
     slot_usage:
-      type:
-        designates_type: true
       performed_by:
         range: SieveAgent
         description: The agent (with version) that performed the step.

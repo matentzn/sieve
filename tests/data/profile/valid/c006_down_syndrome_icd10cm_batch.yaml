@@ -20,7 +20,13 @@ statement:
   has_evidence_lines:
     - id: sieve:el/q90-lexical
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:score/q90-lexical]
+      has_evidence_items:
+        - id: sieve:score/q90-lexical
+          type: ComputationalScore
+          value: "0.97"
+          specified_by: [sieve:method/lexmatch]
+          software_version: oak-0.6
+          parameters: "normalize=true"
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: weak
       score_of_evidence_provided: 0.3
@@ -34,7 +40,17 @@ statement:
           specified_by: [sieve:method/mondo-mapping-guide]
     - id: sieve:el/q90-record
       type: SieveEvidenceLine
-      has_evidence_items: [ICD10CM:Q90]
+      has_evidence_items:
+        - id: ICD10CM:Q90
+          type: ExternalRecord
+          label: Down syndrome
+          resource: infores:icd10cm
+          obsolete_in_source: false
+          record_metadata:
+            retrieved_from: infores:icd10cm
+            source_release: sieve:release/icd10cm-2026
+            retrieval_date: "2026-10-01"
+            source_label: Down syndrome
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: strong
       score_of_evidence_provided: 0.8
@@ -60,24 +76,6 @@ statement:
       score_band: strong
       aggregation_rule: sieve:rule/mapping-v1.0
       signed_packet_version: "2026-10-25"
-external_records:
-  - id: ICD10CM:Q90
-    type: ExternalRecord
-    label: Down syndrome
-    resource: infores:icd10cm
-    obsolete_in_source: false
-    record_metadata:
-      retrieved_from: infores:icd10cm
-      source_release: sieve:release/icd10cm-2026
-      retrieval_date: "2026-10-01"
-      source_label: Down syndrome
-computational_scores:
-  - id: sieve:score/q90-lexical
-    type: ComputationalScore
-    value: "0.97"
-    specified_by: [sieve:method/lexmatch]
-    software_version: oak-0.6
-    parameters: "normalize=true"
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: sieve:pkt/MONDO_0008608-exact-ICD10CM_Q90#references

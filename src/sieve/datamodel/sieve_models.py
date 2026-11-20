@@ -3,6 +3,9 @@ from __future__ import annotations
 import re
 from datetime import date as _Date
 import sys
+# Building the schemas of the mutually recursive models below needs more than the
+# default recursion limit (sieve.datamodel.codegen).
+sys.setrecursionlimit(max(sys.getrecursionlimit(), 5000))
 from datetime import (
     date,
     datetime,
@@ -82,11 +85,12 @@ class LinkMLMeta(RootModel):
 linkml_meta = LinkMLMeta({'default_prefix': 'sieve',
      'default_range': 'string',
      'description': 'SIEVE is a profile of the SEPIO core information model '
-                    '(schema/sepio_core.yaml,\n'
-                    'imported unchanged). Every class here specialises a SEPIO '
-                    'core class. Every\n'
-                    'inherited slot keeps or narrows its core range. Nothing in '
-                    'the core is redefined.\n'
+                    '(schema/sepio_core.yaml, a\n'
+                    "byte-identical copy of sepio-linkml's sepio_classes.yaml). "
+                    'Every class here\n'
+                    'specialises a SEPIO core class. Every inherited slot keeps or '
+                    'narrows its core\n'
+                    'range. Nothing in the core is redefined.\n'
                     '\n'
                     'The profile is driven by the Mondo requirements collection\n'
                     '(requirements/mondo_requirements.tsv). Each class, slot, enum '
@@ -104,15 +108,21 @@ linkml_meta = LinkMLMeta({'default_prefix': 'sieve',
                     'Shape of the data: one EvidencePacket per claim. It holds one '
                     'claim-type\n'
                     'Statement (view B of D-041: identified, reified statement '
-                    'objects), the evidence\n'
-                    'items its lines refer to, and a version. Rules, policies, '
-                    'agents and information\n'
-                    'resources are shared reference data held in a SieveRegistry.\n'
+                    'objects), a version,\n'
+                    'and a frozen reference_snapshot. Evidence is nested: each '
+                    'line carries its items\n'
+                    'in full, each claim or passage the record or document it is '
+                    'reported in. An item\n'
+                    'used in several places is copied under the same id, and the '
+                    'copies must be\n'
+                    'identical (profile check). Rules, policies, agents and '
+                    'information resources are\n'
+                    'reference data, held in the snapshot and referenced by id.\n'
                     '\n'
-                    "Profile conventions: names follow the core's camelCase. "
-                    'Narrowed core slots are\n'
-                    'declared via slot_usage. Value sets for Coding-typed core '
-                    'slots are declared as\n'
+                    'Profile conventions: slots are snake_case, classes CamelCase, '
+                    'as in the core.\n'
+                    'Narrowed core slots are declared via slot_usage. Value sets '
+                    'for Coding-typed core slots are declared as\n'
                     '`bindings` and enforced by sieve.profile_checks, because '
                     'linkml-validate does not\n'
                     'enforce bindings.',
@@ -570,6 +580,10 @@ class Entity(ConfiguredBaseModel):
          'status': 'Draft',
          'title': 'Entity'})
 
+    type: Literal["Entity"] = Field(default="Entity", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -589,13 +603,8 @@ class Entity(ConfiguredBaseModel):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -629,9 +638,8 @@ class InformationEntity(Entity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -647,7 +655,6 @@ class InformationEntity(Entity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -660,7 +667,6 @@ class InformationEntity(Entity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -668,26 +674,22 @@ class InformationEntity(Entity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -695,12 +697,11 @@ class InformationEntity(Entity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -726,7 +727,6 @@ class InformationEntity(Entity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -735,7 +735,10 @@ class InformationEntity(Entity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["InformationEntity"] = Field(default="InformationEntity", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -756,13 +759,8 @@ class InformationEntity(Entity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -805,9 +803,8 @@ class Method(InformationEntity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -823,7 +820,6 @@ class Method(InformationEntity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -836,7 +832,6 @@ class Method(InformationEntity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -844,26 +839,22 @@ class Method(InformationEntity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -871,12 +862,11 @@ class Method(InformationEntity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -902,7 +892,6 @@ class Method(InformationEntity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -911,7 +900,10 @@ class Method(InformationEntity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["Method"] = Field(default="Method", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -932,13 +924,8 @@ class Method(InformationEntity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -994,9 +981,8 @@ class Document(InformationEntity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -1012,7 +998,6 @@ class Document(InformationEntity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -1025,7 +1010,6 @@ class Document(InformationEntity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -1033,26 +1017,22 @@ class Document(InformationEntity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -1060,12 +1040,11 @@ class Document(InformationEntity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -1091,7 +1070,6 @@ class Document(InformationEntity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -1100,7 +1078,10 @@ class Document(InformationEntity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["Document"] = Field(default="Document", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -1121,13 +1102,8 @@ class Document(InformationEntity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -1173,15 +1149,14 @@ class DataItem(InformationEntity):
                       'or application.'],
          'domain_of': ['DataItem'],
          'status': 'Informative'} })
-    variability_measures: Optional[list[DataItem]] = Field(default=[], description="""A statistical score describing the variability inherent in a data item representing a statistical summary of a set of observations/measurements (e.g. the standard deviation associated with a statistical mean calculated across several experimental replicates).""", json_schema_extra = { "linkml_meta": {'comments': ['Examples of statistical measures of variability include an '
+    variability_measures: Optional[list[Union[DataItem,ComputationalScore]]] = Field(default=[], description="""A statistical score describing the variability inherent in a data item representing a statistical summary of a set of observations/measurements (e.g. the standard deviation associated with a statistical mean calculated across several experimental replicates).""", json_schema_extra = { "linkml_meta": {'comments': ['Examples of statistical measures of variability include an '
                       'Interquartile Range, Variance, Standard Deviation, Standard '
                       'Error. The type of variability measure used here represents '
                       'should be reported in the DataItem instance created to '
                       'represent it.'],
          'domain_of': ['DataItem'],
-         'slot_uri': 'sepio-model:variabilityMeasures',
          'status': 'Informative'} })
-    confidence_interval: Optional[DataItem] = Field(default=None, description="""A measure of the probability that a parameter of interest will fall within a defined range of values around a mean or other statistical calculation.""", json_schema_extra = { "linkml_meta": {'comments': ['Confidence intervals reflect the degree of uncertainty in a '
+    confidence_interval: Optional[Union[DataItem,ComputationalScore]] = Field(default=None, description="""A measure of the probability that a parameter of interest will fall within a defined range of values around a mean or other statistical calculation.""", json_schema_extra = { "linkml_meta": {'comments': ['Confidence intervals reflect the degree of uncertainty in a '
                       'sampling method. They may be bounded on one or both sides, and '
                       'are  computed for a designated confidence level (most often 95% '
                       'or 99%.. For example, a Hazard Ratio of 0.47 might have a 95% '
@@ -1193,15 +1168,13 @@ class DataItem(InformationEntity):
                       "upper and lower bounds of the interval (e.g. ''0.42'' and "
                       "''0.55'').'"],
          'domain_of': ['DataItem'],
-         'slot_uri': 'sepio-model:confidenceInterval',
          'status': 'Informative'} })
-    component_data_item: Optional[list[DataItem]] = Field(default=[], description="""A more foundational data item that is a logical component of a compound data item.""", json_schema_extra = { "linkml_meta": {'comments': ["Examples of 'compound' data items with component parts include "
+    component_data_item: Optional[list[Union[DataItem,ComputationalScore]]] = Field(default=[], description="""A more foundational data item that is a logical component of a compound data item.""", json_schema_extra = { "linkml_meta": {'comments': ["Examples of 'compound' data items with component parts include "
                       'a confidence interval, which is comprised of data items '
                       'representing its lower and upper bounds,  or a blood pressure '
                       'reading, which is comprised of separate systolic and diastolic '
                       'measurements.'],
          'domain_of': ['DataItem'],
-         'slot_uri': 'sepio-model:componentDataItem',
          'status': 'Informative'} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
@@ -1212,9 +1185,8 @@ class DataItem(InformationEntity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -1230,7 +1202,6 @@ class DataItem(InformationEntity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -1243,7 +1214,6 @@ class DataItem(InformationEntity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -1251,26 +1221,22 @@ class DataItem(InformationEntity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -1278,12 +1244,11 @@ class DataItem(InformationEntity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -1309,7 +1274,6 @@ class DataItem(InformationEntity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -1318,7 +1282,10 @@ class DataItem(InformationEntity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["DataItem"] = Field(default="DataItem", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -1339,13 +1306,8 @@ class DataItem(InformationEntity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -1388,7 +1350,6 @@ class DataSet(InformationEntity):
                       'released, which may be different than the data set was '
                       'generated.'],
          'domain_of': ['DataSet'],
-         'slot_uri': 'sepio-model:releaseDate',
          'status': 'Informative'} })
     version: Optional[str] = Field(default=None, description="""The version of the DataSet, as assigned by its creator.""", json_schema_extra = { "linkml_meta": {'comments': ['This property can capture version information for resources '
                       'such as data sets and documents that get published and released '
@@ -1415,9 +1376,8 @@ class DataSet(InformationEntity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -1433,7 +1393,6 @@ class DataSet(InformationEntity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -1446,7 +1405,6 @@ class DataSet(InformationEntity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -1454,26 +1412,22 @@ class DataSet(InformationEntity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -1481,12 +1435,11 @@ class DataSet(InformationEntity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -1512,7 +1465,6 @@ class DataSet(InformationEntity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -1521,7 +1473,10 @@ class DataSet(InformationEntity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["DataSet"] = Field(default="DataSet", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -1542,13 +1497,8 @@ class DataSet(InformationEntity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -1594,14 +1544,14 @@ class Activity(Entity):
                       'in ISO format "YYYY-MM-DD".'],
          'domain_of': ['Activity'],
          'status': 'Draft'} })
-    performed_by: Optional[list[Agent]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
+    performed_by: Optional[list[Union[Agent,SieveAgent]]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
+    specified_by: Optional[list[Union[Method,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""A method that was followed in performing an Activity, that describes how it was executed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["Activity"] = Field(default="Activity", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
-    specified_by: Optional[list[Method]] = Field(default=[], description="""A method that was followed in performing an Activity, that describes how it was executed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
-         'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -1621,13 +1571,8 @@ class Activity(Entity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -1654,7 +1599,7 @@ class Contribution(Activity):
          'status': 'Draft',
          'title': 'Contribution'})
 
-    contributor: Optional[Agent] = Field(default=None, description="""The Agent that made the contribution.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that this must be a single agent (which can be a Person, '
+    contributor: Optional[Union[Agent,SieveAgent]] = Field(default=None, description="""The Agent that made the contribution.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that this must be a single agent (which can be a Person, '
                       'or an Organization).  If multiple Agents contributed to an '
                       'entity, a separate Contribution instances MUST be created for '
                       'each.'],
@@ -1669,11 +1614,8 @@ class Contribution(Activity):
                       'each was performed), then a separate Contribution object should '
                       'be created for each activity.'],
          'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:activityType',
          'status': 'Draft'} })
-    contribution_made_to: Optional[InformationEntity] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:contributionMadeTo',
-         'status': 'Informative'} })
+    contribution_made_to: Optional[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'], 'status': 'Informative'} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of activity the Activity instance represents.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute can be used to report a specific type for the '
                       'Activity, in cases where a model does not define Activity '
                       'subclasses for this purpose.  Implementers can define their own '
@@ -1693,14 +1635,14 @@ class Contribution(Activity):
                       'in ISO format "YYYY-MM-DD".'],
          'domain_of': ['Activity'],
          'status': 'Draft'} })
-    performed_by: Optional[list[Agent]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
+    performed_by: Optional[list[Union[Agent,SieveAgent]]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
+    specified_by: Optional[list[Union[Method,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""A method that was followed in performing an Activity, that describes how it was executed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["Contribution"] = Field(default="Contribution", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
-    specified_by: Optional[list[Method]] = Field(default=[], description="""A method that was followed in performing an Activity, that describes how it was executed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
-         'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -1720,13 +1662,8 @@ class Contribution(Activity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -1774,6 +1711,10 @@ class Agent(Entity):
                        'Characteristic',
                        'AppliedRule'],
          'status': 'Draft'} })
+    type: Literal["Agent"] = Field(default="Agent", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -1793,13 +1734,8 @@ class Agent(Entity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -1854,7 +1790,6 @@ class Statement(InformationEntity):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""A possible fact that the Statement assesses or puts forth as true.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute supports an alternate modeling pattern where the '
                       'structured semantics of the possible fact asserted or evaluated '
@@ -1972,9 +1907,8 @@ class Statement(InformationEntity):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -1982,9 +1916,8 @@ class Statement(InformationEntity):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
-    has_evidence_lines: Optional[list[EvidenceLine]] = Field(default=[], description="""An evidence-based argument that supports or disputes the validity of the proposition that a Statement assesses or puts forth as true. The strength and direction of this argument (whether it supports or disputes  the proposition, and how strongly) is based on an interpretation of one or more pieces of information as evidence (i.e. 'Evidence Items).""", json_schema_extra = { "linkml_meta": {'comments': ['Evidence Lines result from the interpretation of one or more '
+    has_evidence_lines: Optional[list[Union[EvidenceLine,SieveEvidenceLine]]] = Field(default=[], description="""An evidence-based argument that supports or disputes the validity of the proposition that a Statement assesses or puts forth as true. The strength and direction of this argument (whether it supports or disputes  the proposition, and how strongly) is based on an interpretation of one or more pieces of information as evidence (i.e. 'Evidence Items).""", json_schema_extra = { "linkml_meta": {'comments': ['Evidence Lines result from the interpretation of one or more '
                       'pieces of information to build an argument for or against a '
                       'particular Proposition. These arguments have direction '
                       '(supporting / disputing) and strength (e.g. strong, moderate, '
@@ -2000,9 +1933,8 @@ class Statement(InformationEntity):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[InformationEntity]] = Field(default=[], description="""A piece of information that represents or contributes to an argument for or against the validity of the Proposition put forth in a Statement. This is a shortcut relation that links a Statement directly to a piece of evidence supporting it, bypassing the Evidence Line class when used data creators do not utilize an Evidence Line object.""", json_schema_extra = { "linkml_meta": {'comments': ['- Evidence is any information that is interpreted in assessing '
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""A piece of information that represents or contributes to an argument for or against the validity of the Proposition put forth in a Statement. This is a shortcut relation that links a Statement directly to a piece of evidence supporting it, bypassing the Evidence Line class when used data creators do not utilize an Evidence Line object.""", json_schema_extra = { "linkml_meta": {'comments': ['- Evidence is any information that is interpreted in assessing '
                       'the truth of  the proposition a Statement puts forth as true or '
                       'false.  A piece of information only becomes evidence when it is '
                       'interpreted in this way. Different types of information '
@@ -2017,14 +1949,12 @@ class Statement(InformationEntity):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
-    has_evidence_from_sources: Optional[list[InformationEntity]] = Field(default=[], description="""An Information Entity (typically a publication, dataset, or database) that provided information used as evidence to generate the knowledge expressed in a Statement.""", json_schema_extra = { "linkml_meta": {'comments': ["This is a 'shortcut property' that can be used to directly link "
+    has_evidence_from_sources: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An Information Entity (typically a publication, dataset, or database) that provided information used as evidence to generate the knowledge expressed in a Statement.""", json_schema_extra = { "linkml_meta": {'comments': ["This is a 'shortcut property' that can be used to directly link "
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -2034,9 +1964,8 @@ class Statement(InformationEntity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -2052,7 +1981,6 @@ class Statement(InformationEntity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -2065,7 +1993,6 @@ class Statement(InformationEntity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -2073,26 +2000,22 @@ class Statement(InformationEntity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -2100,12 +2023,11 @@ class Statement(InformationEntity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -2131,7 +2053,6 @@ class Statement(InformationEntity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -2140,7 +2061,10 @@ class Statement(InformationEntity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["Statement"] = Field(default="Statement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -2161,13 +2085,8 @@ class Statement(InformationEntity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -2222,7 +2141,7 @@ class StudyResult(InformationEntity):
                       "unit of analysis in the study (e.g. 'exposure to nicotine' in "
                       'an analysis correlating this variable with clinical outcomes).'],
          'domain_of': ['StudyResult']} })
-    data_items: Optional[list[DataItem]] = Field(default=[], description="""One or more data items that are included in the StudyResult because it pertains to the 'focus' of the result. This can be data that directly describes this 'focus' (e.g. the population frequency of an allele focus), or be metadata about how data about the 'focus' were generated (e.g the quality measures for the sequencing run used to determine this allele frequency).""", json_schema_extra = { "linkml_meta": {'comments': ['Any type of data item from a Study may be captured in a '
+    data_items: Optional[list[Union[DataItem,ComputationalScore]]] = Field(default=[], description="""One or more data items that are included in the StudyResult because it pertains to the 'focus' of the result. This can be data that directly describes this 'focus' (e.g. the population frequency of an allele focus), or be metadata about how data about the 'focus' were generated (e.g the quality measures for the sequencing run used to determine this allele frequency).""", json_schema_extra = { "linkml_meta": {'comments': ['Any type of data item from a Study may be captured in a '
                       'StudyResult - including raw experimental/observational data, '
                       'derived calculations or quality measures, provenance '
                       'information about how the data were generated in the study, or '
@@ -2234,31 +2153,29 @@ class StudyResult(InformationEntity):
                       'to capture the meaning and value of each type of data item '
                       'captured in a given StudyResult. But in practice, profiles for '
                       'specific StudyResult types may choose to define one or more '
-                      "specializations of the generic 'dataItems' property as named "
+                      "specializations of the generic 'data_items' property as named "
                       'attributes. This makes the data more succinct and parsable, and '
                       'allows specific constraints to be applied and validated for '
                       'different data items. For example, a '
                       'PopulaitonAlleleFrequencyStudyResult profile may define a named '
                       "'focusAlleleFrequency' attribute that is required, and a named "
                       "'focusAlleleCount' attribute that is optional - both of which "
-                      "conceptually specialize the core-im 'dataItems' property. Under "
-                      "this approach, the core 'dataItems' acts as a placeholder to "
-                      'seed such specializations, but is not used directly in '
-                      'StudyResult profiles.'],
+                      "conceptually specialize the core-im 'data_items' property. "
+                      "Under this approach, the core 'data_items' acts as a "
+                      'placeholder to seed such specializations, but is not used '
+                      'directly in StudyResult profiles.'],
          'domain_of': ['StudyResult'],
-         'slot_uri': 'sepio-model:dataItems',
          'status': 'Informative'} })
     interpretation: Optional[Coding] = Field(default=None, description="""The outcome of an interpretation of lower-level data item(s) in a StudyResult, that express some broader conclusion or insight that was made (e.g. that data indicates a result to be is high, normal, or low).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute allows basic interpretations / classifications '
                       'to be included in a Study Result, such as binning a data item '
                       'or items as being in or out of some normal range.'],
          'domain_of': ['StudyResult'],
          'status': 'Informative'} })
-    source_data_set: Optional[list[DataSet]] = Field(default=[], description="""A larger DataSet from which the content of the StudyResult was derived.""", json_schema_extra = { "linkml_meta": {'comments': ['In most cases, a StudyResult will be generated using data from '
+    source_data_set: Optional[list[Union[DataSet,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease]]] = Field(default=[], description="""A larger DataSet from which the content of the StudyResult was derived.""", json_schema_extra = { "linkml_meta": {'comments': ['In most cases, a StudyResult will be generated using data from '
                       'one source dataset - but it is possible multiple datasets '
                       'related to a single study contain data about a particular focus '
                       'that get collected into a single StudyResult instance.'],
          'domain_of': ['StudyResult'],
-         'slot_uri': 'sepio-model:sourceDataSet',
          'status': 'Draft'} })
     component_result: Optional[list[StudyResult]] = Field(default=[], description="""Another StudyResult comprised of data items about the same focus as its parent Result, but based on a more narrowly scoped analysis of the foundational data (e.g. an analysis based on data about a subset of the parent Results full study population).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute allows data creators to break down a StudyResult '
                       'into finer-grained StudyResult instances with a narrower scope. '
@@ -2268,14 +2185,12 @@ class StudyResult(InformationEntity):
                       'individuals in the source data (e.g. frequency of the allele in '
                       'asian vs african subpopulations, or male vs female subgroups).'],
          'domain_of': ['StudyResult'],
-         'slot_uri': 'sepio-model:componentResult',
          'status': 'Draft'} })
     study_group: Optional[StudyGroup] = Field(default=None, description="""A description of a specific group or population of subjects interrogated in the ResearchStudy that produced the data captured in the StudyResult.""", json_schema_extra = { "linkml_meta": {'comments': ['For example, in a StudyResult holding allele frequency data, '
                       'this attribute points to a StudyGroup object that describes '
                       'characteristics of the population that the frequency data was '
                       "generated from (e.g. 'East Asian', 'Female')."],
-         'domain_of': ['StudyResult'],
-         'slot_uri': 'sepio-model:studyGroup'} })
+         'domain_of': ['StudyResult']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -2285,9 +2200,8 @@ class StudyResult(InformationEntity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -2303,7 +2217,6 @@ class StudyResult(InformationEntity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -2316,7 +2229,6 @@ class StudyResult(InformationEntity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -2324,26 +2236,22 @@ class StudyResult(InformationEntity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -2351,12 +2259,11 @@ class StudyResult(InformationEntity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -2382,7 +2289,6 @@ class StudyResult(InformationEntity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -2391,7 +2297,10 @@ class StudyResult(InformationEntity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["StudyResult"] = Field(default="StudyResult", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -2412,13 +2321,8 @@ class StudyResult(InformationEntity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -2509,9 +2413,8 @@ class EvidenceLine(InformationEntity):
                       "provides 'moderate' (strength) 'support' (direction) for this "
                       'target proposition.'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:targetProposition',
          'status': 'Informative'} })
-    has_evidence_items: Optional[list[InformationEntity]] = Field(default=[], description="""An individual piece of information that was evaluated as evidence in building the argument represented by an Evidence Line.""", json_schema_extra = { "linkml_meta": {'comments': ['A given Evidence Line may be supported by one or many '
+    has_evidence_items: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An individual piece of information that was evaluated as evidence in building the argument represented by an Evidence Line.""", json_schema_extra = { "linkml_meta": {'comments': ['A given Evidence Line may be supported by one or many '
                       'individual evidence items. What matters is that all evidence '
                       'items in a given Evidence Line get collectively assessed and '
                       'assigned direction and strength  as a single argument for or '
@@ -2525,23 +2428,18 @@ class EvidenceLine(InformationEntity):
                       'assessed for the support it may offer for a target proposition '
                       '(e.g. the prospect of the variant’s pathogenicity).'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:hasEvidenceItems',
          'status': 'Draft'} })
-    direction_of_evidence_provided: Optional[str] = Field(default=None, description="""The direction of support that the Evidence Line is determined to provide toward its target Proposition (supports, disputes, neutral).""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:directionOfEvidenceProvided',
-         'status': 'Draft'} })
-    strength_of_evidence_provided: Optional[str] = Field(default=None, description="""The strength of support that an Evidence Line is determined to provide for or against its target Proposition, evaluated relative to the direction indicated by the directionOfEvidenceProvided.""", json_schema_extra = { "linkml_meta": {'comments': ['Values of this attribute can be defined by for a given profile '
+    direction_of_evidence_provided: Optional[str] = Field(default=None, description="""The direction of support that the Evidence Line is determined to provide toward its target Proposition (supports, disputes, neutral).""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceLine'], 'status': 'Draft'} })
+    strength_of_evidence_provided: Optional[str] = Field(default=None, description="""The strength of support that an Evidence Line is determined to provide for or against its target Proposition, evaluated relative to the direction indicated by the direction_of_evidence_provided.""", json_schema_extra = { "linkml_meta": {'comments': ['Values of this attribute can be defined by for a given profile '
                       'based on domain/application needs, but should be framed in '
                       "qualitative terms (e.g. 'strong', 'moderate', 'weak'). The "
-                      "'scoreOfEvidenceProvided' attribute can be used to report "
+                      "'score_of_evidence_provided' attribute can be used to report "
                       'quantitative assessments of evidence provided.'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:strengthOfEvidenceProvided',
          'status': 'Draft'} })
-    score_of_evidence_provided: Optional[float] = Field(default=None, description="""A quantitative score indicating the strength of support that an Evidence Line is determined to provide for or against its target Proposition, evaluated relative to the direction indicated by the directionOfEvidenceProvided value.""", json_schema_extra = { "linkml_meta": {'comments': ['A given profile or implementation can define a scoring scale '
+    score_of_evidence_provided: Optional[float] = Field(default=None, description="""A quantitative score indicating the strength of support that an Evidence Line is determined to provide for or against its target Proposition, evaluated relative to the direction indicated by the direction_of_evidence_provided value.""", json_schema_extra = { "linkml_meta": {'comments': ['A given profile or implementation can define a scoring scale '
                       'and rules that meet the needs of their domain or application.'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:scoreOfEvidenceProvided',
          'status': 'Draft'} })
     evidence_item_sources: Optional[list[str]] = Field(default=[], description="""An information resource (e.g. document, dataset, digital resource such as a database or  knowledgebase) that provides information interpreted as evidence in building an Evidence Line.""", json_schema_extra = { "linkml_meta": {'comments': ["This is a 'shortcut relation' that can be used to directly link "
                       'an Evidence Line to sources of its supporting Evidence Items, '
@@ -2550,7 +2448,6 @@ class EvidenceLine(InformationEntity):
                       'information. Future work will define a more formal framework '
                       'for referencing information sources.'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:evidenceItemSources',
          'status': 'Informative'} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
@@ -2561,9 +2458,8 @@ class EvidenceLine(InformationEntity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -2579,7 +2475,6 @@ class EvidenceLine(InformationEntity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -2592,7 +2487,6 @@ class EvidenceLine(InformationEntity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -2600,26 +2494,22 @@ class EvidenceLine(InformationEntity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -2627,12 +2517,11 @@ class EvidenceLine(InformationEntity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -2658,7 +2547,6 @@ class EvidenceLine(InformationEntity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -2667,7 +2555,10 @@ class EvidenceLine(InformationEntity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["EvidenceLine"] = Field(default="EvidenceLine", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -2688,13 +2579,8 @@ class EvidenceLine(InformationEntity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -2726,9 +2612,7 @@ class Proposition(Entity):
          'status': 'Informative',
          'title': 'Proposition'})
 
-    proposition_text: Optional[str] = Field(default=None, description="""A natural-language expression of the Proposition's meaning (i.e. the 'possible fact' it expresses).""", json_schema_extra = { "linkml_meta": {'domain_of': ['Proposition'],
-         'slot_uri': 'sepio-model:propositionText',
-         'status': 'Informative'} })
+    proposition_text: Optional[str] = Field(default=None, description="""A natural-language expression of the Proposition's meaning (i.e. the 'possible fact' it expresses).""", json_schema_extra = { "linkml_meta": {'domain_of': ['Proposition'], 'status': 'Informative'} })
     subject: str = Field(default=..., description="""The Entity or concept about which the Proposition is made.""", json_schema_extra = { "linkml_meta": {'comments': ['While the Core Information Model is domain-agnostic, and '
                       'supports Propositions about any type of Entity, for most VA use '
                       'cases, the subject will be  some type of genetic variation. But '
@@ -2792,6 +2676,10 @@ class Proposition(Entity):
                       "of the 'possible fact' that a Proposition expresses."],
          'domain_of': ['Proposition', 'SieveStatement'],
          'status': 'Informative'} })
+    type: Literal["Proposition"] = Field(default="Proposition", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -2811,13 +2699,8 @@ class Proposition(Entity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -2838,13 +2721,13 @@ class StudyGroup(Entity):
          'status': 'Draft',
          'title': 'Study Group'})
 
-    member_count: Optional[int] = Field(default=None, description="""The total number of individual members in the StudyGroup.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StudyGroup'],
-         'slot_uri': 'sepio-model:memberCount',
-         'status': 'Informative'} })
-    is_subset_of: Optional[list[StudyGroup]] = Field(default=[], description="""A larger StudyGroup of which this StudyGroup represents a subset.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StudyGroup'],
-         'slot_uri': 'sepio-model:isSubsetOf',
-         'status': 'Draft'} })
+    member_count: Optional[int] = Field(default=None, description="""The total number of individual members in the StudyGroup.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StudyGroup'], 'status': 'Informative'} })
+    is_subset_of: Optional[list[StudyGroup]] = Field(default=[], description="""A larger StudyGroup of which this StudyGroup represents a subset.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StudyGroup'], 'status': 'Draft'} })
     characteristics: Optional[list[Characteristic]] = Field(default=[], description="""A feature or role shared by all members of the StudyGroup, representing a criterion for membership in the group.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StudyGroup'], 'status': 'Draft'} })
+    type: Literal["StudyGroup"] = Field(default="StudyGroup", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -2864,13 +2747,8 @@ class StudyGroup(Entity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: str = Field(default=..., description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -2911,7 +2789,7 @@ class Coding(Utility):
     code: Optional[str] = Field(default=None, description="""A symbol uniquely identifying the concept, as in a syntax defined by the code system.  CURIE format is preferred where possible (e.g. ‘SO:0000704’ is the CURIE form of the Sequence Ontology code for 'gene').""", json_schema_extra = { "linkml_meta": {'domain_of': ['Coding']} })
     label: Optional[str] = Field(default=None, description="""The human-readable name for the coded concept, as defined by the code system.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding']} })
     system: Optional[str] = Field(default=None, description="""The terminology/code system that defined the code.  May be reported as a free-text name (e.g. ‘Sequence Ontology’), but it is preferable to provide  a uri/url for the system. When the 'code' is reported as a CURIE, the 'system' should be reported as the uri that the CURIE's prefix expands to (e.g. 'http://purl.obofoundry.org/so.owl/' for the Sequence Ontology).""", json_schema_extra = { "linkml_meta": {'domain_of': ['Coding']} })
-    system_version: Optional[str] = Field(default=None, description="""Version of the terminology or code system that provided the code.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Coding', 'Expression'], 'slot_uri': 'sepio-model:systemVersion'} })
+    system_version: Optional[str] = Field(default=None, description="""Version of the terminology or code system that provided the code.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Coding', 'Expression']} })
 
 
 class Qualifier(Utility):
@@ -2968,8 +2846,8 @@ class Expression(Utility):
                        'Expression',
                        'Extension',
                        'LevelAssignment']} })
-    system_u_r_l: Optional[str] = Field(default=None, description="""A URL for the nomenclature system""", json_schema_extra = { "linkml_meta": {'domain_of': ['Expression'], 'slot_uri': 'sepio-model:systemURL'} })
-    system_version: Optional[str] = Field(default=None, description="""The version of the nomenclature system.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Coding', 'Expression'], 'slot_uri': 'sepio-model:systemVersion'} })
+    system_url: Optional[str] = Field(default=None, description="""A URL for the nomenclature system""", json_schema_extra = { "linkml_meta": {'domain_of': ['Expression']} })
+    system_version: Optional[str] = Field(default=None, description="""The version of the nomenclature system.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Coding', 'Expression']} })
 
 
 class Extension(Utility):
@@ -2984,7 +2862,7 @@ class Extension(Utility):
          'from_schema': 'https://w3id.org/sepio-model',
          'title': 'Extension'})
 
-    extension_description: Optional[str] = Field(default=None, description="""A free text description of the intended meaning and use of the extension element, which may include the types of values it takes, and how to interpret these values in the context of the parent Class.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Extension'], 'slot_uri': 'sepio-model:extensionDescription'} })
+    extension_description: Optional[str] = Field(default=None, description="""A free text description of the intended meaning and use of the extension element, which may include the types of values it takes, and how to interpret these values in the context of the parent Class.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Extension']} })
     name: str = Field(default=..., description="""A name for the Extension. Should be indicative of its meaning and/or the type of information it value represents.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Agent',
                        'Qualifier',
                        'Extension',
@@ -3022,20 +2900,14 @@ class RecordMetadata(Utility):
                       'created that describes this upstream source record, including '
                       'information about its submission to ClinVar.'],
          'domain_of': ['RecordMetadata'],
-         'slot_uri': 'sepio-model:recordIdentifier',
          'status': 'Draft'} })
-    record_version: Optional[str] = Field(default=None, description="""The version number of the record-level artifact the object describes.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RecordMetadata'],
-         'slot_uri': 'sepio-model:recordVersion',
-         'status': 'Draft'} })
+    record_version: Optional[str] = Field(default=None, description="""The version number of the record-level artifact the object describes.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RecordMetadata'], 'status': 'Draft'} })
     derived_from_record: Optional[list[str]] = Field(default=[], description="""Another data record from which the record described here was derived, through a data ingest and/or transformation process.""", json_schema_extra = { "linkml_meta": {'comments': ['Value should be a string representing the identifier of the '
                       'source record.'],
          'domain_of': ['RecordMetadata'],
-         'slot_uri': 'sepio-model:derivedFromRecord',
          'status': 'Draft'} })
-    date_record_created: Optional[str] = Field(default=None, description="""The date the record was initially created.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RecordMetadata'],
-         'slot_uri': 'sepio-model:dateRecordCreated',
-         'status': 'Draft'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""describes specific contributions made by an human or software agent to the creation, modification, or administrative management of a data record or object.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'RecordMetadata'], 'status': 'Draft'} })
+    date_record_created: Optional[str] = Field(default=None, description="""The date the record was initially created.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RecordMetadata'], 'status': 'Draft'} })
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""describes specific contributions made by an human or software agent to the creation, modification, or administrative management of a data record or object.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'RecordMetadata'], 'status': 'Draft'} })
 
 
 class Characteristic(Utility):
@@ -3066,7 +2938,6 @@ class Characteristic(Utility):
                       "values listed. A 'NOT' indicates that the individual does not "
                       'exhibit the characteristic value or values listed.'],
          'domain_of': ['Characteristic'],
-         'slot_uri': 'sepio-model:valueOperator',
          'status': 'Informative'} })
 
 
@@ -3082,7 +2953,6 @@ class EvidencePacket(DataSet):
                                                    'PROV.ENCODING.VERSION'}},
          'from_schema': 'https://w3id.org/sieve',
          'slot_usage': {'id': {'identifier': True, 'name': 'id'},
-                        'type': {'designates_type': True, 'name': 'type'},
                         'version': {'annotations': {'decisions': {'tag': 'decisions',
                                                                   'value': 'D-051'},
                                                     'requirements': {'tag': 'requirements',
@@ -3106,17 +2976,6 @@ class EvidencePacket(DataSet):
                                                    'PROV.INTERP.AGENT '
                                                    'PROV.EI.QUALITY'}},
          'domain_of': ['EvidencePacket']} })
-    external_records: Optional[list[ExternalRecord]] = Field(default=[], description="""External database / terminology records referenced as evidence or origin.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
-    prior_claims: Optional[list[Union[SieveStatement,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement]]] = Field(default=[], description="""Structured claims made by sources (or by Mondo elsewhere), each typed by what it claims: a DOID subclass assertion is a SubclassStatement, an OMIM synonym a SynonymStatement. Whether one supports, disputes or competes is decided by the line that cites it, never by its type.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
-                                       'value': 'D-004 D-061 D-069'},
-                         'requirements': {'tag': 'requirements',
-                                          'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['EvidencePacket']} })
-    text_passages: Optional[list[TextPassage]] = Field(default=[], description="""Text passages extracted from documents (records created in the Mondo ecosystem).""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
-    publications: Optional[list[Publication]] = Field(default=[], description="""Scientific publications referenced as evidence or origin.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
-    web_pages: Optional[list[WebPage]] = Field(default=[], description="""Non-scholarly web pages referenced as evidence or origin.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
-    guidelines: Optional[list[GuidelineDocument]] = Field(default=[], description="""Guideline / consensus documents referenced as evidence.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
-    computational_scores: Optional[list[ComputationalScore]] = Field(default=[], description="""Computed scores (lexical match, Boomer, AI scores) referenced as evidence.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidencePacket']} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of data set the DataSet instance represents (e.g. a 'clinical data set', a 'sequencing data set', a 'gene expression data set', a 'genome annotation data set').""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute can be used to report a specific type for the '
                       'DataSet, in cases where a model does not define DataSet '
                       'subclasses for this purpose.  Implementers can define their own '
@@ -3135,7 +2994,6 @@ class EvidencePacket(DataSet):
                       'released, which may be different than the data set was '
                       'generated.'],
          'domain_of': ['DataSet'],
-         'slot_uri': 'sepio-model:releaseDate',
          'status': 'Informative'} })
     version: str = Field(default=..., description="""Version of this packet snapshot. A change to its lines, items or score creates a new version, so a sign-off on an older version can be told apart.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-051'},
                          'requirements': {'tag': 'requirements',
@@ -3165,9 +3023,8 @@ class EvidencePacket(DataSet):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -3183,7 +3040,6 @@ class EvidencePacket(DataSet):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -3196,7 +3052,6 @@ class EvidencePacket(DataSet):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -3204,26 +3059,22 @@ class EvidencePacket(DataSet):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -3231,12 +3082,11 @@ class EvidencePacket(DataSet):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -3262,7 +3112,6 @@ class EvidencePacket(DataSet):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -3271,7 +3120,10 @@ class EvidencePacket(DataSet):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["EvidencePacket"] = Field(default="EvidencePacket", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -3292,14 +3144,8 @@ class EvidencePacket(DataSet):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["EvidencePacket"] = Field(default="EvidencePacket", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -3344,7 +3190,6 @@ class EvidencePacketCollection(DataSet):
                                                                    'SSSOM export, OWL '
                                                                    'serialisation).',
                                                     'name': 'supporting_method_types'},
-                        'type': {'designates_type': True, 'name': 'type'},
                         'version': {'annotations': {'requirements': {'tag': 'requirements',
                                                                      'value': 'PROV.ENCODING.VERSION'}},
                                     'name': 'version'}}})
@@ -3375,7 +3220,6 @@ class EvidencePacketCollection(DataSet):
                       'released, which may be different than the data set was '
                       'generated.'],
          'domain_of': ['DataSet'],
-         'slot_uri': 'sepio-model:releaseDate',
          'status': 'Informative'} })
     version: Optional[str] = Field(default=None, description="""The version of the DataSet, as assigned by its creator.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.ENCODING.VERSION'}},
@@ -3404,9 +3248,8 @@ class EvidencePacketCollection(DataSet):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -3422,7 +3265,6 @@ class EvidencePacketCollection(DataSet):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -3435,7 +3277,6 @@ class EvidencePacketCollection(DataSet):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -3443,28 +3284,24 @@ class EvidencePacketCollection(DataSet):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Kinds of encoding used (LinkML-Map, SSSOM export, OWL serialisation).""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.ENCODING.METHOD_TYPES'}},
          'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -3472,12 +3309,11 @@ class EvidencePacketCollection(DataSet):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -3503,7 +3339,6 @@ class EvidencePacketCollection(DataSet):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Artefact-level encoding provenance: record_identifier = where the artefact lives; contributions = the pipeline that serialised it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.ENCODING.AGENT '
@@ -3515,7 +3350,10 @@ class EvidencePacketCollection(DataSet):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["EvidencePacketCollection"] = Field(default="EvidencePacketCollection", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -3536,14 +3374,8 @@ class EvidencePacketCollection(DataSet):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["EvidencePacketCollection"] = Field(default="EvidencePacketCollection", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -3560,8 +3392,7 @@ class SieveRegistry(DataSet):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-049 D-054 D-055 D-060 D-064 D-066'}},
          'from_schema': 'https://w3id.org/sieve',
-         'slot_usage': {'id': {'identifier': True, 'name': 'id'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+         'slot_usage': {'id': {'identifier': True, 'name': 'id'}}})
 
     resources: Optional[list[InformationResource]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['SieveRegistry']} })
     releases: Optional[list[SourceRelease]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['SieveRegistry']} })
@@ -3588,7 +3419,6 @@ class SieveRegistry(DataSet):
                       'released, which may be different than the data set was '
                       'generated.'],
          'domain_of': ['DataSet'],
-         'slot_uri': 'sepio-model:releaseDate',
          'status': 'Informative'} })
     version: Optional[str] = Field(default=None, description="""The version of the DataSet, as assigned by its creator.""", json_schema_extra = { "linkml_meta": {'comments': ['This property can capture version information for resources '
                       'such as data sets and documents that get published and released '
@@ -3615,9 +3445,8 @@ class SieveRegistry(DataSet):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -3633,7 +3462,6 @@ class SieveRegistry(DataSet):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -3646,7 +3474,6 @@ class SieveRegistry(DataSet):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -3654,26 +3481,22 @@ class SieveRegistry(DataSet):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -3681,12 +3504,11 @@ class SieveRegistry(DataSet):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -3712,7 +3534,6 @@ class SieveRegistry(DataSet):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -3721,7 +3542,10 @@ class SieveRegistry(DataSet):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["SieveRegistry"] = Field(default="SieveRegistry", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -3742,14 +3566,8 @@ class SieveRegistry(DataSet):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SieveRegistry"] = Field(default="SieveRegistry", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -3761,10 +3579,11 @@ class SieveRegistry(DataSet):
 
 class EvidenceItem(ConfiguredBaseModel):
     """
-    Marker mixin for everything an evidence line (or has_evidence) may point at: each evidence-item class, and SieveEvidenceLine itself (higher-order lines). References are by id. The items live in the packet's typed lists.
+    Marker mixin for everything an evidence line may hold: each evidence-item class, and SieveEvidenceLine itself (higher-order lines). Items are nested in full where they are used. An item used in several places is copied, keeping its id, so the copies can be recognised as one item; copies with the same id must be identical (profile check COPY_DIVERGENCE). The nesting slots keep the core range InformationEntity, because JSON Schema generation cannot expand a mixin into the classes that use it; the profile check NOT_AN_EVIDENCE_ITEM restricts them to classes with this mixin.
     """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'annotations': {'requirements': {'tag': 'requirements',
-                                          'value': 'EINT.STACKING'}},
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-046 D-052'},
+                         'requirements': {'tag': 'requirements',
+                                          'value': 'EINT.STACKING EINT.GROUPING'}},
          'from_schema': 'https://w3id.org/sieve',
          'mixin': True})
 
@@ -3800,7 +3619,7 @@ class UpstreamItem(ConfiguredBaseModel):
 
 class SieveStatement(UpstreamItem, EvidenceItem, Statement):
     """
-    A claim as an identified SEPIO Statement, typed by what it claims (one subclass per claim type). The same classes serve the packet's own Mondo claim and the prior claims other sources make (packet.prior_claims): a claim's type never encodes the role it plays as evidence. Curation slots (review_state, assertion_decisions, origin, proposing_channel, has_evidence_lines, score) belong to the packet's own claim only; a profile check rejects them on prior claims. SPO sits directly on the Statement. There are no Proposition objects. Each concrete subclass is one claim type and binds the predicate to that type's value set. The Statement-level assessment uses the core's \"proposition assessment mode\": score = the inclusion score S, strength = its band, direction = its sign.
+    A claim as an identified SEPIO Statement, typed by what it claims (one subclass per claim type). The same classes serve the packet's own Mondo claim and the prior claims other sources make, nested as items of the lines that cite them: a DOID subclass assertion is a SubclassStatement, an OMIM synonym a SynonymStatement. A claim's type never encodes the role it plays as evidence; whether it supports, disputes or competes is set by the line that cites it. Curation slots (review_state, assertion_decisions, origin, proposing_channel, has_evidence_lines, score) belong to the packet's own claim only; a profile check rejects them on prior claims. SPO sits directly on the Statement. There are no Proposition objects. Each concrete subclass is one claim type and binds the predicate to that type's value set. The Statement-level assessment uses the core's \"proposition assessment mode\": score = the inclusion score S, strength = its band, direction = its sign.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'abstract': True,
          'annotations': {'decisions': {'tag': 'decisions',
@@ -3848,11 +3667,11 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                                          'description': 'Direct claim-to-item links '
                                                         'with no interpretation '
                                                         '(lightweight consumption). '
-                                                        'The values are ids of items '
-                                                        'in the packet.',
-                                         'inlined': False,
+                                                        'The items are nested in full, '
+                                                        'like the items of a line.',
+                                         'inlined_as_list': True,
                                          'name': 'has_evidence',
-                                         'range': 'EvidenceItem'},
+                                         'range': 'InformationEntity'},
                         'has_evidence_from_sources': {'annotations': {'decisions': {'tag': 'decisions',
                                                                                     'value': 'D-025'},
                                                                       'requirements': {'tag': 'requirements',
@@ -3906,12 +3725,18 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                                                        'concordance and dispute are '
                                                        'matched on SPO + negated.',
                                         'name': 'proposition'},
-                        'reported_in': {'annotations': {'requirements': {'tag': 'requirements',
+                        'reported_in': {'annotations': {'decisions': {'tag': 'decisions',
+                                                                      'value': 'D-004 '
+                                                                               'D-061 '
+                                                                               'D-069'},
+                                                        'requirements': {'tag': 'requirements',
                                                                          'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
                                         'description': 'For a prior claim, the record '
-                                                       'or document that makes it.',
+                                                       'or document that makes it, '
+                                                       'nested in full.',
+                                        'inlined_as_list': True,
                                         'name': 'reported_in',
-                                        'range': 'EvidenceItem'},
+                                        'range': 'InformationEntity'},
                         'score': {'annotations': {'decisions': {'tag': 'decisions',
                                                                 'value': 'D-047 D-048 '
                                                                          'D-063'},
@@ -3950,8 +3775,7 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                                     'description': 'The Mondo term the claim is about.',
                                     'name': 'subject',
                                     'range': 'uriorcurie',
-                                    'required': True},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                    'required': True}}})
 
     negated: Optional[bool] = Field(default=False, description="""Negative polarity: the claim is that subject-predicate-object does NOT hold. Profile-level specialisation of the core Proposition.negated, needed because this profile carries SPO on the Statement.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-032'},
                          'requirements': {'tag': 'requirements',
@@ -4017,7 +3841,6 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -4158,9 +3981,8 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -4168,7 +3990,6 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -4189,9 +4010,8 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -4209,7 +4029,6 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -4218,8 +4037,7 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -4229,7 +4047,6 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -4251,7 +4068,6 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -4264,7 +4080,6 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -4272,27 +4087,25 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -4301,12 +4114,11 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -4332,7 +4144,6 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -4341,7 +4152,10 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["SieveStatement"] = Field(default="SieveStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -4351,14 +4165,8 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SieveStatement"] = Field(default="SieveStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -4462,7 +4270,6 @@ class TermExistenceStatement(SieveStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -4604,9 +4411,8 @@ class TermExistenceStatement(SieveStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -4614,7 +4420,6 @@ class TermExistenceStatement(SieveStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -4635,9 +4440,8 @@ class TermExistenceStatement(SieveStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -4655,7 +4459,6 @@ class TermExistenceStatement(SieveStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -4664,8 +4467,7 @@ class TermExistenceStatement(SieveStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -4675,7 +4477,6 @@ class TermExistenceStatement(SieveStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -4697,7 +4498,6 @@ class TermExistenceStatement(SieveStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -4710,7 +4510,6 @@ class TermExistenceStatement(SieveStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -4718,27 +4517,25 @@ class TermExistenceStatement(SieveStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -4747,12 +4544,11 @@ class TermExistenceStatement(SieveStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -4778,7 +4574,6 @@ class TermExistenceStatement(SieveStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -4787,7 +4582,10 @@ class TermExistenceStatement(SieveStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["TermExistenceStatement"] = Field(default="TermExistenceStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -4797,14 +4595,8 @@ class TermExistenceStatement(SieveStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["TermExistenceStatement"] = Field(default="TermExistenceStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -4898,7 +4690,6 @@ class DefinitionStatement(SieveStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -5040,9 +4831,8 @@ class DefinitionStatement(SieveStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -5050,7 +4840,6 @@ class DefinitionStatement(SieveStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -5071,9 +4860,8 @@ class DefinitionStatement(SieveStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -5091,7 +4879,6 @@ class DefinitionStatement(SieveStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -5100,8 +4887,7 @@ class DefinitionStatement(SieveStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -5111,7 +4897,6 @@ class DefinitionStatement(SieveStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -5133,7 +4918,6 @@ class DefinitionStatement(SieveStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -5146,7 +4930,6 @@ class DefinitionStatement(SieveStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -5154,27 +4937,25 @@ class DefinitionStatement(SieveStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -5183,12 +4964,11 @@ class DefinitionStatement(SieveStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -5214,7 +4994,6 @@ class DefinitionStatement(SieveStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -5223,7 +5002,10 @@ class DefinitionStatement(SieveStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["DefinitionStatement"] = Field(default="DefinitionStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -5233,14 +5015,8 @@ class DefinitionStatement(SieveStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["DefinitionStatement"] = Field(default="DefinitionStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -5337,7 +5113,6 @@ class SynonymStatement(SieveStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -5479,9 +5254,8 @@ class SynonymStatement(SieveStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -5489,7 +5263,6 @@ class SynonymStatement(SieveStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -5510,9 +5283,8 @@ class SynonymStatement(SieveStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -5530,7 +5302,6 @@ class SynonymStatement(SieveStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -5539,8 +5310,7 @@ class SynonymStatement(SieveStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -5550,7 +5320,6 @@ class SynonymStatement(SieveStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -5572,7 +5341,6 @@ class SynonymStatement(SieveStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -5585,7 +5353,6 @@ class SynonymStatement(SieveStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -5593,27 +5360,25 @@ class SynonymStatement(SieveStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -5622,12 +5387,11 @@ class SynonymStatement(SieveStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -5653,7 +5417,6 @@ class SynonymStatement(SieveStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -5662,7 +5425,10 @@ class SynonymStatement(SieveStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["SynonymStatement"] = Field(default="SynonymStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -5672,14 +5438,8 @@ class SynonymStatement(SieveStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SynonymStatement"] = Field(default="SynonymStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -5775,7 +5535,6 @@ class SubclassStatement(SieveStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -5917,9 +5676,8 @@ class SubclassStatement(SieveStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -5927,7 +5685,6 @@ class SubclassStatement(SieveStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -5948,9 +5705,8 @@ class SubclassStatement(SieveStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -5968,7 +5724,6 @@ class SubclassStatement(SieveStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -5977,8 +5732,7 @@ class SubclassStatement(SieveStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -5988,7 +5742,6 @@ class SubclassStatement(SieveStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -6010,7 +5763,6 @@ class SubclassStatement(SieveStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -6023,7 +5775,6 @@ class SubclassStatement(SieveStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -6031,27 +5782,25 @@ class SubclassStatement(SieveStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -6060,12 +5809,11 @@ class SubclassStatement(SieveStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -6091,7 +5839,6 @@ class SubclassStatement(SieveStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -6100,7 +5847,10 @@ class SubclassStatement(SieveStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["SubclassStatement"] = Field(default="SubclassStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -6110,14 +5860,8 @@ class SubclassStatement(SieveStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SubclassStatement"] = Field(default="SubclassStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -6210,7 +5954,6 @@ class NegativeSubclassStatement(SubclassStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -6352,9 +6095,8 @@ class NegativeSubclassStatement(SubclassStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -6362,7 +6104,6 @@ class NegativeSubclassStatement(SubclassStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -6383,9 +6124,8 @@ class NegativeSubclassStatement(SubclassStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -6403,7 +6143,6 @@ class NegativeSubclassStatement(SubclassStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -6412,8 +6151,7 @@ class NegativeSubclassStatement(SubclassStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -6423,7 +6161,6 @@ class NegativeSubclassStatement(SubclassStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -6445,7 +6182,6 @@ class NegativeSubclassStatement(SubclassStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -6458,7 +6194,6 @@ class NegativeSubclassStatement(SubclassStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -6466,27 +6201,25 @@ class NegativeSubclassStatement(SubclassStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -6495,12 +6228,11 @@ class NegativeSubclassStatement(SubclassStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -6526,7 +6258,6 @@ class NegativeSubclassStatement(SubclassStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -6535,7 +6266,10 @@ class NegativeSubclassStatement(SubclassStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["NegativeSubclassStatement"] = Field(default="NegativeSubclassStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -6545,14 +6279,8 @@ class NegativeSubclassStatement(SubclassStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["NegativeSubclassStatement"] = Field(default="NegativeSubclassStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -6666,7 +6394,6 @@ class MappingStatement(SieveStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -6810,9 +6537,8 @@ class MappingStatement(SieveStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -6820,7 +6546,6 @@ class MappingStatement(SieveStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -6841,9 +6566,8 @@ class MappingStatement(SieveStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -6861,7 +6585,6 @@ class MappingStatement(SieveStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -6870,8 +6593,7 @@ class MappingStatement(SieveStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -6881,7 +6603,6 @@ class MappingStatement(SieveStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -6903,7 +6624,6 @@ class MappingStatement(SieveStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -6916,7 +6636,6 @@ class MappingStatement(SieveStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -6924,27 +6643,25 @@ class MappingStatement(SieveStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -6953,12 +6670,11 @@ class MappingStatement(SieveStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -6984,7 +6700,6 @@ class MappingStatement(SieveStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -6993,7 +6708,10 @@ class MappingStatement(SieveStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["MappingStatement"] = Field(default="MappingStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -7003,14 +6721,8 @@ class MappingStatement(SieveStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["MappingStatement"] = Field(default="MappingStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -7105,7 +6817,6 @@ class DiseaseAttributeStatement(SieveStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -7247,9 +6958,8 @@ class DiseaseAttributeStatement(SieveStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -7257,7 +6967,6 @@ class DiseaseAttributeStatement(SieveStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -7278,9 +6987,8 @@ class DiseaseAttributeStatement(SieveStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -7298,7 +7006,6 @@ class DiseaseAttributeStatement(SieveStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -7307,8 +7014,7 @@ class DiseaseAttributeStatement(SieveStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -7318,7 +7024,6 @@ class DiseaseAttributeStatement(SieveStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -7340,7 +7045,6 @@ class DiseaseAttributeStatement(SieveStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -7353,7 +7057,6 @@ class DiseaseAttributeStatement(SieveStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -7361,27 +7064,25 @@ class DiseaseAttributeStatement(SieveStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -7390,12 +7091,11 @@ class DiseaseAttributeStatement(SieveStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -7421,7 +7121,6 @@ class DiseaseAttributeStatement(SieveStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -7430,7 +7129,10 @@ class DiseaseAttributeStatement(SieveStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["DiseaseAttributeStatement"] = Field(default="DiseaseAttributeStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -7440,14 +7142,8 @@ class DiseaseAttributeStatement(SieveStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["DiseaseAttributeStatement"] = Field(default="DiseaseAttributeStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -7542,7 +7238,6 @@ class SubsetMembershipStatement(SieveStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -7684,9 +7379,8 @@ class SubsetMembershipStatement(SieveStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -7694,7 +7388,6 @@ class SubsetMembershipStatement(SieveStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -7715,9 +7408,8 @@ class SubsetMembershipStatement(SieveStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -7735,7 +7427,6 @@ class SubsetMembershipStatement(SieveStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -7744,8 +7435,7 @@ class SubsetMembershipStatement(SieveStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -7755,7 +7445,6 @@ class SubsetMembershipStatement(SieveStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -7777,7 +7466,6 @@ class SubsetMembershipStatement(SieveStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -7790,7 +7478,6 @@ class SubsetMembershipStatement(SieveStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -7798,27 +7485,25 @@ class SubsetMembershipStatement(SieveStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -7827,12 +7512,11 @@ class SubsetMembershipStatement(SieveStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -7858,7 +7542,6 @@ class SubsetMembershipStatement(SieveStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -7867,7 +7550,10 @@ class SubsetMembershipStatement(SieveStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["SubsetMembershipStatement"] = Field(default="SubsetMembershipStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -7877,14 +7563,8 @@ class SubsetMembershipStatement(SieveStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SubsetMembershipStatement"] = Field(default="SubsetMembershipStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -7980,7 +7660,6 @@ class MetaclassStatement(SieveStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -8121,9 +7800,8 @@ class MetaclassStatement(SieveStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -8131,7 +7809,6 @@ class MetaclassStatement(SieveStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -8152,9 +7829,8 @@ class MetaclassStatement(SieveStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -8172,7 +7848,6 @@ class MetaclassStatement(SieveStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -8181,8 +7856,7 @@ class MetaclassStatement(SieveStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -8192,7 +7866,6 @@ class MetaclassStatement(SieveStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -8214,7 +7887,6 @@ class MetaclassStatement(SieveStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -8227,7 +7899,6 @@ class MetaclassStatement(SieveStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -8235,27 +7906,25 @@ class MetaclassStatement(SieveStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -8264,12 +7933,11 @@ class MetaclassStatement(SieveStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -8295,7 +7963,6 @@ class MetaclassStatement(SieveStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -8304,7 +7971,10 @@ class MetaclassStatement(SieveStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["MetaclassStatement"] = Field(default="MetaclassStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -8314,14 +7984,8 @@ class MetaclassStatement(SieveStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["MetaclassStatement"] = Field(default="MetaclassStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -8417,7 +8081,6 @@ class ValueSetMembershipStatement(SieveStatement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""Not used by this profile. SPO sits on the Statement, and concordance and dispute are matched on SPO + negated.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-042'},
                          'requirements': {'tag': 'requirements',
@@ -8559,9 +8222,8 @@ class ValueSetMembershipStatement(SieveStatement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -8569,7 +8231,6 @@ class ValueSetMembershipStatement(SieveStatement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
     has_evidence_lines: Optional[list[SieveEvidenceLine]] = Field(default=[], description="""The evidence lines interpreting evidence for or against this claim.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-045'},
                          'requirements': {'tag': 'requirements',
@@ -8590,9 +8251,8 @@ class ValueSetMembershipStatement(SieveStatement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[str]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The values are ids of items in the packet.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Direct claim-to-item links with no interpretation (lightweight consumption). The items are nested in full, like the items of a line.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-037 D-041'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECT_EVIDENCE'}},
          'comments': ['- Evidence is any information that is interpreted in assessing '
@@ -8610,7 +8270,6 @@ class ValueSetMembershipStatement(SieveStatement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
     has_evidence_from_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution without a record id (MONDO:DOID, MONDO:OMIM, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-025'},
                          'requirements': {'tag': 'requirements',
@@ -8619,8 +8278,7 @@ class ValueSetMembershipStatement(SieveStatement):
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -8630,7 +8288,6 @@ class ValueSetMembershipStatement(SieveStatement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: Optional[list[Union[SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Non-asserting roles agents play on the claim: provider, stakeholder, endorser. Who asserted it is the contributor of an AssertionDecision.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'},
@@ -8652,7 +8309,6 @@ class ValueSetMembershipStatement(SieveStatement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -8665,7 +8321,6 @@ class ValueSetMembershipStatement(SieveStatement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -8673,27 +8328,25 @@ class ValueSetMembershipStatement(SieveStatement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
-    reported_in: Optional[list[str]] = Field(default=[], description="""For a prior claim, the record or document that makes it.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
+    reported_in: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""For a prior claim, the record or document that makes it, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
+                                       'value': 'D-004 D-061 D-069'},
+                         'requirements': {'tag': 'requirements',
                                           'value': 'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -8702,12 +8355,11 @@ class ValueSetMembershipStatement(SieveStatement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -8733,7 +8385,6 @@ class ValueSetMembershipStatement(SieveStatement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -8742,7 +8393,10 @@ class ValueSetMembershipStatement(SieveStatement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["ValueSetMembershipStatement"] = Field(default="ValueSetMembershipStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -8752,14 +8406,8 @@ class ValueSetMembershipStatement(SieveStatement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["ValueSetMembershipStatement"] = Field(default="ValueSetMembershipStatement", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -8783,8 +8431,7 @@ class InformationResource(InformationEntity):
          'slot_usage': {'id': {'description': 'Resource identifier, preferably an '
                                               'infores CURIE.',
                                'identifier': True,
-                               'name': 'id'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                               'name': 'id'}}})
 
     curie_prefixes: Optional[list[str]] = Field(default=[], description="""CURIE prefixes whose records belong to this resource.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationResource']} })
     maintainer: Optional[str] = Field(default=None, description="""The organisation responsible for the resource.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
@@ -8811,9 +8458,8 @@ class InformationResource(InformationEntity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -8829,7 +8475,6 @@ class InformationResource(InformationEntity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -8842,7 +8487,6 @@ class InformationResource(InformationEntity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -8850,26 +8494,22 @@ class InformationResource(InformationEntity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -8877,12 +8517,11 @@ class InformationResource(InformationEntity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -8908,7 +8547,6 @@ class InformationResource(InformationEntity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -8917,7 +8555,10 @@ class InformationResource(InformationEntity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["InformationResource"] = Field(default="InformationResource", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""Resource identifier, preferably an infores CURIE.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -8938,14 +8579,8 @@ class InformationResource(InformationEntity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["InformationResource"] = Field(default="InformationResource", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -8965,7 +8600,6 @@ class SourceRelease(DataSet):
                                                    'PROV.EI.RETRIEVAL_SOURCE'}},
          'from_schema': 'https://w3id.org/sieve',
          'slot_usage': {'id': {'identifier': True, 'name': 'id'},
-                        'type': {'designates_type': True, 'name': 'type'},
                         'version': {'name': 'version', 'required': True}}})
 
     of_resource: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['SourceRelease']} })
@@ -8987,7 +8621,6 @@ class SourceRelease(DataSet):
                       'released, which may be different than the data set was '
                       'generated.'],
          'domain_of': ['DataSet'],
-         'slot_uri': 'sepio-model:releaseDate',
          'status': 'Informative'} })
     version: str = Field(default=..., description="""The version of the DataSet, as assigned by its creator.""", json_schema_extra = { "linkml_meta": {'comments': ['This property can capture version information for resources '
                       'such as data sets and documents that get published and released '
@@ -9014,9 +8647,8 @@ class SourceRelease(DataSet):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -9032,7 +8664,6 @@ class SourceRelease(DataSet):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -9045,7 +8676,6 @@ class SourceRelease(DataSet):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -9053,26 +8683,22 @@ class SourceRelease(DataSet):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -9080,12 +8706,11 @@ class SourceRelease(DataSet):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -9111,7 +8736,6 @@ class SourceRelease(DataSet):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -9120,7 +8744,10 @@ class SourceRelease(DataSet):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["SourceRelease"] = Field(default="SourceRelease", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -9141,14 +8768,8 @@ class SourceRelease(DataSet):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SourceRelease"] = Field(default="SourceRelease", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -9195,8 +8816,7 @@ class ExternalRecord(UpstreamItem, EvidenceItem, InformationEntity):
                                             'name': 'record_metadata',
                                             'range': 'RetrievalMetadata',
                                             'required': True},
-                        'resource': {'name': 'resource', 'required': True},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                        'resource': {'name': 'resource', 'required': True}}})
 
     obsolete_in_source: Optional[bool] = Field(default=None, description="""The record is obsolete in the release it was read from.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-010'},
                          'requirements': {'tag': 'requirements',
@@ -9224,9 +8844,8 @@ class ExternalRecord(UpstreamItem, EvidenceItem, InformationEntity):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -9244,7 +8863,6 @@ class ExternalRecord(UpstreamItem, EvidenceItem, InformationEntity):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -9257,7 +8875,6 @@ class ExternalRecord(UpstreamItem, EvidenceItem, InformationEntity):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -9265,26 +8882,22 @@ class ExternalRecord(UpstreamItem, EvidenceItem, InformationEntity):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -9292,12 +8905,11 @@ class ExternalRecord(UpstreamItem, EvidenceItem, InformationEntity):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -9325,7 +8937,6 @@ class ExternalRecord(UpstreamItem, EvidenceItem, InformationEntity):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: RetrievalMetadata = Field(default=..., description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.EI.RETRIEVAL_SOURCE'}},
@@ -9336,7 +8947,10 @@ class ExternalRecord(UpstreamItem, EvidenceItem, InformationEntity):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["ExternalRecord"] = Field(default="ExternalRecord", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -9346,18 +8960,12 @@ class ExternalRecord(UpstreamItem, EvidenceItem, InformationEntity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["ExternalRecord"] = Field(default="ExternalRecord", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""The record's label as read (original name), so label drift can trigger re-review.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-010 D-067'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.ORIGINAL_NAMES_IDS'}},
          'domain_of': ['Entity', 'Coding'],
          'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -9397,7 +9005,9 @@ class TextPassage(EvidenceItem, Statement):
                                          'description': 'Id of the source document, '
                                                         'stated as dependence (the '
                                                         'passage is not independent of '
-                                                        'it).',
+                                                        'it). An id, not a copy: the '
+                                                        'document itself is nested '
+                                                        'under reported_in.',
                                          'inlined': False,
                                          'name': 'derived_from',
                                          'range': 'EvidenceItem'},
@@ -9406,9 +9016,11 @@ class TextPassage(EvidenceItem, Statement):
                                                                          'value': 'PROV.EI.EXECUTION'}},
                                         'description': 'The document (Publication / '
                                                        'WebPage / GuidelineDocument) '
-                                                       'the passage comes from.',
+                                                       'the passage comes from, nested '
+                                                       'in full.',
+                                        'inlined_as_list': True,
                                         'name': 'reported_in',
-                                        'range': 'EvidenceItem',
+                                        'range': 'InformationEntity',
                                         'required': True},
                         'statement_text': {'annotations': {'decisions': {'tag': 'decisions',
                                                                          'value': 'D-050'},
@@ -9416,8 +9028,7 @@ class TextPassage(EvidenceItem, Statement):
                                                                             'value': 'EI.PRIOR_CLAIM.DIRECT_TEXT'}},
                                            'description': 'The verbatim quote.',
                                            'name': 'statement_text',
-                                           'required': True},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                           'required': True}}})
 
     document_version: Optional[str] = Field(default=None, description="""The version of the document the passage was extracted from.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.EI.EXECUTION'}},
@@ -9447,7 +9058,6 @@ class TextPassage(EvidenceItem, Statement):
                       'to, a structured representation of Statement semantics that '
                       'uses the subject-predicate-object-qualifier pattern.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:statementText',
          'status': 'Draft'} })
     proposition: Optional[Proposition] = Field(default=None, description="""A possible fact that the Statement assesses or puts forth as true.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute supports an alternate modeling pattern where the '
                       'structured semantics of the possible fact asserted or evaluated '
@@ -9565,9 +9175,8 @@ class TextPassage(EvidenceItem, Statement):
                       'Variant Interpretation Guidelines would be used as a subject '
                       'classification.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:subjectClassification',
          'status': 'Draft'} })
-    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with hasEvidence and hasEvidenceLine attributes '
+    has_evidence_of_types: Optional[list[str]] = Field(default=[], description="""A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').""", json_schema_extra = { "linkml_meta": {'comments': ['This contrasts with has_evidence and hasEvidenceLine attributes '
                       'that describe specific instances of evidence information, such '
                       'as a particular data item, study result, or prior assertions, '
                       'etc. Where possible, data cretors should use of terms from '
@@ -9575,9 +9184,8 @@ class TextPassage(EvidenceItem, Statement):
                       'to describe specific types of evidence (e.g. ECO:0000044 '
                       "'sequence similarity evidence')."],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceOfTypes',
          'status': 'Informative'} })
-    has_evidence_lines: Optional[list[EvidenceLine]] = Field(default=[], description="""An evidence-based argument that supports or disputes the validity of the proposition that a Statement assesses or puts forth as true. The strength and direction of this argument (whether it supports or disputes  the proposition, and how strongly) is based on an interpretation of one or more pieces of information as evidence (i.e. 'Evidence Items).""", json_schema_extra = { "linkml_meta": {'comments': ['Evidence Lines result from the interpretation of one or more '
+    has_evidence_lines: Optional[list[Union[EvidenceLine,SieveEvidenceLine]]] = Field(default=[], description="""An evidence-based argument that supports or disputes the validity of the proposition that a Statement assesses or puts forth as true. The strength and direction of this argument (whether it supports or disputes  the proposition, and how strongly) is based on an interpretation of one or more pieces of information as evidence (i.e. 'Evidence Items).""", json_schema_extra = { "linkml_meta": {'comments': ['Evidence Lines result from the interpretation of one or more '
                       'pieces of information to build an argument for or against a '
                       'particular Proposition. These arguments have direction '
                       '(supporting / disputing) and strength (e.g. strong, moderate, '
@@ -9593,9 +9201,8 @@ class TextPassage(EvidenceItem, Statement):
                       "Statement''s proposition. Evidence Lines can be omitted if such "
                       'information is not available or needed.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceLines',
          'status': 'Draft'} })
-    has_evidence: Optional[list[InformationEntity]] = Field(default=[], description="""A piece of information that represents or contributes to an argument for or against the validity of the Proposition put forth in a Statement. This is a shortcut relation that links a Statement directly to a piece of evidence supporting it, bypassing the Evidence Line class when used data creators do not utilize an Evidence Line object.""", json_schema_extra = { "linkml_meta": {'comments': ['- Evidence is any information that is interpreted in assessing '
+    has_evidence: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""A piece of information that represents or contributes to an argument for or against the validity of the Proposition put forth in a Statement. This is a shortcut relation that links a Statement directly to a piece of evidence supporting it, bypassing the Evidence Line class when used data creators do not utilize an Evidence Line object.""", json_schema_extra = { "linkml_meta": {'comments': ['- Evidence is any information that is interpreted in assessing '
                       'the truth of  the proposition a Statement puts forth as true or '
                       'false.  A piece of information only becomes evidence when it is '
                       'interpreted in this way. Different types of information '
@@ -9610,14 +9217,12 @@ class TextPassage(EvidenceItem, Statement):
                       'class - to be used data creators cannot or do not wish to '
                       'create an Evidence Line object.'],
          'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidence',
          'status': 'Informative'} })
-    has_evidence_from_sources: Optional[list[InformationEntity]] = Field(default=[], description="""An Information Entity (typically a publication, dataset, or database) that provided information used as evidence to generate the knowledge expressed in a Statement.""", json_schema_extra = { "linkml_meta": {'comments': ["This is a 'shortcut property' that can be used to directly link "
+    has_evidence_from_sources: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An Information Entity (typically a publication, dataset, or database) that provided information used as evidence to generate the knowledge expressed in a Statement.""", json_schema_extra = { "linkml_meta": {'comments': ["This is a 'shortcut property' that can be used to directly link "
                       'a Statement to sources that provided evidence '
                       'supporting/disputing it, without having to create Evidence '
                       'Lines or Evidence Items in the data.'],
-         'domain_of': ['Statement'],
-         'slot_uri': 'sepio-model:hasEvidenceFromSources'} })
+         'domain_of': ['Statement']} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
                       'providing a more precise description of what the Statement '
@@ -9627,7 +9232,6 @@ class TextPassage(EvidenceItem, Statement):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: list[Union[SieveContribution,InterpretationActivity,AssertionDecision]] = Field(default=..., description="""The extraction act(s), with agent, date and method (specified_by).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-057'},
                          'requirements': {'tag': 'requirements',
@@ -9648,7 +9252,6 @@ class TextPassage(EvidenceItem, Statement):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -9661,7 +9264,6 @@ class TextPassage(EvidenceItem, Statement):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -9669,30 +9271,27 @@ class TextPassage(EvidenceItem, Statement):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[str]] = Field(default=[], description="""Id of the source document, stated as dependence (the passage is not independent of it).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-046 D-057'},
+    derived_from: Optional[list[str]] = Field(default=[], description="""Id of the source document, stated as dependence (the passage is not independent of it). An id, not a copy: the document itself is nested under reported_in.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-046 D-057'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.GROUPING'}},
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
          'status': 'Draft'} })
-    reported_in: list[str] = Field(default=..., description="""The document (Publication / WebPage / GuidelineDocument) the passage comes from.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    reported_in: list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]] = Field(default=..., description="""The document (Publication / WebPage / GuidelineDocument) the passage comes from, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.EI.EXECUTION'}},
          'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
@@ -9701,12 +9300,11 @@ class TextPassage(EvidenceItem, Statement):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -9732,7 +9330,6 @@ class TextPassage(EvidenceItem, Statement):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -9741,7 +9338,10 @@ class TextPassage(EvidenceItem, Statement):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["TextPassage"] = Field(default="TextPassage", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -9751,14 +9351,8 @@ class TextPassage(EvidenceItem, Statement):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["TextPassage"] = Field(default="TextPassage", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -9801,8 +9395,7 @@ class Publication(UpstreamItem, EvidenceItem, Document):
                         'record_metadata': {'annotations': {'requirements': {'tag': 'requirements',
                                                                              'value': 'PROV.EI.RETRIEVAL_SOURCE'}},
                                             'name': 'record_metadata',
-                                            'range': 'RetrievalMetadata'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                            'range': 'RetrievalMetadata'}}})
 
     isbn: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Publication']} })
     reports_study: Optional[str] = Field(default=None, description="""Key of the underlying study, family or cohort. Publications that share a key report the same scenario and are not independent.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-046'},
@@ -9854,9 +9447,8 @@ class Publication(UpstreamItem, EvidenceItem, Document):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -9875,7 +9467,6 @@ class Publication(UpstreamItem, EvidenceItem, Document):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -9888,7 +9479,6 @@ class Publication(UpstreamItem, EvidenceItem, Document):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -9896,26 +9486,22 @@ class Publication(UpstreamItem, EvidenceItem, Document):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -9923,12 +9509,11 @@ class Publication(UpstreamItem, EvidenceItem, Document):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -9957,7 +9542,6 @@ class Publication(UpstreamItem, EvidenceItem, Document):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RetrievalMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.EI.RETRIEVAL_SOURCE'}},
@@ -9968,7 +9552,10 @@ class Publication(UpstreamItem, EvidenceItem, Document):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["Publication"] = Field(default="Publication", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -9978,14 +9565,8 @@ class Publication(UpstreamItem, EvidenceItem, Document):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["Publication"] = Field(default="Publication", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -10011,7 +9592,6 @@ class WebPage(UpstreamItem, EvidenceItem, Document):
                                                            'accessed.',
                                             'name': 'record_metadata',
                                             'range': 'RetrievalMetadata'},
-                        'type': {'designates_type': True, 'name': 'type'},
                         'urls': {'name': 'urls', 'required': True}}})
 
     id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'EvidenceItem']} })
@@ -10060,9 +9640,8 @@ class WebPage(UpstreamItem, EvidenceItem, Document):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -10078,7 +9657,6 @@ class WebPage(UpstreamItem, EvidenceItem, Document):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -10091,7 +9669,6 @@ class WebPage(UpstreamItem, EvidenceItem, Document):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -10099,26 +9676,22 @@ class WebPage(UpstreamItem, EvidenceItem, Document):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -10126,12 +9699,11 @@ class WebPage(UpstreamItem, EvidenceItem, Document):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -10157,7 +9729,6 @@ class WebPage(UpstreamItem, EvidenceItem, Document):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RetrievalMetadata] = Field(default=None, description="""retrieval_date = date accessed.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.EI.RETRIEVAL_SOURCE'}},
@@ -10168,7 +9739,10 @@ class WebPage(UpstreamItem, EvidenceItem, Document):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["WebPage"] = Field(default="WebPage", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -10178,14 +9752,8 @@ class WebPage(UpstreamItem, EvidenceItem, Document):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["WebPage"] = Field(default="WebPage", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -10203,8 +9771,7 @@ class GuidelineDocument(UpstreamItem, EvidenceItem, Document):
                                           'value': 'EI.DOCUMENT.GUIDELINE'}},
          'from_schema': 'https://w3id.org/sieve',
          'mixins': ['EvidenceItem', 'UpstreamItem'],
-         'slot_usage': {'id': {'identifier': True, 'name': 'id'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+         'slot_usage': {'id': {'identifier': True, 'name': 'id'}}})
 
     id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'EvidenceItem']} })
     resource: Optional[str] = Field(default=None, description="""The information resource the item belongs to, explicit rather than inferred from the CURIE prefix. Resource level only, no upstream curators.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-055'},
@@ -10252,9 +9819,8 @@ class GuidelineDocument(UpstreamItem, EvidenceItem, Document):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -10270,7 +9836,6 @@ class GuidelineDocument(UpstreamItem, EvidenceItem, Document):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -10283,7 +9848,6 @@ class GuidelineDocument(UpstreamItem, EvidenceItem, Document):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -10291,26 +9855,22 @@ class GuidelineDocument(UpstreamItem, EvidenceItem, Document):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -10318,12 +9878,11 @@ class GuidelineDocument(UpstreamItem, EvidenceItem, Document):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -10349,7 +9908,6 @@ class GuidelineDocument(UpstreamItem, EvidenceItem, Document):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -10358,7 +9916,10 @@ class GuidelineDocument(UpstreamItem, EvidenceItem, Document):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["GuidelineDocument"] = Field(default="GuidelineDocument", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -10368,14 +9929,8 @@ class GuidelineDocument(UpstreamItem, EvidenceItem, Document):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["GuidelineDocument"] = Field(default="GuidelineDocument", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -10397,8 +9952,7 @@ class ComputationalScore(EvidenceItem, DataItem):
          'slot_usage': {'id': {'identifier': True, 'name': 'id'},
                         'specified_by': {'description': 'The method / tool that '
                                                         'computed the score.',
-                                         'name': 'specified_by'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                         'name': 'specified_by'}}})
 
     software_version: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ComputationalScore', 'SieveAgent']} })
     parameters: Optional[str] = Field(default=None, description="""Method parameters (key=value or JSON).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ComputationalScore']} })
@@ -10427,15 +9981,14 @@ class ComputationalScore(EvidenceItem, DataItem):
                       'or application.'],
          'domain_of': ['DataItem'],
          'status': 'Informative'} })
-    variability_measures: Optional[list[DataItem]] = Field(default=[], description="""A statistical score describing the variability inherent in a data item representing a statistical summary of a set of observations/measurements (e.g. the standard deviation associated with a statistical mean calculated across several experimental replicates).""", json_schema_extra = { "linkml_meta": {'comments': ['Examples of statistical measures of variability include an '
+    variability_measures: Optional[list[Union[DataItem,ComputationalScore]]] = Field(default=[], description="""A statistical score describing the variability inherent in a data item representing a statistical summary of a set of observations/measurements (e.g. the standard deviation associated with a statistical mean calculated across several experimental replicates).""", json_schema_extra = { "linkml_meta": {'comments': ['Examples of statistical measures of variability include an '
                       'Interquartile Range, Variance, Standard Deviation, Standard '
                       'Error. The type of variability measure used here represents '
                       'should be reported in the DataItem instance created to '
                       'represent it.'],
          'domain_of': ['DataItem'],
-         'slot_uri': 'sepio-model:variabilityMeasures',
          'status': 'Informative'} })
-    confidence_interval: Optional[DataItem] = Field(default=None, description="""A measure of the probability that a parameter of interest will fall within a defined range of values around a mean or other statistical calculation.""", json_schema_extra = { "linkml_meta": {'comments': ['Confidence intervals reflect the degree of uncertainty in a '
+    confidence_interval: Optional[Union[DataItem,ComputationalScore]] = Field(default=None, description="""A measure of the probability that a parameter of interest will fall within a defined range of values around a mean or other statistical calculation.""", json_schema_extra = { "linkml_meta": {'comments': ['Confidence intervals reflect the degree of uncertainty in a '
                       'sampling method. They may be bounded on one or both sides, and '
                       'are  computed for a designated confidence level (most often 95% '
                       'or 99%.. For example, a Hazard Ratio of 0.47 might have a 95% '
@@ -10447,15 +10000,13 @@ class ComputationalScore(EvidenceItem, DataItem):
                       "upper and lower bounds of the interval (e.g. ''0.42'' and "
                       "''0.55'').'"],
          'domain_of': ['DataItem'],
-         'slot_uri': 'sepio-model:confidenceInterval',
          'status': 'Informative'} })
-    component_data_item: Optional[list[DataItem]] = Field(default=[], description="""A more foundational data item that is a logical component of a compound data item.""", json_schema_extra = { "linkml_meta": {'comments': ["Examples of 'compound' data items with component parts include "
+    component_data_item: Optional[list[Union[DataItem,ComputationalScore]]] = Field(default=[], description="""A more foundational data item that is a logical component of a compound data item.""", json_schema_extra = { "linkml_meta": {'comments': ["Examples of 'compound' data items with component parts include "
                       'a confidence interval, which is comprised of data items '
                       'representing its lower and upper bounds,  or a blood pressure '
                       'reading, which is comprised of separate systolic and diastolic '
                       'measurements.'],
          'domain_of': ['DataItem'],
-         'slot_uri': 'sepio-model:componentDataItem',
          'status': 'Informative'} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
@@ -10466,9 +10017,8 @@ class ComputationalScore(EvidenceItem, DataItem):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -10484,7 +10034,6 @@ class ComputationalScore(EvidenceItem, DataItem):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""The method / tool that computed the score.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -10497,7 +10046,6 @@ class ComputationalScore(EvidenceItem, DataItem):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -10505,26 +10053,22 @@ class ComputationalScore(EvidenceItem, DataItem):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -10532,12 +10076,11 @@ class ComputationalScore(EvidenceItem, DataItem):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -10563,7 +10106,6 @@ class ComputationalScore(EvidenceItem, DataItem):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -10572,7 +10114,10 @@ class ComputationalScore(EvidenceItem, DataItem):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["ComputationalScore"] = Field(default="ComputationalScore", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -10582,14 +10127,8 @@ class ComputationalScore(EvidenceItem, DataItem):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["ComputationalScore"] = Field(default="ComputationalScore", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -10650,15 +10189,21 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                                                                'requirements': {'tag': 'requirements',
                                                                                 'value': 'EINT.GRANULARITY '
                                                                                          'EINT.STACKING'}},
-                                               'description': 'Ids of the items this '
-                                                              'line interprets: packet '
-                                                              'items, or other lines '
-                                                              'for higher-order lines. '
-                                                              'No maximum: granularity '
-                                                              'is parked (D-046).',
-                                               'inlined': False,
+                                               'description': 'The items this line '
+                                                              'interprets, nested in '
+                                                              'full: prior claims, '
+                                                              'records, passages, '
+                                                              'documents, scores, or '
+                                                              'other lines for '
+                                                              'higher-order lines. An '
+                                                              'item that several lines '
+                                                              'use is copied into each '
+                                                              'under the same id. No '
+                                                              'maximum: granularity is '
+                                                              'parked (D-046).',
+                                               'inlined_as_list': True,
                                                'name': 'has_evidence_items',
-                                               'range': 'EvidenceItem'},
+                                               'range': 'InformationEntity'},
                         'id': {'identifier': True, 'name': 'id'},
                         'score_of_evidence_provided': {'annotations': {'decisions': {'tag': 'decisions',
                                                                                      'value': 'D-047 '
@@ -10697,8 +10242,7 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                                                'description': 'Not used. The target is '
                                                               'always the enclosing '
                                                               'Statement.',
-                                               'name': 'target_proposition'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                               'name': 'target_proposition'}}})
 
     computed_by_rule: Optional[str] = Field(default=None, description="""The per-claim-type rule (and version) that assigned the strength. Required for rule-based lines (profile check).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-048 D-054'},
                          'requirements': {'tag': 'requirements',
@@ -10714,7 +10258,7 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.FLAT_COLLAPSE'}},
          'domain_of': ['SieveEvidenceLine']} })
-    supersedes: Optional[list[str]] = Field(default=[], description="""Lines this one corrects (they must be invalidated).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-052'}},
+    supersedes: Optional[list[str]] = Field(default=[], description="""Ids of the lines this one corrects (they must be invalidated).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-052'}},
          'domain_of': ['SieveEvidenceLine']} })
     confidence: Optional[float] = Field(default=None, description="""Data quality (SEPIO confidence): the probability that the evidence was read and linked correctly, e.g. chain confidence or an AI's calibrated self-confidence. It gates (below the floor) or discounts the line and never rewrites its strength.""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-050 D-062 D-063'},
@@ -10778,9 +10322,8 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       "provides 'moderate' (strength) 'support' (direction) for this "
                       'target proposition.'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:targetProposition',
          'status': 'Informative'} })
-    has_evidence_items: Optional[list[str]] = Field(default=[], description="""Ids of the items this line interprets: packet items, or other lines for higher-order lines. No maximum: granularity is parked (D-046).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-046'},
+    has_evidence_items: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""The items this line interprets, nested in full: prior claims, records, passages, documents, scores, or other lines for higher-order lines. An item that several lines use is copied into each under the same id. No maximum: granularity is parked (D-046).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-046'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.GRANULARITY EINT.STACKING'}},
          'comments': ['A given Evidence Line may be supported by one or many '
@@ -10797,13 +10340,11 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       'assessed for the support it may offer for a target proposition '
                       '(e.g. the prospect of the variant’s pathogenicity).'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:hasEvidenceItems',
          'status': 'Draft'} })
     direction_of_evidence_provided: Direction = Field(default=..., description="""The direction of support that the Evidence Line is determined to provide toward its target Proposition (supports, disputes, neutral).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-033 D-051'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.DIRECTION'}},
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:directionOfEvidenceProvided',
          'status': 'Draft'} })
     strength_of_evidence_provided: Optional[str] = Field(default=None, description="""Categorical band, from the strength_bands of the line's AggregationRule.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-047 D-054'},
                          'requirements': {'tag': 'requirements',
@@ -10811,10 +10352,9 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
          'comments': ['Values of this attribute can be defined by for a given profile '
                       'based on domain/application needs, but should be framed in '
                       "qualitative terms (e.g. 'strong', 'moderate', 'weak'). The "
-                      "'scoreOfEvidenceProvided' attribute can be used to report "
+                      "'score_of_evidence_provided' attribute can be used to report "
                       'quantitative assessments of evidence provided.'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:strengthOfEvidenceProvided',
          'status': 'Draft'} })
     score_of_evidence_provided: Optional[float] = Field(default=None, description="""Strength s_i on the shared normalised 0-1 scale. Direction is carried by direction_of_evidence_provided, not by the sign.""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-047 D-054'},
                          'requirements': {'tag': 'requirements',
@@ -10822,7 +10362,6 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
          'comments': ['A given profile or implementation can define a scoring scale '
                       'and rules that meet the needs of their domain or application.'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:scoreOfEvidenceProvided',
          'status': 'Draft'} })
     evidence_item_sources: Optional[list[str]] = Field(default=[], description="""Source-level attribution for this line (resource ids), when no item is represented.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'EINT.SOURCE_ONLY'}},
@@ -10833,7 +10372,6 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       'information. Future work will define a more formal framework '
                       'for referencing information sources.'],
          'domain_of': ['EvidenceLine'],
-         'slot_uri': 'sepio-model:evidenceItemSources',
          'status': 'Informative'} })
     is_about: Optional[list[str]] = Field(default=[], description="""An entity or concept in the world that the information entity describes/is about.""", json_schema_extra = { "linkml_meta": {'comments': ['e.g. In the context of a Statement object, this attribute may '
                       'be used to indicate entities/concepts it is about, in lieu of '
@@ -10844,7 +10382,6 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
     contributions: list[InterpretationActivity] = Field(default=..., description="""The interpretation act. Normally one; a collective act is ONE contribution with participants, not N contributions.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-044 D-046'},
                          'requirements': {'tag': 'requirements',
@@ -10865,7 +10402,6 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -10878,7 +10414,6 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -10886,26 +10421,22 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -10913,12 +10444,11 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -10944,7 +10474,6 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -10953,7 +10482,10 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["SieveEvidenceLine"] = Field(default="SieveEvidenceLine", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     identifiers: Optional[list[str]] = Field(default=[], description="""A globally-unique 'business' identifier or accession number for the real-world entity represented by a data object. These are typically assigned by an external system or authority, and used to connect entities and share content across different systems.""", json_schema_extra = { "linkml_meta": {'comments': ['Preferred values for this attribute are CURIEs or URIs - so the '
                       'system that provisioned the identifier is clear.',
@@ -10963,14 +10495,8 @@ class SieveEvidenceLine(EvidenceItem, EvidenceLine):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SieveEvidenceLine"] = Field(default="SieveEvidenceLine", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -10991,12 +10517,11 @@ class LineStatusChange(Contribution):
          'slot_usage': {'contributor': {'name': 'contributor',
                                         'range': 'SieveAgent',
                                         'required': True},
-                        'date': {'name': 'date', 'required': True},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                        'date': {'name': 'date', 'required': True}}})
 
     action: LineAction = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['LineStatusChange']} })
     reason: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['LineStatusChange']} })
-    replacement_line: Optional[str] = Field(default=None, description="""The new line that corrects this one (action SUPERSEDED).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineStatusChange']} })
+    replacement_line: Optional[str] = Field(default=None, description="""Id of the new line that corrects this one (action SUPERSEDED).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineStatusChange']} })
     contributor: str = Field(default=..., description="""The Agent that made the contribution.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that this must be a single agent (which can be a Person, '
                       'or an Organization).  If multiple Agents contributed to an '
                       'entity, a separate Contribution instances MUST be created for '
@@ -11012,11 +10537,8 @@ class LineStatusChange(Contribution):
                       'each was performed), then a separate Contribution object should '
                       'be created for each activity.'],
          'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:activityType',
          'status': 'Draft'} })
-    contribution_made_to: Optional[InformationEntity] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:contributionMadeTo',
-         'status': 'Informative'} })
+    contribution_made_to: Optional[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'], 'status': 'Informative'} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of activity the Activity instance represents.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute can be used to report a specific type for the '
                       'Activity, in cases where a model does not define Activity '
                       'subclasses for this purpose.  Implementers can define their own '
@@ -11036,14 +10558,14 @@ class LineStatusChange(Contribution):
                       'in ISO format "YYYY-MM-DD".'],
          'domain_of': ['Activity'],
          'status': 'Draft'} })
-    performed_by: Optional[list[Agent]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
+    performed_by: Optional[list[Union[Agent,SieveAgent]]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
+    specified_by: Optional[list[Union[Method,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""A method that was followed in performing an Activity, that describes how it was executed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["LineStatusChange"] = Field(default="LineStatusChange", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
-    specified_by: Optional[list[Method]] = Field(default=[], description="""A method that was followed in performing an Activity, that describes how it was executed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
-         'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -11063,14 +10585,8 @@ class LineStatusChange(Contribution):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["LineStatusChange"] = Field(default="LineStatusChange", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -11098,8 +10614,7 @@ class SieveAgent(Agent):
                                'name': 'id'},
                         'subtype': {'name': 'subtype',
                                     'range': 'AgentKind',
-                                    'required': True},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                    'required': True}}})
 
     roles: Optional[list[LevelAssignment]] = Field(default=[], description="""Dated role / expertise assignments, possibly per domain.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-049'}},
          'domain_of': ['SieveAgent']} })
@@ -11139,6 +10654,10 @@ class SieveAgent(Agent):
                        'Characteristic',
                        'AppliedRule'],
          'status': 'Draft'} })
+    type: Literal["SieveAgent"] = Field(default="SieveAgent", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""ORCID for persons (handles are not accepted, D-026), infores / URL otherwise.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -11158,14 +10677,8 @@ class SieveAgent(Agent):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SieveAgent"] = Field(default="SieveAgent", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -11186,8 +10699,7 @@ class SieveMethod(Method):
                                                    'PROV.SA.METHODS '
                                                    'PROV.ENCODING.METHODS'}},
          'from_schema': 'https://w3id.org/sieve',
-         'slot_usage': {'id': {'identifier': True, 'name': 'id'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+         'slot_usage': {'id': {'identifier': True, 'name': 'id'}}})
 
     version: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['DataSet', 'SieveMethod']} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of method that a Method instance represents (e.g. 'Variant Interpretation Guideline', or 'Experimental Protocol').""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute can be used to report a specific type for the '
@@ -11213,9 +10725,8 @@ class SieveMethod(Method):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -11231,7 +10742,6 @@ class SieveMethod(Method):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -11244,7 +10754,6 @@ class SieveMethod(Method):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -11252,26 +10761,22 @@ class SieveMethod(Method):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -11279,12 +10784,11 @@ class SieveMethod(Method):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -11310,7 +10814,6 @@ class SieveMethod(Method):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -11319,7 +10822,10 @@ class SieveMethod(Method):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["SieveMethod"] = Field(default="SieveMethod", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -11340,14 +10846,8 @@ class SieveMethod(Method):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SieveMethod"] = Field(default="SieveMethod", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -11424,9 +10924,8 @@ class AggregationRule(SieveMethod):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -11442,7 +10941,6 @@ class AggregationRule(SieveMethod):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -11455,7 +10953,6 @@ class AggregationRule(SieveMethod):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -11463,26 +10960,22 @@ class AggregationRule(SieveMethod):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -11490,12 +10983,11 @@ class AggregationRule(SieveMethod):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -11521,7 +11013,6 @@ class AggregationRule(SieveMethod):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -11530,7 +11021,10 @@ class AggregationRule(SieveMethod):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["AggregationRule"] = Field(default="AggregationRule", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -11551,14 +11045,8 @@ class AggregationRule(SieveMethod):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["AggregationRule"] = Field(default="AggregationRule", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -11611,9 +11099,8 @@ class DecisionPolicy(SieveMethod):
                       "the variant 'BRCA2 c.8023A>G', and the disease 'Breast "
                       "Cancer'."],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:isAbout',
          'status': 'Informative'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""Specific actions taken by an Agent toward the creation, modification, validation, or deprecation of an Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds one or more Contribution objects, which '
                       'provide structured descriptions of a contribution made to the '
                       'Information Entity by a particular agent.'],
          'domain_of': ['InformationEntity', 'RecordMetadata'],
@@ -11629,7 +11116,6 @@ class DecisionPolicy(SieveMethod):
                       'document) would live in a RecordMetadata object attached to the '
                       'Information Entity).'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:dateAuthored',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A specification that describes all or part of the process that led to creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['Examples - an experimental protocol or data analysis '
                       'specification that describe how data were generated, or an '
@@ -11642,7 +11128,6 @@ class DecisionPolicy(SieveMethod):
                       'opposed to reporting a *type* of method applied (e.g. '
                       '"Transmission Electron Microscopy").'],
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Draft'} })
     supporting_methods: Optional[list[str]] = Field(default=[], description="""Specific methods that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['These may include methods that directly produced the '
                       'Information Entity, or upstream/accessory methods that '
@@ -11650,26 +11135,22 @@ class DecisionPolicy(SieveMethod):
                       'methods used to produce data that was interpreted as evidence '
                       'to generate a Statement of knowledge.',
                       'This field captures terms representing specific INSTANCES of '
-                      "methods applied, vs the 'supportingMethodTypes' attribute which "
-                      'captures TYPES of methods used.'],
+                      "methods applied, vs the 'supporting_method_types' attribute "
+                      'which captures TYPES of methods used.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethods',
          'status': 'Informative'} })
     supporting_method_types: Optional[list[Coding]] = Field(default=[], description="""Types of methodological approaches that were executed to directly or indirectly support creation of the Information Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['This field captures terms representing TYPES of methods '
-                      "applied, vs the 'specifiedBy' or'supportingMethods' attributes "
-                      'which capture specific INSTANCES of methods used. These may '
-                      'include types of methods that directly produced the Information '
-                      'Entity, or upstream/accessory methods that indirectly support '
-                      'creation of the Information Entity',
+                      "applied, vs the 'specified_by' or'supporting_methods' "
+                      'attributes which capture specific INSTANCES of methods used. '
+                      'These may include types of methods that directly produced the '
+                      'Information Entity, or upstream/accessory methods that '
+                      'indirectly support creation of the Information Entity',
                       'Implementers should define a relevant source or set of method '
                       'type codes/terms to use here, based on the needs of the domain '
                       "or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:supportingMethodTypes',
          'status': 'Informative'} })
-    derived_from: Optional[list[InformationEntity]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:derivedFrom',
-         'status': 'Draft'} })
+    derived_from: Optional[list[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""Another Information Entity from which this Information Entity is derived, in whole or in part.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity'], 'status': 'Draft'} })
     reported_in: Optional[list[str]] = Field(default=[], description="""A document in which the Information Entity is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is used specifically to reference '
                       'documents/publications where the Information Entity is '
                       'expressed or reported.  For a Statement, this might be a '
@@ -11677,12 +11158,11 @@ class DecisionPolicy(SieveMethod):
                       'For a Data Item, this might be a publication with a table or '
                       'figure that reports the value of the  data.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:reportedIn',
          'status': 'Draft'} })
     sources: Optional[list[str]] = Field(default=[], description="""A document or other informtion resource in which the information entity, or evidence supporting it, is reported.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute is more general than '
-                      'InformationEntity.reportedIn (which is used to references a '
+                      'InformationEntity.reported_in (which is used to references a '
                       'Docuement that directly reports the infrormation), and '
-                      'Statement.hasEvidenceFromSources (which is used to reference '
+                      'Statement.has_evidence_from_sources (which is used to reference '
                       'resources that provided evidence used to generate the knowledge '
                       'expressed in a Statement). It can be used to cover both cases, '
                       'in situations where a data provider does not know which is the '
@@ -11708,7 +11188,6 @@ class DecisionPolicy(SieveMethod):
                       'Implementers should define a relevant source of codes or terms '
                       "to use here, based on the needs of the domain or application.'"],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:informationQuality',
          'status': 'Informative'} })
     record_metadata: Optional[RecordMetadata] = Field(default=None, description="""Provenance metadata about a specific concrete record of information as encoded/serialized in a particular data set or object (as opposed to provenance about the abstract information content the encoding carries).""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute holds a structured RecordMetadata objects, which '
                       'can be used to capture when, how, and by whom a record '
@@ -11717,7 +11196,10 @@ class DecisionPolicy(SieveMethod):
                       'administrative information such as versioning and lifecycle '
                       'status.'],
          'domain_of': ['InformationEntity'],
-         'slot_uri': 'sepio-model:recordMetadata',
+         'status': 'Draft'} })
+    type: Literal["DecisionPolicy"] = Field(default="DecisionPolicy", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
@@ -11738,14 +11220,8 @@ class DecisionPolicy(SieveMethod):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["DecisionPolicy"] = Field(default="DecisionPolicy", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -11768,8 +11244,7 @@ class BatchSignOff(Activity):
                         'id': {'identifier': True, 'name': 'id'},
                         'performed_by': {'name': 'performed_by',
                                          'range': 'SieveAgent',
-                                         'required': True},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                         'required': True}}})
 
     filter_query: str = Field(default=..., description="""Machine-readable, re-runnable query over packet contents.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BatchSignOff']} })
     result_set: list[str] = Field(default=..., description="""Frozen result set as \"packet-id@version\" entries.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BatchSignOff']} })
@@ -11794,14 +11269,14 @@ class BatchSignOff(Activity):
                       'in ISO format "YYYY-MM-DD".'],
          'domain_of': ['Activity'],
          'status': 'Draft'} })
-    performed_by: list[str] = Field(default=..., description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
+    performed_by: list[str] = Field(default=..., description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
+    specified_by: Optional[list[Union[Method,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""A method that was followed in performing an Activity, that describes how it was executed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["BatchSignOff"] = Field(default="BatchSignOff", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
          'status': 'Draft'} })
-    specified_by: Optional[list[Method]] = Field(default=[], description="""A method that was followed in performing an Activity, that describes how it was executed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
-         'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -11821,14 +11296,8 @@ class BatchSignOff(Activity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["BatchSignOff"] = Field(default="BatchSignOff", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -11863,8 +11332,7 @@ class SieveContribution(Contribution):
                                          'description': 'Guideline / SOP / workflow / '
                                                         'prompt version followed.',
                                          'name': 'specified_by',
-                                         'range': 'SieveMethod'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                         'range': 'SieveMethod'}}})
 
     role: Optional[AgentRole] = Field(default=None, description="""The role played (curator, provider, stakeholder, endorser, extractor, ...).""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions',
                                        'value': 'D-002 D-004 D-034'}},
@@ -11913,11 +11381,8 @@ class SieveContribution(Contribution):
                       'each was performed), then a separate Contribution object should '
                       'be created for each activity.'],
          'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:activityType',
          'status': 'Draft'} })
-    contribution_made_to: Optional[InformationEntity] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:contributionMadeTo',
-         'status': 'Informative'} })
+    contribution_made_to: Optional[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'], 'status': 'Informative'} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of activity the Activity instance represents.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute can be used to report a specific type for the '
                       'Activity, in cases where a model does not define Activity '
                       'subclasses for this purpose.  Implementers can define their own '
@@ -11937,18 +11402,19 @@ class SieveContribution(Contribution):
                       'in ISO format "YYYY-MM-DD".'],
          'domain_of': ['Activity'],
          'status': 'Draft'} })
-    performed_by: Optional[list[str]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
-         'status': 'Draft'} })
+    performed_by: Optional[list[str]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""Guideline / SOP / workflow / prompt version followed.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-050 D-051'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.INTERP.METHODS '
                                                    'PROV.ASSERTION.METHODS'}},
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["SieveContribution"] = Field(default="SieveContribution", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -11968,14 +11434,8 @@ class SieveContribution(Contribution):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["SieveContribution"] = Field(default="SieveContribution", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -12069,11 +11529,8 @@ class InterpretationActivity(SieveContribution):
                       'each was performed), then a separate Contribution object should '
                       'be created for each activity.'],
          'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:activityType',
          'status': 'Draft'} })
-    contribution_made_to: Optional[InformationEntity] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:contributionMadeTo',
-         'status': 'Informative'} })
+    contribution_made_to: Optional[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'], 'status': 'Informative'} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of activity the Activity instance represents.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute can be used to report a specific type for the '
                       'Activity, in cases where a model does not define Activity '
                       'subclasses for this purpose.  Implementers can define their own '
@@ -12097,18 +11554,19 @@ class InterpretationActivity(SieveContribution):
                       'in ISO format "YYYY-MM-DD".'],
          'domain_of': ['Activity'],
          'status': 'Draft'} })
-    performed_by: Optional[list[str]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
-         'status': 'Draft'} })
+    performed_by: Optional[list[str]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""Guideline / SOP / workflow / prompt version followed.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-050 D-051'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.INTERP.METHODS '
                                                    'PROV.ASSERTION.METHODS'}},
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["InterpretationActivity"] = Field(default="InterpretationActivity", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -12128,14 +11586,8 @@ class InterpretationActivity(SieveContribution):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["InterpretationActivity"] = Field(default="InterpretationActivity", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -12285,11 +11737,8 @@ class AssertionDecision(SieveContribution):
                       'each was performed), then a separate Contribution object should '
                       'be created for each activity.'],
          'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:activityType',
          'status': 'Draft'} })
-    contribution_made_to: Optional[InformationEntity] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'],
-         'slot_uri': 'sepio-model:contributionMadeTo',
-         'status': 'Informative'} })
+    contribution_made_to: Optional[Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]] = Field(default=None, description="""The artifact toward which the contribution was made.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Contribution'], 'status': 'Informative'} })
     subtype: Optional[Coding] = Field(default=None, description="""A specific type of activity the Activity instance represents.""", json_schema_extra = { "linkml_meta": {'comments': ['This attribute can be used to report a specific type for the '
                       'Activity, in cases where a model does not define Activity '
                       'subclasses for this purpose.  Implementers can define their own '
@@ -12311,18 +11760,19 @@ class AssertionDecision(SieveContribution):
                       'in ISO format "YYYY-MM-DD".'],
          'domain_of': ['Activity'],
          'status': 'Draft'} })
-    performed_by: Optional[list[str]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
-         'status': 'Draft'} })
+    performed_by: Optional[list[str]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""Guideline / SOP / workflow / prompt version followed.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-050 D-051'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.INTERP.METHODS '
                                                    'PROV.ASSERTION.METHODS'}},
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["AssertionDecision"] = Field(default="AssertionDecision", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -12342,14 +11792,8 @@ class AssertionDecision(SieveContribution):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["AssertionDecision"] = Field(default="AssertionDecision", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -12387,12 +11831,11 @@ class OriginEvent(Activity):
                                                                           'value': 'PROV.RETRIEVAL.AGENT'}},
                                          'description': 'Pipeline version.',
                                          'name': 'specified_by',
-                                         'range': 'SieveMethod'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                         'range': 'SieveMethod'}}})
 
     derivation_type: DerivationType = Field(default=..., json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-030 D-031'}},
          'domain_of': ['OriginEvent']} })
-    source_item: str = Field(default=..., description="""The upstream item (ExternalRecord, Publication, WebPage) the claim came from.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
+    source_item: Union[InformationEntity,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy] = Field(default=..., description="""The upstream item (ExternalRecord, Publication, WebPage) the claim came from, nested in full.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.ORIGINAL_NAMES_IDS'}},
          'domain_of': ['OriginEvent']} })
     source_label: Optional[str] = Field(default=None, description="""The source's own label at attachment time.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
@@ -12426,15 +11869,17 @@ class OriginEvent(Activity):
     performed_by: Optional[list[str]] = Field(default=[], description="""The pipeline (kBOOM merge, mondo-ingest slurp, provider sync, mondo-ai harvesting) or curator.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""Pipeline version.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["OriginEvent"] = Field(default="OriginEvent", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -12454,14 +11899,8 @@ class OriginEvent(Activity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["OriginEvent"] = Field(default="OriginEvent", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -12490,8 +11929,7 @@ class ResolutionChain(Activity):
                                          'description': 'The alignment workflow (and '
                                                         'version).',
                                          'name': 'specified_by',
-                                         'range': 'SieveMethod'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                         'range': 'SieveMethod'}}})
 
     entity_slot: EntitySlot = Field(default=..., description="""Which entity of the assertion this chain grounds.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ResolutionChain']} })
     steps: list[AlignmentStep] = Field(default=..., description="""Ordered steps; step n's output is step n+1's input (profile check).""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
@@ -12523,16 +11961,17 @@ class ResolutionChain(Activity):
                       'in ISO format "YYYY-MM-DD".'],
          'domain_of': ['Activity'],
          'status': 'Draft'} })
-    performed_by: Optional[list[Agent]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
-         'status': 'Draft'} })
+    performed_by: Optional[list[Union[Agent,SieveAgent]]] = Field(default=[], description="""An Agent who participated in executing the Activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""The alignment workflow (and version).""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.METHODS'}},
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["ResolutionChain"] = Field(default="ResolutionChain", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -12552,14 +11991,8 @@ class ResolutionChain(Activity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["ResolutionChain"] = Field(default="ResolutionChain", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -12602,8 +12035,7 @@ class AlignmentStep(Activity):
                         'specified_by': {'annotations': {'requirements': {'tag': 'requirements',
                                                                           'value': 'PROV.SA.METHODS'}},
                                          'name': 'specified_by',
-                                         'range': 'SieveMethod'},
-                        'type': {'designates_type': True, 'name': 'type'}}})
+                                         'range': 'SieveMethod'}}})
 
     category: TransformationCategory = Field(default=..., json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.METHOD_TYPES'}},
@@ -12683,15 +12115,17 @@ class AlignmentStep(Activity):
     performed_by: Optional[list[str]] = Field(default=[], description="""The agent (with version) that performed the step.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.AGENT'}},
          'domain_of': ['Activity'],
-         'slot_uri': 'sepio-model:performedBy',
          'status': 'Draft'} })
     specified_by: Optional[list[str]] = Field(default=[], description="""A method that was followed in performing an Activity, that describes how it was executed.""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.METHODS'}},
          'domain_of': ['InformationEntity', 'Activity'],
-         'slot_uri': 'sepio-model:specifiedBy',
          'status': 'Informative'} })
-    input: Optional[list[Entity]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
-    output: Optional[list[Entity]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    input: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was input into the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    output: Optional[list[Union[Entity,InformationEntity,Activity,Agent,Proposition,StudyGroup,SieveAgent,Contribution,BatchSignOff,OriginEvent,ResolutionChain,AlignmentStep,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision,Method,Document,DataItem,DataSet,Statement,StudyResult,EvidenceLine,InformationResource,ExternalRecord,SieveEvidenceLine,SieveStatement,TextPassage,TermExistenceStatement,DefinitionStatement,SynonymStatement,SubclassStatement,MappingStatement,DiseaseAttributeStatement,SubsetMembershipStatement,MetaclassStatement,ValueSetMembershipStatement,NegativeSubclassStatement,EvidencePacket,EvidencePacketCollection,SieveRegistry,SourceRelease,ComputationalScore,Publication,WebPage,GuidelineDocument,SieveMethod,AggregationRule,DecisionPolicy]]] = Field(default=[], description="""An entity that was output from the Activity (could be material or information)""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'status': 'Informative'} })
+    type: Literal["AlignmentStep"] = Field(default="AlignmentStep", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
+         'designates_type': True,
+         'domain_of': ['Entity'],
+         'status': 'Draft'} })
     id: str = Field(default=..., description="""The 'logical' identifier of the entity in the system of record, e.g. a UUID.  This 'id' is unique within a given system, but may or may not be globally unique outside the system. It is used within a system to reference one object from another.""", json_schema_extra = { "linkml_meta": {'comments': ['Note that it is common for implementers to create their own '
                       'internal logical ids - typically a serially or randomly '
                       'generated value like a UUID that is assigned to the data object '
@@ -12711,14 +12145,8 @@ class AlignmentStep(Activity):
                       'they represent the same thing.'],
          'domain_of': ['Entity'],
          'status': 'Informative'} })
-    type: Literal["AlignmentStep"] = Field(default="AlignmentStep", description="""The name of the class that is instantiated by a data object representing the Entity.""", json_schema_extra = { "linkml_meta": {'comments': ['MUST be the label of a concrete class from the data model.'],
-         'designates_type': True,
-         'domain_of': ['Entity'],
-         'status': 'Draft'} })
     label: Optional[str] = Field(default=None, description="""A primary name for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'Coding'], 'status': 'Draft'} })
-    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'],
-         'slot_uri': 'sepio-model:alternativeLabels',
-         'status': 'Draft'} })
+    alternative_labels: Optional[list[str]] = Field(default=[], description="""Alternative name(s) for the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     description: Optional[str] = Field(default=None, description="""A free text description of the Entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Entity'], 'status': 'Draft'} })
     extensions: Optional[list[Extension]] = Field(default=[], description="""A list of extensions to the Entity, that allow for capture of information not directly supported by elements defined in the model.""", json_schema_extra = { "linkml_meta": {'comments': ['Extension objects have a key-value data structure that allows '
                       'definition of custom fields in the data itself. Extensions are '
@@ -12767,20 +12195,14 @@ class RetrievalMetadata(RecordMetadata):
                       'created that describes this upstream source record, including '
                       'information about its submission to ClinVar.'],
          'domain_of': ['RecordMetadata'],
-         'slot_uri': 'sepio-model:recordIdentifier',
          'status': 'Draft'} })
-    record_version: Optional[str] = Field(default=None, description="""The version number of the record-level artifact the object describes.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RecordMetadata'],
-         'slot_uri': 'sepio-model:recordVersion',
-         'status': 'Draft'} })
+    record_version: Optional[str] = Field(default=None, description="""The version number of the record-level artifact the object describes.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RecordMetadata'], 'status': 'Draft'} })
     derived_from_record: Optional[list[str]] = Field(default=[], description="""Another data record from which the record described here was derived, through a data ingest and/or transformation process.""", json_schema_extra = { "linkml_meta": {'comments': ['Value should be a string representing the identifier of the '
                       'source record.'],
          'domain_of': ['RecordMetadata'],
-         'slot_uri': 'sepio-model:derivedFromRecord',
          'status': 'Draft'} })
-    date_record_created: Optional[str] = Field(default=None, description="""The date the record was initially created.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RecordMetadata'],
-         'slot_uri': 'sepio-model:dateRecordCreated',
-         'status': 'Draft'} })
-    contributions: Optional[list[Contribution]] = Field(default=[], description="""describes specific contributions made by an human or software agent to the creation, modification, or administrative management of a data record or object.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'RecordMetadata'], 'status': 'Draft'} })
+    date_record_created: Optional[str] = Field(default=None, description="""The date the record was initially created.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RecordMetadata'], 'status': 'Draft'} })
+    contributions: Optional[list[Union[Contribution,LineStatusChange,SieveContribution,InterpretationActivity,AssertionDecision]]] = Field(default=[], description="""describes specific contributions made by an human or software agent to the creation, modification, or administrative management of a data record or object.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InformationEntity', 'RecordMetadata'], 'status': 'Draft'} })
 
 
 class TextLocation(Utility):

@@ -22,7 +22,43 @@ statement:
   has_evidence_lines:
     - id: sieve:el/ds-doid-dispute
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:ca/doid-14250-isa-630]
+      has_evidence_items:
+        - id: sieve:ca/doid-14250-isa-630
+          type: SubclassStatement
+          subject: DOID:14250
+          predicate: {code: rdfs:subClassOf}
+          object: DOID:630
+          reported_in:
+            - id: DOID:14250
+              type: ExternalRecord
+              label: Down syndrome
+              resource: infores:disease-ontology
+              record_metadata:
+                retrieved_from: infores:disease-ontology
+                source_release: sieve:release/doid-2026-09-01
+                retrieval_date: "2026-09-15"
+                source_label: Down syndrome
+          resource: infores:disease-ontology
+          groundings:
+            - id: sieve:chain/doid-14250
+              type: ResolutionChain
+              entity_slot: subject
+              date: "2026-10-20"
+              chain_confidence: 1.0
+              steps:
+                - id: sieve:step/doid-14250-1
+                  type: AlignmentStep
+                  category: GROUNDING
+                  method: STRUCTURED_FIELD
+                  input_value: DOID:14250
+                  output_value: MONDO:0008608
+                  predicate: skos:exactMatch
+                  mapping_set: http://purl.obolibrary.org/obo/mondo/mappings/mondo.sssom.tsv
+                  mapping_set_version: "2026-10-01"
+                  quality_category: grounding_curated
+                  confidence: 1.0
+                  confidence_basis: DETERMINISTIC
+                  review_status: CONFIRMED
       direction_of_evidence_provided: disputes
       strength_of_evidence_provided: moderate
       score_of_evidence_provided: 0.5
@@ -45,7 +81,16 @@ statement:
           run_id: concordance-2026-10-20-r1
     - id: sieve:el/ds-curator-judgement
       type: SieveEvidenceLine
-      has_evidence_items: [DOID:14250]
+      has_evidence_items:
+        - id: DOID:14250
+          type: ExternalRecord
+          label: Down syndrome
+          resource: infores:disease-ontology
+          record_metadata:
+            retrieved_from: infores:disease-ontology
+            source_release: sieve:release/doid-2026-09-01
+            retrieval_date: "2026-09-15"
+            source_label: Down syndrome
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: strong
       score_of_evidence_provided: 0.8
@@ -83,44 +128,6 @@ statement:
       signed_packet_version: "2026-10-20"
       context: ["https://github.com/monarch-initiative/mondo/issues/6004"]
       rationale: Kept despite DOID's positive subclass.
-prior_claims:
-  - id: sieve:ca/doid-14250-isa-630
-    type: SubclassStatement
-    subject: DOID:14250
-    predicate: {code: rdfs:subClassOf}
-    object: DOID:630
-    reported_in: [DOID:14250]
-    resource: infores:disease-ontology
-    groundings:
-      - id: sieve:chain/doid-14250
-        type: ResolutionChain
-        entity_slot: subject
-        date: "2026-10-20"
-        chain_confidence: 1.0
-        steps:
-          - id: sieve:step/doid-14250-1
-            type: AlignmentStep
-            category: GROUNDING
-            method: STRUCTURED_FIELD
-            input_value: DOID:14250
-            output_value: MONDO:0008608
-            predicate: skos:exactMatch
-            mapping_set: http://purl.obolibrary.org/obo/mondo/mappings/mondo.sssom.tsv
-            mapping_set_version: "2026-10-01"
-            quality_category: grounding_curated
-            confidence: 1.0
-            confidence_basis: DETERMINISTIC
-            review_status: CONFIRMED
-external_records:
-  - id: DOID:14250
-    type: ExternalRecord
-    label: Down syndrome
-    resource: infores:disease-ontology
-    record_metadata:
-      retrieved_from: infores:disease-ontology
-      source_release: sieve:release/doid-2026-09-01
-      retrieval_date: "2026-09-15"
-      source_label: Down syndrome
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: sieve:pkt/MONDO_0008608-excl-MONDO_0003847#references
