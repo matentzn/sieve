@@ -1,4 +1,4 @@
-"""The SIEVE schema is a conforming profile of the SEPIO core (snake_case derivation)."""
+"""The SIEVE schema is a conforming profile of the SEPIO core."""
 
 import importlib.util
 import re
@@ -11,7 +11,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 from sieve.datamodel.codegen import generate_pydantic
 from sieve.traceability import CORE_SCHEMA, ROOT, SCHEMA
 
-# sepio-framework/sepio-linkml src/sepio_linkml/schema/sepio_classes.yaml @ 8c2c233
+# sepio-framework/sepio-linkml src/sepio_linkml/schema/sepio_classes.yaml @ 47f46b7
 CANONICAL_CORE = ROOT.parent / "sepio-linkml/src/sepio_linkml/schema/sepio_classes.yaml"
 SNAKE = re.compile(r"^[a-z][a-z0-9_]*$")
 
@@ -31,19 +31,14 @@ def core() -> SchemaView:
 
 
 @pytest.mark.skipif(not CANONICAL_CORE.exists(), reason="sepio-linkml not checked out next to sieve")
-def test_core_is_derived_from_canonical():
-    """sepio_core.yaml is exactly what scripts/snake_case_core.py makes of the canonical core."""
-    spec = importlib.util.spec_from_file_location("snake_case_core", ROOT / "scripts" / "snake_case_core.py")
-    assert spec and spec.loader
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    assert module.render(CANONICAL_CORE) == CORE_SCHEMA.read_text(encoding="utf-8")
+def test_core_is_canonical_copy():
+    """sepio_core.yaml is a byte-identical copy of the canonical SEPIO core."""
+    assert CANONICAL_CORE.read_bytes() == CORE_SCHEMA.read_bytes()
 
 
-def test_core_keeps_canonical_slot_iris(core):
-    """Renamed slots keep their canonical camelCase IRI."""
-    slot = core.induced_slot("has_evidence_lines", "Statement")
-    assert slot.slot_uri == "sepio-model:hasEvidenceLines"
+def test_core_type_is_the_type_designator(core):
+    """The core declares `type` once, as the type designator every profile class inherits."""
+    assert core.get_slot("type").designates_type
 
 
 def test_all_slots_are_snake_case(sv):

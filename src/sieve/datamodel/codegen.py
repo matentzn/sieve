@@ -6,6 +6,12 @@ type inside the class body, so ``Optional[date]`` cannot be evaluated on Python 
 Rather than patching the vendored core, the generated code refers to the type
 through an alias.
 
+The core's ``type`` slot is a type designator, so every slot whose range is a core
+class becomes a union of all its subclasses, profile classes included. Pydantic
+builds the schemas of these mutually recursive models depth-first, which needs more
+than Python's default recursion limit of 1000. The generated module raises the
+limit before the models are built.
+
 Usage::
 
     uv run python -m sieve.datamodel.codegen schema/sieve.yaml src/sieve/datamodel/sieve_models.py
@@ -31,9 +37,25 @@ def fix_date_shadowing(code: str) -> str:
     return code.replace("import re\n", "import re\n" + DATE_ALIAS_IMPORT, 1)
 
 
+RECURSION_LIMIT = (
+    "# Building the schemas of the mutually recursive models below needs more than the\n"
+    "# default recursion limit (sieve.datamodel.codegen).\n"
+    "sys.setrecursionlimit(max(sys.getrecursionlimit(), 5000))\n"
+)
+
+
+def raise_recursion_limit(code: str) -> str:
+    """Raise the recursion limit right after the generated module imports ``sys``.
+
+    >>> raise_recursion_limit("import re\\nimport sys\\nx = 1\\n").splitlines()[-2]
+    'sys.setrecursionlimit(max(sys.getrecursionlimit(), 5000))'
+    """
+    return code.replace("import sys\n", "import sys\n" + RECURSION_LIMIT, 1)
+
+
 def generate_pydantic(schema_path: str | Path) -> str:
     """Return the Pydantic module source for ``schema_path``."""
-    return fix_date_shadowing(PydanticGenerator(str(schema_path)).serialize())
+    return raise_recursion_limit(fix_date_shadowing(PydanticGenerator(str(schema_path)).serialize()))
 
 
 def main() -> None:
