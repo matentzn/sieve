@@ -23,7 +23,29 @@ statement:
     - id: sieve:el/migraine-literature-vascular
       type: SieveEvidenceLine
       description: Historical vascular theory of migraine
-      has_evidence_items: [sieve:tp/pmid-8456789-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-8456789-1
+          type: TextPassage
+          statement_text: >-
+            The vascular theory of migraine, which dominated for decades, proposed that
+            migraine attacks were primarily caused by vasodilation of cranial blood vessels,
+            suggesting a cardiovascular component to the disorder.
+          reported_in:
+            - id: PMID:8456789
+              type: Publication
+              title: The Vascular Theory of Migraine - A Historical Perspective
+              pmid: "8456789"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: "Introduction, page 2"}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-8456789-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-06-10"
       direction_of_evidence_provided: supports
       score_of_evidence_provided: 0.5
       contributions:
@@ -41,7 +63,30 @@ statement:
     - id: sieve:el/migraine-literature-neuro
       type: SieveEvidenceLine
       description: Modern understanding - migraine is a neurological disorder
-      has_evidence_items: [sieve:tp/pmid-31578890-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-31578890-1
+          type: TextPassage
+          statement_text: >-
+            Current evidence overwhelmingly supports migraine as a complex neurological
+            disorder originating in the central nervous system. The trigeminal-vascular
+            system activation is secondary to cortical and brainstem dysfunction, not
+            a primary cardiovascular event.
+          reported_in:
+            - id: PMID:31578890
+              type: Publication
+              title: Migraine as a Primary Brain Disorder
+              pmid: "31578890"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: Abstract}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-31578890-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-06-10"
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.95
       contributions:
@@ -59,7 +104,14 @@ statement:
     - id: sieve:el/migraine-icd11
       type: SieveEvidenceLine
       description: ICD-11 has both migraine and cardiovascular disease but no subclass relationship between them
-      has_evidence_items: [ICD11:8A80]
+      has_evidence_items:
+        - id: ICD11:8A80
+          type: ExternalRecord
+          label: Migraine
+          resource: sieve:resource/icd11
+          record_metadata:
+            retrieved_from: sieve:resource/icd11
+            retrieval_date: "2024-06-10"
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.9
       contributions:
@@ -119,61 +171,6 @@ statement:
       route: INDIVIDUAL_SIGN_OFF
       signed_packet_version: "2024-01-15"
       rationale: Review of migraine classification based on vascular theory.
-external_records:
-  - id: ICD11:8A80
-    type: ExternalRecord
-    label: Migraine
-    resource: sieve:resource/icd11
-    record_metadata:
-      retrieved_from: sieve:resource/icd11
-      retrieval_date: "2024-06-10"
-text_passages:
-  - id: sieve:tp/pmid-8456789-1
-    type: TextPassage
-    statement_text: >-
-      The vascular theory of migraine, which dominated for decades, proposed that
-      migraine attacks were primarily caused by vasodilation of cranial blood vessels,
-      suggesting a cardiovascular component to the disorder.
-    reported_in: [PMID:8456789]
-    text_location: {section: "Introduction, page 2"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-8456789-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-06-10"
-  - id: sieve:tp/pmid-31578890-1
-    type: TextPassage
-    statement_text: >-
-      Current evidence overwhelmingly supports migraine as a complex neurological
-      disorder originating in the central nervous system. The trigeminal-vascular
-      system activation is secondary to cortical and brainstem dysfunction, not
-      a primary cardiovascular event.
-    reported_in: [PMID:31578890]
-    text_location: {section: Abstract}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-31578890-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-06-10"
-publications:
-  - id: PMID:8456789
-    type: Publication
-    title: The Vascular Theory of Migraine - A Historical Perspective
-    pmid: "8456789"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
-  - id: PMID:31578890
-    type: Publication
-    title: Migraine as a Primary Brain Disorder
-    pmid: "31578890"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: http://purl.org/np/RA2345678901#references

@@ -171,7 +171,9 @@ sepio_monarch:
         id: sieve:tp/zolmi-indication
         type: TextPassage
         statement_text: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
-        reported_in: [DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c]
+        reported_in:
+          - id: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+            type: Document
         text_location: {section: "LOINC:34067-9 INDICATIONS AND USAGE"}
         quote_verification: NOT_CHECKED
         contributions:
@@ -253,7 +255,84 @@ sepio_monarch:
         description: >-
           As emitted: FDA-approved indication, read as zolmitriptan INDICATION MONDO:0005475
           (migraine with aura).
-        has_evidence_items: [sieve:tp/zolmi-indication]
+        has_evidence_items:
+          - id: sieve:tp/zolmi-indication
+            type: TextPassage
+            statement_text: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+            reported_in:
+              - id: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+                type: Document
+            text_location: {section: "LOINC:34067-9 INDICATIONS AND USAGE"}
+            quote_verification: NOT_CHECKED
+            contributions:
+              - {id: sieve:act/medic-extract-zolmi-indication, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR, specified_by: [sieve:method/medic-extractor-v1]}
+            groundings:
+              - id: sieve:chain/zolmi-object-asis
+                type: ResolutionChain
+                entity_slot: object
+                chain_confidence: 1.0
+                specified_by: [sieve:method/medic-extractor-v1]
+                steps:
+                  - id: sieve:step/zolmi-object-asis-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: LLM
+                    input_value: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+                    output_value: migraine with aura
+                    span_role: SECTION_TEXT
+                    quality_category: extraction_verbatim
+                    confidence: 1.0
+                    confidence_basis: MEASURED
+                    performed_by: [sieve:agent/claude-haiku-4-5-20251001]
+                    review_status: REJECTED
+                    reviewed_by: sieve:agent/curator-example
+                    review_date: 2026-10-30
+                    _review_illustrative: >-
+                      MeDIC's step is MACHINE (unreviewed). REJECTED is what a curator reading
+                      the span records: the output is narrower than the source phrase, and is
+                      not even a contiguous substring of it ("migraine with or without aura"),
+                      so `extraction_verbatim` is wrong as well. No text_span, because no span
+                      of the input yields this output.
+                  - id: sieve:step/zolmi-object-asis-2
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: LEXICAL_MATCH
+                    input_value: migraine with aura
+                    output_value: MONDO:0005475
+                    predicate: skos:exactMatch
+                    quality_category: grounding_lexical_exact
+                    _confidence_note: MeDIC's 1.0 has no basis here; left out (a confidence needs a basis).
+                  - id: sieve:step/zolmi-object-asis-3
+                    type: AlignmentStep
+                    category: NORMALIZATION
+                    method: DETERMINISTIC_RULE
+                    input_value: MONDO:0005475
+                    output_value: MONDO:0005475
+                    quality_category: normalization_identity
+              - id: sieve:chain/zolmi-object-corrected
+                type: ResolutionChain
+                entity_slot: object
+                steps:
+                  - id: sieve:step/zolmi-object-corrected-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: HUMAN
+                    input_value: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+                    output_value: migraine with or without aura
+                    text_span: {section: "LOINC:34067-9", char_start: 84, char_end: 113}
+                    span_role: SECTION_TEXT
+                    quality_category: extraction_verbatim
+                    performed_by: [sieve:agent/curator-example]
+                    review_status: CONFIRMED
+                  - id: sieve:step/zolmi-object-corrected-2
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: HUMAN
+                    input_value: migraine with or without aura
+                    output_value: MONDO:0005277
+                    quality_category: grounding_curated
+                    performed_by: [sieve:agent/curator-example]
+                    review_status: CONFIRMED
         evidence_item_sources: [sieve:resource/dailymed]
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: high
@@ -288,7 +367,84 @@ sepio_monarch:
         description: >-
           FDA-approved acute-treatment indication, read as zolmitriptan INDICATION
           MONDO:0005277 (migraine disorder).
-        has_evidence_items: [sieve:tp/zolmi-indication]
+        has_evidence_items:
+          - id: sieve:tp/zolmi-indication
+            type: TextPassage
+            statement_text: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+            reported_in:
+              - id: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+                type: Document
+            text_location: {section: "LOINC:34067-9 INDICATIONS AND USAGE"}
+            quote_verification: NOT_CHECKED
+            contributions:
+              - {id: sieve:act/medic-extract-zolmi-indication, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR, specified_by: [sieve:method/medic-extractor-v1]}
+            groundings:
+              - id: sieve:chain/zolmi-object-asis
+                type: ResolutionChain
+                entity_slot: object
+                chain_confidence: 1.0
+                specified_by: [sieve:method/medic-extractor-v1]
+                steps:
+                  - id: sieve:step/zolmi-object-asis-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: LLM
+                    input_value: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+                    output_value: migraine with aura
+                    span_role: SECTION_TEXT
+                    quality_category: extraction_verbatim
+                    confidence: 1.0
+                    confidence_basis: MEASURED
+                    performed_by: [sieve:agent/claude-haiku-4-5-20251001]
+                    review_status: REJECTED
+                    reviewed_by: sieve:agent/curator-example
+                    review_date: 2026-10-30
+                    _review_illustrative: >-
+                      MeDIC's step is MACHINE (unreviewed). REJECTED is what a curator reading
+                      the span records: the output is narrower than the source phrase, and is
+                      not even a contiguous substring of it ("migraine with or without aura"),
+                      so `extraction_verbatim` is wrong as well. No text_span, because no span
+                      of the input yields this output.
+                  - id: sieve:step/zolmi-object-asis-2
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: LEXICAL_MATCH
+                    input_value: migraine with aura
+                    output_value: MONDO:0005475
+                    predicate: skos:exactMatch
+                    quality_category: grounding_lexical_exact
+                    _confidence_note: MeDIC's 1.0 has no basis here; left out (a confidence needs a basis).
+                  - id: sieve:step/zolmi-object-asis-3
+                    type: AlignmentStep
+                    category: NORMALIZATION
+                    method: DETERMINISTIC_RULE
+                    input_value: MONDO:0005475
+                    output_value: MONDO:0005475
+                    quality_category: normalization_identity
+              - id: sieve:chain/zolmi-object-corrected
+                type: ResolutionChain
+                entity_slot: object
+                steps:
+                  - id: sieve:step/zolmi-object-corrected-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: HUMAN
+                    input_value: "Zolmitriptan orally disintegrating tablets are indicated for the acute treatment of migraine with or without aura in adults."
+                    output_value: migraine with or without aura
+                    text_span: {section: "LOINC:34067-9", char_start: 84, char_end: 113}
+                    span_role: SECTION_TEXT
+                    quality_category: extraction_verbatim
+                    performed_by: [sieve:agent/curator-example]
+                    review_status: CONFIRMED
+                  - id: sieve:step/zolmi-object-corrected-2
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: HUMAN
+                    input_value: migraine with or without aura
+                    output_value: MONDO:0005277
+                    quality_category: grounding_curated
+                    performed_by: [sieve:agent/curator-example]
+                    review_status: CONFIRMED
         evidence_item_sources: [sieve:resource/dailymed]
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: high
@@ -315,7 +471,9 @@ sepio_monarch:
           administered to treat any subsequent attacks. Zolmitriptan orally disintegrating
           tablets are not indicated for the prophylactic therapy of migraine or for the
           treatment of hemiplegic or basilar migraine.
-        reported_in: [DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c]
+        reported_in:
+          - id: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+            type: Document
         text_location: {section: "LOINC:34067-9 Limitations of Use"}
         quote_verification: NOT_CHECKED
         _spanRole: LIMITATION_STATEMENT       # no TextPassage slot; span_role exists only on AlignmentStep
@@ -359,7 +517,54 @@ sepio_monarch:
         description: >-
           Target: "zolmitriptan is indicated for the prophylactic therapy of migraine".
           Explicit non-indication in the Limitations of Use subsection.
-        has_evidence_items: [sieve:tp/zolmi-limitation]
+        has_evidence_items:
+          - id: sieve:tp/zolmi-limitation
+            type: TextPassage
+            statement_text: >-
+              Only use zolmitriptan orally disintegrating tablets if a clear diagnosis of migraine
+              has been established. If a patient has no response to zolmitriptan for the first
+              migraine attack, reconsider the diagnosis of migraine before zolmitriptan is
+              administered to treat any subsequent attacks. Zolmitriptan orally disintegrating
+              tablets are not indicated for the prophylactic therapy of migraine or for the
+              treatment of hemiplegic or basilar migraine.
+            reported_in:
+              - id: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+                type: Document
+            text_location: {section: "LOINC:34067-9 Limitations of Use"}
+            quote_verification: NOT_CHECKED
+            _spanRole: LIMITATION_STATEMENT
+            contributions:
+              - {id: sieve:act/medic-extract-zolmi-limitation, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
+            groundings:
+              - id: sieve:chain/zolmi-limitation-hemiplegic
+                type: ResolutionChain
+                entity_slot: object
+                steps:
+                  - id: sieve:step/zolmi-limitation-hemiplegic-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: LLM
+                    input_value: "Zolmitriptan orally disintegrating tablets are not indicated for the prophylactic therapy of migraine or for the treatment of hemiplegic or basilar migraine."
+                    output_value: hemiplegic migraine
+                    span_role: LIMITATION_STATEMENT
+                    trigger_cue: are not indicated for
+                    quality_category: extraction_canonicalized
+                    _note: >-
+                      Illustrative: MeDIC does not extract the limitation's mentions. The output
+                      expands the coordination "hemiplegic or basilar migraine", hence
+                      canonicalized, not verbatim.
+                  - id: sieve:step/zolmi-limitation-hemiplegic-2
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: LEXICAL_MATCH
+                    input_value: hemiplegic migraine
+                    output_value: hemiplegic migraine
+                    quality_category: grounding_unresolved
+                    _note: >-
+                      Mondo has familial (MONDO:0000700) and sporadic (MONDO:0020757) hemiplegic
+                      migraine but no grouping term, so the step stays unresolved instead of being
+                      forced to a child. output_value repeats the input because the slot is
+                      required and there is no id to give.
         evidence_item_sources: [sieve:resource/dailymed]
         direction_of_evidence_provided: disputes
         strength_of_evidence_provided: high
@@ -373,7 +578,54 @@ sepio_monarch:
         description: >-
           Target: "zolmitriptan is indicated for hemiplegic migraine" (object unresolved,
           see sieve:chain/zolmi-limitation-hemiplegic).
-        has_evidence_items: [sieve:tp/zolmi-limitation]
+        has_evidence_items:
+          - id: sieve:tp/zolmi-limitation
+            type: TextPassage
+            statement_text: >-
+              Only use zolmitriptan orally disintegrating tablets if a clear diagnosis of migraine
+              has been established. If a patient has no response to zolmitriptan for the first
+              migraine attack, reconsider the diagnosis of migraine before zolmitriptan is
+              administered to treat any subsequent attacks. Zolmitriptan orally disintegrating
+              tablets are not indicated for the prophylactic therapy of migraine or for the
+              treatment of hemiplegic or basilar migraine.
+            reported_in:
+              - id: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+                type: Document
+            text_location: {section: "LOINC:34067-9 Limitations of Use"}
+            quote_verification: NOT_CHECKED
+            _spanRole: LIMITATION_STATEMENT
+            contributions:
+              - {id: sieve:act/medic-extract-zolmi-limitation, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
+            groundings:
+              - id: sieve:chain/zolmi-limitation-hemiplegic
+                type: ResolutionChain
+                entity_slot: object
+                steps:
+                  - id: sieve:step/zolmi-limitation-hemiplegic-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: LLM
+                    input_value: "Zolmitriptan orally disintegrating tablets are not indicated for the prophylactic therapy of migraine or for the treatment of hemiplegic or basilar migraine."
+                    output_value: hemiplegic migraine
+                    span_role: LIMITATION_STATEMENT
+                    trigger_cue: are not indicated for
+                    quality_category: extraction_canonicalized
+                    _note: >-
+                      Illustrative: MeDIC does not extract the limitation's mentions. The output
+                      expands the coordination "hemiplegic or basilar migraine", hence
+                      canonicalized, not verbatim.
+                  - id: sieve:step/zolmi-limitation-hemiplegic-2
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: LEXICAL_MATCH
+                    input_value: hemiplegic migraine
+                    output_value: hemiplegic migraine
+                    quality_category: grounding_unresolved
+                    _note: >-
+                      Mondo has familial (MONDO:0000700) and sporadic (MONDO:0020757) hemiplegic
+                      migraine but no grouping term, so the step stays unresolved instead of being
+                      forced to a child. output_value repeats the input because the slot is
+                      required and there is no id to give.
         evidence_item_sources: [sieve:resource/dailymed]
         direction_of_evidence_provided: disputes
         strength_of_evidence_provided: high
@@ -386,7 +638,54 @@ sepio_monarch:
         type: SieveEvidenceLine
         description: >-
           Target: "zolmitriptan is indicated for basilar migraine".
-        has_evidence_items: [sieve:tp/zolmi-limitation]
+        has_evidence_items:
+          - id: sieve:tp/zolmi-limitation
+            type: TextPassage
+            statement_text: >-
+              Only use zolmitriptan orally disintegrating tablets if a clear diagnosis of migraine
+              has been established. If a patient has no response to zolmitriptan for the first
+              migraine attack, reconsider the diagnosis of migraine before zolmitriptan is
+              administered to treat any subsequent attacks. Zolmitriptan orally disintegrating
+              tablets are not indicated for the prophylactic therapy of migraine or for the
+              treatment of hemiplegic or basilar migraine.
+            reported_in:
+              - id: DailyMed:3f0040a6-b1d6-3d73-e063-6294a90af23c
+                type: Document
+            text_location: {section: "LOINC:34067-9 Limitations of Use"}
+            quote_verification: NOT_CHECKED
+            _spanRole: LIMITATION_STATEMENT
+            contributions:
+              - {id: sieve:act/medic-extract-zolmi-limitation, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
+            groundings:
+              - id: sieve:chain/zolmi-limitation-hemiplegic
+                type: ResolutionChain
+                entity_slot: object
+                steps:
+                  - id: sieve:step/zolmi-limitation-hemiplegic-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: LLM
+                    input_value: "Zolmitriptan orally disintegrating tablets are not indicated for the prophylactic therapy of migraine or for the treatment of hemiplegic or basilar migraine."
+                    output_value: hemiplegic migraine
+                    span_role: LIMITATION_STATEMENT
+                    trigger_cue: are not indicated for
+                    quality_category: extraction_canonicalized
+                    _note: >-
+                      Illustrative: MeDIC does not extract the limitation's mentions. The output
+                      expands the coordination "hemiplegic or basilar migraine", hence
+                      canonicalized, not verbatim.
+                  - id: sieve:step/zolmi-limitation-hemiplegic-2
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: LEXICAL_MATCH
+                    input_value: hemiplegic migraine
+                    output_value: hemiplegic migraine
+                    quality_category: grounding_unresolved
+                    _note: >-
+                      Mondo has familial (MONDO:0000700) and sporadic (MONDO:0020757) hemiplegic
+                      migraine but no grouping term, so the step stays unresolved instead of being
+                      forced to a child. output_value repeats the input because the slot is
+                      required and there is no id to give.
         evidence_item_sources: [sieve:resource/dailymed]
         direction_of_evidence_provided: disputes
         strength_of_evidence_provided: high
@@ -405,8 +704,9 @@ gaps:
     they sit in free-text `description`. Inside a future indication profile each line would
     sit in its own statement's packet, which works. (3) TextPassage has no span-role slot:
     LIMITATION_STATEMENT / SUBSECTION_HEADER survive only on AlignmentStep.span_role, i.e.
-    only once a mention in the span is grounded. (4) No regulatory document class (SPL),
-    no slots for approval status, approval date (19971125) or authority. (5) An unresolved
+    only once a mention in the span is grounded. (4) No regulatory document class (SPL):
+    the passages nest the label as a bare core Document carrying only its id. No slots for
+    approval status, approval date (19971125) or authority. (5) An unresolved
     grounding has no "no output" form: AlignmentStep.output_value is required, so a
     grounding_unresolved step must repeat its input. (6) MeDIC's `scope_narrowed`,
     `negated_inversion`, `over_extraction`, `wrong_section` have no DataQualityFlag value;
@@ -438,5 +738,6 @@ gaps:
   one_span_many_statements: >-
     Expressible: one TextPassage (sieve:tp/zolmi-limitation) is referenced by three
     SieveEvidenceLines through has_evidence_items, each with its own direction and
-    interpretation act. Evidence items are referenced by id, so reuse costs nothing. The
-    statements the lines target are still missing (profile_misfit).
+    interpretation act. Each line carries a full copy of the passage under the same id,
+    so the copies are recognisably one passage and must stay identical. The statements
+    the lines target are still missing (profile_misfit).

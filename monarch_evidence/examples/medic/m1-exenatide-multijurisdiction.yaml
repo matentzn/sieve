@@ -203,7 +203,9 @@ sepio_monarch:
         id: sieve:tp/dailymed-53d03c03-0
         type: TextPassage
         statement_text: "BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."
-        reported_in: [DailyMed:53d03c03-ebf7-418d-88a8-533eabd2ee4f]
+        reported_in:
+          - id: DailyMed:53d03c03-ebf7-418d-88a8-533eabd2ee4f
+            type: Document
         text_location: {section: "LOINC:34067-9 INDICATIONS AND USAGE", char_start: 0, char_end: 123}
         quote_verification: NOT_CHECKED
         _quoteVerification_note: >-
@@ -285,7 +287,9 @@ sepio_monarch:
         id: sieve:tp/ema-bydureon-0
         type: TextPassage
         statement_text: "Bydureon is indicated in adults 18 years and older with type 2 diabetes mellitus to improve glycaemic control…"
-        reported_in: ["EMA:bydureon"]
+        reported_in:
+          - id: "EMA:bydureon"
+            type: Document
         quote_verification: NOT_CHECKED
         contributions:
           - {id: sieve:act/medic-extract-ema-bydureon, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
@@ -294,7 +298,9 @@ sepio_monarch:
         id: sieve:tp/ema-byetta-0
         type: TextPassage
         statement_text: "Byetta is indicated for treatment of type-2 diabetes mellitus in combination with: metformin; sulphonylureas; …"
-        reported_in: ["EMA:byetta"]
+        reported_in:
+          - id: "EMA:byetta"
+            type: Document
         quote_verification: NOT_CHECKED
         contributions:
           - {id: sieve:act/medic-extract-ema-byetta, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
@@ -303,7 +309,9 @@ sepio_monarch:
         id: sieve:tp/india-approved-new-drugs-0
         type: TextPassage
         statement_text: "For treatment of type 2 diabetes mellitus in combination with Metformin Sulphonylurea Thiazolidinedione…"
-        reported_in: ["INDIA:Approved-New-Drugs"]
+        reported_in:
+          - id: "INDIA:Approved-New-Drugs"
+            type: Document
         quote_verification: NOT_CHECKED
         contributions:
           - {id: sieve:act/medic-extract-india, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
@@ -328,7 +336,9 @@ sepio_monarch:
         id: sieve:tp/pmda-161-20101027-0
         type: TextPassage
         statement_text: "Drugs with a new active ingredient indicated for the treatment of type 2 diabetes mellitus…"
-        reported_in: ["PMDA:EXENATIDE#161-20101027"]
+        reported_in:
+          - id: "PMDA:EXENATIDE#161-20101027"
+            type: Document
         quote_verification: NOT_CHECKED
         contributions:
           - {id: sieve:act/medic-extract-pmda-161, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
@@ -337,7 +347,9 @@ sepio_monarch:
         id: sieve:tp/pmda-151-20120330-0
         type: TextPassage
         statement_text: "A drug with a new additional indication and a new dosage in a new dosage form for the treatment of type 2 diabetes mellitus."
-        reported_in: ["PMDA:EXENATIDE#151-20120330"]
+        reported_in:
+          - id: "PMDA:EXENATIDE#151-20120330"
+            type: Document
         quote_verification: NOT_CHECKED
         contributions:
           - {id: sieve:act/medic-extract-pmda-151, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
@@ -351,7 +363,87 @@ sepio_monarch:
         id: sieve:el/medic-dailymed-53d03c03
         type: SieveEvidenceLine
         description: FDA-approved indication from the DailyMed structured product label.
-        has_evidence_items: [sieve:tp/dailymed-53d03c03-0]
+        has_evidence_items:
+          - id: sieve:tp/dailymed-53d03c03-0
+            type: TextPassage
+            statement_text: "BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."
+            reported_in:
+              - id: DailyMed:53d03c03-ebf7-418d-88a8-533eabd2ee4f
+                type: Document
+            text_location: {section: "LOINC:34067-9 INDICATIONS AND USAGE", char_start: 0, char_end: 123}
+            quote_verification: NOT_CHECKED
+            _quoteVerification_note: >-
+              MeDIC's span is cut from the document by construction, but its record does not
+              say a verbatim check was run, so NOT_CHECKED rather than an assumed VERIFIED.
+            contributions:
+              - id: sieve:act/medic-extract-dailymed-53d03c03
+                type: SieveContribution
+                contributor: sieve:agent/medic-extractor
+                role: EXTRACTOR
+                specified_by: [sieve:method/medic-extractor-v1]
+            groundings:
+              - id: sieve:chain/dailymed-53d03c03-object
+                type: ResolutionChain
+                entity_slot: object
+                chain_confidence: 1.0
+                specified_by: [sieve:method/medic-extractor-v1]
+                steps:
+                  - id: sieve:step/dailymed-53d03c03-object-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: LLM
+                    input_value: >-
+                      BYETTA is indicated as an adjunct to diet and exercise to improve glycemic
+                      control in adults with type 2 diabetes mellitus. Limitations of Use • BYETTA
+                      contains exenatide. Coadministration with other exenatide-containing
+                      products is not recommended.
+                    output_value: type 2 diabetes mellitus
+                    text_span: {section: "LOINC:34067-9", char_start: 98, char_end: 122}
+                    span_role: SECTION_TEXT
+                    quality_category: extraction_verbatim
+                    confidence: 1.0
+                    confidence_basis: MEASURED
+                    performed_by: [sieve:agent/claude-haiku-4-5-20251001]
+                  - id: sieve:step/dailymed-53d03c03-object-2
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: LEXICAL_MATCH
+                    input_value: type 2 diabetes mellitus
+                    output_value: MONDO:0005148
+                    predicate: skos:exactMatch
+                    quality_category: grounding_lexical_exact
+                    _confidence_note: >-
+                      MeDIC gives confidence 1.0 here with no basis. The profile requires a
+                      basis for every confidence (D-062), so the number is left out rather than
+                      given a guessed basis.
+                  - id: sieve:step/dailymed-53d03c03-object-3
+                    type: AlignmentStep
+                    category: NORMALIZATION
+                    method: DETERMINISTIC_RULE
+                    input_value: MONDO:0005148
+                    output_value: MONDO:0005148
+                    quality_category: normalization_identity
+                    confidence: 1.0
+                    confidence_basis: DETERMINISTIC
+              - id: sieve:chain/dailymed-53d03c03-predicate
+                type: ResolutionChain
+                entity_slot: predicate
+                steps:
+                  - id: sieve:step/dailymed-53d03c03-predicate-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: LLM
+                    input_value: "BYETTA is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."
+                    output_value: INDICATION
+                    text_span: {section: "LOINC:34067-9", char_start: 7, char_end: 36}
+                    span_role: SECTION_TEXT
+                    trigger_cue: is indicated as an adjunct to
+                    confidence: 1.0
+                    confidence_basis: MEASURED
+                    performed_by: [sieve:agent/claude-haiku-4-5-20251001]
+                    _qualityCategory_note: >-
+                      No AlignmentQuality value exists for relation extraction (trigger_cue
+                      indication_phrase); left out.
         evidence_item_sources: [sieve:resource/dailymed]
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: high
@@ -374,7 +466,16 @@ sepio_monarch:
         id: sieve:el/medic-ema-bydureon
         type: SieveEvidenceLine
         description: EMA summary of product characteristics (Bydureon).
-        has_evidence_items: [sieve:tp/ema-bydureon-0]
+        has_evidence_items:
+          - id: sieve:tp/ema-bydureon-0
+            type: TextPassage
+            statement_text: "Bydureon is indicated in adults 18 years and older with type 2 diabetes mellitus to improve glycaemic control…"
+            reported_in:
+              - id: "EMA:bydureon"
+                type: Document
+            quote_verification: NOT_CHECKED
+            contributions:
+              - {id: sieve:act/medic-extract-ema-bydureon, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
         evidence_item_sources: [sieve:resource/ema]
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: high
@@ -386,7 +487,16 @@ sepio_monarch:
         id: sieve:el/medic-ema-byetta
         type: SieveEvidenceLine
         description: EMA summary of product characteristics (Byetta). Same authority as Bydureon, so same cluster.
-        has_evidence_items: [sieve:tp/ema-byetta-0]
+        has_evidence_items:
+          - id: sieve:tp/ema-byetta-0
+            type: TextPassage
+            statement_text: "Byetta is indicated for treatment of type-2 diabetes mellitus in combination with: metformin; sulphonylureas; …"
+            reported_in:
+              - id: "EMA:byetta"
+                type: Document
+            quote_verification: NOT_CHECKED
+            contributions:
+              - {id: sieve:act/medic-extract-ema-byetta, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
         evidence_item_sources: [sieve:resource/ema]
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: high
@@ -398,7 +508,32 @@ sepio_monarch:
         id: sieve:el/medic-india
         type: SieveEvidenceLine
         description: CDSCO India approved-new-drugs table; the claim rests on the section, not a phrase.
-        has_evidence_items: [sieve:tp/india-approved-new-drugs-0]
+        has_evidence_items:
+          - id: sieve:tp/india-approved-new-drugs-0
+            type: TextPassage
+            statement_text: "For treatment of type 2 diabetes mellitus in combination with Metformin Sulphonylurea Thiazolidinedione…"
+            reported_in:
+              - id: "INDIA:Approved-New-Drugs"
+                type: Document
+            quote_verification: NOT_CHECKED
+            contributions:
+              - {id: sieve:act/medic-extract-india, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
+            groundings:
+              - id: sieve:chain/india-predicate
+                type: ResolutionChain
+                entity_slot: predicate
+                steps:
+                  - id: sieve:step/india-predicate-1
+                    type: AlignmentStep
+                    category: EXTRACTION
+                    method: LLM
+                    input_value: "For treatment of type 2 diabetes mellitus in combination with Metformin Sulphonylurea Thiazolidinedione…"
+                    output_value: INDICATION
+                    span_role: TABLE_CELL
+                    trigger_cue: section_header
+                    _note: >-
+                      The relation rests on the table's section, not on a phrase in the cell, so
+                      the trigger is the cue type, not verbatim words.
         evidence_item_sources: [sieve:resource/cdsco]
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: moderate
@@ -413,7 +548,16 @@ sepio_monarch:
         id: sieve:el/medic-pmda-161-20101027
         type: SieveEvidenceLine
         description: PMDA review report, new active ingredient (2010).
-        has_evidence_items: [sieve:tp/pmda-161-20101027-0]
+        has_evidence_items:
+          - id: sieve:tp/pmda-161-20101027-0
+            type: TextPassage
+            statement_text: "Drugs with a new active ingredient indicated for the treatment of type 2 diabetes mellitus…"
+            reported_in:
+              - id: "PMDA:EXENATIDE#161-20101027"
+                type: Document
+            quote_verification: NOT_CHECKED
+            contributions:
+              - {id: sieve:act/medic-extract-pmda-161, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
         evidence_item_sources: [sieve:resource/pmda]
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: high
@@ -425,7 +569,16 @@ sepio_monarch:
         id: sieve:el/medic-pmda-151-20120330
         type: SieveEvidenceLine
         description: PMDA review report, additional indication/dosage form (2012). Same drug, same authority, same cluster.
-        has_evidence_items: [sieve:tp/pmda-151-20120330-0]
+        has_evidence_items:
+          - id: sieve:tp/pmda-151-20120330-0
+            type: TextPassage
+            statement_text: "A drug with a new additional indication and a new dosage in a new dosage form for the treatment of type 2 diabetes mellitus."
+            reported_in:
+              - id: "PMDA:EXENATIDE#151-20120330"
+                type: Document
+            quote_verification: NOT_CHECKED
+            contributions:
+              - {id: sieve:act/medic-extract-pmda-151, type: SieveContribution, contributor: sieve:agent/medic-extractor, role: EXTRACTOR}
         evidence_item_sources: [sieve:resource/pmda]
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: high
@@ -443,7 +596,8 @@ gaps:
     enclosing statement to target. (2) No regulatory document class: a structured product
     label, an SmPC, a PMDA review report and the CDSCO list are none of Publication,
     WebPage or GuidelineDocument, and calling them so would be false, so the passages
-    reference document ids with no document record. The LOINC section code survives only
+    nest each label as a bare core Document carrying only its id, with no document record
+    behind it. The LOINC section code survives only
     as a free-text TextLocation.section. (3) No slots for jurisdiction, approval status or
     regulatory authority. (4) ResourceRole is PRIMARY | AGGREGATOR. It covers MeDIC's
     PRIMARY / INTERMEDIARY but has no value for NON_REGULATORY, which is an authority

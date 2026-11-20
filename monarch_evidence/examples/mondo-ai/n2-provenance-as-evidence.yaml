@@ -155,12 +155,28 @@ sepio_monarch:
     statement_text: "diabetes mellitus has exact synonym 'DM'"
     review_state: NOT_VERIFIED
     proposing_channel: CURATOR
-    has_evidence: [PMID:12345678]
+    has_evidence:
+      - id: PMID:12345678
+        type: Publication
+        pmid: "12345678"
+        urls: ["https://pubmed.ncbi.nlm.nih.gov/12345678/"]
+        resource: infores:pubmed
+        generation_context:
+          - {code: "sieve:basis_unknown"}
     origin:
       - id: sieve:origin/mondo-0005015-dm
         type: OriginEvent
         derivation_type: COPIED_FROM
-        source_item: sieve:rec/mondo-2026-08-01-MONDO_0005015
+        source_item:
+          id: sieve:rec/mondo-2026-08-01-MONDO_0005015
+          type: ExternalRecord
+          label: diabetes mellitus
+          resource: infores:mondo
+          record_metadata:
+            retrieved_from: infores:mondo
+            source_release: sieve:release/mondo-2026-08-01
+            record_identifier: MONDO:0005015
+            retrieval_date: "2026-08-01"        # reconstructed: release date stands in for the read date
         source_release: sieve:release/mondo-2026-08-01
         performed_by: [sieve:agent/mondo-ai-mondo-extractor]
         _note: >-
@@ -179,25 +195,6 @@ sepio_monarch:
         role: CURATOR
         agent_role_at_time: curator
         agent_trust_at_time: 0.8
-  external_records:
-    - id: sieve:rec/mondo-2026-08-01-MONDO_0005015
-      type: ExternalRecord
-      label: diabetes mellitus
-      resource: infores:mondo
-      record_metadata:
-        retrieved_from: infores:mondo
-        source_release: sieve:release/mondo-2026-08-01
-        record_identifier: MONDO:0005015
-        retrieval_date: "2026-08-01"            # reconstructed: release date stands in for the read date
-  publications:
-    - id: PMID:12345678
-      type: Publication
-      pmid: "12345678"
-      urls: ["https://pubmed.ncbi.nlm.nih.gov/12345678/"]
-      resource: infores:pubmed
-      generation_context:
-        - {code: "sieve:basis_unknown"}
-  # Registry data the packet refers to by id (SieveRegistry fragment, not part of the packet).
   # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
   reference_snapshot:
     id: sieve:pkt_mondo_0005015_dm#references

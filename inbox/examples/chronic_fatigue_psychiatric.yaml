@@ -23,7 +23,28 @@ statement:
     - id: sieve:el/cfs-literature-historical
       type: SieveEvidenceLine
       description: Historical psychosomatic view of CFS (now largely discredited)
-      has_evidence_items: [sieve:tp/pmid-8872637-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-8872637-1
+          type: TextPassage
+          statement_text: >-
+            Evidence suggests chronic fatigue syndrome may represent a form of
+            somatization, where psychological distress manifests as physical symptoms.
+          reported_in:
+            - id: PMID:8872637
+              type: Publication
+              title: Chronic Fatigue Syndrome - A Stress Disorder?
+              pmid: "8872637"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: "Discussion, page 1156"}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-8872637-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-07-05"
       direction_of_evidence_provided: supports
       score_of_evidence_provided: 0.3
       contributions:
@@ -42,7 +63,30 @@ statement:
     - id: sieve:el/cfs-literature-biomarkers
       type: SieveEvidenceLine
       description: Biological abnormalities identified in CFS/ME patients
-      has_evidence_items: [sieve:tp/pmid-32853382-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-32853382-1
+          type: TextPassage
+          statement_text: >-
+            Multiple studies have identified objective biological abnormalities in
+            ME/CFS patients including immune dysregulation, mitochondrial dysfunction,
+            autonomic nervous system abnormalities, and altered gut microbiome.
+            These findings are inconsistent with a purely psychiatric etiology.
+          reported_in:
+            - id: PMID:32853382
+              type: Publication
+              title: Biological Markers of Myalgic Encephalomyelitis/Chronic Fatigue Syndrome
+              pmid: "32853382"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: "Results, page 8"}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-32853382-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-07-05"
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.85
       contributions:
@@ -60,7 +104,14 @@ statement:
     - id: sieve:el/cfs-icd11
       type: SieveEvidenceLine
       description: ICD-11 has both CFS and psychiatric disorder concepts but no subclass relationship between them
-      has_evidence_items: [ICD11:8E49]
+      has_evidence_items:
+        - id: ICD11:8E49
+          type: ExternalRecord
+          label: Postviral fatigue syndrome
+          resource: sieve:resource/icd11
+          record_metadata:
+            retrieved_from: sieve:resource/icd11
+            retrieval_date: "2024-07-05"
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.95
       contributions:
@@ -77,7 +128,12 @@ statement:
     - id: sieve:el/cfs-nice
       type: SieveEvidenceLine
       description: NICE guidelines have both ME/CFS and psychiatric concepts but explicitly reject psychiatric classification
-      has_evidence_items: [NICE:NG206]
+      has_evidence_items:
+        - id: NICE:NG206
+          type: GuidelineDocument
+          title: NICE guideline NG206 (ME/CFS)
+          urls: ["https://www.nice.org.uk/guidance/ng206"]
+          resource: sieve:resource/nice
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.9
       contributions:
@@ -105,7 +161,11 @@ statement:
     - id: sieve:el/cfs-patient-advocacy
       type: SieveEvidenceLine
       description: Patient advocacy organizations reject psychiatric classification
-      has_evidence_items: ["https://meaction.net/"]
+      has_evidence_items:
+        - id: https://meaction.net/
+          type: WebPage
+          title: ME Action Position Statement
+          urls: ["https://meaction.net/"]
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.6
       contributions:
@@ -153,71 +213,6 @@ statement:
       route: INDIVIDUAL_SIGN_OFF
       signed_packet_version: "2020-03-15"
       rationale: Historical classification of CFS based on psychosomatic theory.
-external_records:
-  - id: ICD11:8E49
-    type: ExternalRecord
-    label: Postviral fatigue syndrome
-    resource: sieve:resource/icd11
-    record_metadata:
-      retrieved_from: sieve:resource/icd11
-      retrieval_date: "2024-07-05"
-text_passages:
-  - id: sieve:tp/pmid-8872637-1
-    type: TextPassage
-    statement_text: >-
-      Evidence suggests chronic fatigue syndrome may represent a form of
-      somatization, where psychological distress manifests as physical symptoms.
-    reported_in: [PMID:8872637]
-    text_location: {section: "Discussion, page 1156"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-8872637-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-07-05"
-  - id: sieve:tp/pmid-32853382-1
-    type: TextPassage
-    statement_text: >-
-      Multiple studies have identified objective biological abnormalities in
-      ME/CFS patients including immune dysregulation, mitochondrial dysfunction,
-      autonomic nervous system abnormalities, and altered gut microbiome.
-      These findings are inconsistent with a purely psychiatric etiology.
-    reported_in: [PMID:32853382]
-    text_location: {section: "Results, page 8"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-32853382-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-07-05"
-publications:
-  - id: PMID:8872637
-    type: Publication
-    title: Chronic Fatigue Syndrome - A Stress Disorder?
-    pmid: "8872637"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
-  - id: PMID:32853382
-    type: Publication
-    title: Biological Markers of Myalgic Encephalomyelitis/Chronic Fatigue Syndrome
-    pmid: "32853382"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
-guidelines:
-  - id: NICE:NG206
-    type: GuidelineDocument
-    title: NICE guideline NG206 (ME/CFS)
-    urls: ["https://www.nice.org.uk/guidance/ng206"]
-    resource: sieve:resource/nice
-web_pages:
-  - id: https://meaction.net/
-    type: WebPage
-    title: ME Action Position Statement
-    urls: ["https://meaction.net/"]
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: http://purl.org/np/RA5678901234#references

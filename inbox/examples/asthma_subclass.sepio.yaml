@@ -18,7 +18,32 @@ statement:
   has_evidence_lines:
     - id: sieve:el/asthma-icd10cm
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:ca/icd10cm-J45-isa-J00-J99]
+      has_evidence_items:
+        - id: sieve:ca/icd10cm-J45-isa-J00-J99
+          type: SubclassStatement
+          subject: ICD10CM:J45
+          predicate: {code: rdfs:subClassOf, label: subClassOf}
+          object: ICD10CM:J00-J99
+          reported_in:
+            - id: ICD10CM:J45
+              type: ExternalRecord
+              label: Asthma
+              resource: infores:icd10cm
+              record_metadata:
+                retrieved_from: infores:icd10cm
+                retrieval_date: "2024-01-20"
+          resource: infores:icd10cm
+          groundings:
+            - id: sieve:chain/icd10cm-J45
+              type: ResolutionChain
+              entity_slot: subject
+              steps:
+                - id: sieve:step/icd10cm-J45-1
+                  type: AlignmentStep
+                  category: GROUNDING
+                  method: STRUCTURED_FIELD
+                  input_value: ICD10CM:J45
+                  output_value: MONDO:0004979
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: strong
       score_of_evidence_provided: 0.9
@@ -38,7 +63,33 @@ statement:
           action: ACCEPTED_UNCHANGED
     - id: sieve:el/asthma-doid
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:ca/doid-2841-isa-0050155]
+      has_evidence_items:
+        - id: sieve:ca/doid-2841-isa-0050155
+          type: SubclassStatement
+          subject: DOID:2841
+          predicate: {code: rdfs:subClassOf, label: subClassOf}
+          object: DOID:0050155
+          reported_in:
+            - id: DOID:2841
+              type: ExternalRecord
+              label: asthma
+              resource: infores:disease-ontology
+              record_metadata:
+                retrieved_from: infores:disease-ontology
+                retrieval_date: "2024-01-20"
+          resource: infores:disease-ontology
+          groundings:
+            - id: sieve:chain/doid-2841
+              type: ResolutionChain
+              entity_slot: subject
+              steps:
+                - id: sieve:step/doid-2841-1
+                  type: AlignmentStep
+                  category: GROUNDING
+                  method: STRUCTURED_FIELD
+                  input_value: DOID:2841
+                  output_value: MONDO:0004979
+                  mapping_set: https://w3id.org/sssom/mappings/mondo-doid.sssom.tsv
       direction_of_evidence_provided: disputes
       strength_of_evidence_provided: moderate
       score_of_evidence_provided: 0.7
@@ -52,7 +103,27 @@ statement:
           read_coverage: STRUCTURED_RECORD
     - id: sieve:el/asthma-gina
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:tp/pmid-28884740-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-28884740-1
+          type: TextPassage
+          statement_text: >-
+            Asthma is a heterogeneous disease, usually characterized by chronic airway
+            inflammation. It is defined by the history of respiratory symptoms such as
+            wheeze, shortness of breath, chest tightness and cough.
+          reported_in:
+            - id: PMID:28884740
+              type: GuidelineDocument
+              title: Global Strategy for Asthma Management and Prevention (GINA 2017)
+              pmid: "28884740"
+              resource: infores:pubmed
+          text_location: {section: "Chapter 1, Definition, page 14"}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-28884740-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-01-20"
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: strong
       score_of_evidence_provided: 0.95
@@ -73,7 +144,29 @@ statement:
           action: ACCEPTED_UNCHANGED
     - id: sieve:el/asthma-patho
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:tp/pmid-31542051-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-31542051-1
+          type: TextPassage
+          statement_text: >-
+            Asthma is a chronic inflammatory disorder of the airways involving multiple
+            cell types, associated with airway hyperresponsiveness leading to recurrent
+            episodes of wheezing, breathlessness, chest tightness, and coughing.
+          reported_in:
+            - id: PMID:31542051
+              type: Publication
+              title: Pathophysiology of Asthma
+              pmid: "31542051"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: Abstract}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-31542051-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-01-20"
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: moderate
       score_of_evidence_provided: 0.85
@@ -153,104 +246,6 @@ statement:
         Cross-ontology concordance (ICD-10), published literature, expert clinical
         review, and AI-assisted research strongly support classifying asthma as a
         respiratory system disorder. Only Disease Ontology dissents.
-prior_claims:
-  - id: sieve:ca/icd10cm-J45-isa-J00-J99
-    type: SubclassStatement
-    subject: ICD10CM:J45
-    predicate: {code: rdfs:subClassOf, label: subClassOf}
-    object: ICD10CM:J00-J99
-    reported_in: [ICD10CM:J45]
-    resource: infores:icd10cm
-    groundings:
-      - id: sieve:chain/icd10cm-J45
-        type: ResolutionChain
-        entity_slot: subject
-        steps:
-          - id: sieve:step/icd10cm-J45-1
-            type: AlignmentStep
-            category: GROUNDING
-            method: STRUCTURED_FIELD
-            input_value: ICD10CM:J45
-            output_value: MONDO:0004979
-  - id: sieve:ca/doid-2841-isa-0050155
-    type: SubclassStatement
-    subject: DOID:2841
-    predicate: {code: rdfs:subClassOf, label: subClassOf}
-    object: DOID:0050155
-    reported_in: [DOID:2841]
-    resource: infores:disease-ontology
-    groundings:
-      - id: sieve:chain/doid-2841
-        type: ResolutionChain
-        entity_slot: subject
-        steps:
-          - id: sieve:step/doid-2841-1
-            type: AlignmentStep
-            category: GROUNDING
-            method: STRUCTURED_FIELD
-            input_value: DOID:2841
-            output_value: MONDO:0004979
-            mapping_set: https://w3id.org/sssom/mappings/mondo-doid.sssom.tsv
-external_records:
-  - id: ICD10CM:J45
-    type: ExternalRecord
-    label: Asthma
-    resource: infores:icd10cm
-    record_metadata:
-      retrieved_from: infores:icd10cm
-      retrieval_date: "2024-01-20"
-  - id: DOID:2841
-    type: ExternalRecord
-    label: asthma
-    resource: infores:disease-ontology
-    record_metadata:
-      retrieved_from: infores:disease-ontology
-      retrieval_date: "2024-01-20"
-text_passages:
-  - id: sieve:tp/pmid-28884740-1
-    type: TextPassage
-    statement_text: >-
-      Asthma is a heterogeneous disease, usually characterized by chronic airway
-      inflammation. It is defined by the history of respiratory symptoms such as
-      wheeze, shortness of breath, chest tightness and cough.
-    reported_in: [PMID:28884740]
-    text_location: {section: "Chapter 1, Definition, page 14"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-28884740-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-01-20"
-  - id: sieve:tp/pmid-31542051-1
-    type: TextPassage
-    statement_text: >-
-      Asthma is a chronic inflammatory disorder of the airways involving multiple
-      cell types, associated with airway hyperresponsiveness leading to recurrent
-      episodes of wheezing, breathlessness, chest tightness, and coughing.
-    reported_in: [PMID:31542051]
-    text_location: {section: Abstract}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-31542051-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-01-20"
-guidelines:
-  - id: PMID:28884740
-    type: GuidelineDocument
-    title: Global Strategy for Asthma Management and Prevention (GINA 2017)
-    pmid: "28884740"
-    resource: infores:pubmed
-publications:
-  - id: PMID:31542051
-    type: Publication
-    title: Pathophysiology of Asthma
-    pmid: "31542051"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: http://purl.org/np/RA9876543210#references

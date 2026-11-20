@@ -151,7 +151,38 @@ sepio_monarch:
     has_evidence_lines:
       - id: el_omim_0564
         type: SieveEvidenceLine
-        has_evidence_items: [ev_omim_0564]
+        has_evidence_items:
+          - id: ev_omim_0564
+            type: SynonymStatement
+            subject: OMIM:620763
+            predicate: {code: oboInOwl:hasExactSynonym}
+            object: LECD
+            reported_in:
+              - id: OMIM:620763
+                type: ExternalRecord
+                label: corneal dystrophy, lisch epithelial
+                resource: infores:omim
+                generation_context:
+                  - {code: "sieve:basis_unknown"}
+                record_metadata:
+                  retrieved_from: infores:omim
+                  retrieval_date: "2026-03-18"  # packet creation date; mondo-ai records no release
+            resource: infores:omim
+            groundings:
+              - id: sieve:chain/omim-620763
+                type: ResolutionChain
+                entity_slot: subject
+                date: "2026-03-18"
+                specified_by: [sieve:method/mondo-ai-concordance]
+                steps:
+                  - id: sieve:step/omim-620763-1
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: STRUCTURED_FIELD
+                    input_value: OMIM:620763
+                    output_value: MONDO:0010425
+                    predicate: skos:exactMatch
+                    mapping_set: https://w3id.org/sieve/mapping-set/mondo.sssom.tsv
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: strong      # as emitted by mondo-ai; no rule band behind it (see gaps)
         date_attached: "2026-03-18"
@@ -170,7 +201,38 @@ sepio_monarch:
           chain step carries no confidence. See gaps.grounding_quality_label_has_no_value.
       - id: el_ordo_29022
         type: SieveEvidenceLine
-        has_evidence_items: [ev_ordo_29022]
+        has_evidence_items:
+          - id: ev_ordo_29022
+            type: SynonymStatement
+            subject: Orphanet:98955
+            predicate: {code: oboInOwl:hasExactSynonym}
+            object: LECD
+            reported_in:
+              - id: Orphanet:98955
+                type: ExternalRecord
+                label: Lisch epithelial corneal dystrophy
+                resource: infores:orphanet
+                generation_context:
+                  - {code: "sieve:basis_unknown"}
+                record_metadata:
+                  retrieved_from: infores:orphanet
+                  retrieval_date: "2026-03-18"
+            resource: infores:orphanet
+            groundings:
+              - id: sieve:chain/orphanet-98955
+                type: ResolutionChain
+                entity_slot: subject
+                date: "2026-03-18"
+                specified_by: [sieve:method/mondo-ai-concordance]
+                steps:
+                  - id: sieve:step/orphanet-98955-1
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: STRUCTURED_FIELD
+                    input_value: Orphanet:98955
+                    output_value: MONDO:0010425
+                    predicate: skos:exactMatch
+                    mapping_set: https://w3id.org/sieve/mapping-set/mondo.sssom.tsv
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: strong
         date_attached: "2026-03-18"
@@ -185,7 +247,38 @@ sepio_monarch:
             read_coverage: STRUCTURED_RECORD
       - id: el_doid_59964
         type: SieveEvidenceLine
-        has_evidence_items: [ev_doid_59964]
+        has_evidence_items:
+          - id: ev_doid_59964
+            type: SynonymStatement
+            subject: DOID:0060450
+            predicate: {code: oboInOwl:hasExactSynonym}
+            object: LECD
+            reported_in:
+              - id: DOID:0060450
+                type: ExternalRecord
+                label: Lisch epithelial corneal dystrophy
+                resource: infores:disease-ontology
+                generation_context:
+                  - {code: "sieve:basis_unknown"}
+                record_metadata:
+                  retrieved_from: infores:disease-ontology
+                  retrieval_date: "2026-03-18"
+            resource: infores:disease-ontology
+            groundings:
+              - id: sieve:chain/doid-0060450
+                type: ResolutionChain
+                entity_slot: subject
+                date: "2026-03-18"
+                specified_by: [sieve:method/mondo-ai-concordance]
+                steps:
+                  - id: sieve:step/doid-0060450-1
+                    type: AlignmentStep
+                    category: GROUNDING
+                    method: STRUCTURED_FIELD
+                    input_value: DOID:0060450
+                    output_value: MONDO:0010425
+                    predicate: skos:exactMatch # stored by mondo-ai under the misnamed key mapping_justification
+                    mapping_set: https://w3id.org/sieve/mapping-set/mondo.sssom.tsv
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: strong
         date_attached: "2026-03-18"
@@ -198,106 +291,10 @@ sepio_monarch:
             method_type: COMPUTED_CONCORDANCE
             specified_by: [sieve:method/mondo-ai-concordance]
             read_coverage: STRUCTURED_RECORD
-  prior_claims:
-    - id: ev_omim_0564
-      type: SynonymStatement
-      subject: OMIM:620763
-      predicate: {code: oboInOwl:hasExactSynonym}
-      object: LECD
-      reported_in: [OMIM:620763]
-      resource: infores:omim
-      groundings:
-        - id: sieve:chain/omim-620763
-          type: ResolutionChain
-          entity_slot: subject
-          date: "2026-03-18"
-          specified_by: [sieve:method/mondo-ai-concordance]
-          steps:
-            - id: sieve:step/omim-620763-1
-              type: AlignmentStep
-              category: GROUNDING
-              method: STRUCTURED_FIELD
-              input_value: OMIM:620763
-              output_value: MONDO:0010425
-              predicate: skos:exactMatch
-              mapping_set: https://w3id.org/sieve/mapping-set/mondo.sssom.tsv
-    - id: ev_ordo_29022
-      type: SynonymStatement
-      subject: Orphanet:98955
-      predicate: {code: oboInOwl:hasExactSynonym}
-      object: LECD
-      reported_in: [Orphanet:98955]
-      resource: infores:orphanet
-      groundings:
-        - id: sieve:chain/orphanet-98955
-          type: ResolutionChain
-          entity_slot: subject
-          date: "2026-03-18"
-          specified_by: [sieve:method/mondo-ai-concordance]
-          steps:
-            - id: sieve:step/orphanet-98955-1
-              type: AlignmentStep
-              category: GROUNDING
-              method: STRUCTURED_FIELD
-              input_value: Orphanet:98955
-              output_value: MONDO:0010425
-              predicate: skos:exactMatch
-              mapping_set: https://w3id.org/sieve/mapping-set/mondo.sssom.tsv
-    - id: ev_doid_59964
-      type: SynonymStatement
-      subject: DOID:0060450
-      predicate: {code: oboInOwl:hasExactSynonym}
-      object: LECD
-      reported_in: [DOID:0060450]
-      resource: infores:disease-ontology
-      groundings:
-        - id: sieve:chain/doid-0060450
-          type: ResolutionChain
-          entity_slot: subject
-          date: "2026-03-18"
-          specified_by: [sieve:method/mondo-ai-concordance]
-          steps:
-            - id: sieve:step/doid-0060450-1
-              type: AlignmentStep
-              category: GROUNDING
-              method: STRUCTURED_FIELD
-              input_value: DOID:0060450
-              output_value: MONDO:0010425
-              predicate: skos:exactMatch      # stored by mondo-ai under the misnamed key mapping_justification
-              mapping_set: https://w3id.org/sieve/mapping-set/mondo.sssom.tsv
-  external_records:
-    - id: OMIM:620763
-      type: ExternalRecord
-      label: corneal dystrophy, lisch epithelial
-      resource: infores:omim
-      generation_context:
-        - {code: "sieve:basis_unknown"}
-      record_metadata:
-        retrieved_from: infores:omim
-        retrieval_date: "2026-03-18"            # packet creation date; mondo-ai records no release
-    - id: Orphanet:98955
-      type: ExternalRecord
-      label: Lisch epithelial corneal dystrophy
-      resource: infores:orphanet
-      generation_context:
-        - {code: "sieve:basis_unknown"}
-      record_metadata:
-        retrieved_from: infores:orphanet
-        retrieval_date: "2026-03-18"
-    - id: DOID:0060450
-      type: ExternalRecord
-      label: Lisch epithelial corneal dystrophy
-      resource: infores:disease-ontology
-      generation_context:
-        - {code: "sieve:basis_unknown"}
-      record_metadata:
-        retrieved_from: infores:disease-ontology
-        retrieval_date: "2026-03-18"
-  # Registry data the packet refers to by id (a SieveRegistry fragment, not part of the
-  # packet). This is where mondo-ai's ResourceConfig weights go: dated, per resource, scoped
-  # to the claim type. DOID derives content from OMIM, so the aggregation rule can put the
-  # DOID line in OMIM's independence cluster.
   # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+  # This is where mondo-ai's ResourceConfig weights go: dated, per resource, scoped to the
+  # claim type. DOID derives content from OMIM, so the aggregation rule can put the DOID
+  # line in OMIM's independence cluster.
   reference_snapshot:
     id: sieve:pkt_000564#references
     type: SieveRegistry

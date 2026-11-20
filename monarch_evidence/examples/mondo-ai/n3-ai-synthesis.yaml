@@ -147,39 +147,56 @@ sepio_monarch:
     has_evidence_lines:
       - id: el_omim_0564
         type: SieveEvidenceLine
-        has_evidence_items: [sieve:ca/omim-620763-LECD]
+        has_evidence_items:
+          - {id: sieve:ca/omim-620763-LECD, type: SynonymStatement, subject: OMIM:620763, predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reported_in: [{id: OMIM:620763, type: ExternalRecord, label: "corneal dystrophy, lisch epithelial", resource: infores:omim, generation_context: [code: "sieve:basis_unknown"], record_metadata: {retrieved_from: infores:omim, retrieval_date: "2026-03-18"}}], resource: infores:omim, groundings: [{id: sieve:chain/omim-620763, type: ResolutionChain, entity_slot: subject, steps: [{id: sieve:step/omim-620763-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD, input_value: OMIM:620763, output_value: MONDO:0010425, predicate: skos:exactMatch, mapping_set: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: strong
         date_attached: "2026-03-18"
         contributions:
-          - {id: sieve:act/el_omim_0564, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor,
-             role: INTERPRETER, date: "2026-03-18", method_type: COMPUTED_CONCORDANCE,
-             specified_by: [sieve:method/mondo-ai-concordance], read_coverage: STRUCTURED_RECORD}
+          - {id: sieve:act/el_omim_0564, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor, role: INTERPRETER, date: "2026-03-18", method_type: COMPUTED_CONCORDANCE, specified_by: [sieve:method/mondo-ai-concordance], read_coverage: STRUCTURED_RECORD}
       - id: el_ordo_29022
         type: SieveEvidenceLine
-        has_evidence_items: [sieve:ca/orphanet-98955-LECD]
+        has_evidence_items:
+          - {id: sieve:ca/orphanet-98955-LECD, type: SynonymStatement, subject: Orphanet:98955, predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reported_in: [{id: Orphanet:98955, type: ExternalRecord, label: Lisch epithelial corneal dystrophy, resource: infores:orphanet, generation_context: [code: "sieve:basis_unknown"], record_metadata: {retrieved_from: infores:orphanet, retrieval_date: "2026-03-18"}}], resource: infores:orphanet, groundings: [{id: sieve:chain/orphanet-98955, type: ResolutionChain, entity_slot: subject, steps: [{id: sieve:step/orphanet-98955-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD, input_value: Orphanet:98955, output_value: MONDO:0010425, predicate: skos:exactMatch, mapping_set: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: strong
         date_attached: "2026-03-18"
         contributions:
-          - {id: sieve:act/el_ordo_29022, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor,
-             role: INTERPRETER, date: "2026-03-18", method_type: COMPUTED_CONCORDANCE,
-             specified_by: [sieve:method/mondo-ai-concordance], read_coverage: STRUCTURED_RECORD}
+          - {id: sieve:act/el_ordo_29022, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor, role: INTERPRETER, date: "2026-03-18", method_type: COMPUTED_CONCORDANCE, specified_by: [sieve:method/mondo-ai-concordance], read_coverage: STRUCTURED_RECORD}
       - id: el_doid_59964
         type: SieveEvidenceLine
-        has_evidence_items: [sieve:ca/doid-0060450-LECD]
+        has_evidence_items:
+          - {id: sieve:ca/doid-0060450-LECD, type: SynonymStatement, subject: DOID:0060450, predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reported_in: [{id: DOID:0060450, type: ExternalRecord, label: Lisch epithelial corneal dystrophy, resource: infores:disease-ontology, generation_context: [code: "sieve:basis_unknown"], record_metadata: {retrieved_from: infores:disease-ontology, retrieval_date: "2026-03-18"}}], resource: infores:disease-ontology, groundings: [{id: sieve:chain/doid-0060450, type: ResolutionChain, entity_slot: subject, steps: [{id: sieve:step/doid-0060450-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD, input_value: DOID:0060450, output_value: MONDO:0010425, predicate: skos:exactMatch, mapping_set: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: strong
         date_attached: "2026-03-18"
         contributions:
-          - {id: sieve:act/el_doid_59964, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor,
-             role: INTERPRETER, date: "2026-03-18", method_type: COMPUTED_CONCORDANCE,
-             specified_by: [sieve:method/mondo-ai-concordance], read_coverage: STRUCTURED_RECORD}
+          - {id: sieve:act/el_doid_59964, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor, role: INTERPRETER, date: "2026-03-18", method_type: COMPUTED_CONCORDANCE, specified_by: [sieve:method/mondo-ai-concordance], read_coverage: STRUCTURED_RECORD}
 
       # added by `mondo-ai enrich`: the quote-bearing line
       - id: el_lit_9f3c1a72
         type: SieveEvidenceLine
-        has_evidence_items: [ev_lit_1b04ef55]
+        has_evidence_items:
+          - id: ev_lit_1b04ef55
+            type: TextPassage
+            statement_text: "Lisch epithelial corneal dystrophy (LECD) is characterised by feathery grey opacities…"
+            reported_in:
+              - id: PMID:16109854
+                type: Publication
+                pmid: "16109854"
+                title: "Lisch epithelial corneal dystrophy (LECD): a rare X-linked disorder"
+                urls: ["https://pubmed.ncbi.nlm.nih.gov/16109854/"]
+                resource: infores:pubmed
+                generation_context:
+                  - {code: "sieve:basis_unknown"}
+            text_location: {section: Abstract}
+            quote_verification: NOT_CHECKED
+            contributions:
+              - id: sieve:act/ev_lit_1b04ef55-extraction
+                type: SieveContribution
+                contributor: sieve:agent/mondo-ai-enricher
+                role: EXTRACTOR
+                specified_by: [sieve:method/mondo-ai-pubmed-enrichment]
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: moderate
         score_of_evidence_provided: 0.5            # the constant rule's output, not a reading of the paper
@@ -200,7 +217,64 @@ sepio_monarch:
       # the synthesis: an LLM verdict over the lines it cited
       - id: sieve:el/synthesis-act_7c2f91ab
         type: SieveEvidenceLine
-        has_evidence_items: [el_omim_0564, el_ordo_29022, el_lit_9f3c1a72]
+        has_evidence_items:
+          - id: el_omim_0564
+            type: SieveEvidenceLine
+            has_evidence_items:
+              - {id: sieve:ca/omim-620763-LECD, type: SynonymStatement, subject: OMIM:620763, predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reported_in: [{id: OMIM:620763, type: ExternalRecord, label: "corneal dystrophy, lisch epithelial", resource: infores:omim, generation_context: [code: "sieve:basis_unknown"], record_metadata: {retrieved_from: infores:omim, retrieval_date: "2026-03-18"}}], resource: infores:omim, groundings: [{id: sieve:chain/omim-620763, type: ResolutionChain, entity_slot: subject, steps: [{id: sieve:step/omim-620763-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD, input_value: OMIM:620763, output_value: MONDO:0010425, predicate: skos:exactMatch, mapping_set: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
+            direction_of_evidence_provided: supports
+            strength_of_evidence_provided: strong
+            date_attached: "2026-03-18"
+            contributions:
+              - {id: sieve:act/el_omim_0564, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor, role: INTERPRETER, date: "2026-03-18", method_type: COMPUTED_CONCORDANCE, specified_by: [sieve:method/mondo-ai-concordance], read_coverage: STRUCTURED_RECORD}
+          - id: el_ordo_29022
+            type: SieveEvidenceLine
+            has_evidence_items:
+              - {id: sieve:ca/orphanet-98955-LECD, type: SynonymStatement, subject: Orphanet:98955, predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reported_in: [{id: Orphanet:98955, type: ExternalRecord, label: Lisch epithelial corneal dystrophy, resource: infores:orphanet, generation_context: [code: "sieve:basis_unknown"], record_metadata: {retrieved_from: infores:orphanet, retrieval_date: "2026-03-18"}}], resource: infores:orphanet, groundings: [{id: sieve:chain/orphanet-98955, type: ResolutionChain, entity_slot: subject, steps: [{id: sieve:step/orphanet-98955-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD, input_value: Orphanet:98955, output_value: MONDO:0010425, predicate: skos:exactMatch, mapping_set: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
+            direction_of_evidence_provided: supports
+            strength_of_evidence_provided: strong
+            date_attached: "2026-03-18"
+            contributions:
+              - {id: sieve:act/el_ordo_29022, type: InterpretationActivity, contributor: sieve:agent/mondo-ai-owl-extractor, role: INTERPRETER, date: "2026-03-18", method_type: COMPUTED_CONCORDANCE, specified_by: [sieve:method/mondo-ai-concordance], read_coverage: STRUCTURED_RECORD}
+          - id: el_lit_9f3c1a72
+            type: SieveEvidenceLine
+            has_evidence_items:
+              - id: ev_lit_1b04ef55
+                type: TextPassage
+                statement_text: "Lisch epithelial corneal dystrophy (LECD) is characterised by feathery grey opacities…"
+                reported_in:
+                  - id: PMID:16109854
+                    type: Publication
+                    pmid: "16109854"
+                    title: "Lisch epithelial corneal dystrophy (LECD): a rare X-linked disorder"
+                    urls: ["https://pubmed.ncbi.nlm.nih.gov/16109854/"]
+                    resource: infores:pubmed
+                    generation_context:
+                      - {code: "sieve:basis_unknown"}
+                text_location: {section: Abstract}
+                quote_verification: NOT_CHECKED
+                contributions:
+                  - id: sieve:act/ev_lit_1b04ef55-extraction
+                    type: SieveContribution
+                    contributor: sieve:agent/mondo-ai-enricher
+                    role: EXTRACTOR
+                    specified_by: [sieve:method/mondo-ai-pubmed-enrichment]
+            direction_of_evidence_provided: supports
+            strength_of_evidence_provided: moderate
+            score_of_evidence_provided: 0.5
+            computed_by_rule: sieve:rule/mondo-ai-literature-default
+            contributions:
+              - id: sieve:act/el_lit_9f3c1a72
+                type: InterpretationActivity
+                contributor: sieve:agent/mondo-ai-enricher
+                role: INTERPRETER
+                date: "2026-08-13"
+                method_type: RULE_BASED_STRENGTH
+                specified_by: [sieve:method/mondo-ai-pubmed-enrichment]
+                read_coverage: ABSTRACT_ONLY
+                access_status: NOT_RECORDED
+                identifier_verified: NOT_CHECKED
+                grounding_checked: NOT_CHECKED
         direction_of_evidence_provided: supports   # CONFIRM
         confidence: 0.95                        # the model's self-reported number
         confidence_basis: PRIOR
@@ -223,7 +297,46 @@ sepio_monarch:
       # a second interpreter disagreeing (hypothetical, as in the earlier sketch)
       - id: sieve:el/synthesis-gpt-4o-example
         type: SieveEvidenceLine
-        has_evidence_items: [el_lit_9f3c1a72]
+        has_evidence_items:
+          - id: el_lit_9f3c1a72
+            type: SieveEvidenceLine
+            has_evidence_items:
+              - id: ev_lit_1b04ef55
+                type: TextPassage
+                statement_text: "Lisch epithelial corneal dystrophy (LECD) is characterised by feathery grey opacities…"
+                reported_in:
+                  - id: PMID:16109854
+                    type: Publication
+                    pmid: "16109854"
+                    title: "Lisch epithelial corneal dystrophy (LECD): a rare X-linked disorder"
+                    urls: ["https://pubmed.ncbi.nlm.nih.gov/16109854/"]
+                    resource: infores:pubmed
+                    generation_context:
+                      - {code: "sieve:basis_unknown"}
+                text_location: {section: Abstract}
+                quote_verification: NOT_CHECKED
+                contributions:
+                  - id: sieve:act/ev_lit_1b04ef55-extraction
+                    type: SieveContribution
+                    contributor: sieve:agent/mondo-ai-enricher
+                    role: EXTRACTOR
+                    specified_by: [sieve:method/mondo-ai-pubmed-enrichment]
+            direction_of_evidence_provided: supports
+            strength_of_evidence_provided: moderate
+            score_of_evidence_provided: 0.5
+            computed_by_rule: sieve:rule/mondo-ai-literature-default
+            contributions:
+              - id: sieve:act/el_lit_9f3c1a72
+                type: InterpretationActivity
+                contributor: sieve:agent/mondo-ai-enricher
+                role: INTERPRETER
+                date: "2026-08-13"
+                method_type: RULE_BASED_STRENGTH
+                specified_by: [sieve:method/mondo-ai-pubmed-enrichment]
+                read_coverage: ABSTRACT_ONLY
+                access_status: NOT_RECORDED
+                identifier_verified: NOT_CHECKED
+                grounding_checked: NOT_CHECKED
         direction_of_evidence_provided: disputes   # REVIEW / "neutral" has no Direction value
         confidence: 0.55
         confidence_basis: PRIOR
@@ -239,62 +352,8 @@ sepio_monarch:
             rationale: >-
               'LECD' is also used for Lisch nodules in the literature; the abbreviation may be
               ambiguous. Recommended action: REVIEW.
-  prior_claims:
-    - {id: sieve:ca/omim-620763-LECD, type: SynonymStatement, subject: OMIM:620763,
-       predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reported_in: [OMIM:620763], resource: infores:omim,
-       groundings: [{id: sieve:chain/omim-620763, type: ResolutionChain, entity_slot: subject,
-         steps: [{id: sieve:step/omim-620763-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD,
-                  input_value: OMIM:620763, output_value: MONDO:0010425, predicate: skos:exactMatch,
-                  mapping_set: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
-    - {id: sieve:ca/orphanet-98955-LECD, type: SynonymStatement, subject: Orphanet:98955,
-       predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reported_in: [Orphanet:98955], resource: infores:orphanet,
-       groundings: [{id: sieve:chain/orphanet-98955, type: ResolutionChain, entity_slot: subject,
-         steps: [{id: sieve:step/orphanet-98955-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD,
-                  input_value: Orphanet:98955, output_value: MONDO:0010425, predicate: skos:exactMatch,
-                  mapping_set: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
-    - {id: sieve:ca/doid-0060450-LECD, type: SynonymStatement, subject: DOID:0060450,
-       predicate: {code: oboInOwl:hasExactSynonym}, object: LECD, reported_in: [DOID:0060450], resource: infores:disease-ontology,
-       groundings: [{id: sieve:chain/doid-0060450, type: ResolutionChain, entity_slot: subject,
-         steps: [{id: sieve:step/doid-0060450-1, type: AlignmentStep, category: GROUNDING, method: STRUCTURED_FIELD,
-                  input_value: DOID:0060450, output_value: MONDO:0010425, predicate: skos:exactMatch,
-                  mapping_set: "https://w3id.org/sieve/mapping-set/mondo.sssom.tsv"}]}]}
-  external_records:
-    - {id: OMIM:620763, type: ExternalRecord, label: "corneal dystrophy, lisch epithelial", resource: infores:omim,
-       generation_context: [{code: "sieve:basis_unknown"}],
-       record_metadata: {retrieved_from: infores:omim, retrieval_date: "2026-03-18"}}
-    - {id: Orphanet:98955, type: ExternalRecord, label: Lisch epithelial corneal dystrophy, resource: infores:orphanet,
-       generation_context: [{code: "sieve:basis_unknown"}],
-       record_metadata: {retrieved_from: infores:orphanet, retrieval_date: "2026-03-18"}}
-    - {id: DOID:0060450, type: ExternalRecord, label: Lisch epithelial corneal dystrophy, resource: infores:disease-ontology,
-       generation_context: [{code: "sieve:basis_unknown"}],
-       record_metadata: {retrieved_from: infores:disease-ontology, retrieval_date: "2026-03-18"}}
-  text_passages:
-    - id: ev_lit_1b04ef55
-      type: TextPassage
-      statement_text: "Lisch epithelial corneal dystrophy (LECD) is characterised by feathery grey opacities…"
-      reported_in: [PMID:16109854]
-      # derived_from (dependence on the paper, D-046/D-057) omitted: its core range
-      # InformationEntity is inlined, so it cannot reference PMID:16109854 by id. See gaps.
-      text_location: {section: Abstract}
-      quote_verification: NOT_CHECKED
-      contributions:
-        - id: sieve:act/ev_lit_1b04ef55-extraction
-          type: SieveContribution
-          contributor: sieve:agent/mondo-ai-enricher
-          role: EXTRACTOR
-          specified_by: [sieve:method/mondo-ai-pubmed-enrichment]
-  publications:
-    - id: PMID:16109854
-      type: Publication
-      pmid: "16109854"
-      title: "Lisch epithelial corneal dystrophy (LECD): a rare X-linked disorder"
-      urls: ["https://pubmed.ncbi.nlm.nih.gov/16109854/"]
-      resource: infores:pubmed
-      generation_context:
-        - {code: "sieve:basis_unknown"}
-  # Registry data the packet refers to by id (SieveRegistry fragment, not part of the packet).
-  # The 0.65 / 0.56 are the organisation's declared trust in each model, dated and revisable.
   # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
+  # The 0.65 / 0.56 are the organisation's declared trust in each model, dated and revisable.
   reference_snapshot:
     id: sieve:pkt_000564#references
     type: SieveRegistry

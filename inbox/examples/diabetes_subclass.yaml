@@ -22,7 +22,21 @@ statement:
     - id: sieve:el/dm-icd10cm
       type: SieveEvidenceLine
       description: Cross-ontology concordance with ICD-10 - diabetes classified under endocrine diseases
-      has_evidence_items: [sieve:ca/icd10cm-E11-isa-E00-E89]
+      has_evidence_items:
+        - id: sieve:ca/icd10cm-E11-isa-E00-E89
+          type: SubclassStatement
+          subject: ICD10CM:E11
+          predicate: {code: rdfs:subClassOf, label: subClassOf}
+          object: ICD10CM:E00-E89
+          reported_in:
+            - id: ICD10CM:E11
+              type: ExternalRecord
+              label: Type 2 diabetes mellitus
+              resource: infores:icd10cm
+              record_metadata:
+                retrieved_from: infores:icd10cm
+                retrieval_date: "2024-03-15"
+          resource: infores:icd10cm
       direction_of_evidence_provided: supports
       score_of_evidence_provided: 0.95
       contributions:
@@ -36,7 +50,29 @@ statement:
     - id: sieve:el/dm-literature-1
       type: SieveEvidenceLine
       description: Published literature evidence supporting endocrine classification
-      has_evidence_items: [sieve:tp/pmid-12345678-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-12345678-1
+          type: TextPassage
+          statement_text: >-
+            Diabetes mellitus represents a heterogeneous group of metabolic
+            disorders fundamentally rooted in endocrine dysfunction, specifically
+            involving the pancreatic islet cells and their insulin-producing capacity.
+          reported_in:
+            - id: PMID:12345678
+              type: Publication
+              title: Classification of Diabetes as an Endocrine Disorder
+              pmid: "12345678"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: "Results, Section 3.2, paragraph 1"}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-12345678-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-03-15"
       direction_of_evidence_provided: supports
       score_of_evidence_provided: 0.9
       contributions:
@@ -55,7 +91,29 @@ statement:
     - id: sieve:el/dm-literature-2
       type: SieveEvidenceLine
       description: Some argue diabetes is primarily a metabolic disorder
-      has_evidence_items: [sieve:tp/pmid-29876543-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-29876543-1
+          type: TextPassage
+          statement_text: >-
+            While traditionally classified under endocrine disorders, diabetes mellitus
+            is fundamentally a disorder of glucose metabolism. The focus on insulin
+            secretion overlooks the broader metabolic dysregulation that defines the disease.
+          reported_in:
+            - id: PMID:29876543
+              type: Publication
+              title: Rethinking Diabetes Classification - A Metabolic Perspective
+              pmid: "29876543"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: "Discussion, page 412"}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-29876543-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-03-15"
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.6
       contributions:
@@ -92,68 +150,6 @@ statement:
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
       signed_packet_version: "2019-03-22"
-prior_claims:
-  - id: sieve:ca/icd10cm-E11-isa-E00-E89
-    type: SubclassStatement
-    subject: ICD10CM:E11
-    predicate: {code: rdfs:subClassOf, label: subClassOf}
-    object: ICD10CM:E00-E89
-    reported_in: [ICD10CM:E11]
-    resource: infores:icd10cm
-external_records:
-  - id: ICD10CM:E11
-    type: ExternalRecord
-    label: Type 2 diabetes mellitus
-    resource: infores:icd10cm
-    record_metadata:
-      retrieved_from: infores:icd10cm
-      retrieval_date: "2024-03-15"
-text_passages:
-  - id: sieve:tp/pmid-12345678-1
-    type: TextPassage
-    statement_text: >-
-      Diabetes mellitus represents a heterogeneous group of metabolic
-      disorders fundamentally rooted in endocrine dysfunction, specifically
-      involving the pancreatic islet cells and their insulin-producing capacity.
-    reported_in: [PMID:12345678]
-    text_location: {section: "Results, Section 3.2, paragraph 1"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-12345678-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-03-15"
-  - id: sieve:tp/pmid-29876543-1
-    type: TextPassage
-    statement_text: >-
-      While traditionally classified under endocrine disorders, diabetes mellitus
-      is fundamentally a disorder of glucose metabolism. The focus on insulin
-      secretion overlooks the broader metabolic dysregulation that defines the disease.
-    reported_in: [PMID:29876543]
-    text_location: {section: "Discussion, page 412"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-29876543-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-03-15"
-publications:
-  - id: PMID:12345678
-    type: Publication
-    title: Classification of Diabetes as an Endocrine Disorder
-    pmid: "12345678"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
-  - id: PMID:29876543
-    type: Publication
-    title: Rethinking Diabetes Classification - A Metabolic Perspective
-    pmid: "29876543"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: http://purl.org/np/RA1234567890#references

@@ -20,12 +20,61 @@ statement:
   statement_text: fibromyalgia subClassOf rheumatic disease
   review_state: PENDING_REVIEW
   proposing_channel: CURATOR
-  has_evidence: [sieve:tp/pmid-28389214-1]
+  has_evidence:
+    - id: sieve:tp/pmid-28389214-1
+      type: TextPassage
+      description: >-
+        Growing evidence for central sensitization mechanism. Legacy interpretation
+        (direction UNCERTAIN, strength 0.6): the text indicates uncertainty about the
+        classification, noting evidence for neurological mechanisms while
+        acknowledging the ongoing debate.
+      statement_text: >-
+        Evidence increasingly suggests that fibromyalgia is characterized by
+        central sensitization and altered pain processing in the central nervous
+        system. However, the exact classification remains debated, with some
+        advocating for neurological and others for rheumatic categorization.
+      reported_in:
+        - id: PMID:28389214
+          type: Publication
+          title: Central Sensitization in Fibromyalgia - A Neurological Perspective
+          pmid: "28389214"
+          resource: infores:pubmed
+          generation_context:
+            - {code: sieve:basis_unknown}
+      text_location: {section: "Discussion, page 892"}
+      quote_verification: NOT_CHECKED
+      contributions:
+        - id: sieve:act/tp-pmid-28389214-1
+          type: SieveContribution
+          contributor: sieve:agent/unrecorded-legacy-interpreter
+          role: EXTRACTOR
+          date: "2024-04-22"
   has_evidence_lines:
     - id: sieve:el/fm-literature-acr
       type: SieveEvidenceLine
       description: ACR historically classified fibromyalgia with rheumatic conditions
-      has_evidence_items: [sieve:tp/pmid-2306288-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-2306288-1
+          type: TextPassage
+          statement_text: >-
+            Fibromyalgia is classified as a rheumatic condition based on its presentation
+            with widespread musculoskeletal pain and tenderness at specific anatomical sites.
+          reported_in:
+            - id: PMID:2306288
+              type: Publication
+              title: The American College of Rheumatology 1990 Criteria for Fibromyalgia
+              pmid: "2306288"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: "Methods, page 160"}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-2306288-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-04-22"
       direction_of_evidence_provided: supports
       score_of_evidence_provided: 0.4
       contributions:
@@ -43,7 +92,33 @@ statement:
     - id: sieve:el/fm-snomed
       type: SieveEvidenceLine
       description: SNOMED CT places fibromyalgia under soft tissue disorders
-      has_evidence_items: [sieve:ca/sctid-24693007-isa-19660004]
+      has_evidence_items:
+        - id: sieve:ca/sctid-24693007-isa-19660004
+          type: SubclassStatement
+          subject: SCTID:24693007
+          predicate: {code: rdfs:subClassOf, label: subClassOf}
+          object: SCTID:19660004
+          reported_in:
+            - id: SCTID:24693007
+              type: ExternalRecord
+              label: Fibromyalgia
+              resource: sieve:resource/snomedct
+              record_metadata:
+                retrieved_from: sieve:resource/snomedct
+                retrieval_date: "2024-04-22"
+          resource: sieve:resource/snomedct
+          groundings:
+            - id: sieve:chain/sctid-24693007
+              type: ResolutionChain
+              entity_slot: subject
+              steps:
+                - id: sieve:step/sctid-24693007-1
+                  type: AlignmentStep
+                  category: GROUNDING
+                  method: STRUCTURED_FIELD
+                  input_value: SCTID:24693007
+                  output_value: MONDO:0005546
+                  mapping_set: https://w3id.org/sssom/mappings/mondo-snomed.sssom.tsv
       direction_of_evidence_provided: supports
       score_of_evidence_provided: 0.5
       contributions:
@@ -72,85 +147,6 @@ statement:
       outcome: ACCEPTED
       route: INDIVIDUAL_SIGN_OFF
       signed_packet_version: "2022-08-10"
-prior_claims:
-  - id: sieve:ca/sctid-24693007-isa-19660004
-    type: SubclassStatement
-    subject: SCTID:24693007
-    predicate: {code: rdfs:subClassOf, label: subClassOf}
-    object: SCTID:19660004
-    reported_in: [SCTID:24693007]
-    resource: sieve:resource/snomedct
-    groundings:
-      - id: sieve:chain/sctid-24693007
-        type: ResolutionChain
-        entity_slot: subject
-        steps:
-          - id: sieve:step/sctid-24693007-1
-            type: AlignmentStep
-            category: GROUNDING
-            method: STRUCTURED_FIELD
-            input_value: SCTID:24693007
-            output_value: MONDO:0005546
-            mapping_set: https://w3id.org/sssom/mappings/mondo-snomed.sssom.tsv
-external_records:
-  - id: SCTID:24693007
-    type: ExternalRecord
-    label: Fibromyalgia
-    resource: sieve:resource/snomedct
-    record_metadata:
-      retrieved_from: sieve:resource/snomedct
-      retrieval_date: "2024-04-22"
-text_passages:
-  - id: sieve:tp/pmid-2306288-1
-    type: TextPassage
-    statement_text: >-
-      Fibromyalgia is classified as a rheumatic condition based on its presentation
-      with widespread musculoskeletal pain and tenderness at specific anatomical sites.
-    reported_in: [PMID:2306288]
-    text_location: {section: "Methods, page 160"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-2306288-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-04-22"
-  - id: sieve:tp/pmid-28389214-1
-    type: TextPassage
-    description: >-
-      Growing evidence for central sensitization mechanism. Legacy interpretation
-      (direction UNCERTAIN, strength 0.6): the text indicates uncertainty about the
-      classification, noting evidence for neurological mechanisms while
-      acknowledging the ongoing debate.
-    statement_text: >-
-      Evidence increasingly suggests that fibromyalgia is characterized by
-      central sensitization and altered pain processing in the central nervous
-      system. However, the exact classification remains debated, with some
-      advocating for neurological and others for rheumatic categorization.
-    reported_in: [PMID:28389214]
-    text_location: {section: "Discussion, page 892"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-28389214-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-04-22"
-publications:
-  - id: PMID:2306288
-    type: Publication
-    title: The American College of Rheumatology 1990 Criteria for Fibromyalgia
-    pmid: "2306288"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
-  - id: PMID:28389214
-    type: Publication
-    title: Central Sensitization in Fibromyalgia - A Neurological Perspective
-    pmid: "28389214"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: http://purl.org/np/RA3456789012#references

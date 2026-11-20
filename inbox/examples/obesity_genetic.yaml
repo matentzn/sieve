@@ -25,7 +25,28 @@ statement:
     - id: sieve:el/obesity-literature-gwas
       type: SieveEvidenceLine
       description: GWAS studies identify genetic variants associated with obesity
-      has_evidence_items: [sieve:tp/pmid-30677029-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-30677029-1
+          type: TextPassage
+          statement_text: >-
+            GWAS have identified over 900 genetic loci associated with body mass index
+            and obesity-related traits, explaining approximately 6% of BMI variance.
+          reported_in:
+            - id: PMID:30677029
+              type: Publication
+              title: Genome-wide Association Studies of Obesity
+              pmid: "30677029"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: "Results, page 245"}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-30677029-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-05-18"
       direction_of_evidence_provided: supports
       score_of_evidence_provided: 0.55
       contributions:
@@ -44,7 +65,31 @@ statement:
     - id: sieve:el/obesity-literature-environmental
       type: SieveEvidenceLine
       description: Environmental and behavioral factors are primary drivers
-      has_evidence_items: [sieve:tp/pmid-28402261-1]
+      has_evidence_items:
+        - id: sieve:tp/pmid-28402261-1
+          type: TextPassage
+          statement_text: >-
+            The rapid rise in obesity prevalence over the past 50 years cannot be
+            explained by genetic changes, which occur over much longer timescales.
+            Environmental factors including food availability, physical activity
+            patterns, and socioeconomic conditions are the primary drivers of the
+            obesity epidemic.
+          reported_in:
+            - id: PMID:28402261
+              type: Publication
+              title: The Global Obesity Pandemic - Shaped by Global Drivers and Local Environments
+              pmid: "28402261"
+              resource: infores:pubmed
+              generation_context:
+                - {code: sieve:basis_unknown}
+          text_location: {section: "Discussion, page 1342"}
+          quote_verification: NOT_CHECKED
+          contributions:
+            - id: sieve:act/tp-pmid-28402261-1
+              type: SieveContribution
+              contributor: sieve:agent/unrecorded-legacy-interpreter
+              role: EXTRACTOR
+              date: "2024-05-18"
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.9
       contributions:
@@ -62,7 +107,14 @@ statement:
     - id: sieve:el/obesity-icd10cm
       type: SieveEvidenceLine
       description: ICD-10 has both obesity and genetic disease concepts but no subclass relationship between them
-      has_evidence_items: [ICD10CM:E66]
+      has_evidence_items:
+        - id: ICD10CM:E66
+          type: ExternalRecord
+          label: Overweight and obesity
+          resource: infores:icd10cm
+          record_metadata:
+            retrieved_from: infores:icd10cm
+            retrieval_date: "2024-05-18"
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.85
       contributions:
@@ -139,61 +191,6 @@ statement:
       signed_packet_version: "2023-11-20"
       context: ["https://github.com/monarch-initiative/mondo/pull/8901"]
       rationale: Proposed reclassification of obesity as primarily genetic.
-external_records:
-  - id: ICD10CM:E66
-    type: ExternalRecord
-    label: Overweight and obesity
-    resource: infores:icd10cm
-    record_metadata:
-      retrieved_from: infores:icd10cm
-      retrieval_date: "2024-05-18"
-text_passages:
-  - id: sieve:tp/pmid-30677029-1
-    type: TextPassage
-    statement_text: >-
-      GWAS have identified over 900 genetic loci associated with body mass index
-      and obesity-related traits, explaining approximately 6% of BMI variance.
-    reported_in: [PMID:30677029]
-    text_location: {section: "Results, page 245"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-30677029-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-05-18"
-  - id: sieve:tp/pmid-28402261-1
-    type: TextPassage
-    statement_text: >-
-      The rapid rise in obesity prevalence over the past 50 years cannot be
-      explained by genetic changes, which occur over much longer timescales.
-      Environmental factors including food availability, physical activity
-      patterns, and socioeconomic conditions are the primary drivers of the
-      obesity epidemic.
-    reported_in: [PMID:28402261]
-    text_location: {section: "Discussion, page 1342"}
-    quote_verification: NOT_CHECKED
-    contributions:
-      - id: sieve:act/tp-pmid-28402261-1
-        type: SieveContribution
-        contributor: sieve:agent/unrecorded-legacy-interpreter
-        role: EXTRACTOR
-        date: "2024-05-18"
-publications:
-  - id: PMID:30677029
-    type: Publication
-    title: Genome-wide Association Studies of Obesity
-    pmid: "30677029"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
-  - id: PMID:28402261
-    type: Publication
-    title: The Global Obesity Pandemic - Shaped by Global Drivers and Local Environments
-    pmid: "28402261"
-    resource: infores:pubmed
-    generation_context:
-      - {code: sieve:basis_unknown}
 # Frozen copy of every registry entry this packet references (self-contained packet, D-051).
 reference_snapshot:
   id: http://purl.org/np/RA4567890123#references

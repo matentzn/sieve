@@ -190,7 +190,7 @@ sepio_monarch:
     interpretation provenance) fits unchanged.
   fragments:
 
-    # --- documents: each publication exists once and is referenced by id ----------------
+    # --- documents: each publication once here, copied under its id where a passage cites it
     - class: Publication
       data:
         id: PMID:25604431
@@ -230,7 +230,14 @@ sepio_monarch:
         id: sieve:tp/pmid-25604431-tetramer
         type: TextPassage
         statement_text: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
-        reported_in: [PMID:25604431]
+        reported_in:
+          - id: PMID:25604431
+            type: Publication
+            pmid: "25604431"
+            title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+            resource: infores:pubmed
+            generation_context:
+              - {code: "PT:review", label: Review}
         text_location: {section: Abstract}
         quote_verification: NOT_CHECKED
         contributions: &d1_extract
@@ -246,7 +253,14 @@ sepio_monarch:
         id: sieve:tp/pmid-25604431-fibrils
         type: TextPassage
         statement_text: "to then misfold and aggregate into amyloid fibrils"
-        reported_in: [PMID:25604431]
+        reported_in:
+          - id: PMID:25604431
+            type: Publication
+            pmid: "25604431"
+            title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+            resource: infores:pubmed
+            generation_context:
+              - {code: "PT:review", label: Review}
         text_location: {section: Abstract}
         quote_verification: NOT_CHECKED
         contributions: *d1_extract
@@ -255,7 +269,14 @@ sepio_monarch:
         id: sieve:tp/pmid-29962408-destabilize
         type: TextPassage
         statement_text: "The mutations destabilize the tetramer and/or monomer of TTR, and thus the stabilization of TTR is a key strategy for the treatment of TTR-related amyloidosis."
-        reported_in: [PMID:29962408]
+        reported_in:
+          - id: PMID:29962408
+            type: Publication
+            pmid: "29962408"
+            title: Inhibition of the Amyloidogenesis of Transthyretin by Natural Products and Synthetic Compounds.
+            resource: infores:pubmed
+            generation_context:
+              - {code: "PT:review", label: Review}
         text_location: {section: Abstract}
         quote_verification: NOT_CHECKED
         contributions: *d1_extract
@@ -265,7 +286,15 @@ sepio_monarch:
         type: TextPassage
         _trimmed: as_is shortens this snippet with an ellipsis
         statement_text: "These findings identify disrupted GSH homeostasis and inflammatory activation as metabolic features associated with symptomatic TTR-V30M amyloidosis in vivo…"
-        reported_in: [PMID:42436580]
+        reported_in:
+          - id: PMID:42436580
+            type: Publication
+            pmid: "42436580"
+            title: Disrupted glutathione homeostasis in the pathogenesis of TTR-V30M amyloidosis.
+            resource: infores:pubmed
+            generation_context:
+              - {code: "PT:journal-article", label: Journal Article}
+              - {code: "dismech:HUMAN_CLINICAL", label: human clinical (DisMech evidence_source)}
         text_location: {section: Abstract}
         quote_verification: NOT_CHECKED
         contributions: *d1_extract
@@ -276,7 +305,28 @@ sepio_monarch:
         _target: mechanistic_hypotheses[canonical_variant_ttr_amyloidogenesis] (status CANONICAL)
         id: sieve:el/attr-canonical-25604431
         type: SieveEvidenceLine
-        has_evidence_items: [sieve:tp/pmid-25604431-tetramer]
+        has_evidence_items:
+          - id: sieve:tp/pmid-25604431-tetramer
+            type: TextPassage
+            statement_text: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
+            reported_in:
+              - id: PMID:25604431
+                type: Publication
+                pmid: "25604431"
+                title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+                resource: infores:pubmed
+                generation_context:
+                  - {code: "PT:review", label: Review}
+            text_location: {section: Abstract}
+            quote_verification: NOT_CHECKED
+            contributions:
+              - id: sieve:act/attr-extraction
+                type: SieveContribution
+                contributor: sieve:agent/dismech-curation-agent
+                role: EXTRACTOR
+                date: 2026-07-18
+                specified_by: [sieve:method/dismech-references-skill]
+                run_id: sieve:run/dismech-attr-session
         direction_of_evidence_provided: supports
         independence_cluster: sieve:cluster/pmid-25604431
         contributions:
@@ -295,7 +345,28 @@ sepio_monarch:
         _target: mechanistic_hypotheses[canonical_variant_ttr_amyloidogenesis] (status CANONICAL)
         id: sieve:el/attr-canonical-29962408
         type: SieveEvidenceLine
-        has_evidence_items: [sieve:tp/pmid-29962408-destabilize]
+        has_evidence_items:
+          - id: sieve:tp/pmid-29962408-destabilize
+            type: TextPassage
+            statement_text: "The mutations destabilize the tetramer and/or monomer of TTR, and thus the stabilization of TTR is a key strategy for the treatment of TTR-related amyloidosis."
+            reported_in:
+              - id: PMID:29962408
+                type: Publication
+                pmid: "29962408"
+                title: Inhibition of the Amyloidogenesis of Transthyretin by Natural Products and Synthetic Compounds.
+                resource: infores:pubmed
+                generation_context:
+                  - {code: "PT:review", label: Review}
+            text_location: {section: Abstract}
+            quote_verification: NOT_CHECKED
+            contributions:
+              - id: sieve:act/attr-extraction
+                type: SieveContribution
+                contributor: sieve:agent/dismech-curation-agent
+                role: EXTRACTOR
+                date: 2026-07-18
+                specified_by: [sieve:method/dismech-references-skill]
+                run_id: sieve:run/dismech-attr-session
         direction_of_evidence_provided: supports
         independence_cluster: sieve:cluster/pmid-29962408
         contributions:
@@ -314,7 +385,30 @@ sepio_monarch:
         _target: mechanistic_hypotheses[val30met_glutathione_signature] (status EMERGING)
         id: sieve:el/attr-gsh-42436580
         type: SieveEvidenceLine
-        has_evidence_items: [sieve:tp/pmid-42436580-gsh]
+        has_evidence_items:
+          - id: sieve:tp/pmid-42436580-gsh
+            type: TextPassage
+            _trimmed: as_is shortens this snippet with an ellipsis
+            statement_text: "These findings identify disrupted GSH homeostasis and inflammatory activation as metabolic features associated with symptomatic TTR-V30M amyloidosis in vivo…"
+            reported_in:
+              - id: PMID:42436580
+                type: Publication
+                pmid: "42436580"
+                title: Disrupted glutathione homeostasis in the pathogenesis of TTR-V30M amyloidosis.
+                resource: infores:pubmed
+                generation_context:
+                  - {code: "PT:journal-article", label: Journal Article}
+                  - {code: "dismech:HUMAN_CLINICAL", label: human clinical (DisMech evidence_source)}
+            text_location: {section: Abstract}
+            quote_verification: NOT_CHECKED
+            contributions:
+              - id: sieve:act/attr-extraction
+                type: SieveContribution
+                contributor: sieve:agent/dismech-curation-agent
+                role: EXTRACTOR
+                date: 2026-07-18
+                specified_by: [sieve:method/dismech-references-skill]
+                run_id: sieve:run/dismech-attr-session
         direction_of_evidence_provided: supports
         independence_cluster: sieve:cluster/pmid-42436580
         contributions:
@@ -335,7 +429,28 @@ sepio_monarch:
         _target: pathophysiology[TTR Tetramer Destabilization, Misfolding, and Oligomerization]
         id: sieve:el/attr-node-25604431
         type: SieveEvidenceLine
-        has_evidence_items: [sieve:tp/pmid-25604431-tetramer]
+        has_evidence_items:
+          - id: sieve:tp/pmid-25604431-tetramer
+            type: TextPassage
+            statement_text: "TTR protein destabilised by TTR gene mutation is prone to dissociate from its native tetramer to monomer, and to then misfold and aggregate into amyloid fibrils"
+            reported_in:
+              - id: PMID:25604431
+                type: Publication
+                pmid: "25604431"
+                title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+                resource: infores:pubmed
+                generation_context:
+                  - {code: "PT:review", label: Review}
+            text_location: {section: Abstract}
+            quote_verification: NOT_CHECKED
+            contributions:
+              - id: sieve:act/attr-extraction
+                type: SieveContribution
+                contributor: sieve:agent/dismech-curation-agent
+                role: EXTRACTOR
+                date: 2026-07-18
+                specified_by: [sieve:method/dismech-references-skill]
+                run_id: sieve:run/dismech-attr-session
         direction_of_evidence_provided: supports
         independence_cluster: sieve:cluster/pmid-25604431
         contributions:
@@ -354,7 +469,28 @@ sepio_monarch:
         _target: "pathophysiology[…].downstream[TTR Amyloid Fibril Formation and Extracellular Deposition] (DIRECT; hypothesis_groups: canonical_variant_ttr_amyloidogenesis)"
         id: sieve:el/attr-edge-25604431
         type: SieveEvidenceLine
-        has_evidence_items: [sieve:tp/pmid-25604431-fibrils]
+        has_evidence_items:
+          - id: sieve:tp/pmid-25604431-fibrils
+            type: TextPassage
+            statement_text: "to then misfold and aggregate into amyloid fibrils"
+            reported_in:
+              - id: PMID:25604431
+                type: Publication
+                pmid: "25604431"
+                title: "Transthyretin (ATTR) amyloidosis: clinical spectrum, molecular pathogenesis and disease-modifying treatments."
+                resource: infores:pubmed
+                generation_context:
+                  - {code: "PT:review", label: Review}
+            text_location: {section: Abstract}
+            quote_verification: NOT_CHECKED
+            contributions:
+              - id: sieve:act/attr-extraction
+                type: SieveContribution
+                contributor: sieve:agent/dismech-curation-agent
+                role: EXTRACTOR
+                date: 2026-07-18
+                specified_by: [sieve:method/dismech-references-skill]
+                run_id: sieve:run/dismech-attr-session
         direction_of_evidence_provided: supports
         independence_cluster: sieve:cluster/pmid-25604431
         contributions:
@@ -379,9 +515,10 @@ gaps:
     statement there is also no inclusion score, review state or decision. What survives,
     and validates, is the evidence side: publications, passages, lines and interpretation acts.
   reuse_vs_duplication: >-
-    Addressed for the evidence side. Each publication is one Publication object referenced
-    by id. The sentence quoted twice is one TextPassage (reported_in the paper)
-    referenced by two lines, and the sub-span is a second passage. All four passages share
+    Addressed for the evidence side. Each publication is one Publication object, copied
+    under its id wherever a passage is reported in it. The sentence quoted twice is one
+    TextPassage (reported_in the paper), copied into both lines under the same id, and
+    the sub-span is a second passage. All four passages share
     one extraction SieveContribution (same id and run_id), which records that they came from
     one act by one agent. What stays open is reuse across statements: with no statement,
     nothing records that the shared passage backs two different claims, beyond the two

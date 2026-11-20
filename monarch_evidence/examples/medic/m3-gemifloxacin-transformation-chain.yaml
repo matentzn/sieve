@@ -272,7 +272,19 @@ sepio_monarch:
         id: sieve:el/grls-ls000940
         type: SieveEvidenceLine
         description: Russian Ministry of Health state register of medicines, registration ЛС-000940 (2011-08-12).
-        has_evidence_items: [GRLS:ЛС-000940]
+        has_evidence_items:
+          - id: GRLS:ЛС-000940
+            type: ExternalRecord
+            label: Гемифлоксацин
+            resource: sieve:resource/grls
+            date_authored: "2011-08-12"
+            _dateAuthored_note: The registration date (MeDIC approval_date 20110812).
+            record_metadata:
+              retrieved_from: sieve:resource/grls
+              record_identifier: ЛС-000940
+              retrieval_date: 2026-08-13
+              _retrievalDate_illustrative: Taken from the MeDIC build date; MeDIC stores no per-record read date here.
+              source_label: Гемифлоксацин
         direction_of_evidence_provided: supports
         strength_of_evidence_provided: high
         confidence: 0.855
