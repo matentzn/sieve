@@ -759,7 +759,7 @@
 
 <h1 id="slot-has_evidence">Slot: has_evidence<a class="headerlink" href="#slot-has_evidence" title="Permanent link">&para;</a></h1>
 <p><em>A piece of information that represents or contributes to an argument for or against the validity of the Proposition put forth in a Statement. This is a shortcut relation that links a Statement directly to a piece of evidence supporting it, bypassing the Evidence Line class when used data creators do not utilize an Evidence Line object.</em></p>
-<p>URI: <a href="https://example.org/sepio-model/hasEvidence">sepio-model:hasEvidence</a>
+<p>URI: <a href="https://w3id.org/sieve/has_evidence">sieve:has_evidence</a>
 Alias: has_evidence</p>
 <!-- no inheritance hierarchy -->
 
@@ -774,18 +774,8 @@ Alias: has_evidence</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../SynonymStatement/">SynonymStatement</a></td>
-<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
-<td>C010 (candidate): the term is a member of what an external record covers (e</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
-<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td>C002: the term has this textual definition</td>
 <td>no</td>
 </tr>
 <tr>
@@ -794,23 +784,18 @@ Alias: has_evidence</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../SieveStatement/">SieveStatement</a></td>
-<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
-<td>C002: the term has this textual definition</td>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../SubclassStatement/">SubclassStatement</a></td>
-<td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td>C010 (candidate): the term is a member of what an external record covers (e</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
-<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
+<td><a href="../TextPassage/">TextPassage</a></td>
+<td>A verbatim passage extracted from a document as a prior claim</td>
 <td>no</td>
 </tr>
 <tr>
@@ -819,8 +804,28 @@ Alias: has_evidence</p>
 <td>no</td>
 </tr>
 <tr>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
 <td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../SieveStatement/">SieveStatement</a></td>
+<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../Statement/">Statement</a></td>
+<td>A claim of purported truth as made by a particular agent, on a particular occ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../SubclassStatement/">SubclassStatement</a></td>
+<td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -829,13 +834,8 @@ Alias: has_evidence</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../Statement/">Statement</a></td>
-<td>A claim of purported truth as made by a particular agent, on a particular occ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../TextPassage/">TextPassage</a></td>
-<td>A verbatim passage extracted from a document as a prior claim</td>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -874,7 +874,7 @@ Alias: has_evidence</p>
 <tbody>
 <tr>
 <td>self</td>
-<td>sepio-model:hasEvidence</td>
+<td>sieve:has_evidence</td>
 </tr>
 <tr>
 <td>native</td>
@@ -904,14 +904,13 @@ Alias: has_evidence</p>
 <a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Informative</span>
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:hasEvidence</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">has_evidence</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">has_evidence</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 </details>
 

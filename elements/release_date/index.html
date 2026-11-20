@@ -759,7 +759,7 @@
 
 <h1 id="slot-release_date">Slot: release_date<a class="headerlink" href="#slot-release_date" title="Permanent link">&para;</a></h1>
 <p><em>Indicates when a version of a DataSet was formally released.</em></p>
-<p>URI: <a href="https://example.org/sepio-model/releaseDate">sepio-model:releaseDate</a>
+<p>URI: <a href="https://w3id.org/sieve/release_date">sieve:release_date</a>
 Alias: release_date</p>
 <!-- no inheritance hierarchy -->
 
@@ -774,8 +774,8 @@ Alias: release_date</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../DataSet/">DataSet</a></td>
-<td>A collection of related data items or records that are organized together in ...</td>
+<td><a href="../EvidencePacket/">EvidencePacket</a></td>
+<td>One claim, the evidence it rests on, and a version</td>
 <td>no</td>
 </tr>
 <tr>
@@ -784,18 +784,18 @@ Alias: release_date</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../EvidencePacketCollection/">EvidencePacketCollection</a></td>
-<td>A released artefact holding many packets, e</td>
-<td>yes</td>
-</tr>
-<tr>
 <td><a href="../SieveRegistry/">SieveRegistry</a></td>
 <td>Shared reference data, maintained once and referenced by id from packets: inf...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../EvidencePacket/">EvidencePacket</a></td>
-<td>One claim, the evidence it rests on, and a version</td>
+<td><a href="../EvidencePacketCollection/">EvidencePacketCollection</a></td>
+<td>A released artefact holding many packets, e</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../DataSet/">DataSet</a></td>
+<td>A collection of related data items or records that are organized together in ...</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -824,7 +824,7 @@ Alias: release_date</p>
 <tbody>
 <tr>
 <td>self</td>
-<td>sepio-model:releaseDate</td>
+<td>sieve:release_date</td>
 </tr>
 <tr>
 <td>native</td>
@@ -843,14 +843,13 @@ Alias: release_date</p>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Informative</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:releaseDate</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">release_date</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DataSet</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DataSet</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">release_date</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DataSet</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DataSet</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
 </details>
 

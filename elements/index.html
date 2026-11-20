@@ -864,9 +864,10 @@
 
 
 <h1 id="sieve-a-sepio-profile-for-evidence-based-curation-of-mondo-claims">SIEVE - a SEPIO profile for evidence-based curation of Mondo claims<a class="headerlink" href="#sieve-a-sepio-profile-for-evidence-based-curation-of-mondo-claims" title="Permanent link">&para;</a></h1>
-<p>SIEVE is a profile of the SEPIO core information model (schema/sepio_core.yaml,
-imported unchanged). Every class here specialises a SEPIO core class. Every
-inherited slot keeps or narrows its core range. Nothing in the core is redefined.</p>
+<p>SIEVE is a profile of the SEPIO core information model (schema/sepio_core.yaml, a
+byte-identical copy of sepio-linkml's sepio_classes.yaml). Every class here
+specialises a SEPIO core class. Every inherited slot keeps or narrows its core
+range. Nothing in the core is redefined.</p>
 <p>The profile is driven by the Mondo requirements collection
 (requirements/mondo_requirements.tsv). Each class, slot, enum and permissible value
 that realises a requirement carries it in <code>annotations.requirements</code>
@@ -875,11 +876,14 @@ in <code>annotations.decisions</code> (Mondo decision-log IDs). requirements/tra
 assigns every requirement to a SEPIO design module and a disposition.
 tests/test_traceability.py keeps both sides consistent.</p>
 <p>Shape of the data: one EvidencePacket per claim. It holds one claim-type
-Statement (view B of D-041: identified, reified statement objects), the evidence
-items its lines refer to, and a version. Rules, policies, agents and information
-resources are shared reference data held in a SieveRegistry.</p>
-<p>Profile conventions: names follow the core's camelCase. Narrowed core slots are
-declared via slot_usage. Value sets for Coding-typed core slots are declared as
+Statement (view B of D-041: identified, reified statement objects), a version,
+and a frozen reference_snapshot. Evidence is nested: each line carries its items
+in full, each claim or passage the record or document it is reported in. An item
+used in several places is copied under the same id, and the copies must be
+identical (profile check). Rules, policies, agents and information resources are
+reference data, held in the snapshot and referenced by id.</p>
+<p>Profile conventions: slots are snake_case, classes CamelCase, as in the core.
+Narrowed core slots are declared via slot_usage. Value sets for Coding-typed core slots are declared as
 <code>bindings</code> and enforced by sieve.profile_checks, because linkml-validate does not
 enforce bindings.</p>
 <p>URI: https://w3id.org/sieve</p>
@@ -1091,7 +1095,7 @@ enforce bindings.</p>
 </tr>
 <tr>
 <td><a href="EvidenceItem/">EvidenceItem</a></td>
-<td>Marker mixin for everything an evidence line (or has_evidence) may point at: ...</td>
+<td>Marker mixin for everything an evidence line may hold: each evidence-item cla...</td>
 </tr>
 <tr>
 <td><a href="UpstreamItem/">UpstreamItem</a></td>
@@ -1273,10 +1277,6 @@ enforce bindings.</p>
 <td>Another StudyResult comprised of data items about the same focus as its paren...</td>
 </tr>
 <tr>
-<td><a href="computational_scores/">computational_scores</a></td>
-<td>Computed scores (lexical match, Boomer, AI scores) referenced as evidence</td>
-</tr>
-<tr>
 <td><a href="computed_by_rule/">computed_by_rule</a></td>
 <td>The per-claim-type rule (and version) that assigned the strength</td>
 </tr>
@@ -1421,10 +1421,6 @@ enforce bindings.</p>
 <td>A list of extensions to the Entity, that allow for capture of information not...</td>
 </tr>
 <tr>
-<td><a href="external_records/">external_records</a></td>
-<td>External database / terminology records referenced as evidence or origin</td>
-</tr>
-<tr>
 <td><a href="filter_query/">filter_query</a></td>
 <td>Machine-readable, re-runnable query over packet contents</td>
 </tr>
@@ -1443,10 +1439,6 @@ enforce bindings.</p>
 <tr>
 <td><a href="groundings/">groundings</a></td>
 <td>For a prior claim made in a source's own identifiers, one resolution chain pe...</td>
-</tr>
-<tr>
-<td><a href="guidelines/">guidelines</a></td>
-<td>Guideline / consensus documents referenced as evidence</td>
 </tr>
 <tr>
 <td><a href="has_evidence/">has_evidence</a></td>
@@ -1685,10 +1677,6 @@ enforce bindings.</p>
 <td>The packet version this snapshot supersedes</td>
 </tr>
 <tr>
-<td><a href="prior_claims/">prior_claims</a></td>
-<td>Structured claims made by sources (or by Mondo elsewhere), each typed by what...</td>
-</tr>
-<tr>
 <td><a href="proposing_channel/">proposing_channel</a></td>
 <td>The channel that proposed the claim</td>
 </tr>
@@ -1699,10 +1687,6 @@ enforce bindings.</p>
 <tr>
 <td><a href="proposition_text/">proposition_text</a></td>
 <td>A natural-language expression of the Proposition's meaning (i</td>
-</tr>
-<tr>
-<td><a href="publications/">publications</a></td>
-<td>Scientific publications referenced as evidence or origin</td>
 </tr>
 <tr>
 <td><a href="qualifier/">qualifier</a></td>
@@ -1762,7 +1746,7 @@ enforce bindings.</p>
 </tr>
 <tr>
 <td><a href="replacement_line/">replacement_line</a></td>
-<td>The new line that corrects this one (action SUPERSEDED)</td>
+<td>Id of the new line that corrects this one (action SUPERSEDED)</td>
 </tr>
 <tr>
 <td><a href="reported_in/">reported_in</a></td>
@@ -1894,7 +1878,7 @@ enforce bindings.</p>
 </tr>
 <tr>
 <td><a href="source_item/">source_item</a></td>
-<td>The upstream item (ExternalRecord, Publication, WebPage) the claim came from</td>
+<td>The upstream item (ExternalRecord, Publication, WebPage) the claim came from,...</td>
 </tr>
 <tr>
 <td><a href="source_label/">source_label</a></td>
@@ -1974,7 +1958,7 @@ enforce bindings.</p>
 </tr>
 <tr>
 <td><a href="supersedes/">supersedes</a></td>
-<td>Lines this one corrects (they must be invalidated)</td>
+<td>Ids of the lines this one corrects (they must be invalidated)</td>
 </tr>
 <tr>
 <td><a href="supporting_method_types/">supporting_method_types</a></td>
@@ -1989,7 +1973,7 @@ enforce bindings.</p>
 <td>The terminology/code system that defined the code</td>
 </tr>
 <tr>
-<td><a href="system_u_r_l/">system_u_r_l</a></td>
+<td><a href="system_url/">system_url</a></td>
 <td>A URL for the nomenclature system</td>
 </tr>
 <tr>
@@ -2003,10 +1987,6 @@ enforce bindings.</p>
 <tr>
 <td><a href="text_location/">text_location</a></td>
 <td>Exact location (section, character offsets)</td>
-</tr>
-<tr>
-<td><a href="text_passages/">text_passages</a></td>
-<td>Text passages extracted from documents (records created in the Mondo ecosyste...</td>
 </tr>
 <tr>
 <td><a href="text_span/">text_span</a></td>
@@ -2075,10 +2055,6 @@ enforce bindings.</p>
 <tr>
 <td><a href="version/">version</a></td>
 <td></td>
-</tr>
-<tr>
-<td><a href="web_pages/">web_pages</a></td>
-<td>Non-scholarly web pages referenced as evidence or origin</td>
 </tr>
 </tbody>
 </table>

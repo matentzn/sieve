@@ -605,11 +605,11 @@ separate kernel) is open: <code>issues/issue_minimal_kernel_vs_profile.md</code>
 </tr>
 <tr>
 <td><code>TextSpan</code>, inlined in the line</td>
-<td><code>TextPassage</code> in the packet's <code>text_passages</code>, referenced from the line by id, with its extraction provenance</td>
+<td><code>TextPassage</code>, nested in the line, with its id and its extraction provenance</td>
 </tr>
 <tr>
 <td><code>Document</code>, inlined via <code>reported_in</code></td>
-<td><code>Publication</code> in the packet's <code>publications</code>, referenced from <code>TextPassage.reported_in</code></td>
+<td><code>Publication</code>, nested under <code>TextPassage.reported_in</code></td>
 </tr>
 <tr>
 <td><code>Direction</code> (<code>SUPPORTS</code> / <code>REFUTES</code> / <code>NEUTRAL</code>)</td>

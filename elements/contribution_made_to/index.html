@@ -759,7 +759,7 @@
 
 <h1 id="slot-contribution_made_to">Slot: contribution_made_to<a class="headerlink" href="#slot-contribution_made_to" title="Permanent link">&para;</a></h1>
 <p><em>The artifact toward which the contribution was made.</em></p>
-<p>URI: <a href="https://example.org/sepio-model/contributionMadeTo">sepio-model:contributionMadeTo</a>
+<p>URI: <a href="https://w3id.org/sieve/contribution_made_to">sieve:contribution_made_to</a>
 Alias: contribution_made_to</p>
 <!-- no inheritance hierarchy -->
 
@@ -774,18 +774,13 @@ Alias: contribution_made_to</p>
 </thead>
 <tbody>
 <tr>
+<td><a href="../SieveContribution/">SieveContribution</a></td>
+<td>An agent's contribution to a claim, line or record, with the agent's role and...</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../Contribution/">Contribution</a></td>
 <td>An action or actions taken by a particular agent in the creation, modificatio...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../InterpretationActivity/">InterpretationActivity</a></td>
-<td>The act of interpreting evidence as a line: who (human with perspective, or A...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../LineStatusChange/">LineStatusChange</a></td>
-<td>A record that a line was invalidated, superseded, or accepted unchanged by a ...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -794,8 +789,13 @@ Alias: contribution_made_to</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../SieveContribution/">SieveContribution</a></td>
-<td>An agent's contribution to a claim, line or record, with the agent's role and...</td>
+<td><a href="../LineStatusChange/">LineStatusChange</a></td>
+<td>A record that a line was invalidated, superseded, or accepted unchanged by a ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../InterpretationActivity/">InterpretationActivity</a></td>
+<td>The act of interpreting evidence as a line: who (human with perspective, or A...</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -820,7 +820,7 @@ Alias: contribution_made_to</p>
 <tbody>
 <tr>
 <td>self</td>
-<td>sepio-model:contributionMadeTo</td>
+<td>sieve:contribution_made_to</td>
 </tr>
 <tr>
 <td>native</td>
@@ -835,14 +835,13 @@ Alias: contribution_made_to</p>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Informative</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:contributionMadeTo</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">contribution_made_to</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Contribution</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Contribution</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">contribution_made_to</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Contribution</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Contribution</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
 </details>
 

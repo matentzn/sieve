@@ -759,7 +759,7 @@
 
 <h1 id="slot-supporting_methods">Slot: supporting_methods<a class="headerlink" href="#slot-supporting_methods" title="Permanent link">&para;</a></h1>
 <p><em>Specific methods that were executed to directly or indirectly support creation of the Information Entity.</em></p>
-<p>URI: <a href="https://example.org/sepio-model/supportingMethods">sepio-model:supportingMethods</a>
+<p>URI: <a href="https://w3id.org/sieve/supporting_methods">sieve:supporting_methods</a>
 Alias: supporting_methods</p>
 <!-- no inheritance hierarchy -->
 
@@ -774,13 +774,33 @@ Alias: supporting_methods</p>
 </thead>
 <tbody>
 <tr>
+<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td>C008: the term is in a Mondo subset</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../Method/">Method</a></td>
 <td>A set of instructions that specify how to achieve some objective</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
-<td>C008: the term is in a Mondo subset</td>
+<td><a href="../EvidencePacket/">EvidencePacket</a></td>
+<td>One claim, the evidence it rests on, and a version</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../AggregationRule/">AggregationRule</a></td>
+<td>The versioned rule that turns a claim type's evidence lines into strengths an...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../SieveRegistry/">SieveRegistry</a></td>
+<td>Shared reference data, maintained once and referenced by id from packets: inf...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -794,78 +814,8 @@ Alias: supporting_methods</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
-<td>C002: the term has this textual definition</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../Statement/">Statement</a></td>
-<td>A claim of purported truth as made by a particular agent, on a particular occ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../MappingStatement/">MappingStatement</a></td>
-<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../SieveRegistry/">SieveRegistry</a></td>
-<td>Shared reference data, maintained once and referenced by id from packets: inf...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../SynonymStatement/">SynonymStatement</a></td>
-<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../DataSet/">DataSet</a></td>
-<td>A collection of related data items or records that are organized together in ...</td>
-<td>no</td>
-</tr>
-<tr>
 <td><a href="../StudyResult/">StudyResult</a></td>
 <td>A collection of data items from a single study that pertain to a particular s...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../EvidenceLine/">EvidenceLine</a></td>
-<td>An independent, evidence-based argument that may support or refute the validi...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../SieveEvidenceLine/">SieveEvidenceLine</a></td>
-<td>One evidentiary judgement: these items bear on the enclosing claim in this di...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../InformationResource/">InformationResource</a></td>
-<td>A registry entry for a source as a whole (OMIM, Orphanet, Disease Ontology, W...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
-<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
-<td>C009 (candidate): the kind of class this term is (grouping, disorder, subtype...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../WebPage/">WebPage</a></td>
-<td>A non-scholarly web page (GARD, MedlinePlus, Wikipedia, patient organisations...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../TextPassage/">TextPassage</a></td>
-<td>A verbatim passage extracted from a document as a prior claim</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../EvidencePacket/">EvidencePacket</a></td>
-<td>One claim, the evidence it rests on, and a version</td>
 <td>no</td>
 </tr>
 <tr>
@@ -874,28 +824,33 @@ Alias: supporting_methods</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../Publication/">Publication</a></td>
-<td>A scientific publication (PMID, DOI, ISBN)</td>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td>C010 (candidate): the term is a member of what an external record covers (e</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../SieveMethod/">SieveMethod</a></td>
-<td>A versioned, identifiable method: a guideline or SOP, an extraction or alignm...</td>
+<td><a href="../MappingStatement/">MappingStatement</a></td>
+<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../EvidencePacketCollection/">EvidencePacketCollection</a></td>
-<td>A released artefact holding many packets, e</td>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../Document/">Document</a></td>
-<td>A collection of information, usually in a text-based or graphic human-readabl...</td>
+<td><a href="../Statement/">Statement</a></td>
+<td>A claim of purported truth as made by a particular agent, on a particular occ...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../GuidelineDocument/">GuidelineDocument</a></td>
-<td>A guideline or consensus document (e</td>
+<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
+<td>C009 (candidate): the kind of class this term is (grouping, disorder, subtype...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td>C002: the term has this textual definition</td>
 <td>no</td>
 </tr>
 <tr>
@@ -904,18 +859,23 @@ Alias: supporting_methods</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
-<td>C010 (candidate): the term is a member of what an external record covers (e</td>
+<td><a href="../TextPassage/">TextPassage</a></td>
+<td>A verbatim passage extracted from a document as a prior claim</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
-<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
+<td><a href="../SieveMethod/">SieveMethod</a></td>
+<td>A versioned, identifiable method: a guideline or SOP, an extraction or alignm...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../AggregationRule/">AggregationRule</a></td>
-<td>The versioned rule that turns a claim type's evidence lines into strengths an...</td>
+<td><a href="../GuidelineDocument/">GuidelineDocument</a></td>
+<td>A guideline or consensus document (e</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../EvidenceLine/">EvidenceLine</a></td>
+<td>An independent, evidence-based argument that may support or refute the validi...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -924,13 +884,8 @@ Alias: supporting_methods</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../ExternalRecord/">ExternalRecord</a></td>
-<td>A record in an external database or terminology (DOID:0110413, OMIM:219700, I...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
-<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
+<td><a href="../SieveEvidenceLine/">SieveEvidenceLine</a></td>
+<td>One evidentiary judgement: these items bear on the enclosing claim in this di...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -939,8 +894,53 @@ Alias: supporting_methods</p>
 <td>no</td>
 </tr>
 <tr>
+<td><a href="../InformationResource/">InformationResource</a></td>
+<td>A registry entry for a source as a whole (OMIM, Orphanet, Disease Ontology, W...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../Document/">Document</a></td>
+<td>A collection of information, usually in a text-based or graphic human-readabl...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../EvidencePacketCollection/">EvidencePacketCollection</a></td>
+<td>A released artefact holding many packets, e</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../Publication/">Publication</a></td>
+<td>A scientific publication (PMID, DOI, ISBN)</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../WebPage/">WebPage</a></td>
+<td>A non-scholarly web page (GARD, MedlinePlus, Wikipedia, patient organisations...</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../DecisionPolicy/">DecisionPolicy</a></td>
 <td>A human-authored, human-approved decision procedure that an automated system ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../DataSet/">DataSet</a></td>
+<td>A collection of related data items or records that are organized together in ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../ExternalRecord/">ExternalRecord</a></td>
+<td>A record in an external database or terminology (DOID:0110413, OMIM:219700, I...</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -957,7 +957,7 @@ Alias: supporting_methods</p>
 <h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h2>
 <ul>
 <li>These may include methods that directly produced the Information Entity, or upstream/accessory methods that indirectly support creation of the Information Entity - e.g. methods used to produce data that was interpreted as evidence to generate a Statement of knowledge.</li>
-<li>This field captures terms representing specific INSTANCES of methods applied, vs the 'supportingMethodTypes' attribute which captures TYPES of methods used.</li>
+<li>This field captures terms representing specific INSTANCES of methods applied, vs the 'supporting_method_types' attribute which captures TYPES of methods used.</li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information<a class="headerlink" href="#identifier-and-mapping-information" title="Permanent link">&para;</a></h2>
 <h3 id="schema-source">Schema Source<a class="headerlink" href="#schema-source" title="Permanent link">&para;</a></h3>
@@ -975,7 +975,7 @@ Alias: supporting_methods</p>
 <tbody>
 <tr>
 <td>self</td>
-<td>sepio-model:supportingMethods</td>
+<td>sieve:supporting_methods</td>
 </tr>
 <tr>
 <td>native</td>
@@ -994,18 +994,17 @@ Alias: supporting_methods</p>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">used to produce data that was interpreted as evidence to generate a Statement of</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">knowledge.</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">This field captures terms representing specific INSTANCES of methods applied, vs</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">the &#39;supportingMethodTypes&#39; attribute which captures TYPES of methods used.</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">the &#39;supporting_method_types&#39; attribute which captures TYPES of methods used.</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Informative</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:supportingMethods</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supporting_methods</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">supporting_methods</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InformationEntity</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 </details>
 

@@ -759,7 +759,7 @@
 
 <h1 id="slot-has_evidence_of_types">Slot: has_evidence_of_types<a class="headerlink" href="#slot-has_evidence_of_types" title="Permanent link">&para;</a></h1>
 <p><em>A term describing a type of evidence used to assess the validity of Statement's proposition (e.g. 'sequence similarity evidence', 'in vitro assay evidence').</em></p>
-<p>URI: <a href="https://example.org/sepio-model/hasEvidenceOfTypes">sepio-model:hasEvidenceOfTypes</a>
+<p>URI: <a href="https://w3id.org/sieve/has_evidence_of_types">sieve:has_evidence_of_types</a>
 Alias: has_evidence_of_types</p>
 <!-- no inheritance hierarchy -->
 
@@ -774,18 +774,8 @@ Alias: has_evidence_of_types</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../SynonymStatement/">SynonymStatement</a></td>
-<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
-<td>C010 (candidate): the term is a member of what an external record covers (e</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
-<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td>C002: the term has this textual definition</td>
 <td>no</td>
 </tr>
 <tr>
@@ -794,23 +784,18 @@ Alias: has_evidence_of_types</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../SieveStatement/">SieveStatement</a></td>
-<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
+<td><a href="../DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
-<td>C002: the term has this textual definition</td>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td>C010 (candidate): the term is a member of what an external record covers (e</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../SubclassStatement/">SubclassStatement</a></td>
-<td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
-<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
+<td><a href="../TextPassage/">TextPassage</a></td>
+<td>A verbatim passage extracted from a document as a prior claim</td>
 <td>no</td>
 </tr>
 <tr>
@@ -819,13 +804,18 @@ Alias: has_evidence_of_types</p>
 <td>no</td>
 </tr>
 <tr>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
 <td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
-<td>C009 (candidate): the kind of class this term is (grouping, disorder, subtype...</td>
+<td><a href="../SieveStatement/">SieveStatement</a></td>
+<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -834,8 +824,18 @@ Alias: has_evidence_of_types</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../TextPassage/">TextPassage</a></td>
-<td>A verbatim passage extracted from a document as a prior claim</td>
+<td><a href="../SubclassStatement/">SubclassStatement</a></td>
+<td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../MetaclassStatement/">MetaclassStatement</a></td>
+<td>C009 (candidate): the kind of class this term is (grouping, disorder, subtype...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -851,7 +851,7 @@ Alias: has_evidence_of_types</p>
 </ul>
 <h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h2>
 <ul>
-<li>This contrasts with hasEvidence and hasEvidenceLine attributes that describe specific instances of evidence information, such as a particular data item, study result, or prior assertions, etc. Where possible, data cretors should use of terms from ontologies such as the Evidence and Conclusion Ontology (ECO) to describe specific types of evidence (e.g. ECO:0000044 'sequence similarity evidence').</li>
+<li>This contrasts with has_evidence and hasEvidenceLine attributes that describe specific instances of evidence information, such as a particular data item, study result, or prior assertions, etc. Where possible, data cretors should use of terms from ontologies such as the Evidence and Conclusion Ontology (ECO) to describe specific types of evidence (e.g. ECO:0000044 'sequence similarity evidence').</li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information<a class="headerlink" href="#identifier-and-mapping-information" title="Permanent link">&para;</a></h2>
 <h3 id="schema-source">Schema Source<a class="headerlink" href="#schema-source" title="Permanent link">&para;</a></h3>
@@ -869,7 +869,7 @@ Alias: has_evidence_of_types</p>
 <tbody>
 <tr>
 <td>self</td>
-<td>sepio-model:hasEvidenceOfTypes</td>
+<td>sieve:has_evidence_of_types</td>
 </tr>
 <tr>
 <td>native</td>
@@ -883,7 +883,7 @@ Alias: has_evidence_of_types</p>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A term describing a type of evidence used to assess the validity of Statement&#39;s</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">proposition (e.g. &#39;sequence similarity evidence&#39;, &#39;in vitro assay evidence&#39;).</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">comments</span><span class="p">:</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">This contrasts with hasEvidence and hasEvidenceLine attributes that describe specific</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">This contrasts with has_evidence and hasEvidenceLine attributes that describe specific</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">instances of evidence information, such as a particular data item, study result,</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">or prior assertions, etc. Where possible, data cretors should use of terms from</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">ontologies such as the Evidence and Conclusion Ontology (ECO) to describe specific</span>
@@ -891,14 +891,13 @@ Alias: has_evidence_of_types</p>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Informative</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:hasEvidenceOfTypes</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">has_evidence_of_types</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">has_evidence_of_types</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Statement</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 </details>
 

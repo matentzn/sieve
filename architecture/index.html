@@ -477,9 +477,10 @@ here as a record of what it does.</p>
 <h2 id="schema-and-model-working">Schema and model (working)<a class="headerlink" href="#schema-and-model-working" title="Permanent link">¶</a></h2>
 <h3 id="schema"><code>schema/</code><a class="headerlink" href="#schema" title="Permanent link">¶</a></h3>
 <ul>
-<li><strong><code>sepio_core.yaml</code></strong>: a byte-identical copy of the SEPIO core from sepio-linkml
-  (commit <code>8c2c233</code>). <code>tests/test_profile_schema.py</code> pins its hash, so it cannot be
-  edited by accident.</li>
+<li><strong><code>sepio_core.yaml</code></strong>: a byte-identical copy of <code>sepio_classes.yaml</code> from
+  sepio-linkml (commit <code>47f46b7</code>). <code>tests/test_profile_schema.py</code> compares it with the
+  canonical file when sepio-linkml is checked out next to sieve, so it cannot drift or
+  be edited by accident.</li>
 <li><strong><code>sieve.yaml</code></strong>: the profile. It imports <code>linkml:types</code> and <code>sepio_core</code>, and every
   class specialises a core class. Narrowed core slots are declared in <code>slot_usage</code>.
   Predicate value sets are declared as <code>bindings</code>, and the claim-evidence matrix as a

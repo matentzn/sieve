@@ -1236,9 +1236,9 @@ for a requirement are those annotated with its ID in <code>schema/sieve.yaml</co
 <td>Directly Corresponding Prior Claim — Structured Data</td>
 <td>Y → Y</td>
 <td>modelled</td>
-<td><code>EvidencePacket.prior_claims</code><br><code>SieveStatement.reported_in</code><br><code>SieveStatement.groundings</code></td>
+<td><code>SieveStatement.reported_in</code><br><code>SieveStatement.groundings</code></td>
 <td>D-004, D-005, D-033, D-061</td>
-<td>A prior claim is an ordinary claim-type Statement (a DOID subclass assertion is a SubclassStatement) in packet.prior_claims: the source's own SPO in its own terms, reported_in its ExternalRecord, plus one ResolutionChain per grounded entity (D-061). Its type says what it claims, never its role: support, dispute or competition is set by the line that cites it (D-033, D-069). Source relation qualifiers are deliberately absent (D-005).</td>
+<td>A prior claim is an ordinary claim-type Statement (a DOID subclass assertion is a SubclassStatement), nested in the line that cites it: the source's own SPO in its own terms, with its ExternalRecord nested under reported_in, plus one ResolutionChain per grounded entity (D-061). Its type says what it claims, never its role: support, dispute or competition is set by the line that cites it (D-033, D-069). Source relation qualifiers are deliberately absent (D-005).</td>
 </tr>
 <tr>
 <td><code>EI.PRIOR_CLAIM.SUPPORTING_TEXT</code></td>
@@ -1522,7 +1522,7 @@ for a requirement are those annotated with its ID in <code>schema/sieve.yaml</co
 <td>Evidence Item Grouping Criteria</td>
 <td>N → M</td>
 <td>modelled</td>
-<td><code>InformationResource</code><br><code>InformationResource.derives_content_from</code><br><code>TextPassage.derived_from</code><br><code>Publication.reports_study</code><br><code>SieveEvidenceLine.independence_cluster</code></td>
+<td><code>EvidenceItem</code><br><code>InformationResource</code><br><code>InformationResource.derives_content_from</code><br><code>TextPassage.derived_from</code><br><code>Publication.reports_study</code><br><code>SieveEvidenceLine.independence_cluster</code></td>
 <td>D-046, D-063</td>
 <td>Dependence is representable: source-from-source (InformationResource.derives_content_from), same study (Publication.reports_study), derived item (core derived_from), collective acts (SieveContribution.participants). Lines also carry independence_cluster, the cluster the aggregation rule assigned them to (D-063).</td>
 </tr>
@@ -1542,7 +1542,7 @@ for a requirement are those annotated with its ID in <code>schema/sieve.yaml</co
 <td>modelled</td>
 <td><code>EvidenceItem</code><br><code>SieveEvidenceLine.has_evidence_items</code><br><code>AggregationRule.stacked_lines</code><br><code>StackingPolicy</code></td>
 <td>D-046</td>
-<td>Core-native: an EvidenceLine is an InformationEntity, so it can be an evidence item of a higher-order line. The profile allows line ids in has_evidence_items.</td>
+<td>Core-native: an EvidenceLine is an InformationEntity, so it can be an evidence item of a higher-order line. A higher-order line nests full copies of the lines it reads in has_evidence_items; the scorer matches them to the statement's lines by id.</td>
 </tr>
 <tr>
 <td><code>EINT.DISTINCT_MODELS</code></td>
@@ -1569,7 +1569,7 @@ for a requirement are those annotated with its ID in <code>schema/sieve.yaml</co
 <td>modelled</td>
 <td><code>SieveStatement.has_evidence</code></td>
 <td>D-041, D-037</td>
-<td>Core Statement.has_evidence, narrowed to references to evidence items in the packet. Kept for lightweight consumption alongside lines.</td>
+<td>Core Statement.has_evidence, holding evidence items nested in full, like the items of a line. Kept for lightweight consumption alongside lines.</td>
 </tr>
 <tr>
 <td><code>EINT.SOURCE_ONLY</code></td>

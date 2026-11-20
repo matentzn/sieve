@@ -774,13 +774,13 @@ Alias: resource</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../SynonymStatement/">SynonymStatement</a></td>
-<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
+<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
+<td>C002: the term has this textual definition</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
-<td>C010 (candidate): the term is a member of what an external record covers (e</td>
+<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td>C008: the term is in a Mondo subset</td>
 <td>no</td>
 </tr>
 <tr>
@@ -794,8 +794,38 @@ Alias: resource</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
-<td>C008: the term is in a Mondo subset</td>
+<td><a href="../ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td>C010 (candidate): the term is a member of what an external record covers (e</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../MappingStatement/">MappingStatement</a></td>
+<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../SynonymStatement/">SynonymStatement</a></td>
+<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../GuidelineDocument/">GuidelineDocument</a></td>
+<td>A guideline or consensus document (e</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../Publication/">Publication</a></td>
+<td>A scientific publication (PMID, DOI, ISBN)</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../WebPage/">WebPage</a></td>
+<td>A non-scholarly web page (GARD, MedlinePlus, Wikipedia, patient organisations...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -809,33 +839,8 @@ Alias: resource</p>
 <td>yes</td>
 </tr>
 <tr>
-<td><a href="../DefinitionStatement/">DefinitionStatement</a></td>
-<td>C002: the term has this textual definition</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../Publication/">Publication</a></td>
-<td>A scientific publication (PMID, DOI, ISBN)</td>
-<td>no</td>
-</tr>
-<tr>
 <td><a href="../SubclassStatement/">SubclassStatement</a></td>
 <td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
-<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../MappingStatement/">MappingStatement</a></td>
-<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
-<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -844,13 +849,8 @@ Alias: resource</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../WebPage/">WebPage</a></td>
-<td>A non-scholarly web page (GARD, MedlinePlus, Wikipedia, patient organisations...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../GuidelineDocument/">GuidelineDocument</a></td>
-<td>A guideline or consensus document (e</td>
+<td><a href="../TermExistenceStatement/">TermExistenceStatement</a></td>
+<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
 <td>no</td>
 </tr>
 </tbody>

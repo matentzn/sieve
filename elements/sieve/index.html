@@ -758,9 +758,10 @@
 
 
 <h1 id="sieve">sieve<a class="headerlink" href="#sieve" title="Permanent link">&para;</a></h1>
-<p>SIEVE is a profile of the SEPIO core information model (schema/sepio_core.yaml,
-imported unchanged). Every class here specialises a SEPIO core class. Every
-inherited slot keeps or narrows its core range. Nothing in the core is redefined.</p>
+<p>SIEVE is a profile of the SEPIO core information model (schema/sepio_core.yaml, a
+byte-identical copy of sepio-linkml's sepio_classes.yaml). Every class here
+specialises a SEPIO core class. Every inherited slot keeps or narrows its core
+range. Nothing in the core is redefined.</p>
 <p>The profile is driven by the Mondo requirements collection
 (requirements/mondo_requirements.tsv). Each class, slot, enum and permissible value
 that realises a requirement carries it in <code>annotations.requirements</code>
@@ -769,11 +770,14 @@ in <code>annotations.decisions</code> (Mondo decision-log IDs). requirements/tra
 assigns every requirement to a SEPIO design module and a disposition.
 tests/test_traceability.py keeps both sides consistent.</p>
 <p>Shape of the data: one EvidencePacket per claim. It holds one claim-type
-Statement (view B of D-041: identified, reified statement objects), the evidence
-items its lines refer to, and a version. Rules, policies, agents and information
-resources are shared reference data held in a SieveRegistry.</p>
-<p>Profile conventions: names follow the core's camelCase. Narrowed core slots are
-declared via slot_usage. Value sets for Coding-typed core slots are declared as
+Statement (view B of D-041: identified, reified statement objects), a version,
+and a frozen reference_snapshot. Evidence is nested: each line carries its items
+in full, each claim or passage the record or document it is reported in. An item
+used in several places is copied under the same id, and the copies must be
+identical (profile check). Rules, policies, agents and information resources are
+reference data, held in the snapshot and referenced by id.</p>
+<p>Profile conventions: slots are snake_case, classes CamelCase, as in the core.
+Narrowed core slots are declared via slot_usage. Value sets for Coding-typed core slots are declared as
 <code>bindings</code> and enforced by sieve.profile_checks, because linkml-validate does not
 enforce bindings.</p>
 <p>URI: https://w3id.org/sieve</p>

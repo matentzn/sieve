@@ -759,7 +759,7 @@
 
 <h1 id="slot-data_items">Slot: data_items<a class="headerlink" href="#slot-data_items" title="Permanent link">&para;</a></h1>
 <p><em>One or more data items that are included in the StudyResult because it pertains to the 'focus' of the result. This can be data that directly describes this 'focus' (e.g. the population frequency of an allele focus), or be metadata about how data about the 'focus' were generated (e.g the quality measures for the sequencing run used to determine this allele frequency).</em></p>
-<p>URI: <a href="https://example.org/sepio-model/dataItems">sepio-model:dataItems</a>
+<p>URI: <a href="https://w3id.org/sieve/data_items">sieve:data_items</a>
 Alias: data_items</p>
 <!-- no inheritance hierarchy -->
 
@@ -792,7 +792,7 @@ Alias: data_items</p>
 <h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Any type of data item from a Study may be captured in a StudyResult - including raw experimental/observational data, derived calculations or quality measures, provenance information about how the data were generated in the study, or qualitative expert interpretations of the primary study data (e.g. the interpretation of a blood cholesterol value of 250 mg/dL as being 'high', or a Polyphen functional impact score of 0.115 as being 'deleterious').</li>
-<li>The model specifies use of a key-value based 'DataItem' object to capture the meaning and value of each type of data item captured in a given StudyResult. But in practice, profiles for specific StudyResult types may choose to define one or more specializations of the generic 'dataItems' property as named attributes. This makes the data more succinct and parsable, and allows specific constraints to be applied and validated for different data items. For example, a PopulaitonAlleleFrequencyStudyResult profile may define a named 'focusAlleleFrequency' attribute that is required, and a named 'focusAlleleCount' attribute that is optional - both of which conceptually specialize the core-im 'dataItems' property. Under this approach, the core 'dataItems' acts as a placeholder to seed such specializations, but is not used directly in StudyResult profiles.</li>
+<li>The model specifies use of a key-value based 'DataItem' object to capture the meaning and value of each type of data item captured in a given StudyResult. But in practice, profiles for specific StudyResult types may choose to define one or more specializations of the generic 'data_items' property as named attributes. This makes the data more succinct and parsable, and allows specific constraints to be applied and validated for different data items. For example, a PopulaitonAlleleFrequencyStudyResult profile may define a named 'focusAlleleFrequency' attribute that is required, and a named 'focusAlleleCount' attribute that is optional - both of which conceptually specialize the core-im 'data_items' property. Under this approach, the core 'data_items' acts as a placeholder to seed such specializations, but is not used directly in StudyResult profiles.</li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information<a class="headerlink" href="#identifier-and-mapping-information" title="Permanent link">&para;</a></h2>
 <h3 id="schema-source">Schema Source<a class="headerlink" href="#schema-source" title="Permanent link">&para;</a></h3>
@@ -810,7 +810,7 @@ Alias: data_items</p>
 <tbody>
 <tr>
 <td>self</td>
-<td>sepio-model:dataItems</td>
+<td>sieve:data_items</td>
 </tr>
 <tr>
 <td>native</td>
@@ -836,25 +836,24 @@ Alias: data_items</p>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">The model specifies use of a key-value based &#39;DataItem&#39; object to capture the meaning</span>
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">and value of each type of data item captured in a given StudyResult. But in practice,</span>
 <a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">profiles for specific StudyResult types may choose to define one or more specializations</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">of the generic &#39;dataItems&#39; property as named attributes. This makes the data more</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">of the generic &#39;data_items&#39; property as named attributes. This makes the data more</span>
 <a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">succinct and parsable, and allows specific constraints to be applied and validated</span>
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">for different data items. For example, a PopulaitonAlleleFrequencyStudyResult profile</span>
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">may define a named &#39;focusAlleleFrequency&#39; attribute that is required, and a named</span>
 <a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">&#39;focusAlleleCount&#39; attribute that is optional - both of which conceptually specialize</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">the core-im &#39;dataItems&#39; property. Under this approach, the core &#39;dataItems&#39; acts</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">the core-im &#39;data_items&#39; property. Under this approach, the core &#39;data_items&#39; acts</span>
 <a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">as a placeholder to seed such specializations, but is not used directly in StudyResult</span>
 <a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">profiles.</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
 <a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Informative</span>
 <a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="nt">slot_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sepio-model:dataItems</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data_items</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">StudyResult</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="nt">domain_of</span><span class="p">:</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">StudyResult</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DataItem</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data_items</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">StudyResult</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="nt">domain_of</span><span class="p">:</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">StudyResult</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DataItem</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 </details>
 
