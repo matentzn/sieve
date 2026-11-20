@@ -18,7 +18,8 @@ Everything hangs off one container per claim, the versioned **`EvidencePacket`**
   the statement; `negated: true` makes a negative claim.
 - **Evidence items**: the information used as evidence (`ExternalRecord`,
   prior claims (claim-type statements), `TextPassage`, `Publication`, `WebPage`,
-  `GuidelineDocument`, `ComputationalScore`), in typed lists on the packet.
+  `GuidelineDocument`, `ComputationalScore`), written out in full inside the lines
+  that use them. A shared item is copied under the same id.
 - **Evidence lines**: each `SieveEvidenceLine` is one judgement that some items
   support or dispute the claim, with a strength in [0, 1] and the
   `InterpretationActivity` that produced it.

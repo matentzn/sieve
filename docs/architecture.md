@@ -32,9 +32,10 @@ flowchart LR
 
 ### `schema/`
 
-- **`sepio_core.yaml`**: a byte-identical copy of the SEPIO core from sepio-linkml
-  (commit `8c2c233`). `tests/test_profile_schema.py` pins its hash, so it cannot be
-  edited by accident.
+- **`sepio_core.yaml`**: a byte-identical copy of `sepio_classes.yaml` from
+  sepio-linkml (commit `47f46b7`). `tests/test_profile_schema.py` compares it with the
+  canonical file when sepio-linkml is checked out next to sieve, so it cannot drift or
+  be edited by accident.
 - **`sieve.yaml`**: the profile. It imports `linkml:types` and `sepio_core`, and every
   class specialises a core class. Narrowed core slots are declared in `slot_usage`.
   Predicate value sets are declared as `bindings`, and the claim-evidence matrix as a

@@ -5,14 +5,15 @@ terms, read the [Primer](primer.md) first.
 
 SIEVE is a **profile of the SEPIO core information model**, in two LinkML files:
 
-- `schema/sepio_core.yaml`: the canonical SEPIO core, copied unchanged from
-  [sepio-linkml](https://github.com/sepio-framework/sepio-linkml) (commit `8c2c233`)
-  and pinned by hash in `tests/test_profile_schema.py`.
+- `schema/sepio_core.yaml`: the canonical SEPIO core, a byte-identical copy of
+  `sepio_classes.yaml` from
+  [sepio-linkml](https://github.com/sepio-framework/sepio-linkml) (commit `47f46b7`).
+  `tests/test_profile_schema.py` compares it with the canonical file.
 - `schema/sieve.yaml`: the profile (`id: https://w3id.org/sieve`). It imports the
   core, and every class in it specialises a core class. Inherited slots keep or narrow
   their core range. Nothing in the core is redefined.
 
-Names follow the core's camelCase. The profile was built from the Mondo requirements
+Slots are snake_case and classes CamelCase, as in the core. The profile was built from the Mondo requirements
 collection: each class, slot and enum value that realises a requirement carries the
 requirement ID in `annotations.requirements`, and the decision-log IDs behind it in
 `annotations.decisions`. The requirement-by-requirement mapping is on the
@@ -26,15 +27,21 @@ annotations.
 ## The shape of the data
 
 - **One `EvidencePacket` per claim.** A packet (is_a `DataSet`) holds one claim-type
-  statement, the evidence items its lines refer to, and a required `version`. A
-  change to its lines, items or score makes a new version (`previous_version` points
-  back). Packets are never deleted: a rejected claim stays on record with its
-  evidence and decisions.
-- **Lines live on the statement, items live on the packet.** Evidence lines are
-  inlined under `statement.has_evidence_lines`. Evidence items sit in typed lists on
-  the packet (`external_records`, `prior_claims`, `text_passages`,
-  `publications`, `web_pages`, `guidelines`, `computational_scores`), and lines refer
-  to them by id.
+  statement, a required `version` and a frozen `reference_snapshot`. A change to its
+  lines, items or score makes a new version (`previous_version` points back). Packets
+  are never deleted: a rejected claim stays on record with its evidence and decisions.
+- **Evidence is nested.** Evidence lines sit under `statement.has_evidence_lines`,
+  and each line carries its items in full in `has_evidence_items`. A prior claim or a
+  passage carries the record or document it is reported in under `reported_in`; an
+  origin event carries its `source_item`; direct evidence (`has_evidence`) is nested
+  too. A higher-order line carries full copies of the lines it reads.
+- **Copies keep their id.** An item used in several places is copied into each, under
+  the same id, so a reader or the scorer can tell "the same passage again" from "a
+  different passage". Copies with the same id must be identical (`COPY_DIVERGENCE`).
+  A few links stay ids, because nesting would be circular or duplicate a copy that is
+  already there: `supersedes`, `LineStatusChange.replacement_line`,
+  `TextPassage.derived_from` and `AssertionDecision.evidence_line`. They must resolve
+  to an item or line in the packet (`DANGLING_REFERENCE`).
 - **Shared reference data is maintained in a `SieveRegistry`.** Information resources,
   source releases, agents, methods, aggregation rules, decision policies and batch
   sign-offs are maintained once there.
@@ -56,11 +63,12 @@ flowchart TD
     L --> IA["InterpretationActivity<br/>who, when, how"]
     S --> D["AssertionDecision<br/>outcome, route, S, packet version"]
     S --> O["OriginEvent<br/>copied / cloned / inspired by"]
-    P --> I["typed item lists<br/>external_records, prior_claims,<br/>text_passages, publications, ..."]
-    L -. "has_evidence_items (ids)" .-> I
-    R[("SieveRegistry<br/>resources, releases, agents,<br/>methods, rules, policies, batches")]
-    L -. "computed_by_rule" .-> R
-    D -. "policy, batch, aggregation_rule" .-> R
+    L --> I["evidence items, nested<br/>prior claims, records, passages,<br/>documents, scores, lines"]
+    I --> RI["record or document<br/>nested under reported_in"]
+    O --> I
+    P --> R[("reference_snapshot<br/>resources, releases, agents,<br/>methods, rules, policies, batches")]
+    L -. "computed_by_rule (id)" .-> R
+    D -. "policy, batch, aggregation_rule (ids)" .-> R
 ```
 
 ## SEPIO design modules
@@ -95,7 +103,7 @@ concordance and dispute are matched on subject, predicate, object and `negated`.
 | `review_state` | ReviewState | Yes | `NOT_VERIFIED` (default), `PENDING_REVIEW`, `VERIFIED`. Workflow state, distinct from the decision outcome. |
 | `proposing_channel` | ProposingChannel | No | Who proposed the claim (curator, source ingest, lexical pipeline, AI agent, ...). Selects the claim prior. |
 | `has_evidence_lines` | SieveEvidenceLine[] | No | The evidence lines, inlined. |
-| `has_evidence` | ids | No | Direct claim-to-item links with no interpretation. |
+| `has_evidence` | evidence items, nested | No | Direct claim-to-item links with no interpretation. |
 | `has_evidence_from_sources` | InformationResource ids | No | Source-level attribution without a record id (e.g. MONDO:DOID). |
 | `origin` | OriginEvent[] | No | Where the claim was copied, cloned or adapted from. |
 | `assertion_decisions` | AssertionDecision[] | No | Decision history, oldest first. |
@@ -129,21 +137,24 @@ C009 and C010 use `sieve:` placeholder IRIs for their predicates.
 ### Evidence items
 
 An evidence item is the information interpreted as evidence. Whether an item is
-**evidence** (corroboration) or **origin** depends on where it is referenced: from an
-evidence line, or from `statement.origin`.
+**evidence** (corroboration) or **origin** depends on where it is nested: in an
+evidence line, or in `statement.origin`.
 
-| Class | Core parent | Packet list | What it is |
-|---|---|---|---|
-| `ExternalRecord` | InformationEntity | `external_records` | A record in an external database or terminology (`DOID:14250`, `OMIM:219700`), as read from a release. Requires `resource` and `record_metadata`; `obsolete_in_source` flags obsolete records. |
-| any claim type (e.g. `SubclassStatement`) | Statement | `prior_claims` | A prior claim a source makes, in its own identifiers (`DOID:14250 is_a DOID:630`), typed by what it claims, never by its role. `reported_in` names the record; `groundings` records how each id was resolved to Mondo; `own_log_odds` is set when a competing-claim line cites it (D-069). |
-| `TextPassage` | Statement | `text_passages` | A verbatim passage (`statement_text`) from a document (`reported_in`). Created in the Mondo ecosystem, so it requires its extraction `contributions` and a `quote_verification` outcome. |
-| `Publication` | Document | `publications` | A PMID, DOI or ISBN. Publications sharing a `reports_study` key are not independent. |
-| `WebPage` | Document | `web_pages` | A non-scholarly page (GARD, MedlinePlus, Wikipedia). GitHub issues are not web-page evidence: they go in a contribution's `context`. |
-| `GuidelineDocument` | Document | `guidelines` | A guideline or consensus document. |
-| `ComputationalScore` | DataItem | `computational_scores` | A computed score (lexical match, Boomer, AI score): `value`, the method in `specified_by`, `software_version`, `parameters`. |
+| Class | Core parent | What it is |
+|---|---|---|
+| `ExternalRecord` | InformationEntity | A record in an external database or terminology (`DOID:14250`, `OMIM:219700`), as read from a release. Requires `resource` and `record_metadata`; `obsolete_in_source` flags obsolete records. |
+| any claim type (e.g. `SubclassStatement`) | Statement | A prior claim a source makes, in its own identifiers (`DOID:14250 is_a DOID:630`), typed by what it claims, never by its role. `reported_in` nests the record; `groundings` records how each id was resolved to Mondo; `own_log_odds` is set when a competing-claim line cites it (D-069). |
+| `TextPassage` | Statement | A verbatim passage (`statement_text`) from a document, nested under `reported_in`; `derived_from` names the same document by id. Created in the Mondo ecosystem, so it requires its extraction `contributions` and a `quote_verification` outcome. |
+| `Publication` | Document | A PMID, DOI or ISBN. Publications sharing a `reports_study` key are not independent. |
+| `WebPage` | Document | A non-scholarly page (GARD, MedlinePlus, Wikipedia). GitHub issues are not web-page evidence: they go in a contribution's `context`. |
+| `GuidelineDocument` | Document | A guideline or consensus document. |
+| `ComputationalScore` | DataItem | A computed score (lexical match, Boomer, AI score): `value`, the method in `specified_by`, `software_version`, `parameters`. |
 
-Two mixins supply the shared slots. `EvidenceItem` marks everything a line can point at
-(including lines themselves, for higher-order lines). `UpstreamItem` marks items made
+Two mixins supply the shared slots. `EvidenceItem` marks everything a line can hold
+(including lines themselves, for higher-order lines). The nesting slots keep the core
+range `InformationEntity`, because JSON Schema generation cannot expand a mixin into
+the classes that use it; the profile check `NOT_AN_EVIDENCE_ITEM` restricts them to
+`EvidenceItem` classes. `UpstreamItem` marks items made
 outside Mondo and adds `resource`, `generation_context` (study type or curation basis;
 `sieve:basis_unknown` when the source does not say) and `resource_role_override`.
 
@@ -160,7 +171,7 @@ the enclosing statement, so the core `target_proposition` is unused.
 
 | Field | Range | Req | Description |
 |---|---|---|---|
-| `has_evidence_items` | ids | No | Items (or other lines) this line interprets. |
+| `has_evidence_items` | evidence items, nested | No | Items (or other lines) this line interprets, in full. |
 | `direction_of_evidence_provided` | Direction | Yes | `supports` or `disputes`. There is no neutral. |
 | `strength_of_evidence_provided` | string | No | Categorical band, from the rule's `strength_bands`. |
 | `score_of_evidence_provided` | float, [0, 1] | No | Strength on the shared 0-1 scale. Direction is not carried by the sign. |
@@ -269,8 +280,9 @@ evidence. `statement.strength` is the band of S and `statement.direction` its si
 S is computed, not asserted: a signer's view goes in as an expert line, not as an edit
 to S. The S that a decision was given on is copied to `AssertionDecision.inclusion_score`.
 
-The scoring code has not been written for this model yet. The values in the example
-packets are illustrative (see `issues/issue_migrate_app_to_profile.md`).
+`sieve.inclusion_score.score_packet` is the reference implementation; it reads every
+parameter from the packet's frozen rule. Some S values stored in older example packets
+were typed in by hand and may not match it.
 
 ## Validation
 
@@ -289,7 +301,8 @@ uv run linkml-validate -s schema/sieve.yaml -C SieveRegistry registry.yaml
     validate a JSON copy. The test suite loads YAML with dates kept as strings.
 
 **`sieve.profile_checks.check_packet`** covers what linkml-validate cannot: predicate
-bindings, the claim-evidence matrix, dangling references, read coverage on
+bindings, the claim-evidence matrix, nested item types, copy consistency, dangling id
+links, read coverage on
 document-based lines, methods on AI and rule-based lines, chain contiguity,
 supersession and blind approvals. It also reports WARNING states that need a person
 (obsolete-to-obsolete mappings, definitions with no source, read coverage not
@@ -323,7 +336,13 @@ statement:
   has_evidence_lines:
     - id: sieve:el/q90-lexical
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:score/q90-lexical]
+      has_evidence_items:
+        - id: sieve:score/q90-lexical
+          type: ComputationalScore
+          value: "0.97"
+          specified_by: [sieve:method/lexmatch]
+          software_version: oak-0.6
+          parameters: "normalize=true"
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: weak
       score_of_evidence_provided: 0.3
@@ -337,7 +356,16 @@ statement:
           specified_by: [sieve:method/mondo-mapping-guide]
     - id: sieve:el/q90-record
       type: SieveEvidenceLine
-      has_evidence_items: [ICD10CM:Q90]
+      has_evidence_items:
+        - id: ICD10CM:Q90
+          type: ExternalRecord
+          label: Down syndrome
+          resource: infores:icd10cm
+          record_metadata:
+            retrieved_from: infores:icd10cm
+            source_release: sieve:release/icd10cm-2026
+            retrieval_date: "2026-10-01"
+            source_label: Down syndrome
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: strong
       score_of_evidence_provided: 0.8
@@ -363,23 +391,6 @@ statement:
       score_band: strong
       aggregation_rule: sieve:rule/mapping-v1.0
       signed_packet_version: "2026-10-25"
-external_records:
-  - id: ICD10CM:Q90
-    type: ExternalRecord
-    label: Down syndrome
-    resource: infores:icd10cm
-    record_metadata:
-      retrieved_from: infores:icd10cm
-      source_release: sieve:release/icd10cm-2026
-      retrieval_date: "2026-10-01"
-      source_label: Down syndrome
-computational_scores:
-  - id: sieve:score/q90-lexical
-    type: ComputationalScore
-    value: "0.97"
-    specified_by: [sieve:method/lexmatch]
-    software_version: oak-0.6
-    parameters: "normalize=true"
 ```
 
 The other examples in `tests/data/profile/valid/` cover a synonym accepted under a
@@ -389,13 +400,12 @@ packets are in `inbox/examples/`.
 
 ## Coming from the pre-profile model
 
-The earlier snake_case model (`sepio_classes.yaml`, `status`, `ConcordanceItem`, ...)
-is gone. Roughly:
+The earlier pre-profile model (`status`, `ConcordanceItem`, ...) is gone. Roughly:
 
 | Before | Now |
 |---|---|
 | `status`, `CurationDecision` | `statement.review_state` + `statement.assertion_decisions` |
-| items inlined in lines | items in typed packet lists, referenced by id |
+| items inlined in lines | items still nested in lines, now with `id` and `type`, copies identical |
 | `ConcordanceItem` | a prior claim, e.g. `SynonymStatement` (the claim) + `ExternalRecord` (the record) |
 | `SieveDocument` with `quote` | `Publication` / `WebPage` / `GuidelineDocument`, plus `TextPassage` for the quote |
 | `ComputationalResult` | `ComputationalScore` |

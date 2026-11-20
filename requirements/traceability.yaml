@@ -254,8 +254,9 @@ requirements:
     decisions: [D-004, D-005, D-033, D-061]
     rationale: >-
       A prior claim is an ordinary claim-type Statement (a DOID subclass assertion is a
-      SubclassStatement) in packet.prior_claims: the source's own SPO in its own terms,
-      reported_in its ExternalRecord, plus one ResolutionChain per grounded entity
+      SubclassStatement), nested in the line that cites it: the source's own SPO in its
+      own terms, with its ExternalRecord nested under reported_in, plus one
+      ResolutionChain per grounded entity
       (D-061). Its type says what it claims, never its role: support, dispute or
       competition is set by the line that cites it (D-033, D-069). Source relation
       qualifiers are deliberately absent (D-005).
@@ -345,7 +346,8 @@ requirements:
     decisions: [D-046]
     rationale: >-
       Core-native: an EvidenceLine is an InformationEntity, so it can be an evidence
-      item of a higher-order line. The profile allows line ids in has_evidence_items.
+      item of a higher-order line. A higher-order line nests full copies of the lines it
+      reads in has_evidence_items; the scorer matches them to the statement's lines by id.
   EINT.DISTINCT_MODELS:
     module: evidence-line
     disposition: modelled
@@ -366,8 +368,8 @@ requirements:
     disposition: modelled
     decisions: [D-041, D-037]
     rationale: >-
-      Core Statement.has_evidence, narrowed to references to evidence items in the
-      packet. Kept for lightweight consumption alongside lines.
+      Core Statement.has_evidence, holding evidence items nested in full, like the
+      items of a line. Kept for lightweight consumption alongside lines.
   EINT.SOURCE_ONLY:
     module: evidence-line
     disposition: modelled

@@ -25,7 +25,6 @@ statement:
   has_evidence_lines:
     - id: sieve:el/ds-doid-dispute
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:ca/doid-14250-isa-630]
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.5
       contributions:
@@ -35,6 +34,15 @@ statement:
           date: "2026-10-20"
           method_type: COMPUTED_CONCORDANCE
           specified_by: [sieve:method/concordance-workflow]
+      has_evidence_items:
+        - id: sieve:ca/doid-14250-isa-630
+          type: SubclassStatement     # a prior claim: DOID's own subclass assertion
+          subject: DOID:14250         # Disease Ontology: Down syndrome
+          predicate: {code: rdfs:subClassOf}
+          object: DOID:630            # genetic disease
+          resource: infores:disease-ontology
+          reported_in:                # the DOID record it was read from
+            - {id: DOID:14250, type: ExternalRecord, resource: infores:disease-ontology, record_metadata: {...}}
   assertion_decisions:
     - id: sieve:dec/ds-excl-2026
       type: AssertionDecision
@@ -44,14 +52,6 @@ statement:
       route: INDIVIDUAL_SIGN_OFF
       inclusion_score: 0.46
       signed_packet_version: "2026-10-20"
-prior_claims:
-  - id: sieve:ca/doid-14250-isa-630
-    type: SubclassStatement           # a prior claim: DOID's own subclass assertion
-    subject: DOID:14250               # Disease Ontology: Down syndrome
-    predicate: {code: rdfs:subClassOf}
-    object: DOID:630                  # genetic disease
-    reported_in: [DOID:14250]
-    resource: infores:disease-ontology
 ```
 
 Disease Ontology places Down syndrome under its genetic disease class, which grounds to
@@ -70,18 +70,18 @@ graph TD
     S --> L2[Evidence line<br/>disputes]
     S --> D[Assertion decisions<br/>the verdicts]
     S --> O[Origin<br/>where the claim came from]
-    L1 -.-> I1[Item: an OMIM record]
-    L2 -.-> I2[Item: a DOID assertion]
-    P --> I1
-    P --> I2
+    L1 --> I1[Item: an OMIM record]
+    L2 --> I2[Item: a DOID assertion]
+    I2 --> R2[its DOID record]
 ```
 
 - **Statement**: the one claim. Its `type` says which kind of claim it is.
 - **Evidence item**: one piece of information (a database record, another source's
-  assertion, a passage from a paper, a computed score). Items sit in typed lists on
-  the packet (`external_records`, `prior_claims`, `text_passages`, ...).
+  assertion, a passage from a paper, a computed score). Each item is written out in
+  full inside the line that uses it. If two lines use the same item, each carries a
+  copy with the same id, and the copies must be identical.
 - **Evidence line**: one judgement that some items bear on the claim, in one
-  direction, with some strength. Lines point at items by id.
+  direction, with some strength. A line carries its items, so it can be read on its own.
 - **Assertion decision**: whether the claim goes into Mondo, who decided, and on which
   packet version.
 - **Origin**: where the claim was copied or cloned from. That is not the same as

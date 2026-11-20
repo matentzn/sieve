@@ -11,8 +11,9 @@ It does not re-teach the data model. Read these first:
 
 ## What you produce
 
-An agent's output is one `EvidencePacket` per claim, in the profile shape (camelCase,
-`id` and `type` on every entity). An agent typically contributes three things:
+An agent's output is one `EvidencePacket` per claim, in the profile shape (snake_case
+slots, `id` and `type` on every entity, evidence items nested in the lines that use
+them). An agent typically contributes three things:
 
 - **evidence items it created**: a `TextPassage` with the verbatim quote it
   extracted, plus the `Publication` / `WebPage` / `GuidelineDocument` it came from;
@@ -68,7 +69,29 @@ statement:
   has_evidence_lines:
     - id: sieve:el/cf-passage
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:tp/pmid-20301428-1]
+      has_evidence_items:              # the passage, written out in full
+        - id: sieve:tp/pmid-20301428-1
+          type: TextPassage
+          statement_text: "Illustrative passage: cystic fibrosis is caused by pathogenic variants in CFTR."
+          reported_in:                 # the paper, nested
+            - id: PMID:20301428
+              type: Publication
+              pmid: "20301428"
+              resource: infores:pubmed
+              generation_context:
+                - {code: "PT:review", label: Review}
+          derived_from: [PMID:20301428]  # the same paper by id: the passage depends on it
+          document_version: "2025-01"
+          text_location: {section: Molecular Genetics, char_start: 1200, char_end: 1278}
+          quote_verification: NOT_CHECKED    # VERIFIED only after a machine check
+          contributions:
+            - id: sieve:act/tp-extraction
+              type: SieveContribution
+              contributor: sieve:agent/mondo-ai-extractor
+              role: EXTRACTOR
+              date: "2026-10-10"
+              specified_by: [sieve:method/evidence-extraction-prompt]
+              run_id: mondo-ai-evidence-2026-10-10-r7
       direction_of_evidence_provided: supports
       score_of_evidence_provided: 0.8
       confidence: 0.85
@@ -87,30 +110,11 @@ statement:
           grounding_checked: VERIFIED
           sought_disputing_evidence: true
           run_id: mondo-ai-evidence-2026-10-10-r7
-text_passages:
-  - id: sieve:tp/pmid-20301428-1
-    type: TextPassage
-    statement_text: "Illustrative passage: cystic fibrosis is caused by pathogenic variants in CFTR."
-    reported_in: [PMID:20301428]
-    document_version: "2025-01"
-    text_location: {section: Molecular Genetics, char_start: 1200, char_end: 1278}
-    quote_verification: NOT_CHECKED    # VERIFIED only after a machine check
-    contributions:
-      - id: sieve:act/tp-extraction
-        type: SieveContribution
-        contributor: sieve:agent/mondo-ai-extractor
-        role: EXTRACTOR
-        date: "2026-10-10"
-        specified_by: [sieve:method/evidence-extraction-prompt]
-        run_id: mondo-ai-evidence-2026-10-10-r7
-publications:
-  - id: PMID:20301428
-    type: Publication
-    pmid: "20301428"
-    resource: infores:pubmed
-    generation_context:
-      - {code: "PT:review", label: Review}
+reference_snapshot: {...}              # frozen copies of the agents, methods and resources referenced
 ```
+
+If you cite the same passage in a second line, copy it there with the same id. The
+copies must be identical.
 
 The full test file adds the resolution chain for "CFTR" (an LLM extraction step, then
 a lexical grounding step to `HGNC:1884`), an OMIM concordance line, a reviewer's

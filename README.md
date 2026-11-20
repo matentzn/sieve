@@ -10,10 +10,10 @@ model is a profile of the [SEPIO](https://github.com/sepio-framework/sepio-linkm
 information model, traced requirement by requirement to the Mondo requirements
 collection.
 
-- `schema/sepio_core.yaml`: the SEPIO core, copied unchanged from sepio-linkml
-  (commit `8c2c233`, hash-pinned in the tests).
+- `schema/sepio_core.yaml`: the SEPIO core, a byte-identical copy of sepio-linkml's
+  `sepio_classes.yaml` (commit `47f46b7`; the tests compare it with the canonical file).
 - `schema/sieve.yaml`: the SIEVE profile (`id: https://w3id.org/sieve`). Every class
-  specialises a core class; names are camelCase.
+  specialises a core class; slots are snake_case, classes CamelCase.
 
 Documentation: <https://matentzn.github.io/sieve> (sources in `docs/`). Design:
 `specs/2026-10-29-sieve-sepio-profile-design.md`.
@@ -32,12 +32,14 @@ One versioned `EvidencePacket` per claim. The statement is one of ten claim type
 `DiseaseAttributeStatement`, `SubsetMembershipStatement`, `MetaclassStatement`,
 `ValueSetMembershipStatement`), each binding its predicate to a value set and listing
 the evidence it accepts. Evidence lines (`SieveEvidenceLine`, each with its
-`InterpretationActivity`) sit on the statement and refer by id to evidence items in
-typed lists on the packet (`ExternalRecord`, prior claims typed by claim type, `TextPassage`,
-`Publication`, `WebPage`, `GuidelineDocument`, `ComputationalScore`). An
+`InterpretationActivity`) sit on the statement and carry their evidence items in full
+(`ExternalRecord`, prior claims typed by claim type, `TextPassage`, `Publication`,
+`WebPage`, `GuidelineDocument`, `ComputationalScore`, or other lines). An item used in
+several places is copied under the same id, and the copies must be identical. An
 `AssertionDecision` records the outcome, route, inclusion score S in [-1, 1], rule,
 policy or batch, and the packet version it was given on. Rules, policies, agents and
-information resources live in a `SieveRegistry`.
+information resources are referenced by id and frozen in the packet's
+`reference_snapshot`.
 
 ```yaml
 id: sieve:pkt/MONDO_0008608-excl-MONDO_0003847
@@ -54,24 +56,25 @@ statement:
   has_evidence_lines:
     - id: sieve:el/ds-doid-dispute
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:ca/doid-14250-isa-630]
       direction_of_evidence_provided: disputes
       score_of_evidence_provided: 0.5
       contributions:
         - id: sieve:act/ds-doid-concordance
           type: InterpretationActivity
-          contributor: sieve:agent/concordance-pipeline
+          contributor: sieve:agent/concordance-pipeline   # an id into reference_snapshot
           date: "2026-10-20"
           method_type: COMPUTED_CONCORDANCE
           specified_by: [sieve:method/concordance-workflow]
-prior_claims:
-  - id: sieve:ca/doid-14250-isa-630
-    type: SubclassStatement            # a prior claim, typed by what it claims
-    subject: DOID:14250
-    predicate: {code: rdfs:subClassOf}
-    object: DOID:630
-    reported_in: [DOID:14250]
-    resource: infores:disease-ontology
+      has_evidence_items:
+        - id: sieve:ca/doid-14250-isa-630
+          type: SubclassStatement      # a prior claim, typed by what it claims, nested in full
+          subject: DOID:14250
+          predicate: {code: rdfs:subClassOf}
+          object: DOID:630
+          resource: infores:disease-ontology
+          reported_in:
+            - {id: DOID:14250, type: ExternalRecord, resource: infores:disease-ontology, record_metadata: {...}}
+reference_snapshot: {...}              # frozen agents, methods, rules and resources
 ```
 
 Full examples: `tests/data/profile/valid/` (C003, C005, C006, C007) and the registry in

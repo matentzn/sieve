@@ -15,9 +15,9 @@ the generated artefacts current. If you are new to the packet shape, read the
 
 ## 1. Author a packet by hand
 
-A packet is one YAML file per claim: the statement (with its lines, origin and
-decisions inlined) and the evidence items the lines refer to, in typed lists. Every
-entity has an `id` and a `type`. This synonym claim, copied from OMIM in 2019 and
+A packet is one YAML file per claim: the statement, with its lines, origin and
+decisions, and each line carrying its evidence items in full. Every entity has an `id`
+and a `type`. This synonym claim, copied from OMIM in 2019 and
 corroborated by the current OMIM release, is adapted from
 `tests/data/profile/valid/c003_spoan_synonym_policy.yaml`:
 
@@ -37,7 +37,16 @@ statement:
     - id: sieve:origin/spoan-omim
       type: OriginEvent
       derivation_type: COPIED_FROM
-      source_item: OMIM:609541
+      source_item:                     # the OMIM record, copy 1 (here it is the origin)
+        id: OMIM:609541
+        type: ExternalRecord
+        resource: infores:omim
+        generation_context:
+          - {code: "sieve:basis_unknown"}
+        record_metadata:
+          retrieved_from: infores:omim
+          source_release: sieve:release/omim-2026-10-01
+          retrieval_date: "2026-10-02"
       source_label: SPOAN syndrome
       source_release: sieve:release/omim-2019-04-30
       performed_by: [sieve:agent/concordance-pipeline]
@@ -45,7 +54,23 @@ statement:
   has_evidence_lines:                    # what corroborates it now
     - id: sieve:el/spoan-omim
       type: SieveEvidenceLine
-      has_evidence_items: [sieve:ca/omim-609541-syn]
+      has_evidence_items:
+        - id: sieve:ca/omim-609541-syn
+          type: SynonymStatement       # OMIM's own synonym claim
+          subject: OMIM:609541
+          predicate: {code: oboInOwl:hasExactSynonym}
+          object: SPOAN syndrome
+          resource: infores:omim
+          reported_in:
+            - id: OMIM:609541          # the same record, copy 2 (here it is evidence)
+              type: ExternalRecord
+              resource: infores:omim
+              generation_context:
+                - {code: "sieve:basis_unknown"}
+              record_metadata:
+                retrieved_from: infores:omim
+                source_release: sieve:release/omim-2026-10-01
+                retrieval_date: "2026-10-02"
       direction_of_evidence_provided: supports
       strength_of_evidence_provided: strong
       score_of_evidence_provided: 0.9
@@ -62,33 +87,20 @@ statement:
           method_type: COMPUTED_CONCORDANCE
           specified_by: [sieve:method/concordance-workflow]
           read_coverage: STRUCTURED_RECORD
-prior_claims:
-  - id: sieve:ca/omim-609541-syn
-    type: SynonymStatement
-    subject: OMIM:609541
-    predicate: {code: oboInOwl:hasExactSynonym}
-    object: SPOAN syndrome
-    reported_in: [OMIM:609541]
-    resource: infores:omim
-external_records:
-  - id: OMIM:609541
-    type: ExternalRecord
-    resource: infores:omim
-    generation_context:
-      - {code: "sieve:basis_unknown"}
-    record_metadata:
-      retrieved_from: infores:omim
-      source_release: sieve:release/omim-2026-10-01
-      retrieval_date: "2026-10-02"
+reference_snapshot: {...}              # frozen copies of the rule, releases, agents, methods, resources
 ```
 
 Notes:
 
 - Pick the statement `type` for the claim (`SynonymStatement`, `MappingStatement`,
   ...); it fixes which predicates and which item classes are allowed.
-- Lines refer to items by id. Each item goes in the list for its class.
+- Write each item out in full where it is used. An item used twice (here the OMIM
+  record, as origin and as evidence) is copied with the same id, and the copies must
+  be identical; `sieve.profile_checks` reports `COPY_DIVERGENCE` otherwise.
 - Rules, releases, agents and methods (`sieve:rule/...`, `sieve:release/...`,
-  `infores:...`) are ids in a `SieveRegistry`; see `tests/data/profile/registry.yaml`.
+  `infores:...`) are ids. Each packet carries a frozen copy of the entries it uses in
+  its `reference_snapshot`, taken from a `SieveRegistry`; see
+  `tests/data/profile/registry.yaml`.
 - A new claim usually has no `assertion_decisions` yet. The full test file adds the
   policy-based acceptance and the resolution chain for the OMIM id.
 - Quote dates, so linkml-validate reads them as strings.
