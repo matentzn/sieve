@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://matentzn.github.io/sieve/api/">
       
       
-        <link rel="prev" href="../orcid-setup/">
+        <link rel="prev" href="../workflows/">
       
       
         <link rel="next" href="../ai-integration/">
@@ -540,34 +540,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../cli/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CLI Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../workflows/" class="md-nav__link">
         
   
@@ -576,34 +548,6 @@
     
   
     Workflows
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../orcid-setup/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ORCID Setup
   
 
     
@@ -788,72 +732,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#sievedatamodelloaders-pre-profile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sieve.datamodel.loaders (pre-profile)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sievestore-pre-profile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sieve.store (pre-profile)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sievepacket_ingest-pre-profile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sieve.packet_ingest (pre-profile)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sievepacket_export-pre-profile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sieve.packet_export (pre-profile)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sievescoring-pre-profile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sieve.scoring (pre-profile)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sieveauth" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sieve.auth
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -919,77 +797,44 @@
 
 
 <h1 id="python-api-reference">Python API Reference<a class="headerlink" href="#python-api-reference" title="Permanent link">&para;</a></h1>
-<div class="admonition warning">
-<p class="admonition-title">Application modules not yet migrated</p>
-<p><code>sieve.datamodel</code>, <code>sieve.datamodel.codegen</code>, <code>sieve.profile_checks</code> and
-<code>sieve.traceability</code> work with the current profile. <code>sieve.datamodel.loaders</code>,
-<code>sieve.store</code>, <code>sieve.packet_ingest</code>, <code>sieve.packet_export</code> and <code>sieve.scoring</code>
-still target the pre-profile model and fail at import or at run time. They are
-being migrated (<code>issues/issue_migrate_app_to_profile.md</code>). Their signatures are
-listed below as they are in the source.</p>
-</div>
 <p>For what the model fields mean, see the <a href="../data-model/">Data Model</a>.</p>
 <table>
 <thead>
 <tr>
 <th>Module</th>
 <th>Purpose</th>
-<th>Status</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>sieve.datamodel</code></td>
 <td>Generated Pydantic models</td>
-<td>current</td>
 </tr>
 <tr>
 <td><code>sieve.datamodel.codegen</code></td>
 <td>Generate the models from the schema</td>
-<td>current</td>
+</tr>
+<tr>
+<td><code>sieve.packet_items</code></td>
+<td>Walk the nested evidence items of a packet</td>
 </tr>
 <tr>
 <td><code>sieve.profile_checks</code></td>
 <td>Profile constraints beyond linkml-validate</td>
-<td>current</td>
+</tr>
+<tr>
+<td><code>sieve.inclusion_score</code></td>
+<td>Reference inclusion score S of a packet</td>
 </tr>
 <tr>
 <td><code>sieve.traceability</code></td>
 <td>Requirement-to-schema traceability</td>
-<td>current</td>
-</tr>
-<tr>
-<td><code>sieve.datamodel.loaders</code></td>
-<td>Polymorphic packet loading</td>
-<td>pre-profile</td>
-</tr>
-<tr>
-<td><code>sieve.store</code></td>
-<td><code>PacketStore</code>, DuckDB persistence</td>
-<td>pre-profile</td>
-</tr>
-<tr>
-<td><code>sieve.packet_ingest</code></td>
-<td>Validate and ingest YAML packets</td>
-<td>pre-profile</td>
-</tr>
-<tr>
-<td><code>sieve.packet_export</code></td>
-<td>RDF and YAML export</td>
-<td>pre-profile</td>
-</tr>
-<tr>
-<td><code>sieve.scoring</code></td>
-<td>Net Evidence Ratio</td>
-<td>pre-profile</td>
-</tr>
-<tr>
-<td><code>sieve.auth</code></td>
-<td>ORCID OAuth and curator authorisation</td>
-<td>model-independent</td>
 </tr>
 </tbody>
 </table>
+<p>The application layer of the pre-profile model (Streamlit review app, DuckDB store,
+ingest / export, scoring, CLI) was removed on 2026-11-20; it is to be rebuilt on the
+profile.</p>
 <hr />
 <h2 id="sievedatamodel">sieve.datamodel<a class="headerlink" href="#sievedatamodel" title="Permanent link">&para;</a></h2>
 <p>Pydantic v2 classes generated from <code>schema/sieve.yaml</code> into
@@ -1172,77 +1017,6 @@ subject obsolescence is read from term status, not stored on mappings.</p>
 </code></pre></div>
 <p><code>just gen-traceability</code> writes <code>render_markdown()</code> to
 <code>docs/requirements-traceability.md</code>.</p>
-<hr />
-<h2 id="sievedatamodelloaders-pre-profile">sieve.datamodel.loaders (pre-profile)<a class="headerlink" href="#sievedatamodelloaders-pre-profile" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">load_packet</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvidencePacket</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">packet_from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">EvidencePacket</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">EVIDENCE_ITEM_TYPES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]]</span>
-</code></pre></div>
-<p>Dispatched inlined evidence items to their concrete class by <code>type</code> before validating.
-It imports classes that no longer exist; <code>EvidencePacket.model_validate</code> replaces it.</p>
-<h2 id="sievestore-pre-profile">sieve.store (pre-profile)<a class="headerlink" href="#sievestore-pre-profile" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">PacketStore</span><span class="p">:</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;data/sieve.duckdb&quot;</span><span class="p">)</span>   <span class="c1"># &quot;:memory:&quot; for tests</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">insert_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet</span><span class="p">:</span> <span class="n">EvidencePacket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>   <span class="c1"># upsert; stores the NER</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvidencePacket</span> <span class="o">|</span> <span class="kc">None</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">list_packets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>                    <span class="c1"># {status: count}</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_item_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">item_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_decisions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>    <span class="c1"># newest first</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">record_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decision</span><span class="p">:</span> <span class="n">CurationDecision</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</code></pre></div>
-<h2 id="sievepacket_ingest-pre-profile">sieve.packet_ingest (pre-profile)<a class="headerlink" href="#sievepacket_ingest-pre-profile" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_packet_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span>           <span class="c1"># [] means valid</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">ingest_packet_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">store</span><span class="p">:</span> <span class="n">PacketStore</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">ingest_packet_directory</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">store</span><span class="p">:</span> <span class="n">PacketStore</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="c1"># {&quot;files&quot;: int, &quot;success&quot;: int, &quot;errors&quot;: int, &quot;error_details&quot;: [...]}</span>
-</code></pre></div>
-<h2 id="sievepacket_export-pre-profile">sieve.packet_export (pre-profile)<a class="headerlink" href="#sievepacket_export-pre-profile" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">packet_to_yaml</span><span class="p">(</span><span class="n">packet</span><span class="p">:</span> <span class="n">EvidencePacket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">export_packets_to_yaml</span><span class="p">(</span><span class="n">packets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EvidencePacket</span><span class="p">],</span> <span class="n">output_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">packet_to_rdf</span><span class="p">(</span><span class="n">packet</span><span class="p">:</span> <span class="n">EvidencePacket</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">export_packets_to_rdf</span><span class="p">(</span><span class="n">packets</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;turtle&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="k">def</span><span class="w"> </span><span class="nf">expand_curie</span><span class="p">(</span><span class="n">curie</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">converter</span><span class="p">:</span> <span class="n">curies</span><span class="o">.</span><span class="n">Converter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">URIRef</span> <span class="o">|</span> <span class="kc">None</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_obo_converter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">curies</span><span class="o">.</span><span class="n">Converter</span>
-</code></pre></div>
-<p><code>packet_to_rdf</code> emitted an <code>owl:Axiom</code> for packets with status <code>ACCEPTED</code>, <code>REJECTED</code> or
-<code>CONTROVERSIAL</code> and skipped the rest with a warning.</p>
-<h2 id="sievescoring-pre-profile">sieve.scoring (pre-profile)<a class="headerlink" href="#sievescoring-pre-profile" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">net_evidence_ratio</span><span class="p">(</span><span class="n">packet</span><span class="p">:</span> <span class="n">EvidencePacket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span>   <span class="c1"># (S+ - S-) / (S+ + S- + S0)</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">line_score</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span>     <span class="c1"># score, else strong=1.0 / moderate=0.6 / weak=0.3, else 1.0</span>
-</code></pre></div>
-<p>To be replaced by the inclusion score S of the claim type's <code>AggregationRule</code> (see
-<a href="../data-model/#the-inclusion-score">Data Model</a>).</p>
-<hr />
-<h2 id="sieveauth">sieve.auth<a class="headerlink" href="#sieveauth" title="Permanent link">&para;</a></h2>
-<p>ORCID OAuth login and curator authorisation for the Streamlit review UI. It does not
-use the data model.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sieve.auth</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="n">OrcidUser</span><span class="p">,</span>                  <span class="c1"># dataclass: orcid, name, access_token</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="n">AuthorizedCurator</span><span class="p">,</span>          <span class="c1"># dataclass: orcid, name, role (&quot;admin&quot;|&quot;curator&quot;)</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">is_dev_mode</span><span class="p">,</span>                <span class="c1"># () -&gt; bool  (SIEVE_DEV_MODE=true bypasses auth)</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="n">is_orcid_configured</span><span class="p">,</span>        <span class="c1"># () -&gt; bool</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    <span class="n">get_orcid_config</span><span class="p">,</span>           <span class="c1"># () -&gt; dict</span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="n">get_authorization_url</span><span class="p">,</span>      <span class="c1"># () -&gt; str</span>
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    <span class="n">exchange_code_for_token</span><span class="p">,</span>    <span class="c1"># (code: str) -&gt; OrcidUser | None</span>
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>    <span class="n">load_authorized_curators</span><span class="p">,</span>   <span class="c1"># () -&gt; dict[str, AuthorizedCurator]  (keyed by ORCID)</span>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    <span class="n">is_authorized_curator</span><span class="p">,</span>      <span class="c1"># (orcid: str | None) -&gt; bool  (True in dev mode)</span>
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="n">get_curator_role</span><span class="p">,</span>           <span class="c1"># (orcid: str | None) -&gt; str | None</span>
-<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>    <span class="n">is_admin</span><span class="p">,</span>                   <span class="c1"># (orcid: str | None) -&gt; bool  (True in dev mode)</span>
-<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>    <span class="n">get_curator_info</span><span class="p">,</span>           <span class="c1"># () -&gt; tuple[str | None, str | None]  (orcid, name)</span>
-<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="p">)</span>
-</code></pre></div>
-<p>Authorised curators are read from <code>curators.yaml</code> (path overridable via the
-<code>CURATORS_FILE</code> env var), cached for 60 seconds:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">curators</span><span class="p">:</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">orcid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0000-0001-2345-6789&quot;</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dr.</span><span class="nv"> </span><span class="s">Jane</span><span class="nv"> </span><span class="s">Smith&quot;</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
-</code></pre></div>
-<p>Streamlit-bound helpers (<code>get_current_user</code>, <code>set_current_user</code>, <code>logout</code>,
-<code>handle_oauth_callback</code>, <code>render_login_ui</code>) require an active Streamlit session.</p>
 
 
 

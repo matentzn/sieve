@@ -13,10 +13,10 @@
         <link rel="canonical" href="https://matentzn.github.io/sieve/workflows/">
       
       
-        <link rel="prev" href="../cli/">
+        <link rel="prev" href="../requirements-traceability/">
       
       
-        <link rel="next" href="../orcid-setup/">
+        <link rel="next" href="../api/">
       
       
         
@@ -537,34 +537,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../cli/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CLI Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -671,82 +643,10 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#5-ingest-into-duckdb-pre-profile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Ingest into DuckDB (pre-profile)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-review-in-the-app-pre-profile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Review in the app (pre-profile)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-export-to-rdf-and-yaml-pre-profile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7. Export to RDF and YAML (pre-profile)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-orcid-auth-and-curators" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. ORCID auth and curators
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../orcid-setup/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ORCID Setup
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -900,14 +800,6 @@
 <p>Recipes for authoring and checking packets against the SIEVE profile, and for keeping
 the generated artefacts current. If you are new to the packet shape, read the
 <a href="../primer/">Primer</a> first; for every field see the <a href="../data-model/">Data Model</a>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Ingest, review and export target the pre-profile model</p>
-<p>Sections 1 to 4 work with the current profile. Sections 5 to 8 (ingest into
-DuckDB, review in the app, RDF / YAML export, ORCID curators) describe the
-application layer, which still targets the pre-profile model and does not run
-against current packets. It is being migrated
-(<code>issues/issue_migrate_app_to_profile.md</code>).</p>
-</div>
 <hr />
 <h2 id="1-author-a-packet-by-hand">1. Author a packet by hand<a class="headerlink" href="#1-author-a-packet-by-hand" title="Permanent link">&para;</a></h2>
 <p>A packet is one YAML file per claim: the statement, with its lines, origin and
@@ -1044,51 +936,6 @@ assumes <code>sepio-linkml</code> is checked out next to this repository:</p>
 <p><code>tests/test_profile_schema.py</code> and <code>tests/test_traceability.py</code> fail if the checked-in
 model or traceability page is stale, if a requirement has no trace entry, or if an
 annotated requirement ID does not exist.</p>
-<hr />
-<h2 id="5-ingest-into-duckdb-pre-profile">5. Ingest into DuckDB (pre-profile)<a class="headerlink" href="#5-ingest-into-duckdb-pre-profile" title="Permanent link">&para;</a></h2>
-<p><code>sieve ingest</code> loaded every <code>*.yaml</code> / <code>*.yml</code> packet under a directory into DuckDB
-(default <code>data/sieve.duckdb</code>), stored its JSON, computed its Net Evidence Ratio, and
-reported per-file errors without aborting the batch:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sieve<span class="w"> </span>ingest<span class="w"> </span>-I<span class="w"> </span>inbox/examples/<span class="w"> </span>--db<span class="w"> </span>data/sieve.duckdb
-</code></pre></div>
-<p>Re-ingesting a packet with an existing <code>id</code> overwrote it. The command currently fails
-at import.</p>
-<hr />
-<h2 id="6-review-in-the-app-pre-profile">6. Review in the app (pre-profile)<a class="headerlink" href="#6-review-in-the-app-pre-profile" title="Permanent link">&para;</a></h2>
-<p><code>sieve run</code> launches the Streamlit app with <strong>Dashboard</strong>, <strong>Review Queue</strong>,
-<strong>Ingest</strong> and <strong>Export</strong> pages. An authorised curator (ORCID login, manual ORCID
-entry, or <code>SIEVE_DEV_MODE=true</code>) could accept or reject individual items and record an
-<strong>Accept / Reject / Controversial</strong> decision, which wrote a <code>CurationDecision</code> and set
-the packet's <code>status</code>.</p>
-<p>In the profile these become a <code>LineStatusChange</code> on a line, an <code>AssertionDecision</code>
-with route <code>INDIVIDUAL_SIGN_OFF</code>, and the statement's <code>review_state</code>.</p>
-<hr />
-<h2 id="7-export-to-rdf-and-yaml-pre-profile">7. Export to RDF and YAML (pre-profile)<a class="headerlink" href="#7-export-to-rdf-and-yaml-pre-profile" title="Permanent link">&para;</a></h2>
-<p><code>sieve export</code> read packet files and emitted RDF (<code>rdf</code>/<code>turtle</code>/<code>ttl</code>, <code>xml</code>, <code>n3</code>,
-<code>nt</code>) or combined YAML:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-I<span class="w"> </span>exports/accepted/<span class="w"> </span>-O<span class="w"> </span>rdf<span class="w"> </span>-o<span class="w"> </span>accepted.ttl
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>sieve<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-I<span class="w"> </span>packets/<span class="w"> </span>-O<span class="w"> </span>yaml<span class="w"> </span>-o<span class="w"> </span>combined.yaml
-</code></pre></div>
-<p>Each decided packet became an <code>owl:Axiom</code> annotation of the statement, linked back to
-the packet via <code>SEPIO:0000124</code>. Undecided packets were skipped with a warning. See
-<a href="../cli/#sieve-export">cli.md</a> for the options.</p>
-<hr />
-<h2 id="8-orcid-auth-and-curators">8. ORCID auth and curators<a class="headerlink" href="#8-orcid-auth-and-curators" title="Permanent link">&para;</a></h2>
-<p>Who may record decisions in the app is controlled by ORCID identity plus a
-<code>curators.yaml</code> allow-list (path overridable via <code>CURATORS_FILE</code>), matched by ORCID
-with or without the <code>orcid:</code> prefix:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">curators</span><span class="p">:</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">orcid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0000-0001-2345-6789&quot;</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dr.</span><span class="nv"> </span><span class="s">Jane</span><span class="nv"> </span><span class="s">Smith&quot;</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">orcid</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0000-0002-3456-7890&quot;</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dr.</span><span class="nv"> </span><span class="s">John</span><span class="nv"> </span><span class="s">Doe&quot;</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">curator</span>
-</code></pre></div>
-<p>Modes: ORCID OAuth (<code>ORCID_CLIENT_ID</code> / <code>ORCID_CLIENT_SECRET</code>, optionally
-<code>ORCID_REDIRECT_URI</code>, <code>ORCID_SANDBOX</code>), manual ORCID entry when OAuth is not
-configured, and <code>SIEVE_DEV_MODE=true</code>, which bypasses auth. The file is re-read roughly
-once a minute. See <a href="../orcid-setup/">ORCID Setup</a>.</p>
 
 
 

@@ -331,35 +331,11 @@
           </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../cli/">
-<span class="md-ellipsis">
-    
-  
-    CLI Reference
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
 <a class="md-nav__link" href="../workflows/">
 <span class="md-ellipsis">
     
   
     Workflows
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../orcid-setup/">
-<span class="md-ellipsis">
-    
-  
-    ORCID Setup
   
 
     
@@ -501,13 +477,10 @@ metadata (score, offsets, method) — so the minimal "A" shape stays valid while
 <h2 id="the-transform-in-one-picture">The transform, in one picture<a class="headerlink" href="#the-transform-in-one-picture" title="Permanent link">¶</a></h2>
 <div class="mermaid">flowchart LR
     DM[DisMech record<br/>Fanconi Anemia] --&gt;|"dismech_to_minimal<br/>(linkml-map)"| MIN[minimal<br/>EvidencedClaim]
-    MIN --&gt;|"minimal_to_sieve<br/>(linkml-map, pre-profile)"| SV[sieve<br/>EvidencePacket]
     MIN -. validates .-&gt; MS[(schema/minimal.yaml)]
-    SV -. "fails: pre-profile shape" .-&gt; SS[(schema/sieve.yaml)]
 </div>
-<p>Both hops are <a href="https://linkml.io/linkml-map/">linkml-map</a> transformation specs in
-<code>transform/</code>. Only the first works today; the second still targets the pre-profile
-SIEVE model. The source shape is a vendored snapshot of DisMech's model
+<p>The transform is a <a href="https://linkml.io/linkml-map/">linkml-map</a> specification in
+<code>transform/</code>. The source shape is a vendored snapshot of DisMech's model
 (<code>transform/dismech_source.yaml</code>) so the pipeline runs without the DisMech repo
 checked out.</p>
 <h2 id="before-a-dismech-assertion">Before: a DisMech assertion<a class="headerlink" href="#before-a-dismech-assertion" title="Permanent link">¶</a></h2>
@@ -580,10 +553,8 @@ not a sentence.</p>
 names. <code>schema/minimal.yaml</code> is unchanged: snake_case, standalone, and aligned with SEPIO
 only through <code>class_uri</code> / <code>slot_uri</code>. A minimal instance is therefore not a valid SIEVE
 packet, and nothing in <code>sieve.yaml</code> refers to <code>minimal.yaml</code>.</p>
-<p>The second transform (<code>transform/minimal_to_sieve.transform.yaml</code>) still emits the
-pre-profile SIEVE shape (<code>SieveDocument</code> items, snake_case slots, <code>status</code>), which the
-profile rejects, so <code>just transform-minimal-to-sieve</code> and <code>just transform-all</code> fail at
-their last validation step. How the two schemas should relate again (a sub-profile of
+<p>A second transform, minimal to the pre-profile SIEVE shape, was removed on 2026-11-20.
+How the two schemas should relate again (a sub-profile of
 the core, a transform as the formal bridge, a camelCase standalone kernel, or no
 separate kernel) is open: <code>issues/issue_minimal_kernel_vs_profile.md</code>.</p>
 <p>For orientation, the nearest counterparts in the profile (not a decided mapping):</p>
@@ -652,16 +623,12 @@ separate kernel) is open: <code>issues/issue_minimal_kernel_vs_profile.md</code>
 <td>DisMech → minimal transform</td>
 </tr>
 <tr>
-<td><code>transform/minimal_to_sieve.transform.yaml</code></td>
-<td>minimal → sieve transform (pre-profile target, currently fails)</td>
-</tr>
-<tr>
 <td><code>project.justfile</code></td>
-<td><code>transform-dismech</code>, <code>transform-minimal-to-sieve</code>, <code>transform-all</code></td>
+<td><code>transform-dismech</code></td>
 </tr>
 <tr>
 <td><code>tests/test_transform_dismech.py</code></td>
-<td>runs the pipeline and validates both outputs (the SIEVE stage currently fails)</td>
+<td>runs the transform and validates its output</td>
 </tr>
 </tbody>
 </table>
