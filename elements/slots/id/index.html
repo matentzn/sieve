@@ -717,58 +717,23 @@ Alias: id</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../../classes/SieveStatement/">SieveStatement</a></td>
-<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
-<td>yes</td>
+<td><a href="../../classes/EvidenceItem/">EvidenceItem</a></td>
+<td>Marker mixin for everything an evidence line may hold: each evidence-item cla...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/Method/">Method</a></td>
+<td>A set of instructions that specify how to achieve some objective</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
+<td>no</td>
 </tr>
 <tr>
 <td><a href="../../classes/DefinitionStatement/">DefinitionStatement</a></td>
 <td>C002: the term has this textual definition</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/SieveMethod/">SieveMethod</a></td>
-<td>A versioned, identifiable method: a guideline or SOP, an extraction or alignm...</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../../classes/EvidenceLine/">EvidenceLine</a></td>
-<td>An independent, evidence-based argument that may support or refute the validi...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/MappingStatement/">MappingStatement</a></td>
-<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/EvidencePacket/">EvidencePacket</a></td>
-<td>One claim, the evidence it rests on, and a version</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../../classes/GuidelineDocument/">GuidelineDocument</a></td>
-<td>A guideline or consensus document (e</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../../classes/DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
-<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/Activity/">Activity</a></td>
-<td>An action or set of actions performed by an agent, that occurs over a period ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
-<td>C008: the term is in a Mondo subset</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/MetaclassStatement/">MetaclassStatement</a></td>
-<td>C009 (candidate): the kind of class this term is (grouping, disorder, subtype...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -777,113 +742,18 @@ Alias: id</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/StudyResult/">StudyResult</a></td>
-<td>A collection of data items from a single study that pertain to a particular s...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/Publication/">Publication</a></td>
-<td>A scientific publication (PMID, DOI, ISBN)</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../../classes/AlignmentStep/">AlignmentStep</a></td>
-<td>One extraction, translation, grounding or normalisation step</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/Document/">Document</a></td>
-<td>A collection of information, usually in a text-based or graphic human-readabl...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/StudyGroup/">StudyGroup</a></td>
-<td>A collection of individuals or specimens from the same taxonomic class, selec...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/SieveEvidenceLine/">SieveEvidenceLine</a></td>
-<td>One evidentiary judgement: these items bear on the enclosing claim in this di...</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../../classes/ResolutionChain/">ResolutionChain</a></td>
-<td>How a source mention or id was resolved to the target id: an ordered, contigu...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/SieveContribution/">SieveContribution</a></td>
-<td>An agent's contribution to a claim, line or record, with the agent's role and...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/Statement/">Statement</a></td>
-<td>A claim of purported truth as made by a particular agent, on a particular occ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/Entity/">Entity</a></td>
-<td>Anything that exists, has existed, or will exist</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/SubclassStatement/">SubclassStatement</a></td>
-<td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/EvidencePacketCollection/">EvidencePacketCollection</a></td>
-<td>A released artefact holding many packets, e</td>
-<td>yes</td>
-</tr>
-<tr>
 <td><a href="../../classes/TextPassage/">TextPassage</a></td>
 <td>A verbatim passage extracted from a document as a prior claim</td>
 <td>yes</td>
 </tr>
 <tr>
-<td><a href="../../classes/Method/">Method</a></td>
-<td>A set of instructions that specify how to achieve some objective</td>
+<td><a href="../../classes/Agent/">Agent</a></td>
+<td>An autonomous actor (person, organization, or software agent) that bears some...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/LineStatusChange/">LineStatusChange</a></td>
-<td>A record that a line was invalidated, superseded, or accepted unchanged by a ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/SynonymStatement/">SynonymStatement</a></td>
-<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/SieveRegistry/">SieveRegistry</a></td>
-<td>Shared reference data, maintained once and referenced by id from packets: inf...</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../../classes/NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
-<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/TermExistenceStatement/">TermExistenceStatement</a></td>
-<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/SieveAgent/">SieveAgent</a></td>
-<td>A person (ORCID), organisation or group (e</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../../classes/DecisionPolicy/">DecisionPolicy</a></td>
-<td>A human-authored, human-approved decision procedure that an automated system ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/DataSet/">DataSet</a></td>
-<td>A collection of related data items or records that are organized together in ...</td>
+<td><a href="../../classes/DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -892,28 +762,28 @@ Alias: id</p>
 <td>no</td>
 </tr>
 <tr>
+<td><a href="../../classes/GuidelineDocument/">GuidelineDocument</a></td>
+<td>A guideline or consensus document (e</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../../classes/EvidenceLine/">EvidenceLine</a></td>
+<td>An independent, evidence-based argument that may support or refute the validi...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/SourceRelease/">SourceRelease</a></td>
+<td>A specific release of an information resource, as ingested via a preprocessed...</td>
+<td>yes</td>
+</tr>
+<tr>
 <td><a href="../../classes/BatchSignOff/">BatchSignOff</a></td>
 <td>A one-off curator approval of a filtered result set, with banded review depth</td>
 <td>yes</td>
 </tr>
 <tr>
-<td><a href="../../classes/ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
-<td>C010 (candidate): the term is a member of what an external record covers (e</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/ComputationalScore/">ComputationalScore</a></td>
-<td>A computed score used as machine evidence: lexical match, Boomer probability,...</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../../classes/InterpretationActivity/">InterpretationActivity</a></td>
-<td>The act of interpreting evidence as a line: who (human with perspective, or A...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/AggregationRule/">AggregationRule</a></td>
-<td>The versioned rule that turns a claim type's evidence lines into strengths an...</td>
+<td><a href="../../classes/DecisionPolicy/">DecisionPolicy</a></td>
+<td>A human-authored, human-approved decision procedure that an automated system ...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -927,23 +797,53 @@ Alias: id</p>
 <td>yes</td>
 </tr>
 <tr>
-<td><a href="../../classes/DataItem/">DataItem</a></td>
-<td>An Information Entity representing an individual piece of data, generated or ...</td>
+<td><a href="../../classes/SieveMethod/">SieveMethod</a></td>
+<td>A versioned, identifiable method: a guideline or SOP, an extraction or alignm...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../../classes/ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td>C010 (candidate): the term is a member of what an external record covers (e</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/Agent/">Agent</a></td>
-<td>An autonomous actor (person, organization, or software agent) that bears some...</td>
+<td><a href="../../classes/LineStatusChange/">LineStatusChange</a></td>
+<td>A record that a line was invalidated, superseded, or accepted unchanged by a ...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/Proposition/">Proposition</a></td>
-<td>An abstract entity representing a possible fact that is either true or false</td>
+<td><a href="../../classes/AssertionDecision/">AssertionDecision</a></td>
+<td>The overall decision that puts a claim into Mondo (or keeps it out)</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/EvidenceItem/">EvidenceItem</a></td>
-<td>Marker mixin for everything an evidence line may hold: each evidence-item cla...</td>
+<td><a href="../../classes/AlignmentStep/">AlignmentStep</a></td>
+<td>One extraction, translation, grounding or normalisation step</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/ResolutionChain/">ResolutionChain</a></td>
+<td>How a source mention or id was resolved to the target id: an ordered, contigu...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/Document/">Document</a></td>
+<td>A collection of information, usually in a text-based or graphic human-readabl...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td>C008: the term is in a Mondo subset</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/ComputationalScore/">ComputationalScore</a></td>
+<td>A computed score used as machine evidence: lexical match, Boomer probability,...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../../classes/DataSet/">DataSet</a></td>
+<td>A collection of related data items or records that are organized together in ...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -952,19 +852,119 @@ Alias: id</p>
 <td>yes</td>
 </tr>
 <tr>
-<td><a href="../../classes/SourceRelease/">SourceRelease</a></td>
-<td>A specific release of an information resource, as ingested via a preprocessed...</td>
+<td><a href="../../classes/SubclassStatement/">SubclassStatement</a></td>
+<td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/StudyResult/">StudyResult</a></td>
+<td>A collection of data items from a single study that pertain to a particular s...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/Proposition/">Proposition</a></td>
+<td>An abstract entity representing a possible fact that is either true or false</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/StudyGroup/">StudyGroup</a></td>
+<td>A collection of individuals or specimens from the same taxonomic class, selec...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/DataItem/">DataItem</a></td>
+<td>An Information Entity representing an individual piece of data, generated or ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/SieveContribution/">SieveContribution</a></td>
+<td>An agent's contribution to a claim, line or record, with the agent's role and...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/SieveEvidenceLine/">SieveEvidenceLine</a></td>
+<td>One evidentiary judgement: these items bear on the enclosing claim in this di...</td>
 <td>yes</td>
 </tr>
 <tr>
-<td><a href="../../classes/AssertionDecision/">AssertionDecision</a></td>
-<td>The overall decision that puts a claim into Mondo (or keeps it out)</td>
+<td><a href="../../classes/SynonymStatement/">SynonymStatement</a></td>
+<td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
 <td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/Entity/">Entity</a></td>
+<td>Anything that exists, has existed, or will exist</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/Statement/">Statement</a></td>
+<td>A claim of purported truth as made by a particular agent, on a particular occ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/AggregationRule/">AggregationRule</a></td>
+<td>The versioned rule that turns a claim type's evidence lines into strengths an...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/Publication/">Publication</a></td>
+<td>A scientific publication (PMID, DOI, ISBN)</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../../classes/SieveAgent/">SieveAgent</a></td>
+<td>A person (ORCID), organisation or group (e</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../../classes/InterpretationActivity/">InterpretationActivity</a></td>
+<td>The act of interpreting evidence as a line: who (human with perspective, or A...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/EvidencePacketCollection/">EvidencePacketCollection</a></td>
+<td>A released artefact holding many packets, e</td>
+<td>yes</td>
 </tr>
 <tr>
 <td><a href="../../classes/InformationResource/">InformationResource</a></td>
 <td>A registry entry for a source as a whole (OMIM, Orphanet, Disease Ontology, W...</td>
 <td>yes</td>
+</tr>
+<tr>
+<td><a href="../../classes/EvidencePacket/">EvidencePacket</a></td>
+<td>One claim, the evidence it rests on, and a version</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../../classes/SieveStatement/">SieveStatement</a></td>
+<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../../classes/MetaclassStatement/">MetaclassStatement</a></td>
+<td>C009 (candidate): the kind of class this term is (grouping, disorder, subtype...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/Activity/">Activity</a></td>
+<td>An action or set of actions performed by an agent, that occurs over a period ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/SieveRegistry/">SieveRegistry</a></td>
+<td>Shared reference data, maintained once and referenced by id from packets: inf...</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../../classes/TermExistenceStatement/">TermExistenceStatement</a></td>
+<td>C001: the term exists as a Mondo disease concept, is obsolete, is replaced by...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/MappingStatement/">MappingStatement</a></td>
+<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
+<td>no</td>
 </tr>
 </tbody>
 </table>

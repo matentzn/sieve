@@ -718,8 +718,13 @@ Alias: log_odds_source_packet</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../../classes/SieveStatement/">SieveStatement</a></td>
-<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
+<td><a href="../../classes/NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
+<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
+<td>C010 (candidate): the term is a member of what an external record covers (e</td>
 <td>no</td>
 </tr>
 <tr>
@@ -728,18 +733,13 @@ Alias: log_odds_source_packet</p>
 <td>no</td>
 </tr>
 <tr>
+<td><a href="../../classes/DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
+<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../../classes/SynonymStatement/">SynonymStatement</a></td>
 <td>C003: the term has this synonym; scope (exact / related / narrow / broad) is ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/NegativeSubclassStatement/">NegativeSubclassStatement</a></td>
-<td>C005 (excluded_subClassOf): a claim in its own right that the subject is NOT ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/MappingStatement/">MappingStatement</a></td>
-<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -748,13 +748,8 @@ Alias: log_odds_source_packet</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/DiseaseAttributeStatement/">DiseaseAttributeStatement</a></td>
-<td>C007: a definitional disease attribute (gene basis, characteristic, feature, ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
-<td>C008: the term is in a Mondo subset</td>
+<td><a href="../../classes/SieveStatement/">SieveStatement</a></td>
+<td>A claim as an identified SEPIO Statement, typed by what it claims (one subcla...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -763,13 +758,18 @@ Alias: log_odds_source_packet</p>
 <td>no</td>
 </tr>
 <tr>
+<td><a href="../../classes/SubsetMembershipStatement/">SubsetMembershipStatement</a></td>
+<td>C008: the term is in a Mondo subset</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../../classes/SubclassStatement/">SubclassStatement</a></td>
 <td>C004: subclass placement (is_a), or one element of a logical definition (owl:...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/ValueSetMembershipStatement/">ValueSetMembershipStatement</a></td>
-<td>C010 (candidate): the term is a member of what an external record covers (e</td>
+<td><a href="../../classes/MappingStatement/">MappingStatement</a></td>
+<td>C006: a cross-reference with a SKOS predicate taken from the curated precisio...</td>
 <td>no</td>
 </tr>
 </tbody>
