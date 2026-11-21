@@ -37,6 +37,7 @@ def test_stale_camelcase_key_is_rejected():
     """The snake_case flip is enforced: the pre-flip camelCase spelling of a slot
     is no longer a permitted field, so a packet using it fails validation."""
     packet = _load("valid/example_packet.yaml")
-    packet["hasEvidenceLines"] = packet.pop("has_evidence_lines")
+    statement = packet["statement"]
+    statement["hasEvidenceLines"] = statement.pop("has_evidence_lines")
     report = validate(packet, _schema(), "EvidencePacket")
     assert report.results  # unknown slot 'hasEvidenceLines' must be rejected
