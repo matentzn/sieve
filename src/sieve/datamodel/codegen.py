@@ -12,6 +12,9 @@ builds the schemas of these mutually recursive models depth-first, which needs m
 than Python's default recursion limit of 1000. The generated module raises the
 limit before the models are built.
 
+The generator records the absolute schema path as ``source_file``; only the file
+name is kept, so the checked-in module is the same in every checkout.
+
 Usage::
 
     uv run python -m sieve.datamodel.codegen schema/sieve.yaml src/sieve/datamodel/sieve_models.py
@@ -53,9 +56,21 @@ def raise_recursion_limit(code: str) -> str:
     return code.replace("import sys\n", "import sys\n" + RECURSION_LIMIT, 1)
 
 
+def strip_source_path(code: str) -> str:
+    """Keep only the file name in the schema's ``source_file`` metadata.
+
+    The generator records the absolute schema path, which differs between checkouts.
+
+    >>> strip_source_path("     'source_file': '/home/x/sieve/schema/sieve.yaml',\\n")
+    "     'source_file': 'sieve.yaml',\\n"
+    """
+    return re.sub(r"('source_file': ')[^']*/([^'/]+')", r"\1\2", code)
+
+
 def generate_pydantic(schema_path: str | Path) -> str:
     """Return the Pydantic module source for ``schema_path``."""
-    return raise_recursion_limit(fix_date_shadowing(PydanticGenerator(str(schema_path)).serialize()))
+    code = PydanticGenerator(str(schema_path)).serialize()
+    return raise_recursion_limit(fix_date_shadowing(strip_source_path(code)))
 
 
 def main() -> None:

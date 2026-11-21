@@ -164,7 +164,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'sieve',
                            'prefix_reference': 'http://www.w3.org/2004/02/skos/core#'}},
      'see_also': ['https://github.com/matentzn/sieve',
                   'https://github.com/sepio-framework/sepio-linkml'],
-     'source_file': '/Users/matentzn/ws/projects/sieve/schema/sieve.yaml',
+     'source_file': 'sieve.yaml',
      'title': 'SIEVE - a SEPIO profile for evidence-based curation of Mondo claims'} )
 
 class ClaimType(str, Enum):
