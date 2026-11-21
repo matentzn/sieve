@@ -44,9 +44,7 @@ nav:
     - Schema Reference: elements/index.md
     - Requirements Traceability: requirements-traceability.md
   - User Guide:
-    - CLI Reference: cli.md
     - Workflows: workflows.md
-    - ORCID Setup: orcid-setup.md
   - Developer Guide:
     - Python API: api.md
     - AI Integration: ai-integration.md

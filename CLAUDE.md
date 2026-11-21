@@ -33,24 +33,20 @@ NEVER required, if you think you need them, it's likely a bad smell that your lo
 - `just format` - Run ruff linting/formatting checks
 - `uv run pytest tests/test_simple.py::test_simple` - Run a specific test
 
-### Running the CLI
-- `uv run sieve --help` - Run the CLI tool with options
-
 ### Documentation
 - `just _serve` - Run local documentation server with mkdocs
 
 ## Project Architecture
 
 ### Core Structure
-- **src/my_awesome_tool/** - Main package containing the CLI and application logic
-  - `cli.py` - Typer-based CLI interface, entry point for the application
+- **schema/** - `sepio_core.yaml` (canonical SEPIO core, unchanged) and `sieve.yaml` (the SIEVE profile)
+- **src/sieve/** - generated Pydantic models, profile checks, inclusion score, traceability
 - **tests/** - Test suite using pytest with parametrized tests
 - **docs/** - MkDocs-managed documentation with Material theme
 
 ### Technology Stack
 - **Python 3.10+** with `uv` for dependency management
 - **LinkML** for data modeling (linkml-runtime)
-- **Typer** for CLI interface
 - **pytest** for testing
 - **mypy** for type checking
 - **ruff** for linting and formatting
@@ -61,10 +57,6 @@ NEVER required, if you think you need them, it's likely a bad smell that your lo
 - `justfile` - Command runner recipes for common development tasks
 - `mkdocs.yml` - Documentation configuration
 - `uv.lock` - Locked dependency versions
-
-## Future Considerations
-
-- **URL routing**: Currently using Streamlit with query params (`?packet=pkt_000001`) for packet URLs. Consider switching to FastAPI + templates for proper REST-style URLs (`/packets/pkt_000001`) if sharing/bookmarking becomes important.
 
 ## Development Workflow
 

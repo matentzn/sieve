@@ -1,27 +1,19 @@
 # Python API Reference
 
-!!! warning "Application modules not yet migrated"
-    `sieve.datamodel`, `sieve.datamodel.codegen`, `sieve.profile_checks` and
-    `sieve.traceability` work with the current profile. `sieve.datamodel.loaders`,
-    `sieve.store`, `sieve.packet_ingest`, `sieve.packet_export` and `sieve.scoring`
-    still target the pre-profile model and fail at import or at run time. They are
-    being migrated (`issues/issue_migrate_app_to_profile.md`). Their signatures are
-    listed below as they are in the source.
-
 For what the model fields mean, see the [Data Model](data-model.md).
 
-| Module | Purpose | Status |
-|--------|---------|--------|
-| `sieve.datamodel` | Generated Pydantic models | current |
-| `sieve.datamodel.codegen` | Generate the models from the schema | current |
-| `sieve.profile_checks` | Profile constraints beyond linkml-validate | current |
-| `sieve.traceability` | Requirement-to-schema traceability | current |
-| `sieve.datamodel.loaders` | Polymorphic packet loading | pre-profile |
-| `sieve.store` | `PacketStore`, DuckDB persistence | pre-profile |
-| `sieve.packet_ingest` | Validate and ingest YAML packets | pre-profile |
-| `sieve.packet_export` | RDF and YAML export | pre-profile |
-| `sieve.scoring` | Net Evidence Ratio | pre-profile |
-| `sieve.auth` | ORCID OAuth and curator authorisation | model-independent |
+| Module | Purpose |
+|--------|---------|
+| `sieve.datamodel` | Generated Pydantic models |
+| `sieve.datamodel.codegen` | Generate the models from the schema |
+| `sieve.packet_items` | Walk the nested evidence items of a packet |
+| `sieve.profile_checks` | Profile constraints beyond linkml-validate |
+| `sieve.inclusion_score` | Reference inclusion score S of a packet |
+| `sieve.traceability` | Requirement-to-schema traceability |
+
+The application layer of the pre-profile model (Streamlit review app, DuckDB store,
+ingest / export, scoring, CLI) was removed on 2026-11-20; it is to be rebuilt on the
+profile.
 
 ---
 
@@ -174,102 +166,3 @@ collect_annotations(sv, key="decisions")["D-063"]            # elements behind d
 
 `just gen-traceability` writes `render_markdown()` to
 `docs/requirements-traceability.md`.
-
----
-
-## sieve.datamodel.loaders (pre-profile)
-
-```python
-def load_packet(path: Path) -> EvidencePacket
-def packet_from_dict(data: dict[str, Any]) -> EvidencePacket
-EVIDENCE_ITEM_TYPES: dict[str, type[BaseModel]]
-```
-
-Dispatched inlined evidence items to their concrete class by `type` before validating.
-It imports classes that no longer exist; `EvidencePacket.model_validate` replaces it.
-
-## sieve.store (pre-profile)
-
-```python
-class PacketStore:
-    def __init__(self, db_path: str = "data/sieve.duckdb")   # ":memory:" for tests
-    def insert_packet(self, packet: EvidencePacket) -> str   # upsert; stores the NER
-    def get_packet(self, packet_id: str) -> EvidencePacket | None
-    def list_packets(self, status: str | None = None) -> list[dict]
-    def get_stats(self) -> dict[str, int]                    # {status: count}
-    def update_status(self, packet_id: str, status: str) -> None
-    def set_item_rating(self, packet_id: str, item_id: str, rating: str) -> None
-    def get_decisions(self, packet_id: str) -> list[dict]    # newest first
-    def record_decision(self, decision: CurationDecision) -> str
-    def close(self) -> None
-```
-
-## sieve.packet_ingest (pre-profile)
-
-```python
-def validate_packet_dict(data: dict[str, Any]) -> list           # [] means valid
-def ingest_packet_file(path: Path, store: PacketStore) -> str
-def ingest_packet_directory(path: Path, store: PacketStore) -> dict[str, Any]
-    # {"files": int, "success": int, "errors": int, "error_details": [...]}
-```
-
-## sieve.packet_export (pre-profile)
-
-```python
-def packet_to_yaml(packet: EvidencePacket) -> str
-def export_packets_to_yaml(packets: list[EvidencePacket], output_path: Path) -> None
-def packet_to_rdf(packet: EvidencePacket, graph: Graph | None = None) -> Graph
-def export_packets_to_rdf(packets, output_path=None, format="turtle") -> str
-def expand_curie(curie: str | None, converter: curies.Converter) -> URIRef | None
-def get_obo_converter() -> curies.Converter
-```
-
-`packet_to_rdf` emitted an `owl:Axiom` for packets with status `ACCEPTED`, `REJECTED` or
-`CONTROVERSIAL` and skipped the rest with a warning.
-
-## sieve.scoring (pre-profile)
-
-```python
-def net_evidence_ratio(packet: EvidencePacket) -> float   # (S+ - S-) / (S+ + S- + S0)
-def line_score(line) -> float     # score, else strong=1.0 / moderate=0.6 / weak=0.3, else 1.0
-```
-
-To be replaced by the inclusion score S of the claim type's `AggregationRule` (see
-[Data Model](data-model.md#the-inclusion-score)).
-
----
-
-## sieve.auth
-
-ORCID OAuth login and curator authorisation for the Streamlit review UI. It does not
-use the data model.
-
-```python
-from sieve.auth import (
-    OrcidUser,                  # dataclass: orcid, name, access_token
-    AuthorizedCurator,          # dataclass: orcid, name, role ("admin"|"curator")
-    is_dev_mode,                # () -> bool  (SIEVE_DEV_MODE=true bypasses auth)
-    is_orcid_configured,        # () -> bool
-    get_orcid_config,           # () -> dict
-    get_authorization_url,      # () -> str
-    exchange_code_for_token,    # (code: str) -> OrcidUser | None
-    load_authorized_curators,   # () -> dict[str, AuthorizedCurator]  (keyed by ORCID)
-    is_authorized_curator,      # (orcid: str | None) -> bool  (True in dev mode)
-    get_curator_role,           # (orcid: str | None) -> str | None
-    is_admin,                   # (orcid: str | None) -> bool  (True in dev mode)
-    get_curator_info,           # () -> tuple[str | None, str | None]  (orcid, name)
-)
-```
-
-Authorised curators are read from `curators.yaml` (path overridable via the
-`CURATORS_FILE` env var), cached for 60 seconds:
-
-```yaml
-curators:
-  - orcid: "0000-0001-2345-6789"
-    name: "Dr. Jane Smith"
-    role: admin
-```
-
-Streamlit-bound helpers (`get_current_user`, `set_current_user`, `logout`,
-`handle_oauth_callback`, `render_login_ui`) require an active Streamlit session.

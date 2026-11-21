@@ -153,8 +153,9 @@ release pipeline).
 
 ## Out of scope / not done
 
-- The application layer (`app.py`, `scoring.py`, `store.py`, loaders, export and
-  ingest, CLI, LinkML-Map transforms) still targets the old model and is broken.
+- No application layer. The pre-profile one (Streamlit app, DuckDB store, loaders,
+  export and ingest, NER scoring, CLI, ORCID login) and the minimal-to-SIEVE transform
+  were removed on 2026-11-20, with their tests and dependencies.
 - Logical definitions as class expressions (C004 uses one statement per
   `intersection_of` element).
 - C009 / C010 predicates use `sieve:` placeholder IRIs.

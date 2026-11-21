@@ -60,14 +60,11 @@ metadata (score, offsets, method) — so the minimal "A" shape stays valid while
 ```mermaid
 flowchart LR
     DM[DisMech record<br/>Fanconi Anemia] -->|"dismech_to_minimal<br/>(linkml-map)"| MIN[minimal<br/>EvidencedClaim]
-    MIN -->|"minimal_to_sieve<br/>(linkml-map, pre-profile)"| SV[sieve<br/>EvidencePacket]
     MIN -. validates .-> MS[(schema/minimal.yaml)]
-    SV -. "fails: pre-profile shape" .-> SS[(schema/sieve.yaml)]
 ```
 
-Both hops are [linkml-map](https://linkml.io/linkml-map/) transformation specs in
-`transform/`. Only the first works today; the second still targets the pre-profile
-SIEVE model. The source shape is a vendored snapshot of DisMech's model
+The transform is a [linkml-map](https://linkml.io/linkml-map/) specification in
+`transform/`. The source shape is a vendored snapshot of DisMech's model
 (`transform/dismech_source.yaml`) so the pipeline runs without the DisMech repo
 checked out.
 
@@ -151,10 +148,8 @@ names. `schema/minimal.yaml` is unchanged: snake_case, standalone, and aligned w
 only through `class_uri` / `slot_uri`. A minimal instance is therefore not a valid SIEVE
 packet, and nothing in `sieve.yaml` refers to `minimal.yaml`.
 
-The second transform (`transform/minimal_to_sieve.transform.yaml`) still emits the
-pre-profile SIEVE shape (`SieveDocument` items, snake_case slots, `status`), which the
-profile rejects, so `just transform-minimal-to-sieve` and `just transform-all` fail at
-their last validation step. How the two schemas should relate again (a sub-profile of
+A second transform, minimal to the pre-profile SIEVE shape, was removed on 2026-11-20.
+How the two schemas should relate again (a sub-profile of
 the core, a transform as the formal bridge, a camelCase standalone kernel, or no
 separate kernel) is open: `issues/issue_minimal_kernel_vs_profile.md`.
 
@@ -180,6 +175,5 @@ See the [Data Model](data-model.md) for the profile.
 | `transform/dismech_source.yaml` | vendored snapshot of the DisMech evidence shape |
 | `transform/dismech_fanconi_input.yaml` | the input Fanconi assertion |
 | `transform/dismech_to_minimal.transform.yaml` | DisMech → minimal transform |
-| `transform/minimal_to_sieve.transform.yaml` | minimal → sieve transform (pre-profile target, currently fails) |
-| `project.justfile` | `transform-dismech`, `transform-minimal-to-sieve`, `transform-all` |
-| `tests/test_transform_dismech.py` | runs the pipeline and validates both outputs (the SIEVE stage currently fails) |
+| `project.justfile` | `transform-dismech` |
+| `tests/test_transform_dismech.py` | runs the transform and validates its output |

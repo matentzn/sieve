@@ -60,12 +60,9 @@ linkml-validate needs dates quoted in YAML (see [Data Model](data-model.md#valid
 The fixtures in `tests/data/profile/valid/` leave dates unquoted, so the CLI rejects
 them as they are; the tests load them with dates kept as strings.
 
-!!! warning "Application layer not yet migrated"
-    The review app, the DuckDB store, ingest, RDF export, scoring and the `sieve` CLI
-    still target the pre-profile model and do not work with the current schema. They
-    are being migrated (`issues/issue_migrate_app_to_profile.md`). The
-    [CLI Reference](cli.md), [Workflows](workflows.md) and [Python API](api.md) pages
-    mark which parts this affects.
+!!! note "No application layer yet"
+    The pre-profile review app, DuckDB store, ingest, RDF export, scoring and `sieve`
+    CLI were removed on 2026-11-20. They are to be rebuilt on the profile.
 
 ## Use cases
 
@@ -80,10 +77,10 @@ them as they are; the tests load them with dates kept as strings.
 - [Primer](primer.md): plain-language introduction to the model
 - [Minimal Evidence Model](monarch-evidence.md): the separate reusable microschema
 - [Data Model](data-model.md): the profile, module by module
-- [Architecture](architecture.md): schema, checks and application components
+- [Architecture](architecture.md): schema, model, checks and traceability
 - [Schema Reference](elements/index.md): generated per-class and per-slot pages
 - [Requirements Traceability](requirements-traceability.md): requirement to schema element
-- [CLI Reference](cli.md) and [Workflows](workflows.md): commands and recipes
+- [Workflows](workflows.md): recipes
 - [Python API](api.md): module and function reference
 - [AI Integration](ai-integration.md): authoring packets as an AI agent
 
@@ -91,7 +88,6 @@ them as they are; the tests load them with dates kept as strings.
 
 - **Python 3.10+**, `uv`, `just`
 - **LinkML** for the schema, validation and the generated Pydantic model
-- **DuckDB**, **Streamlit**, **RDFLib** and **Typer** in the (pre-profile) application layer
 
 ## Contributing
 

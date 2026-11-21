@@ -18,11 +18,10 @@ collection.
 Documentation: <https://matentzn.github.io/sieve> (sources in `docs/`). Design:
 `specs/2026-10-29-sieve-sepio-profile-design.md`.
 
-> **Status.** The schema, the generated Pydantic model, the profile checks and the
-> traceability tooling work. The application layer (Streamlit app, DuckDB store,
-> ingest, RDF export, scoring, the `sieve` CLI and the LinkML-Map transforms) still
-> targets the pre-profile model and is broken. Migration is tracked in
-> `issues/issue_migrate_app_to_profile.md`.
+> **Status.** The repo holds the schema, the generated Pydantic model, the profile
+> checks, the inclusion score and the traceability tooling. The pre-profile application
+> layer (Streamlit app, DuckDB store, ingest, RDF export, scoring, `sieve` CLI) was
+> removed on 2026-11-20 and is to be rebuilt on the profile.
 
 ## Data model
 
@@ -104,9 +103,6 @@ just extract-requirements  # re-extract requirements/mondo_requirements.tsv from
 just test
 ```
 
-`just test` currently also runs the legacy application tests, which fail until the
-migration lands.
-
 ## Requirements traceability
 
 Each schema element that realises a Mondo requirement carries the requirement ID in
@@ -127,15 +123,14 @@ sieve/
 ├── requirements/                 # Mondo requirements TSV + traceability.yaml
 ├── scripts/                      # extract_requirements.py, render_traceability.py
 ├── specs/                        # design specs
-├── transform/                    # linkml-map: dismech → minimal → sieve (second hop pre-profile)
+├── transform/                    # linkml-map: dismech → minimal
 ├── monarch_evidence/             # Monarch evidence modelling: SPEC + corpus + analysis
 ├── src/sieve/
-│   ├── datamodel/                # generated Pydantic models + codegen (loaders.py is pre-profile)
+│   ├── datamodel/                # generated Pydantic models + codegen
+│   ├── packet_items.py           # walk the nested evidence items
 │   ├── profile_checks.py         # profile constraints beyond linkml-validate
-│   ├── traceability.py           # requirement ↔ schema element index and matrix
-│   ├── scoring.py, store.py, packet_ingest.py, packet_export.py,
-│   ├── cli.py, app.py            # application layer (pre-profile, being migrated)
-│   └── auth.py                   # ORCID OAuth
+│   ├── inclusion_score.py        # reference inclusion score S
+│   └── traceability.py           # requirement ↔ schema element index and matrix
 ├── docs/
 └── tests/
     └── data/profile/             # profile example packets and registry

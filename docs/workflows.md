@@ -4,13 +4,6 @@ Recipes for authoring and checking packets against the SIEVE profile, and for ke
 the generated artefacts current. If you are new to the packet shape, read the
 [Primer](primer.md) first; for every field see the [Data Model](data-model.md).
 
-!!! warning "Ingest, review and export target the pre-profile model"
-    Sections 1 to 4 work with the current profile. Sections 5 to 8 (ingest into
-    DuckDB, review in the app, RDF / YAML export, ORCID curators) describe the
-    application layer, which still targets the pre-profile model and does not run
-    against current packets. It is being migrated
-    (`issues/issue_migrate_app_to_profile.md`).
-
 ---
 
 ## 1. Author a packet by hand
@@ -175,70 +168,3 @@ just extract-requirements /path/to/Mondo_Requirements_Collection_Forms.xlsx
 `tests/test_profile_schema.py` and `tests/test_traceability.py` fail if the checked-in
 model or traceability page is stale, if a requirement has no trace entry, or if an
 annotated requirement ID does not exist.
-
----
-
-## 5. Ingest into DuckDB (pre-profile)
-
-`sieve ingest` loaded every `*.yaml` / `*.yml` packet under a directory into DuckDB
-(default `data/sieve.duckdb`), stored its JSON, computed its Net Evidence Ratio, and
-reported per-file errors without aborting the batch:
-
-```bash
-sieve ingest -I inbox/examples/ --db data/sieve.duckdb
-```
-
-Re-ingesting a packet with an existing `id` overwrote it. The command currently fails
-at import.
-
----
-
-## 6. Review in the app (pre-profile)
-
-`sieve run` launches the Streamlit app with **Dashboard**, **Review Queue**,
-**Ingest** and **Export** pages. An authorised curator (ORCID login, manual ORCID
-entry, or `SIEVE_DEV_MODE=true`) could accept or reject individual items and record an
-**Accept / Reject / Controversial** decision, which wrote a `CurationDecision` and set
-the packet's `status`.
-
-In the profile these become a `LineStatusChange` on a line, an `AssertionDecision`
-with route `INDIVIDUAL_SIGN_OFF`, and the statement's `review_state`.
-
----
-
-## 7. Export to RDF and YAML (pre-profile)
-
-`sieve export` read packet files and emitted RDF (`rdf`/`turtle`/`ttl`, `xml`, `n3`,
-`nt`) or combined YAML:
-
-```bash
-sieve export -I exports/accepted/ -O rdf -o accepted.ttl
-sieve export -I packets/ -O yaml -o combined.yaml
-```
-
-Each decided packet became an `owl:Axiom` annotation of the statement, linked back to
-the packet via `SEPIO:0000124`. Undecided packets were skipped with a warning. See
-[cli.md](cli.md#sieve-export) for the options.
-
----
-
-## 8. ORCID auth and curators
-
-Who may record decisions in the app is controlled by ORCID identity plus a
-`curators.yaml` allow-list (path overridable via `CURATORS_FILE`), matched by ORCID
-with or without the `orcid:` prefix:
-
-```yaml
-curators:
-  - orcid: "0000-0001-2345-6789"
-    name: "Dr. Jane Smith"
-    role: admin
-  - orcid: "0000-0002-3456-7890"
-    name: "Dr. John Doe"
-    role: curator
-```
-
-Modes: ORCID OAuth (`ORCID_CLIENT_ID` / `ORCID_CLIENT_SECRET`, optionally
-`ORCID_REDIRECT_URI`, `ORCID_SANDBOX`), manual ORCID entry when OAuth is not
-configured, and `SIEVE_DEV_MODE=true`, which bypasses auth. The file is re-read roughly
-once a minute. See [ORCID Setup](orcid-setup.md).
