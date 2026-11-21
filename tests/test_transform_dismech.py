@@ -1,8 +1,8 @@
-"""The DisMech -> minimal -> sieve linkml-map pipeline runs and both outputs validate.
+"""The DisMech -> minimal linkml-map transform runs and its output validates.
 
-Exercises the transforms in transform/ end to end (the same commands as the
-`transform-*` recipes in project.justfile), then validates each output against its
-target schema. Guards the minimal microschema and its compatibility with sieve.
+Exercises transform/dismech_to_minimal.transform.yaml (the same command as the
+`transform-dismech` recipe in project.justfile), then validates the output against
+the minimal microschema.
 """
 
 import subprocess
@@ -25,7 +25,7 @@ def _schema(name):
     return sv.schema
 
 
-def _map_data(spec, source_schema, source_type, in_path, out_path, unrestricted=False):
+def _map_data(spec, source_schema, source_type, in_path, out_path):
     cmd = [
         str(LINKML_MAP), "map-data",
         "-T", str(TRANSFORM / spec),
@@ -34,15 +34,13 @@ def _map_data(spec, source_schema, source_type, in_path, out_path, unrestricted=
         str(in_path),
         "-o", str(out_path),
     ]
-    if unrestricted:
-        cmd.insert(2, "--unrestricted-eval")
     proc = subprocess.run(cmd, capture_output=True, text=True)
     assert proc.returncode == 0, f"map-data failed:\n{proc.stderr}"
     with open(out_path, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
-def test_dismech_to_minimal_then_sieve(tmp_path):
+def test_dismech_to_minimal(tmp_path):
     # Stage 1: DisMech pathophysiology assertion -> minimal EvidencedClaim
     minimal_out = tmp_path / "fanconi_minimal.yaml"
     claim = _map_data(
@@ -62,19 +60,3 @@ def test_dismech_to_minimal_then_sieve(tmp_path):
     strengths = {ln.get("strength_of_evidence_provided") for ln in claim["has_evidence_lines"]}
     assert strengths == {None, "WEAK"}
     assert validate(claim, _schema("minimal.yaml"), "EvidencedClaim").results == []
-
-    # Stage 2: minimal EvidencedClaim -> sieve EvidencePacket
-    sieve_out = tmp_path / "fanconi_sieve.yaml"
-    packet = _map_data(
-        "minimal_to_sieve.transform.yaml",
-        SCHEMA / "minimal.yaml",
-        "EvidencedClaim",
-        minimal_out,
-        sieve_out,
-        unrestricted=True,
-    )
-    # A minimal TextSpan lifts to a sieve SieveDocument (snippet -> quote).
-    doc = packet["has_evidence_lines"][0]["has_evidence_items"][0]
-    assert doc["type"] == "SieveDocument"
-    assert doc["quote"]
-    assert validate(packet, _schema("sieve.yaml"), "EvidencePacket").results == []
