@@ -36,9 +36,12 @@ deck-pdf:
 # Generates the per-class/slot markdown reference the "Schema Reference" nav section
 # serves. Output (docs/elements/) is gitignored and regenerated on build/deploy.
 
-# Generate the LinkML schema reference into docs/elements/.
+# Generate the LinkML schema reference into docs/elements/. Classes, slots, enums and
+# types go in separate subfolders, so pages that differ only by case (slot
+# `aggregation_rule`, class `AggregationRule`) do not overwrite each other on macOS.
 gen-docs:
-    uv run gen-doc -d docs/elements schema/sieve.yaml
+    rm -rf docs/elements/*
+    uv run gen-doc --subfolder-type-separation -d docs/elements schema/sieve.yaml
     @echo "Schema reference generated in docs/elements/ (from schema/sieve.yaml)"
 
 # Serve the docs locally with a freshly generated schema reference.
