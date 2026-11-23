@@ -407,17 +407,6 @@
 
 
 
-      TermExistenceStatement : groundings
-
-
-
-
-
-        TermExistenceStatement --&gt; "*" ResolutionChain : groundings
-        click ResolutionChain href "../../classes/ResolutionChain/"
-
-
-
       TermExistenceStatement : has_evidence
 
 
@@ -570,6 +559,17 @@
 
 
 
+      TermExistenceStatement : resolution_chains
+
+
+
+
+
+        TermExistenceStatement --&gt; "*" ResolutionChain : resolution_chains
+        click ResolutionChain href "../../classes/ResolutionChain/"
+
+
+
       TermExistenceStatement : resource
 
 
@@ -715,7 +715,7 @@
 <td><a href="../SieveStatement/">SieveStatement</a></td>
 </tr>
 <tr>
-<td><a href="../../slots/groundings/">groundings</a></td>
+<td><a href="../../slots/resolution_chains/">resolution_chains</a></td>
 <td>* <br/> <a href="../ResolutionChain/">ResolutionChain</a></td>
 <td>For a prior claim made in a source's own identifiers, one resolution chain pe...</td>
 <td><a href="../SieveStatement/">SieveStatement</a></td>
@@ -1224,8 +1224,8 @@
 <a href="#__codelineno-1-160" id="__codelineno-1-160" name="__codelineno-1-160"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
 <a href="#__codelineno-1-161" id="__codelineno-1-161" name="__codelineno-1-161"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveStatement</span>
 <a href="#__codelineno-1-162" id="__codelineno-1-162" name="__codelineno-1-162"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ProposingChannel</span>
-<a href="#__codelineno-1-163" id="__codelineno-1-163" name="__codelineno-1-163"></a><span class="w">  </span><span class="nt">groundings</span><span class="p">:</span>
-<a href="#__codelineno-1-164" id="__codelineno-1-164" name="__codelineno-1-164"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">groundings</span>
+<a href="#__codelineno-1-163" id="__codelineno-1-163" name="__codelineno-1-163"></a><span class="w">  </span><span class="nt">resolution_chains</span><span class="p">:</span>
+<a href="#__codelineno-1-164" id="__codelineno-1-164" name="__codelineno-1-164"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">resolution_chains</span>
 <a href="#__codelineno-1-165" id="__codelineno-1-165" name="__codelineno-1-165"></a><span class="w">    </span><span class="nt">annotations</span><span class="p">:</span>
 <a href="#__codelineno-1-166" id="__codelineno-1-166" name="__codelineno-1-166"></a><span class="w">      </span><span class="nt">requirements</span><span class="p">:</span>
 <a href="#__codelineno-1-167" id="__codelineno-1-167" name="__codelineno-1-167"></a><span class="w">        </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">requirements</span>
@@ -1234,14 +1234,14 @@
 <a href="#__codelineno-1-170" id="__codelineno-1-170" name="__codelineno-1-170"></a><span class="w">        </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">decisions</span>
 <a href="#__codelineno-1-171" id="__codelineno-1-171" name="__codelineno-1-171"></a><span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">D-061</span>
 <a href="#__codelineno-1-172" id="__codelineno-1-172" name="__codelineno-1-172"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">For a prior claim made in a source's own identifiers, one resolution</span>
-<a href="#__codelineno-1-173" id="__codelineno-1-173" name="__codelineno-1-173"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">chain per grounded entity slot, with a frozen copy of the mapping it used.</span>
-<a href="#__codelineno-1-174" id="__codelineno-1-174" name="__codelineno-1-174"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
-<a href="#__codelineno-1-175" id="__codelineno-1-175" name="__codelineno-1-175"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-<a href="#__codelineno-1-176" id="__codelineno-1-176" name="__codelineno-1-176"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">groundings</span>
-<a href="#__codelineno-1-177" id="__codelineno-1-177" name="__codelineno-1-177"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TermExistenceStatement</span>
-<a href="#__codelineno-1-178" id="__codelineno-1-178" name="__codelineno-1-178"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
-<a href="#__codelineno-1-179" id="__codelineno-1-179" name="__codelineno-1-179"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveStatement</span>
-<a href="#__codelineno-1-180" id="__codelineno-1-180" name="__codelineno-1-180"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TextPassage</span>
+<a href="#__codelineno-1-173" id="__codelineno-1-173" name="__codelineno-1-173"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping</span>
+<a href="#__codelineno-1-174" id="__codelineno-1-174" name="__codelineno-1-174"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.</span>
+<a href="#__codelineno-1-175" id="__codelineno-1-175" name="__codelineno-1-175"></a><span class="w">    </span><span class="nt">from_schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://w3id.org/sieve</span>
+<a href="#__codelineno-1-176" id="__codelineno-1-176" name="__codelineno-1-176"></a><span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<a href="#__codelineno-1-177" id="__codelineno-1-177" name="__codelineno-1-177"></a><span class="w">    </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">resolution_chains</span>
+<a href="#__codelineno-1-178" id="__codelineno-1-178" name="__codelineno-1-178"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TermExistenceStatement</span>
+<a href="#__codelineno-1-179" id="__codelineno-1-179" name="__codelineno-1-179"></a><span class="w">    </span><span class="nt">domain_of</span><span class="p">:</span>
+<a href="#__codelineno-1-180" id="__codelineno-1-180" name="__codelineno-1-180"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SieveStatement</span>
 <a href="#__codelineno-1-181" id="__codelineno-1-181" name="__codelineno-1-181"></a><span class="w">    </span><span class="nt">range</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ResolutionChain</span>
 <a href="#__codelineno-1-182" id="__codelineno-1-182" name="__codelineno-1-182"></a><span class="w">    </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <a href="#__codelineno-1-183" id="__codelineno-1-183" name="__codelineno-1-183"></a><span class="w">    </span><span class="nt">inlined</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>

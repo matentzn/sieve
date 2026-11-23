@@ -805,7 +805,7 @@ evidence line, or in <code>statement.origin</code>.</p>
 <tr>
 <td>any claim type (e.g. <code>SubclassStatement</code>)</td>
 <td>Statement</td>
-<td>A prior claim a source makes, in its own identifiers (<code>DOID:14250 is_a DOID:630</code>), typed by what it claims, never by its role. <code>reported_in</code> nests the record; <code>groundings</code> records how each id was resolved to Mondo; <code>own_log_odds</code> is set when a competing-claim line cites it (D-069).</td>
+<td>A prior claim a source makes, in its own identifiers (<code>DOID:14250 is_a DOID:630</code>), typed by what it claims, never by its role. <code>reported_in</code> nests the record; <code>resolution_chains</code> records how each id was mapped to Mondo (NORMALIZATION steps; GROUNDING is for strings, as in a passage's <code>groundings</code>); <code>own_log_odds</code> is set when a competing-claim line cites it (D-069).</td>
 </tr>
 <tr>
 <td><code>TextPassage</code></td>
@@ -989,7 +989,7 @@ and why. That is also where a reviewer's verdict on an AI's line goes.</p>
 <tr>
 <td><code>ResolutionChain</code></td>
 <td>Activity</td>
-<td>How a source id or mention was resolved to the target id: ordered <code>steps</code> for one <code>entity_slot</code>, with <code>chain_confidence</code>.</td>
+<td>How a source id or mention was resolved to the target id: ordered <code>steps</code> for one <code>entity_slot</code>, with <code>chain_confidence</code>. A mention is grounded (string to id); a source id is normalized (id to id).</td>
 </tr>
 <tr>
 <td><code>AlignmentStep</code></td>
