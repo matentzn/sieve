@@ -33,14 +33,14 @@ statement:
                 retrieved_from: infores:icd10cm
                 retrieval_date: "2024-01-20"
           resource: infores:icd10cm
-          groundings:
+          resolution_chains:
             - id: sieve:chain/icd10cm-J45
               type: ResolutionChain
               entity_slot: subject
               steps:
                 - id: sieve:step/icd10cm-J45-1
                   type: AlignmentStep
-                  category: GROUNDING
+                  category: NORMALIZATION
                   method: STRUCTURED_FIELD
                   input_value: ICD10CM:J45
                   output_value: MONDO:0004979
@@ -78,14 +78,14 @@ statement:
                 retrieved_from: infores:disease-ontology
                 retrieval_date: "2024-01-20"
           resource: infores:disease-ontology
-          groundings:
+          resolution_chains:
             - id: sieve:chain/doid-2841
               type: ResolutionChain
               entity_slot: subject
               steps:
                 - id: sieve:step/doid-2841-1
                   type: AlignmentStep
-                  category: GROUNDING
+                  category: NORMALIZATION
                   method: STRUCTURED_FIELD
                   input_value: DOID:2841
                   output_value: MONDO:0004979

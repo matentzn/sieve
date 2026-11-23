@@ -107,14 +107,14 @@ statement:
                 retrieved_from: sieve:resource/snomedct
                 retrieval_date: "2024-04-22"
           resource: sieve:resource/snomedct
-          groundings:
+          resolution_chains:
             - id: sieve:chain/sctid-24693007
               type: ResolutionChain
               entity_slot: subject
               steps:
                 - id: sieve:step/sctid-24693007-1
                   type: AlignmentStep
-                  category: GROUNDING
+                  category: NORMALIZATION
                   method: STRUCTURED_FIELD
                   input_value: SCTID:24693007
                   output_value: MONDO:0005546

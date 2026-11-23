@@ -65,14 +65,14 @@ statement:
                 retrieved_from: infores:omim
                 source_release: sieve:release/omim-2026-10-01
                 retrieval_date: "2026-10-02"
-          groundings:
+          resolution_chains:
             - id: sieve:chain/omim-609541
               type: ResolutionChain
               entity_slot: subject
               steps:
                 - id: sieve:step/omim-609541-1
                   type: AlignmentStep
-                  category: GROUNDING
+                  category: NORMALIZATION
                   method: SOURCE_ASSERTED
                   input_value: OMIM:609541
                   output_value: MONDO:0012297
@@ -198,14 +198,14 @@ statement:
                     retrieved_from: infores:omim
                     source_release: sieve:release/omim-2026-10-01
                     retrieval_date: "2026-10-02"
-              groundings:
+              resolution_chains:
                 - id: sieve:chain/omim-609541
                   type: ResolutionChain
                   entity_slot: subject
                   steps:
                     - id: sieve:step/omim-609541-1
                       type: AlignmentStep
-                      category: GROUNDING
+                      category: NORMALIZATION
                       method: SOURCE_ASSERTED
                       input_value: OMIM:609541
                       output_value: MONDO:0012297

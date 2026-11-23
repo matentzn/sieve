@@ -178,6 +178,29 @@ def test_resolution_chain_is_contiguous(c007):
     assert "CHAIN_CONTIGUITY" in _codes(c007, "ERROR")
 
 
+def test_prior_claim_chain_is_contiguous(c005):
+    """PROV.SA.EXECUTION: the prior claim's resolution chains are checked too."""
+    chain = find_item(c005, "sieve:ca/doid-14250-isa-630")["resolution_chains"][0]
+    chain["steps"].append({**chain["steps"][0], "id": "sieve:step/x", "input_value": "MONDO:0000001"})
+    assert "CHAIN_CONTIGUITY" in _codes(c005, "ERROR")
+
+
+def test_grounding_reads_a_string(c005):
+    """PROV.SA.METHOD_TYPES: grounding resolves a string; an id-to-id step is normalization."""
+    step = find_item(c005, "sieve:ca/doid-14250-isa-630")["resolution_chains"][0]["steps"][0]
+    assert step["category"] == "NORMALIZATION"
+    assert "GROUNDING_INPUT_IS_ID" not in _codes(c005)
+    step["category"] = "GROUNDING"
+    assert "GROUNDING_INPUT_IS_ID" in _codes(c005, "ERROR")
+
+
+def test_grounding_of_a_mention_passes(c007):
+    """A string-to-id grounding (the gene symbol "CFTR" to HGNC:1884) is fine."""
+    steps = find_item(c007, "sieve:tp/pmid-20301428-1")["groundings"][0]["steps"]
+    assert [s["category"] for s in steps] == ["EXTRACTION", "GROUNDING"]
+    assert "GROUNDING_INPUT_IS_ID" not in _codes(c007)
+
+
 def test_superseded_line_must_be_invalidated(c005):
     """EINT.FLAT_COLLAPSE / D-052: corrections are new lines; the old one is invalidated."""
     lines = c005["statement"]["has_evidence_lines"]

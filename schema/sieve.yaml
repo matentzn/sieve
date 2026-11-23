@@ -375,13 +375,14 @@ classes:
         annotations:
           requirements: PROV.RETRIEVAL.AGENT
           decisions: D-063
-      groundings:
+      resolution_chains:
         range: ResolutionChain
         multivalued: true
         inlined_as_list: true
         description: >-
           For a prior claim made in a source's own identifiers, one resolution chain per
-          grounded entity slot, with a frozen copy of the mapping it used.
+          resolved entity slot, with a frozen copy of the mapping it used. Mapping a
+          source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.
         annotations:
           requirements: PROV.SA.EXECUTION EI.PRIOR_CLAIM.DIRECT_STRUCTURED
           decisions: D-061
@@ -917,7 +918,9 @@ classes:
         range: ResolutionChain
         multivalued: true
         inlined_as_list: true
-        description: Grounding of the passage's mentions to Mondo / HGNC / ... ids.
+        description: >-
+          Grounding of the passage's mentions (strings) to Mondo / HGNC / ... ids, one
+          resolution chain per mention.
         annotations:
           requirements: PROV.SA.EXECUTION
           decisions: D-061
@@ -1758,8 +1761,10 @@ classes:
     description: >-
       How a source mention or id was resolved to the target id: an ordered,
       contiguous chain of alignment steps (MeDIC model). It covers text-to-structure,
-      term-to-term and source ingest. Chain confidence is the product of the step
-      confidences. It is data quality, never evidence strength.
+      term-to-term and source ingest. A chain from a mention has a GROUNDING step
+      (string to id); a chain from a source id has NORMALIZATION steps (id to id).
+      Chain confidence is the product of the step confidences. It is data quality,
+      never evidence strength.
     annotations:
       requirements: PROV.SA.EXECUTION PROV.SA.DATE PROV.SA.METHODS
       decisions: D-061 D-062
@@ -1777,7 +1782,7 @@ classes:
       entity_slot:
         range: EntitySlot
         required: true
-        description: Which entity of the assertion this chain grounds.
+        description: Which entity of the assertion this chain resolves.
       steps:
         range: AlignmentStep
         multivalued: true
@@ -1799,7 +1804,9 @@ classes:
   AlignmentStep:
     is_a: Activity
     description: >-
-      One extraction, translation, grounding or normalisation step. It records its
+      One extraction, translation, grounding or normalisation step. Grounding
+      resolves a string to an id; normalisation maps an id to another id (for
+      example a source CURIE to a Mondo CURIE through a mapping set). It records its
       input and output value, method, agent, rules applied, quality category,
       confidence with basis, and review status. Reviewing a step answers "did the
       machine read and link correctly?". That is separate from reviewing the claim.
@@ -1843,7 +1850,9 @@ classes:
           requirements: PROV.SA.EXECUTION
       predicate:
         range: uriorcurie
-        description: Mapping predicate of a grounding / normalisation step (e.g. skos:exactMatch).
+        description: >-
+          Mapping predicate of a grounding or normalisation step (e.g. skos:exactMatch).
+          An id-to-id mapping from a mapping set is a normalisation step.
       mapping_justification:
         range: uriorcurie
         description: SSSOM / semapv mapping justification.
@@ -2336,7 +2345,9 @@ enums:
       EXTRACTION:
       TRANSLATION:
       GROUNDING:
+        description: Resolve a string (a mention or label) to an id. The input is never an id (profile check).
       NORMALIZATION:
+        description: Map an id to another id, e.g. a source CURIE to a Mondo CURIE through a mapping set.
 
   TransformationMethod:
     description: MeDIC TransformationMethod (provisional).

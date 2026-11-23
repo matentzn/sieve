@@ -507,7 +507,13 @@ class TransformationCategory(str, Enum):
     EXTRACTION = "EXTRACTION"
     TRANSLATION = "TRANSLATION"
     GROUNDING = "GROUNDING"
+    """
+    Resolve a string (a mention or label) to an id. The input is never an id (profile check).
+    """
     NORMALIZATION = "NORMALIZATION"
+    """
+    Map an id to another id, e.g. a source CURIE to a Mondo CURIE through a mapping set.
+    """
 
 
 class TransformationMethod(str, Enum):
@@ -3802,11 +3808,11 @@ class SieveStatement(UpstreamItem, EvidenceItem, Statement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -4231,11 +4237,11 @@ class TermExistenceStatement(SieveStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -4651,11 +4657,11 @@ class DefinitionStatement(SieveStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -5074,11 +5080,11 @@ class SynonymStatement(SieveStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -5496,11 +5502,11 @@ class SubclassStatement(SieveStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -5915,11 +5921,11 @@ class NegativeSubclassStatement(SubclassStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -6355,11 +6361,11 @@ class MappingStatement(SieveStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -6778,11 +6784,11 @@ class DiseaseAttributeStatement(SieveStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -7199,11 +7205,11 @@ class SubsetMembershipStatement(SieveStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -7621,11 +7627,11 @@ class MetaclassStatement(SieveStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -8042,11 +8048,11 @@ class ValueSetMembershipStatement(SieveStatement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.RETRIEVAL.AGENT'}},
          'domain_of': ['SieveStatement']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per grounded entity slot, with a frozen copy of the mapping it used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    resolution_chains: Optional[list[ResolutionChain]] = Field(default=[], description="""For a prior claim made in a source's own identifiers, one resolution chain per resolved entity slot, with a frozen copy of the mapping it used. Mapping a source id to a Mondo id is a NORMALIZATION step, not a GROUNDING step.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION '
                                                    'EI.PRIOR_CLAIM.DIRECT_STRUCTURED'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['SieveStatement']} })
     own_log_odds: Optional[float] = Field(default=None, description="""The claim's log-odds L from its own evidence only, frozen at this packet version. Set on a prior claim that a competing-claim line cites (D-069); never its contested score.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-069'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'EINT.CONTRADICTION'}},
@@ -9042,10 +9048,10 @@ class TextPassage(EvidenceItem, Statement):
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.EI.EXECUTION'}},
          'domain_of': ['TextPassage']} })
-    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""Grounding of the passage's mentions to Mondo / HGNC / ... ids.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
+    groundings: Optional[list[ResolutionChain]] = Field(default=[], description="""Grounding of the passage's mentions (strings) to Mondo / HGNC / ... ids, one resolution chain per mention.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION'}},
-         'domain_of': ['SieveStatement', 'TextPassage']} })
+         'domain_of': ['TextPassage']} })
     id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Entity', 'EvidenceItem']} })
     statement_text: str = Field(default=..., description="""The verbatim quote.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-050'},
                          'requirements': {'tag': 'requirements',
@@ -11912,7 +11918,7 @@ class OriginEvent(Activity):
 
 class ResolutionChain(Activity):
     """
-    How a source mention or id was resolved to the target id: an ordered, contiguous chain of alignment steps (MeDIC model). It covers text-to-structure, term-to-term and source ingest. Chain confidence is the product of the step confidences. It is data quality, never evidence strength.
+    How a source mention or id was resolved to the target id: an ordered, contiguous chain of alignment steps (MeDIC model). It covers text-to-structure, term-to-term and source ingest. A chain from a mention has a GROUNDING step (string to id); a chain from a source id has NORMALIZATION steps (id to id). Chain confidence is the product of the step confidences. It is data quality, never evidence strength.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061 D-062'},
                          'requirements': {'tag': 'requirements',
@@ -11931,7 +11937,7 @@ class ResolutionChain(Activity):
                                          'name': 'specified_by',
                                          'range': 'SieveMethod'}}})
 
-    entity_slot: EntitySlot = Field(default=..., description="""Which entity of the assertion this chain grounds.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ResolutionChain']} })
+    entity_slot: EntitySlot = Field(default=..., description="""Which entity of the assertion this chain resolves.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ResolutionChain']} })
     steps: list[AlignmentStep] = Field(default=..., description="""Ordered steps; step n's output is step n+1's input (profile check).""", json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION'}},
          'domain_of': ['ResolutionChain']} })
@@ -12004,7 +12010,7 @@ class ResolutionChain(Activity):
 
 class AlignmentStep(Activity):
     """
-    One extraction, translation, grounding or normalisation step. It records its input and output value, method, agent, rules applied, quality category, confidence with basis, and review status. Reviewing a step answers \"did the machine read and link correctly?\". That is separate from reviewing the claim.
+    One extraction, translation, grounding or normalisation step. Grounding resolves a string to an id; normalisation maps an id to another id (for example a source CURIE to a Mondo CURIE through a mapping set). It records its input and output value, method, agent, rules applied, quality category, confidence with basis, and review status. Reviewing a step answers \"did the machine read and link correctly?\". That is separate from reviewing the claim.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061 D-062'},
                          'requirements': {'tag': 'requirements',
@@ -12049,7 +12055,7 @@ class AlignmentStep(Activity):
     output_value: str = Field(default=..., json_schema_extra = { "linkml_meta": {'annotations': {'requirements': {'tag': 'requirements',
                                           'value': 'PROV.SA.EXECUTION'}},
          'domain_of': ['AlignmentStep']} })
-    predicate: Optional[str] = Field(default=None, description="""Mapping predicate of a grounding / normalisation step (e.g. skos:exactMatch).""", json_schema_extra = { "linkml_meta": {'domain_of': ['Statement', 'Proposition', 'AlignmentStep']} })
+    predicate: Optional[str] = Field(default=None, description="""Mapping predicate of a grounding or normalisation step (e.g. skos:exactMatch). An id-to-id mapping from a mapping set is a normalisation step.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Statement', 'Proposition', 'AlignmentStep']} })
     mapping_justification: Optional[str] = Field(default=None, description="""SSSOM / semapv mapping justification.""", json_schema_extra = { "linkml_meta": {'domain_of': ['AlignmentStep']} })
     mapping_set: Optional[str] = Field(default=None, description="""The mapping set the step used.""", json_schema_extra = { "linkml_meta": {'annotations': {'decisions': {'tag': 'decisions', 'value': 'D-061'},
                          'requirements': {'tag': 'requirements',

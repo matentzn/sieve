@@ -39,7 +39,7 @@ statement:
                 retrieval_date: "2026-09-15"
                 source_label: Down syndrome
           resource: infores:disease-ontology
-          groundings:
+          resolution_chains:
             - id: sieve:chain/doid-14250
               type: ResolutionChain
               entity_slot: subject
@@ -48,14 +48,14 @@ statement:
               steps:
                 - id: sieve:step/doid-14250-1
                   type: AlignmentStep
-                  category: GROUNDING
+                  category: NORMALIZATION
                   method: STRUCTURED_FIELD
                   input_value: DOID:14250
                   output_value: MONDO:0008608
                   predicate: skos:exactMatch
                   mapping_set: http://purl.obolibrary.org/obo/mondo/mappings/mondo.sssom.tsv
                   mapping_set_version: "2026-10-01"
-                  quality_category: grounding_curated
+                  quality_category: normalization_curated
                   confidence: 1.0
                   confidence_basis: DETERMINISTIC
                   review_status: CONFIRMED

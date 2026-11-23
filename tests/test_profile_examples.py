@@ -108,7 +108,7 @@ def test_line_confidence_needs_basis(validator, c005):
 
 def test_step_confidence_needs_basis(validator, c005):
     claim = find_item(c005, "sieve:ca/doid-14250-isa-630")
-    del claim["groundings"][0]["steps"][0]["confidence_basis"]
+    del claim["resolution_chains"][0]["steps"][0]["confidence_basis"]
     assert _errors(validator, c005)
     # Nested items are polymorphic; validate against the concrete type for the reason.
     assert any("confidence_basis" in e for e in _errors(validator, claim, claim["type"]))

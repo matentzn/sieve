@@ -9,7 +9,8 @@ Coding, follow references between packet objects, or depend on the claim type:
 - nested evidence: copies of an item share its id and must be identical, and the
   links that stay ids (supersedes, derived_from, ...) resolve inside the packet;
 - read coverage on document-based lines, methods on AI and rule-based lines;
-- resolution-chain contiguity, supersession, blind approvals;
+- resolution-chain contiguity, grounding steps that read an id, supersession,
+  blind approvals;
 - competing claims (D-069): one disputing line per claim, only for exclusive claim
   types, and never an automated acceptance while it is live;
 - self-containment (D-051) and unknown human agents;
@@ -19,6 +20,7 @@ Every issue names the requirement it enforces, so a failure can be traced back t
 the requirements workbook.
 """
 
+import re
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any, Iterator, Literal
@@ -210,14 +212,36 @@ def _check_id_links(packet: dict, items: dict[str, dict]) -> Iterator[Issue]:
             yield Issue("ERROR", "DANGLING_REFERENCE", f"{where}: {ref} is not an item or line in the packet", "EINT.REQUIRED")
 
 
+CURIE = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]*:\S+$")
+
+
+def is_curie(value: str) -> bool:
+    """True when ``value`` reads as a CURIE (prefix, colon, local id, no spaces).
+
+    >>> is_curie("OMIM:609541"), is_curie("CFTR"), is_curie("type 2 diabetes mellitus")
+    (True, False, False)
+    """
+    return bool(CURIE.match(value))
+
+
 def _chains(items: dict[str, dict]) -> Iterator[dict]:
+    """Passage chains (``groundings``) and prior-claim chains (``resolution_chains``)."""
     for item in items.values():
         yield from item.get("groundings") or []
+        yield from item.get("resolution_chains") or []
 
 
 def _check_chains(items: dict[str, dict]) -> Iterator[Issue]:
     for chain in _chains(items):
         steps = chain.get("steps") or []
+        for step in steps:
+            if step["category"] == "GROUNDING" and is_curie(str(step["input_value"])):
+                yield Issue(
+                    "ERROR",
+                    "GROUNDING_INPUT_IS_ID",
+                    f"{step['id']}: grounding reads a string, but {step['input_value']!r} is an id (use NORMALIZATION)",
+                    "PROV.SA.METHOD_TYPES",
+                )
         for before, after in zip(steps, steps[1:]):
             if before["output_value"] != after["input_value"]:
                 yield Issue(

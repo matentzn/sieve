@@ -168,7 +168,7 @@ sepio_monarch:
                   retrieved_from: infores:omim
                   retrieval_date: "2026-03-18"  # packet creation date; mondo-ai records no release
             resource: infores:omim
-            groundings:
+            resolution_chains:
               - id: sieve:chain/omim-620763
                 type: ResolutionChain
                 entity_slot: subject
@@ -177,7 +177,7 @@ sepio_monarch:
                 steps:
                   - id: sieve:step/omim-620763-1
                     type: AlignmentStep
-                    category: GROUNDING
+                    category: NORMALIZATION
                     method: STRUCTURED_FIELD
                     input_value: OMIM:620763
                     output_value: MONDO:0010425
@@ -196,9 +196,9 @@ sepio_monarch:
             specified_by: [sieve:method/mondo-ai-concordance]
             read_coverage: STRUCTURED_RECORD
         _note: >-
-          mondo-ai labels this grounding EXACT_MATCH_LOW_CONFIDENCE (subject_normalization).
+          mondo-ai labels this normalization EXACT_MATCH_LOW_CONFIDENCE (subject_normalization).
           The profile has no AlignmentQuality value for it, and no number was emitted, so the
-          chain step carries no confidence. See gaps.grounding_quality_label_has_no_value.
+          chain step carries no confidence. See gaps.normalization_quality_label_has_no_value.
       - id: el_ordo_29022
         type: SieveEvidenceLine
         has_evidence_items:
@@ -218,7 +218,7 @@ sepio_monarch:
                   retrieved_from: infores:orphanet
                   retrieval_date: "2026-03-18"
             resource: infores:orphanet
-            groundings:
+            resolution_chains:
               - id: sieve:chain/orphanet-98955
                 type: ResolutionChain
                 entity_slot: subject
@@ -227,7 +227,7 @@ sepio_monarch:
                 steps:
                   - id: sieve:step/orphanet-98955-1
                     type: AlignmentStep
-                    category: GROUNDING
+                    category: NORMALIZATION
                     method: STRUCTURED_FIELD
                     input_value: Orphanet:98955
                     output_value: MONDO:0010425
@@ -264,7 +264,7 @@ sepio_monarch:
                   retrieved_from: infores:disease-ontology
                   retrieval_date: "2026-03-18"
             resource: infores:disease-ontology
-            groundings:
+            resolution_chains:
               - id: sieve:chain/doid-0060450
                 type: ResolutionChain
                 entity_slot: subject
@@ -273,7 +273,7 @@ sepio_monarch:
                 steps:
                   - id: sieve:step/doid-0060450-1
                     type: AlignmentStep
-                    category: GROUNDING
+                    category: NORMALIZATION
                     method: STRUCTURED_FIELD
                     input_value: DOID:0060450
                     output_value: MONDO:0010425
@@ -362,14 +362,14 @@ gaps:
   concordance_is_not_a_text_span: >-
     ADDRESSED: a prior claim typed by what it claims, here a SynonymStatement (the source's own SPO, reported_in the ExternalRecord, with
     resource) + ExternalRecord (label as read, resource, record_metadata) + one ResolutionChain
-    per grounded slot (SieveStatement.groundings, AlignmentStep with predicate and
+    per resolved slot (SieveStatement.resolution_chains, AlignmentStep with predicate and
     mapping_set). The SynonymStatement matrix permits structured prior claims; no quote is invented.
   no_curation_state_used: >-
     OPEN (data, not model). All packets are NOT_VERIFIED with no AssertionDecision. The profile
     now offers the routes that would clear 160k synonyms without 160k sign-offs
     (DELEGATED_POLICY under a DecisionPolicy, BATCH_SIGN_OFF with a BatchSignOff), but none has
     been exercised.
-  grounding_quality_label_has_no_value: >-
+  normalization_quality_label_has_no_value: >-
     NEW. mondo-ai's subject_normalization EXACT_MATCH_LOW_CONFIDENCE (on the OMIM line only) has
     no AlignmentQuality value and no confidence number, so the chain step carries neither
     quality_category nor confidence. Either AlignmentQuality needs a "low-confidence exact" value

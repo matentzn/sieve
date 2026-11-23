@@ -143,7 +143,7 @@ evidence line, or in `statement.origin`.
 | Class | Core parent | What it is |
 |---|---|---|
 | `ExternalRecord` | InformationEntity | A record in an external database or terminology (`DOID:14250`, `OMIM:219700`), as read from a release. Requires `resource` and `record_metadata`; `obsolete_in_source` flags obsolete records. |
-| any claim type (e.g. `SubclassStatement`) | Statement | A prior claim a source makes, in its own identifiers (`DOID:14250 is_a DOID:630`), typed by what it claims, never by its role. `reported_in` nests the record; `groundings` records how each id was resolved to Mondo; `own_log_odds` is set when a competing-claim line cites it (D-069). |
+| any claim type (e.g. `SubclassStatement`) | Statement | A prior claim a source makes, in its own identifiers (`DOID:14250 is_a DOID:630`), typed by what it claims, never by its role. `reported_in` nests the record; `resolution_chains` records how each id was mapped to Mondo (NORMALIZATION steps; GROUNDING is for strings, as in a passage's `groundings`); `own_log_odds` is set when a competing-claim line cites it (D-069). |
 | `TextPassage` | Statement | A verbatim passage (`statement_text`) from a document, nested under `reported_in`; `derived_from` names the same document by id. Created in the Mondo ecosystem, so it requires its extraction `contributions` and a `quote_verification` outcome. |
 | `Publication` | Document | A PMID, DOI or ISBN. Publications sharing a `reports_study` key are not independent. |
 | `WebPage` | Document | A non-scholarly page (GARD, MedlinePlus, Wikipedia). GitHub issues are not web-page evidence: they go in a contribution's `context`. |
@@ -201,7 +201,7 @@ and why. That is also where a reviewer's verdict on an AI's line goes.
 | `InterpretationActivity` | SieveContribution | The act behind a line: `date`, `method_type`, `read_coverage`, `access_status`, and the checks an AI act records (`identifier_verified`, `grounding_checked`, `sought_disputing_evidence`, `reasoning_trace`). |
 | `AssertionDecision` | SieveContribution | The decision on the claim (see [below](#two-levels-of-judgement)). |
 | `OriginEvent` | Activity | How the claim entered Mondo: `derivation_type` (`CLONED_FROM`, `COPIED_FROM`, `INSPIRED_BY`), `source_item`, `source_label`, `source_release`, pipeline and date. |
-| `ResolutionChain` | Activity | How a source id or mention was resolved to the target id: ordered `steps` for one `entity_slot`, with `chain_confidence`. |
+| `ResolutionChain` | Activity | How a source id or mention was resolved to the target id: ordered `steps` for one `entity_slot`, with `chain_confidence`. A mention is grounded (string to id); a source id is normalized (id to id). |
 | `AlignmentStep` | Activity | One extraction, translation, grounding or normalisation step: `input_value`, `output_value`, `method`, `quality_category`, `confidence` + basis, mapping set and version, `review_status`. |
 
 ### Record metadata

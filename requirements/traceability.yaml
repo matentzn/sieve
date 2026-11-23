@@ -256,8 +256,8 @@ requirements:
       A prior claim is an ordinary claim-type Statement (a DOID subclass assertion is a
       SubclassStatement), nested in the line that cites it: the source's own SPO in its
       own terms, with its ExternalRecord nested under reported_in, plus one
-      ResolutionChain per grounded entity
-      (D-061). Its type says what it claims, never its role: support, dispute or
+      ResolutionChain per resolved entity in resolution_chains, whose steps map the
+      source id to Mondo by NORMALIZATION (D-061). Its type says what it claims, never its role: support, dispute or
       competition is set by the line that cites it (D-033, D-069). Source relation
       qualifiers are deliberately absent (D-005).
   EI.PRIOR_CLAIM.SUPPORTING_TEXT: {module: evidence-item, disposition: not_desired, rationale: Not used.}

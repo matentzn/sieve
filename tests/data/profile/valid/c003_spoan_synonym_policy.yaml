@@ -52,20 +52,20 @@ statement:
                 source_release: sieve:release/omim-2026-10-01
                 retrieval_date: "2026-10-02"
           resource: infores:omim
-          groundings:
+          resolution_chains:
             - id: sieve:chain/omim-609541
               type: ResolutionChain
               entity_slot: subject
               steps:
                 - id: sieve:step/omim-609541-1
                   type: AlignmentStep
-                  category: GROUNDING
+                  category: NORMALIZATION
                   method: SOURCE_ASSERTED
                   input_value: OMIM:609541
                   output_value: MONDO:0012297
                   predicate: skos:exactMatch
                   mapping_set_version: "2026-10-01"
-                  quality_category: grounding_curated
+                  quality_category: normalization_curated
                   confidence: 1.0
                   confidence_basis: DETERMINISTIC
       direction_of_evidence_provided: supports

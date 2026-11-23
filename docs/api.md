@@ -121,6 +121,7 @@ subject obsolescence is read from term status, not stored on mappings.
 | `METHOD_REQUIRED` | ERROR | AI or rule-based line without `specified_by`, or rule-based line without `computed_by_rule` (PROV.INTERP.METHODS) |
 | `SUPERSEDED_NOT_INVALIDATED` | ERROR | a superseded line is still VALID (EINT.FLAT_COLLAPSE) |
 | `CHAIN_CONTIGUITY` | ERROR | a resolution step does not read the previous step's output (PROV.SA.EXECUTION) |
+| `GROUNDING_INPUT_IS_ID` | ERROR | a GROUNDING step reads a CURIE; id-to-id steps are NORMALIZATION (PROV.SA.METHOD_TYPES) |
 | `BLIND_APPROVAL_EVIDENCE` | ERROR | a `review_depth: NONE` decision contributes an evidence line |
 | `OBSOLETE_TO_OBSOLETE`, `DEFINITION_WITHOUT_SOURCE`, `CONCORDANCE_DIRECTION`, `READ_COVERAGE_NOT_RECORDED` | WARNING | states that need a person |
 
